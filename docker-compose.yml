@@ -1,0 +1,21 @@
+version: '2'
+
+services:
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+
+  wp:
+    depends_on:
+      - db
+    build: .
+    ports:
+      - "8000:80"
+    volumes:
+      - ./doofinder-for-woocommerce:/usr/src/doofinder-for-woocommerce
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_PASSWORD: root
