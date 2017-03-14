@@ -52,7 +52,7 @@ Install and activate [as any other plugin](https://codex.wordpress.org/Managing_
 
 __Important:__ To use this plugin you need to have an account at Doofinder. If you don't have one you can signup [here](http://www.doofinder.com/signup) to get your 30 day free trial period.
 
-The minimum technical equirements are basically the same as the WooCommerce ones. This plugin requires PHP 5.4 or greater.
+The minimum technical equirements are basically the same as the WooCommerce ones. Take a look at their [server requirements](https://docs.woocommerce.com/document/server-requirements/) for more info.
 
 = Configuration =
 
