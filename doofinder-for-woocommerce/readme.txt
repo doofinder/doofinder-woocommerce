@@ -66,7 +66,7 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 
 == Changelog ==
 
-= 0.2.0 =
+= 1.0.0 =
 Plugin built from the ground up. Added feed pagination, custom attributes, WPML support and more.
 
 = 0.1.6 =
