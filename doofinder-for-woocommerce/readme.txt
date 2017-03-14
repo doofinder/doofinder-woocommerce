@@ -11,18 +11,13 @@ This plugin integrates the Doofinder search service with your WooCommerce shop.
 
 == Description ==
 
-Doofinder provides fast, accurate results based on your website contents.
-Results appear in your search box at an incredible speed as the user types.
+Doofinder provides fast, accurate results based on your website contents. Results appear in your search box at an incredible speed as the user types.
 
-Doofinder can be installed in any website with very little configuration (you
-give us a data feed and we give you a bit of javascript code).
+Doofinder can be installed in any website with very little configuration (you give us a data feed and we give you a bit of javascript code).
 
-This extension allows you to easily populate the data feed Doofinder needs to
-be able to search your database and to insert the Doofinder layer script into
-your WooCommerce site.
+This extension allows you to easily populate the data feed Doofinder needs to be able to search your database and to insert the Doofinder layer script into your WooCommerce site.
 
-With Doofinder you are confident that your visitors are finding what they are
-looking for regardless of the number of products in your site.
+With Doofinder you are confident that your visitors are finding what they are looking for regardless of the number of products in your site.
 
 These are some advantages of using Doofinder in your site:
 
@@ -36,9 +31,7 @@ These are some advantages of using Doofinder in your site:
 - Provides statistical information.
 - Doofinder brings back the control over the searches in your site to you.
 
-When users start typing in the search box, Doofinder displays the best results
-for their search. If users make typos, our algorithms will detect them and will
-perform the search as if the term were correctly typed.
+When users start typing in the search box, Doofinder displays the best results for their search. If users make typos, our algorithms will detect them and will perform the search as if the term were correctly typed.
 
 Furthermore, Doofinder sorts the results displaying the most relevant first.
 
