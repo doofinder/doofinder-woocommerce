@@ -214,6 +214,8 @@ class Data_Feed {
 	 * @since 1.0.0
 	 */
 	public function generate() {
+		header( 'Content-Type: text/plain' );
+
 		if (
 			'yes' !== $this->settings['protected'] ||
 			( isset( $_GET['secret'] ) && $this->settings['password'] === $_GET['secret'] )
@@ -223,7 +225,6 @@ class Data_Feed {
 			$this->render();
 		}
 
-		header( 'Content-Type: text/plain' );
 		echo '';
 	}
 
@@ -292,8 +293,6 @@ class Data_Feed {
 	 * @since 1.0.0
 	 */
 	private function render() {
-		header( 'Content-Type: text/plain' );
-
 		if ( empty( $this->products ) ) {
 			echo '';
 		} else {
