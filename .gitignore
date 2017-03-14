@@ -16,3 +16,6 @@ wp-content/plugins/hello.php
 /sitemap.xml
 /sitemap.xml.gz
 
+doofinder-for-woocommerce.zip
+node_modules
+build
