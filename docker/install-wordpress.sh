@@ -13,7 +13,8 @@ alias wp="wpcli --path=/var/www/html --allow-root"
 cd /var/www/html
 
 if ! $(wp core is-installed); then
-  wp core install --url=localhost:8000 --title=WooCommerce --admin_user=admin --admin_password=admin123 --admin_email=foo@bar.com --skip-email
+  echo "Installing WordPress at localhost:${DOCKER_SERVICE_PORT}"
+  wp core install --url=localhost:${DOCKER_SERVICE_PORT} --title=WooCommerce --admin_user=admin --admin_password=admin123 --admin_email=foo@bar.com --skip-email
 
   wp plugin install wordpress-importer --activate
   wp plugin install woocommerce --activate
