@@ -1,5 +1,10 @@
 version: '2'
 
+networks:
+  front:
+    external:
+      name: front
+
 services:
   db:
     image: mysql:5.7
@@ -11,11 +16,17 @@ services:
     depends_on:
       - db
     build: .
-    ports:
-      - "8000:80"
     volumes:
       - ./doofinder-for-woocommerce:/usr/src/doofinder-for-woocommerce
     restart: always
+    networks:
+      default:
+      front:
+        aliases:
+          - woocommerce
     environment:
       WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_PASSWORD: root
+      DOCKER_SERVICE_PORT: ${DOCKER_SERVICE_PORT}
+    ports:
+      - "${DOCKER_SERVICE_PORT}:80"
