@@ -18,7 +18,10 @@ module.exports = (grunt) ->
       txt:
         options:
           prefix: 'Version: '
-        src: ["doofinder-for-woocommerce/readme.txt"]
+        src: [
+          "doofinder-for-woocommerce/doofinder-for-woocommerce.php",
+          "doofinder-for-woocommerce/readme.txt"
+        ]
 
     compress:
       build:
