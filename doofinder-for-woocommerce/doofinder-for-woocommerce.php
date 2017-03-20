@@ -27,7 +27,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 			 *
 			 * @var string
 			 */
-			public static $version = '1.0.0';
+			public static $version = '1.0';
 
 			/**
 			 * The only instance of Doofinder_For_WooCommerce
