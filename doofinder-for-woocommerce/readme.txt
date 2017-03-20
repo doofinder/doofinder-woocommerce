@@ -1,6 +1,7 @@
 === Doofinder for WooCommerce ===
 Contributors: doofinder
 Tags: search, autocomplete, woocommerce
+Version: 1.0.0
 Requires at least: 4.1
 Tested up to: 4.7.3
 Stable tag: trunk
