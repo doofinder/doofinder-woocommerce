@@ -1,7 +1,7 @@
 === Doofinder for WooCommerce ===
 Contributors: doofinder
 Tags: search, autocomplete, woocommerce
-Version: 1.0.0
+Version: 1.0
 Requires at least: 4.1
 Tested up to: 4.7.3
 Stable tag: trunk
@@ -123,7 +123,7 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 
 == Changelog ==
 
-= 1.0.0 =
+= 1.0 =
 Plugin built from the ground up. Added feed pagination, custom attributes, WPML support and more.
 
 = 0.1.6 =
