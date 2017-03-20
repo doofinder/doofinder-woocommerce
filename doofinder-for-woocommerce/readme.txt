@@ -146,6 +146,6 @@ First usable version.
 
 == Upgrade Notice ==
 
-= 1.0.0 =
+= 1.0 =
 
 This version is recommended for all new and existing users.
