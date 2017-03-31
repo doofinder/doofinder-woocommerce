@@ -163,7 +163,7 @@ class Data_Feed_Item {
 			$title = $this->attributes->get( 'title', $post );
 		}
 
-		$this->fields['title'] = $title . $suffix;
+		$this->add_field( 'title', $title . $suffix );
 	}
 
 	/**
@@ -179,9 +179,9 @@ class Data_Feed_Item {
 		}
 
 		if ( $this->attributes->have( 'description' ) ) {
-			$this->fields['description'] = $this->attributes->get( 'description', $post );
+			$this->add_field( 'description', $this->attributes->get( 'description', $post ) );
 		} else {
-			$this->fields['description'] = $post->post_content;
+			$this->add_field( 'description', $post->post_content );
 		}
 	}
 
@@ -314,6 +314,20 @@ class Data_Feed_Item {
 	}
 
 	/* Helpers ********************************************************************/
+
+	/**
+	 * Add a field, but clean up the value from HTML, control characters, etc.
+	 *
+	 * @since 1.0.1
+	 * @param string $name  Field name to add.
+	 * @param string $value Field value to add.
+	 */
+	private function add_field( $name, $value ) {
+		$value = preg_replace( '/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $value );
+		$value = wp_strip_all_tags( $value );
+
+		$this->fields[ $name ] = $value;
+	}
 
 	/**
 	 * Get all categories (in forms of paths from term to the oldest ancestor) for a given term.

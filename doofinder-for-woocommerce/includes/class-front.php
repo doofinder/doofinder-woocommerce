@@ -61,15 +61,16 @@ class Front {
 	 * @since 1.0.0
 	 */
 	private function add_internal_search() {
-		add_filter( 'posts_pre_query', function() {
+		add_filter( 'posts_pre_query', function( $posts, $query ) {
 			global $wp_query, $skip_internal_search;
 
 			/*
 			 * Only use Internal Search on WooCommerce shop pages.
+			 * Only use it for the main product query.git
 			 * $skip_internal_search is a flag that prevents firing this filter in nested
 			 * queries.
 			 */
-			if ( ! is_shop() || true === $skip_internal_search ) {
+			if ( ! is_shop() || 'product' !== $query->query['post_type'] || true === $skip_internal_search ) {
 				return null;
 			}
 
@@ -94,6 +95,6 @@ class Front {
 			$wp_query->max_num_pages = $results['max_num_pages'];
 
 			return $results['ids'];
-		} );
+		}, 10, 2 );
 	}
 }
