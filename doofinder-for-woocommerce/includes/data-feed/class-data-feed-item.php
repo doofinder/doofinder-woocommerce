@@ -318,7 +318,7 @@ class Data_Feed_Item {
 	/**
 	 * Add a field, but clean up the value from HTML, control characters, etc.
 	 *
-	 * @since 1.1.0
+	 * @since 1.0.1
 	 * @param string $name  Field name to add.
 	 * @param string $value Field value to add.
 	 */
