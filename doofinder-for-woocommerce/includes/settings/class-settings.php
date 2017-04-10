@@ -33,7 +33,7 @@ class Settings {
 	 * @return string Full prefixed option name to store in DB.
 	 */
 	public static function option_id( $part1, $part2 = '', $suffix = '' ) {
-		$id = [ self::$prefix ];
+		$id = array( self::$prefix );
 		$id[] = $part1;
 
 		if ( $part2 ) {

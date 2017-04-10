@@ -117,10 +117,10 @@ class Multilanguage {
 		$multilanguage = self::instance();
 
 		if ( ! $multilanguage->is_active() ) {
-			call_user_func_array( $action, [ 'code' => '' ] );
+			call_user_func_array( $action, array( 'code' => '' ) );
 		} else {
 			foreach ( $multilanguage->handler->get_languages() as $language ) {
-				call_user_func_array( $action, [ 'code' => $language['prefix'] ] );
+				call_user_func_array( $action, array( 'code' => $language['prefix'] ) );
 			}
 		}
 	}

@@ -58,7 +58,8 @@ class Internal_Search {
 
 		$language_code = '';
 		if ( $multilanguage->is_active() ) {
-			$language_code = $multilanguage->get_default_language()['prefix'];
+			$default_language = $multilanguage->get_default_language();
+			$language_code = $default_language['prefix'];
 		}
 
 		$this->api_key = Settings::get( 'internal_search', 'api_key', $language_code );
