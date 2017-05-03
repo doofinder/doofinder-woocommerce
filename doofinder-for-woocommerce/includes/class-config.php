@@ -22,8 +22,9 @@ class Config {
 	 * @since 1.0.0
 	 */
 	public static function register() {
-		add_feed( 'doofinder-config', function() {
-			$feed = new self();
+		$class = __CLASS__;
+		add_feed( 'doofinder-config', function() use ( $class ) {
+			$feed = new $class();
 			$feed->generate();
 		} );
 	}
