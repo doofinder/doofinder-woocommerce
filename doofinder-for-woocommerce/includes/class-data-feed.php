@@ -85,8 +85,9 @@ class Data_Feed {
 	 * @since 1.0.0
 	 */
 	public static function register() {
-		add_feed( 'doofinder', function() {
-			$feed = new self();
+		$class = __CLASS__;
+		add_feed( 'doofinder', function() use ( $class ) {
+			$feed = new $class();
 			$feed->generate();
 		} );
 	}
