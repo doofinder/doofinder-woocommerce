@@ -1,7 +1,7 @@
 === Doofinder for WooCommerce ===
 Contributors: doofinder
 Tags: search, autocomplete, woocommerce
-Version: 1.0.3
+Version: 1.2.0
 Requires at least: 4.1
 Tested up to: 4.7.3
 Stable tag: trunk
@@ -93,6 +93,9 @@ The password protecting the product feed.
 
 If this option is selected the product feed will contain prices of the products. If it is not selected then prices will be omitted.
 
+**Export product tags**
+If this options is selected, product tags will be exported in the feed under the `tags` tag.
+
 **Split variable products**
 
 If this option is selected then each variation of the variable product will be exported as a separate product.
@@ -122,6 +125,9 @@ You can click *Delete* to remove the additional attributes from the feed.
 Just send your questions to <mailto:support@doofinder.com> and we will try to answer as fast as possible with a working solution for you.
 
 == Changelog ==
+
+= 1.2.0 =
+Added Export Product Tags feature.
 
 = 1.0.3 =
 More backwards compatibility with PHP 5.3.
