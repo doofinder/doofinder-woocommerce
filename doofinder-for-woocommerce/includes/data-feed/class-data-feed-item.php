@@ -93,13 +93,15 @@ class Data_Feed_Item {
 		$this->add_link();
 		$this->add_title();
 		$this->add_description();
-		$this->add_product_type();
 		$this->add_group_id();
 		$this->add_variation_attributes();
 		$this->add_availability();
 		$this->add_sku();
 		$this->add_thumbnail();
 		$this->add_prices();
+
+		$this->add_product_type();
+		$this->add_tags();
 
 		$this->add_additional_attributes();
 	}
@@ -182,20 +184,6 @@ class Data_Feed_Item {
 			$this->add_field( 'description', $this->attributes->get( 'description', $post ) );
 		} else {
 			$this->add_field( 'description', $post->post_content );
-		}
-	}
-
-	/**
-	 * Add categories.
-	 * Product variations don't have categories so we have to grab them from parent.
-	 *
-	 * @since 1.0.0
-	 */
-	private function add_product_type() {
-		if ( $this->parent ) {
-			$this->fields['product_type'] = $this->get_categories( $this->parent->ID );
-		} else {
-			$this->fields['product_type'] = $this->get_categories( $this->product->post->ID );
 		}
 	}
 
@@ -296,6 +284,51 @@ class Data_Feed_Item {
 		}
 	}
 
+	/* Taxonomies *****************************************************************/
+
+	/**
+	 * Add categories.
+	 * Product variations don't have categories so we have to grab them from parent.
+	 *
+	 * @since 1.0.0
+	 */
+	private function add_product_type() {
+		if ( $this->parent ) {
+			$this->fields['product_type'] = $this->get_categories( $this->parent->ID );
+		} else {
+			$this->fields['product_type'] = $this->get_categories( $this->product->post->ID );
+		}
+	}
+
+	/**
+	 * Add tags.
+	 * Product variations don't have tags so we have to grab them from parent.
+	 * Whether or not tags are exported can be controlled via settings.
+	 *
+	 * @since 1.2.0
+	 */
+	private function add_tags() {
+		if ( 'yes' !== $this->settings['export_tags'] ) {
+			return;
+		}
+
+		$id = $this->product->post->ID;
+		if ( $this->parent ) {
+			$id = $this->parent->ID;
+		}
+
+		$tags = wp_get_post_terms( $id, 'product_tag' );
+		if ( ! $tags ) {
+			return;
+		}
+
+		$tags = array_map( function( $tag ) {
+			return $tag->name;
+		}, $tags );
+
+		$this->fields['tags'] = implode( '/', $tags );
+	}
+
 	/* Additional fields **********************************************************/
 
 	/**
@@ -318,7 +351,7 @@ class Data_Feed_Item {
 	/**
 	 * Add a field, but clean up the value from HTML, control characters, etc.
 	 *
-	 * @since 1.0.1
+	 * @since 1.1.0
 	 * @param string $name  Field name to add.
 	 * @param string $value Field value to add.
 	 */

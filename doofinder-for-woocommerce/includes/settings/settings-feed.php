@@ -52,6 +52,14 @@ return array(
 		'default' => 'yes',
 	),
 
+	array(
+		'title'   => __( 'Export product tags', 'woocommerce-doofinder' ),
+		'desc'    => '',
+		'id'      => Settings::option_id( 'feed', 'export_tags', $affix ),
+		'type'    => 'checkbox',
+		'default' => 'no',
+	),
+
 	/*
 	 * Image size configuration temporarily omitted.
 	 */
