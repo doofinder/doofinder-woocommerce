@@ -5,7 +5,6 @@ namespace Doofinder\WC;
 use Doofinder\WC\Data_Feed\Data_Feed_Item;
 use Doofinder\WC\Data_Feed\Feed_XML;
 use Doofinder\WC\Settings\Settings;
-use Symfony\Component\Config\Definition\Exception\Exception;
 
 defined( 'ABSPATH' ) or die;
 
@@ -111,6 +110,7 @@ class Data_Feed {
 		$this->settings = array(
 			// Doofinder settings
 			'export_prices'  => Settings::get( 'feed', 'export_prices', $this->language ),
+			'export_tags'    => Settings::get( 'feed', 'export_tags', $this->language ),
 			'image_size'     => Settings::get( 'feed', 'image_size', $this->language ),
 			'split_variable' => Settings::get( 'feed', 'split_variable', $this->language ),
 			'protected'      => Settings::get( 'feed', 'password_protected', $this->language ),
