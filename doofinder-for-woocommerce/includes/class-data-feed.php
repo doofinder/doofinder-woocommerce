@@ -142,6 +142,11 @@ class Data_Feed {
 			'ignore_sticky_posts' => 1,
 
 			'meta_query' => array(
+				'relation' => 'OR',
+				array(
+					'key' => '_visibility',
+					'compare' => 'NOT EXISTS',
+				),
 				array(
 					'key' => '_visibility',
 					'value' => array( 'search', 'visible' ),
