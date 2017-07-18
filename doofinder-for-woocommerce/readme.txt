@@ -1,9 +1,9 @@
 === Doofinder for WooCommerce ===
 Contributors: doofinder
 Tags: search, autocomplete, woocommerce
-Version: 1.2.0
+Version: 1.2.1
 Requires at least: 4.1
-Tested up to: 4.7.3
+Tested up to: 4.8
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -125,6 +125,9 @@ You can click *Delete* to remove the additional attributes from the feed.
 Just send your questions to <mailto:support@doofinder.com> and we will try to answer as fast as possible with a working solution for you.
 
 == Changelog ==
+
+= 1.2.1 =
+Fixed bug that prevented products with no explicit visibility set from being exported in the data feed.
 
 = 1.2.0 =
 Added Export Product Tags feature.
