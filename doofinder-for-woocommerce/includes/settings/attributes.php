@@ -1,6 +1,6 @@
 <?php
 
-return array(
+$attributes_array = array(
 	/*
 	 * WordPress fields
 	 */
@@ -81,3 +81,16 @@ return array(
 		'source' => '_height',
 	),
 );
+
+$wc_attributes = wc_get_attribute_taxonomies();
+
+foreach ($wc_attributes as $wc_attribute) {
+
+	$attributes_array['pa_'.$wc_attribute->attribute_name] = array(
+		'title'  => __( 'Custom Attribute:', 'woocommerce-doofinder' ).' '.$wc_attribute->attribute_label,
+		'type'   => 'wc_attribute',
+		'source' => $wc_attribute->attribute_name,
+	);
+}
+
+return $attributes_array;
