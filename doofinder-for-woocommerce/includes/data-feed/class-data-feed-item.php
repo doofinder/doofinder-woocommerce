@@ -459,8 +459,13 @@ class Data_Feed_Item {
 			$pricing[] = $product->get_price_including_tax( 1, $regular_price );
 			$pricing[] = $sale_price ? $product->get_price_including_tax( 1, $sale_price ) : false;
 		} else {
-			$pricing[] = wc_get_price_excluding_tax( $product, array( 1, $regular_price ) );
-			$pricing[] = $sale_price ? $product->get_price_excluding_tax($product, array( 1, $sale_price ) ) : false;
+			if ( function_exists( 'wc_get_price_excluding_tax' ) ) {
+				$pricing[] = wc_get_price_excluding_tax( $product, array( 1, $regular_price ) );
+				$pricing[] = $sale_price ? $product->get_price_excluding_tax($product, array( 1, $sale_price ) ) : false;
+			} else {
+				$pricing[] = $product->get_price_excluding_tax( 1, $regular_price );
+				$pricing[] = $sale_price ? $product->get_price_excluding_tax( 1, $sale_price ) : false;
+			}
 		}
 
 		return $pricing;
