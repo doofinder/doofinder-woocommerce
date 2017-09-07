@@ -158,10 +158,11 @@ class Attributes {
 	 * @param string   $source  Name of the product attribute.
 	 * @param \WP_Post $product Product to retrieve attribute from.
 	 * @return mixed The attribute value.
+	 * @since 1.2.2
 	 */
 	private function get_attribute_wc( $source, $product ) {
-		$_pf = new WC_Product_Factory();
-		$product_object = $_pf->get_product($product->ID);
-		return $product_object->get_attribute($source);
+		$product_factory = new \WC_Product_Factory();
+		$product_object = $product_factory->get_product( $product->ID );
+		return $product_object->get_attribute( $source );
 	}
 }

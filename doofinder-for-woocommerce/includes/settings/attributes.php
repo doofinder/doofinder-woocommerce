@@ -84,10 +84,9 @@ $attributes_array = array(
 
 $wc_attributes = wc_get_attribute_taxonomies();
 
-foreach ($wc_attributes as $wc_attribute) {
-
-	$attributes_array['pa_'.$wc_attribute->attribute_name] = array(
-		'title'  => __( 'Custom Attribute:', 'woocommerce-doofinder' ).' '.$wc_attribute->attribute_label,
+foreach ( $wc_attributes as $wc_attribute ) {
+	$attributes_array[ 'pa_' . $wc_attribute->attribute_name ] = array(
+		'title'  => __( 'Custom Attribute:', 'woocommerce-doofinder' ) . ' ' . $wc_attribute->attribute_label,
 		'type'   => 'wc_attribute',
 		'source' => $wc_attribute->attribute_name,
 	);
