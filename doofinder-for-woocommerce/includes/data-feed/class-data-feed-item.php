@@ -104,6 +104,8 @@ class Data_Feed_Item {
 		$this->add_tags();
 
 		$this->add_additional_attributes();
+
+		$this->remove_empty_fields();
 	}
 
 	/**
@@ -343,6 +345,19 @@ class Data_Feed_Item {
 		$attributes = array_map( 'wp_parse_args', $attributes );
 		foreach( $attributes as $attribute ) {
 			$this->fields[ $attribute['field'] ] = $this->attributes->get_attribute_value( $attribute[ 'attribute' ], $this->post );
+		}
+	}
+
+	/**
+	 * Removes all empty fields
+	 *
+	 * @since 1.2.2
+	 */
+	private function remove_empty_fields() {
+		foreach ( $this->fields as $key => $field ) {
+			if ( empty( $this->fields[ $key ] ) ) {
+				unset( $this->fields[ $key ] );
+			}
 		}
 	}
 
