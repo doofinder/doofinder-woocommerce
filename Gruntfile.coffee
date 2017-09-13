@@ -19,7 +19,6 @@ module.exports = (grunt) ->
         options:
           prefix: 'Version: '
         src: [
-          "doofinder-for-woocommerce/doofinder-for-woocommerce.php",
           "doofinder-for-woocommerce/readme.txt"
         ]
 
@@ -34,4 +33,4 @@ module.exports = (grunt) ->
         }]
 
   grunt.registerTask "default", ["version"]
-  grunt.registerTask "release", ["version", "clean", "copy", "compress"]
+  grunt.registerTask "build", ["clean", "copy", "compress"]

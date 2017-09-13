@@ -104,6 +104,8 @@ class Data_Feed_Item {
 		$this->add_tags();
 
 		$this->add_additional_attributes();
+
+		$this->remove_empty_fields();
 	}
 
 	/**
@@ -135,9 +137,9 @@ class Data_Feed_Item {
 	 */
 	private function add_link() {
 		if ( $this->attributes->have( 'link' ) ) {
-			$this->fields['link'] = $this->attributes->get( 'link', $this->product->post );
+			$this->fields['link'] = $this->attributes->get( 'link', $this->post );
 		} else {
-			$this->fields['link'] = get_permalink( $this->product->post );
+			$this->fields['link'] = get_permalink( $this->post );
 		}
 	}
 
@@ -155,7 +157,7 @@ class Data_Feed_Item {
 			$suffix = ' (' . implode( ', ', $attributes ) . ')';
 		}
 
-		$post = $this->product->post;
+		$post = $this->post;
 		if ( $this->parent ) {
 			$post = $this->parent;
 		}
@@ -175,7 +177,7 @@ class Data_Feed_Item {
 	 * @since 1.0.0
 	 */
 	private function add_description() {
-		$post = $this->product->post;
+		$post = $this->post;
 		if ( $this->parent ) {
 			$post = $this->parent;
 		}
@@ -248,7 +250,7 @@ class Data_Feed_Item {
 	 */
 	private function add_thumbnail() {
 		$size = 'full';
-		$image_id = get_post_thumbnail_id( $this->product->id );
+		$image_id = get_post_thumbnail_id( $this->post->ID );
 
 		if ( $this->settings['image_size'] && has_image_size( $this->settings['image_size'] ) ) {
 			$size = $this->settings['image_size'];
@@ -296,7 +298,7 @@ class Data_Feed_Item {
 		if ( $this->parent ) {
 			$this->fields['product_type'] = $this->get_categories( $this->parent->ID );
 		} else {
-			$this->fields['product_type'] = $this->get_categories( $this->product->post->ID );
+			$this->fields['product_type'] = $this->get_categories( $this->post->ID );
 		}
 	}
 
@@ -312,7 +314,7 @@ class Data_Feed_Item {
 			return;
 		}
 
-		$id = $this->product->post->ID;
+		$id = $this->post->ID;
 		if ( $this->parent ) {
 			$id = $this->parent->ID;
 		}
@@ -343,6 +345,19 @@ class Data_Feed_Item {
 		$attributes = array_map( 'wp_parse_args', $attributes );
 		foreach( $attributes as $attribute ) {
 			$this->fields[ $attribute['field'] ] = $this->attributes->get_attribute_value( $attribute[ 'attribute' ], $this->post );
+		}
+	}
+
+	/**
+	 * Removes all empty fields
+	 *
+	 * @since 1.2.2
+	 */
+	private function remove_empty_fields() {
+		foreach ( $this->fields as $key => $field ) {
+			if ( empty( $this->fields[ $key ] ) ) {
+				unset( $this->fields[ $key ] );
+			}
 		}
 	}
 
@@ -459,8 +474,13 @@ class Data_Feed_Item {
 			$pricing[] = $product->get_price_including_tax( 1, $regular_price );
 			$pricing[] = $sale_price ? $product->get_price_including_tax( 1, $sale_price ) : false;
 		} else {
-			$pricing[] = $product->get_price_excluding_tax( 1, $regular_price );
-			$pricing[] = $sale_price ? $product->get_price_excluding_tax( 1, $sale_price ) : false;
+			if ( function_exists( 'wc_get_price_excluding_tax' ) ) {
+				$pricing[] = wc_get_price_excluding_tax( $product, array( 1, $regular_price ) );
+				$pricing[] = $sale_price ? $product->get_price_excluding_tax($product, array( 1, $sale_price ) ) : false;
+			} else {
+				$pricing[] = $product->get_price_excluding_tax( 1, $regular_price );
+				$pricing[] = $sale_price ? $product->get_price_excluding_tax( 1, $sale_price ) : false;
+			}
 		}
 
 		return $pricing;

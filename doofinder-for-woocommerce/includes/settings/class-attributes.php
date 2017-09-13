@@ -104,6 +104,10 @@ class Attributes {
 			case 'meta':
 				$value = $this->get_attribute_meta( $attribute['source'], $product );
 				break;
+
+			case 'wc_attribute':
+				$value = $this->get_attribute_wc( $attribute['source'], $product );
+				break;
 		}
 
 		// Check if we should export units
@@ -146,5 +150,19 @@ class Attributes {
 	 */
 	private function get_attribute_meta( $source, $product ) {
 		return get_post_meta( $product->ID, $source, true );
+	}
+
+	/**
+	 * Get the value of woocommerce product attribute.
+	 *
+	 * @param string   $source  Name of the product attribute.
+	 * @param \WP_Post $product Product to retrieve attribute from.
+	 * @return mixed The attribute value.
+	 * @since 1.2.2
+	 */
+	private function get_attribute_wc( $source, $product ) {
+		$product_factory = new \WC_Product_Factory();
+		$product_object = $product_factory->get_product( $product->ID );
+		return $product_object->get_attribute( $source );
 	}
 }
