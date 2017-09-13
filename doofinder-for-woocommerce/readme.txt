@@ -127,7 +127,7 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 == Changelog ==
 
 = 1.2.2 =
-Added custom product attributes options to attribute selection fields
+Added custom product attributes options to attribute selection fields. Now empty fields are not exported, saving space in the data feed.
 
 = 1.2.1 =
 Fixed bug that prevented products with no explicit visibility set from being exported in the data feed.
