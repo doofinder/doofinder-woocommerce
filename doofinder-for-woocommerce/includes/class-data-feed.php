@@ -152,6 +152,10 @@ class Data_Feed {
 					'value' => array( 'search', 'visible' ),
 					'compare' => 'IN',
 				),
+				array(
+					'key' => '_visibility',
+					'value' => ''
+				),
 			),
 
 			'posts_per_page' => -1,
