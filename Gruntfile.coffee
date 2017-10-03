@@ -13,12 +13,13 @@ module.exports = (grunt) ->
         dest: "build"
 
     version:
-      php:
+      code:
         src: ["doofinder-for-woocommerce/doofinder-for-woocommerce.php"]
-      txt:
+      text:
         options:
           prefix: 'Version: '
         src: [
+          "doofinder-for-woocommerce/doofinder-for-woocommerce.php",
           "doofinder-for-woocommerce/readme.txt"
         ]
 
