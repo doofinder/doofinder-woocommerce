@@ -7,6 +7,6 @@ To learn more check the [plugin page](https://wordpress.org/plugins-wp/doofinder
 ## Developers
 
 ```
-$ grunt         # Change version number
-$ grunt release # Change version number and build the release
+$ grunt       # Changes version number
+$ grunt build # Builds the release
 ```
