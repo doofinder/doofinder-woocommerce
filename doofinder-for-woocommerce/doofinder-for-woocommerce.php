@@ -6,6 +6,8 @@
  * Version: 1.2.4
  * Author: doofinder
  * Description: Integrate Doofinder Search in your WooCommerce shop.
+ * WC requires at least: 2.1.0
+ * WC tested up to: 3.2.1
  *
  * @package WordPress
  */
