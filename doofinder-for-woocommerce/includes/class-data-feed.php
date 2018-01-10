@@ -85,7 +85,7 @@ class Data_Feed {
 	 */
 	public static function register() {
 		$class = __CLASS__;
-		add_feed( 'doofinder', function() use ( $class ) {
+		add_feed( 'doofinder', function () use ( $class ) {
 			$feed = new $class();
 			$feed->generate();
 		} );
@@ -97,6 +97,7 @@ class Data_Feed {
 	 * Data_Feed constructor.
 	 *
 	 * @since 1.0.0
+	 *
 	 * @param string $language Language of the feed to show.
 	 */
 	public function __construct() {
@@ -117,12 +118,12 @@ class Data_Feed {
 			'password'       => Settings::get( 'feed', 'password', $this->language ),
 
 			// WooCommerce settings
-			'include_taxes'  => ( 'incl' === get_option('woocommerce_tax_display_shop') ),
+			'include_taxes'  => ( 'incl' === get_option( 'woocommerce_tax_display_shop' ) ),
 		);
 
 		// Load required data from DB.
-		foreach( get_terms( 'product_cat' ) as $term ) {
-			$this->terms_cache[$term->term_id] = $term;
+		foreach ( get_terms( 'product_cat' ) as $term ) {
+			$this->terms_cache[ $term->term_id ] = $term;
 		}
 
 		$this->load_products();
@@ -135,40 +136,66 @@ class Data_Feed {
 	 * @since 1.0.0
 	 */
 	private function load_products() {
+		global $woocommerce;
+
 		$args = array(
-			'post_type' => 'product',
+			'post_type'   => 'product',
 			'post_status' => 'publish',
 
 			'ignore_sticky_posts' => 1,
 
-			'meta_query' => array(
-				'relation' => 'OR',
-				array(
-					'key' => '_visibility',
-					'compare' => 'NOT EXISTS',
-				),
-				array(
-					'key' => '_visibility',
-					'value' => array( 'search', 'visible' ),
-					'compare' => 'IN',
-				),
-				array(
-					'key' => '_visibility',
-					'value' => ''
-				),
-			),
-
 			'posts_per_page' => -1,
 
 			'orderby' => 'ID',
-			'order' => 'ASC',
+			'order'   => 'ASC',
 
-			'cache_results' => false,
+			'cache_results'          => false,
 			'update_post_meta_cache' => false,
 			'update_post_term_cache' => false,
 		);
 
+		// Visibility
+		// We should only show products that have catalog visibility set to search.
+		// However different WooCommerce version store it in different places.
+
+		// Version 3+
+		// Since version 3.0.0 catalog visibility became a taxonomy.
+		// Whenever the product is hidden from search the term "exclude-from-search"
+		// is added.
+		if ( version_compare( $woocommerce->version, '3.0.0', '>=' ) ) {
+			$args['tax_query'] = array(
+				array(
+					'taxonomy' => 'product_visibility',
+					'field'    => 'name',
+					'terms'    => array( 'exclude-from-search' ),
+					'operator' => 'NOT IN',
+				),
+			);
+		}
+
+		// Version 2+
+		// In older versions visibility was stored as a post meta on the product.
+		else {
+			$args['meta_query'] = array(
+				'relation' => 'OR',
+				array(
+					'key'     => '_visibility',
+					'compare' => 'NOT EXISTS',
+				),
+				array(
+					'key'     => '_visibility',
+					'value'   => array( 'search', 'visible' ),
+					'compare' => 'IN',
+				),
+				array(
+					'key'   => '_visibility',
+					'value' => '',
+				),
+			);
+		}
+
 		// GET parameters
+		// 'limit' and 'offset' parameters create pagination.
 		$limit = 0;
 		if ( isset( $_GET['limit'] ) && ! empty( $_GET['limit'] ) ) {
 			$limit = (int) $_GET['limit'];
@@ -261,7 +288,7 @@ class Data_Feed {
 			if ( 'yes' === $this->settings['split_variable'] && $product->is_type( 'variable' ) ) {
 				$children = $product->get_children();
 
-				foreach( $children as $child ) {
+				foreach ( $children as $child ) {
 					$item = new Data_Feed_Item(
 						$this->product_variations[ $child ],
 						$product->post,
