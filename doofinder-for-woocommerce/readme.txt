@@ -1,9 +1,9 @@
 === Doofinder for WooCommerce ===
-Contributors: doofinder
-Tags: search, autocomplete, woocommerce
-Version: 1.2.5
+Contributors: doofinder, chop chop
+Tags: search, autocomplete, woo commerce, e-commerce, ecommerce, sales, shop
+Version: 1.2.6
 Requires at least: 4.1
-Tested up to: 4.8
+Tested up to: 4.9.1
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -126,7 +126,10 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 
 == Changelog ==
 
-= 1.2.4 =
+= 1.2.6 =
+Handle taxonomy based catalog visibility for WooCommerce 3+.
+
+= 1.2.5 =
 Just added WooCommerce version checks.
 
 = 1.2.4 =
