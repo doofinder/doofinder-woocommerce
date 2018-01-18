@@ -217,8 +217,22 @@ class Data_Feed_Item {
 
 		$attributes = $this->product->get_variation_attributes();
 		foreach ( array_keys( $attributes ) as $attribute ) {
-			$values = array_map( 'trim', preg_split('/\,/', $this->product->get_attribute( $attribute ) ) );
-			$this->fields[ str_replace( 'pa_', '', $attribute ) ] = implode( '/', $values );
+			$values = array_map( 'trim', preg_split( '/\,/', $this->product->get_attribute( $attribute ) ) );
+
+			// Custom attributes added at the product level can have
+			// characters in them that are not allowed in XML tags,
+			// and therefore need to be slugified.
+
+			// Woo adds 'pa_' to attributes added in "Attributes" men.
+			$slug = str_replace( 'pa_', '', $attribute );
+
+			// Make lowercase, remove all non-url characters.
+			$slug = sanitize_title( $slug );
+
+			// "sanitize_title" separates words using "-"; use "_" instead.
+			$slug = preg_replace( '/-/', '_', $slug );
+
+			$this->fields[ $slug ] = implode( '/', $values );
 		}
 	}
 
