@@ -74,6 +74,7 @@ class Data_Feed_Item {
 	 * $parent should be passed only when $post is a product variation.
 	 *
 	 * @since 1.0.0
+	 *
 	 * @param \WP_Post $post        WooCommerce product to add to feed.
 	 * @param \WP_Post $parent      Parent of $product, if $product is a variable product.
 	 * @param array    $settings    Doofinder and WC settings.
@@ -81,11 +82,11 @@ class Data_Feed_Item {
 	 * @param array    $terms_cache All product categories loaded from DB.
 	 */
 	public function __construct( $post, $parent = null, $settings, &$paths_cache, &$terms_cache ) {
-		$this->post        = $post;
-		$this->product     = WC()->product_factory->get_product( $post );
-		$this->parent      = $parent;
-		$this->settings    = $settings;
-		$this->attributes  = Attributes::instance();
+		$this->post = $post;
+		$this->product = WC()->product_factory->get_product( $post );
+		$this->parent = $parent;
+		$this->settings = $settings;
+		$this->attributes = Attributes::instance();
 		$this->paths_cache = &$paths_cache;
 		$this->terms_cache = &$terms_cache;
 
@@ -274,15 +275,16 @@ class Data_Feed_Item {
 			return;
 		}
 
-		list( $regular_price, $sale_price ) = $this->get_prices( $this->product );
+		$prices = $this->get_prices( $this->product );
 
-		if ( $regular_price ) {
-			$this->fields['price'] = $regular_price;
+		if ( $prices['regular'] ) {
+			$this->fields['price'] = $prices['regular'];
 		}
 
-		if ( $sale_price ) {
-			$field_name = $regular_price ? 'sale_price' : 'price';
-			$this->fields[ $field_name ] = $sale_price;
+		if ( $prices['sale'] ) {
+			// If there's no regular price display sale price as regular.
+			$field_name = $prices['regular'] ? 'sale_price' : 'price';
+			$this->fields[ $field_name ] = $prices['sale'];
 		}
 	}
 
@@ -324,7 +326,7 @@ class Data_Feed_Item {
 			return;
 		}
 
-		$tags = array_map( function( $tag ) {
+		$tags = array_map( function ( $tag ) {
 			return $tag->name;
 		}, $tags );
 
@@ -343,8 +345,8 @@ class Data_Feed_Item {
 		}
 
 		$attributes = array_map( 'wp_parse_args', $attributes );
-		foreach( $attributes as $attribute ) {
-			$this->fields[ $attribute['field'] ] = $this->attributes->get_attribute_value( $attribute[ 'attribute' ], $this->post );
+		foreach ( $attributes as $attribute ) {
+			$this->fields[ $attribute['field'] ] = $this->attributes->get_attribute_value( $attribute['attribute'], $this->post );
 		}
 	}
 
@@ -367,6 +369,7 @@ class Data_Feed_Item {
 	 * Add a field, but clean up the value from HTML, control characters, etc.
 	 *
 	 * @since 1.1.0
+	 *
 	 * @param string $name  Field name to add.
 	 * @param string $value Field value to add.
 	 */
@@ -381,7 +384,9 @@ class Data_Feed_Item {
 	 * Get all categories (in forms of paths from term to the oldest ancestor) for a given term.
 	 *
 	 * @since 1.0.0
+	 *
 	 * @param int $id ID of WP_Post to get categories for.
+	 *
 	 * @return string All category paths.
 	 */
 	private function get_categories( $id ) {
@@ -389,12 +394,13 @@ class Data_Feed_Item {
 		$terms = get_the_terms( $id, 'product_cat' );
 
 		if ( is_array( $terms ) ) {
-			foreach( $terms as $term ) {
+			foreach ( $terms as $term ) {
 				$paths[] = $this->get_category_path( $term );
 			}
 		}
 
 		$this->clean_paths( $paths );
+
 		return implode( '%%', $paths );
 	}
 
@@ -406,7 +412,7 @@ class Data_Feed_Item {
 	 */
 	private function clean_paths( &$paths ) {
 		sort( $paths );
-		for ( $x = 0, $i = 1, $j = count( $paths ); $i < $j; $x = $i++ ) {
+		for ( $x = 0, $i = 1, $j = count( $paths ); $i < $j; $x = $i ++ ) {
 			if ( strpos( $paths[ $i ], $paths[ $x ] ) === 0 ) {
 				unset( $paths[ $x ] );
 			}
@@ -417,7 +423,9 @@ class Data_Feed_Item {
 	 * Generate a path from the given term to the oldest ancestor.
 	 *
 	 * @since 1.0.0
+	 *
 	 * @param \WP_Term $term
+	 *
 	 * @return array|mixed|string
 	 */
 	private function get_category_path( \WP_Term $term ) {
@@ -450,39 +458,113 @@ class Data_Feed_Item {
 	 * Get regular and sale price of the Product.
 	 *
 	 * @since 1.0.0
-	 * @param \WC_Product $product
+	 *
+	 * @param \WC_Product|\WC_Product_Variable $product
+	 *
 	 * @return array Regular and sale price.
 	 */
-	private function get_prices( $product )	{
-		$pricing = array();
-		$regular_price = false;
-		$sale_price = false;
-
+	private function get_prices( $product ) {
+		// Calculate prices for variable products
 		if ( $product->is_type( 'variable' ) ) {
-			$regular_price = $product->get_variation_regular_price( 'min' );
-			if ( $product->is_on_sale() ) {
-				$sale_price = $product->get_variation_sale_price( 'min' );
-			}
-		} else {
-			$regular_price = $product->get_regular_price();
-			if ( $product->is_on_sale() ) {
-				$sale_price = $product->get_sale_price();
-			}
+			return $this->get_variable_prices( $product );
+		}
+
+		// Calculate prices for non-variable products
+		$prices = array( 'regular' => $product->get_regular_price() );
+		if ( $product->is_on_sale() ) {
+			$prices['sale'] = $product->get_sale_price();
 		}
 
 		if ( $this->settings['include_taxes'] ) {
-			$pricing[] = $product->get_price_including_tax( 1, $regular_price );
-			$pricing[] = $sale_price ? $product->get_price_including_tax( 1, $sale_price ) : false;
-		} else {
-			if ( function_exists( 'wc_get_price_excluding_tax' ) ) {
-				$pricing[] = wc_get_price_excluding_tax( $product, array( 1, $regular_price ) );
-				$pricing[] = $sale_price ? $product->get_price_excluding_tax($product, array( 1, $sale_price ) ) : false;
+			// Methods for retrieving prices with taxes on \WC_Product have been
+			// deprecated in Woo 3.0.0, but we want to make sure we don't crash
+			// and retrieve the prices correctly if older version of WooCommerce
+			// is installed.
+			if ( function_exists( 'wc_get_price_including_tax' ) ) {
+				$prices = $this->get_simple_prices_with_taxes( $product, $prices );
 			} else {
-				$pricing[] = $product->get_price_excluding_tax( 1, $regular_price );
-				$pricing[] = $sale_price ? $product->get_price_excluding_tax( 1, $sale_price ) : false;
+				$prices = $this->get_simple_prices_with_taxes_legacy( $product, $prices );
 			}
 		}
 
-		return $pricing;
+		return $prices;
+	}
+
+	/**
+	 * Retrieve prices with taxes for non-variable product.
+	 *
+	 * @since 1.2.6
+	 *
+	 * @param \WC_Product $product
+	 * @param array       $prices
+	 *
+	 * @return array
+	 */
+	private function get_simple_prices_with_taxes( $product, $prices ) {
+		$prices['regular'] = wc_get_price_including_tax( $product, array(
+			'qty'   => 1,
+			'price' => $prices['regular'],
+		) );
+
+		if ( isset( $prices['sale'] ) ) {
+			$prices['sale'] = wc_get_price_including_tax( $product, array(
+				'qty'   => 1,
+				'price' => $prices['sale'],
+			) );
+		}
+
+		return $prices;
+	}
+
+	/**
+	 * Retrieve prices with taxes for the non-variable product.
+	 *
+	 * This function is here to provide WooCommerce 2.* compatibility,
+	 * as it uses legacy methods on \WC_Product that were deprecated
+	 * in WooCommerce 3.0.0. It will not be used if new version
+	 * of WooCommerce is installed.
+	 *
+	 * @since 1.2.6
+	 *
+	 * @param \WC_Product $product
+	 * @param array       $prices
+	 *
+	 * @return array
+	 */
+	private function get_simple_prices_with_taxes_legacy( $product, $prices ) {
+		$prices['regular'] = $product->get_price_including_tax( 1, $prices['regular'] );
+
+		if ( isset( $prices['sale'] ) ) {
+			$prices['sale'] = $product->get_price_including_tax( 1, $prices['sale'] );
+		}
+
+		return $prices;
+	}
+
+	/**
+	 * Retrieve regular and (optionally) sale price for a variable product.
+	 *
+	 * @since 1.2.6
+	 *
+	 * @param \WC_Product_Variable $product
+	 *
+	 * @return array
+	 */
+	private function get_variable_prices( $product ) {
+		$include_taxes = (bool) $this->settings['include_taxes'];
+
+		$regular_price = $product->get_variation_regular_price( 'min', $include_taxes );
+		$sale_price = false;
+
+		if ( $product->is_on_sale() ) {
+			$sale_price = $product->get_variation_sale_price( 'min', $include_taxes );
+		}
+
+		$prices = array( 'regular' => $regular_price );
+		if ( $sale_price ) {
+			$prices['sale'] = $sale_price;
+		}
+
+		return $prices;
 	}
 }
