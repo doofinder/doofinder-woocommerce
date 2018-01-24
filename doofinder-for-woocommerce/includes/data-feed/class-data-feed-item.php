@@ -219,6 +219,11 @@ class Data_Feed_Item {
 		foreach ( array_keys( $attributes ) as $attribute ) {
 			$values = array_map( 'trim', preg_split( '/\,/', $this->product->get_attribute( $attribute ) ) );
 
+			foreach ( $values as $key => $val ) {
+				$val = str_replace('/', '//', $val );
+				$values[ $key ] = str_replace( ' | ', '/', $val );
+			}
+
 			// Custom attributes added at the product level can have
 			// characters in them that are not allowed in XML tags,
 			// and therefore need to be slugified.
