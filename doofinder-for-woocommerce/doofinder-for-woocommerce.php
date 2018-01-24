@@ -3,7 +3,7 @@
  * Plugin Name: Doofinder for WooCommerce
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 1.2.6
+ * Version: 1.2.7
  * Author: doofinder
  * Description: Integrate Doofinder Search in your WooCommerce shop.
  * WC requires at least: 2.1.0
@@ -17,7 +17,13 @@ namespace Doofinder\WC;
 defined( 'ABSPATH' ) or die;
 
 // Initialize only if WooCommerce is installed
-if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ):
+if (
+	// Check if plugin is installed on the current site
+	in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ||
+
+	// Check if plugin is installed site-wide in multi-site environment
+	array_key_exists( 'woocommerce/woocommerce.php', apply_filters( 'active_sitewide_plugins', get_site_option( 'active_sitewide_plugins' ) ) )
+):
 
 	if ( ! class_exists( '\Doofinder\WC\Doofinder_For_WooCommerce' ) ):
 
@@ -33,7 +39,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 			 *
 			 * @var string
 			 */
-			public static $version = '1.2.6';
+			public static $version = '1.2.7';
 
 			/**
 			 * The only instance of Doofinder_For_WooCommerce
