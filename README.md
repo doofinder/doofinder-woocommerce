@@ -17,7 +17,8 @@ $ docker-compose up
 In the WooCommerce importer choose _Show advanced options_ and use this path:
 
 ```
-wp-content/plugins/woocommerce/dummy-data/dummy-data.csv
+# previously: wp-content/plugins/woocommerce/dummy-data/dummy-data.csv
+wp-content/plugins/woocommerce/sample-data/sample_products.csv
 ```
 
 Then click _Run the importer_.
