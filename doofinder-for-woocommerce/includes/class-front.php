@@ -47,8 +47,8 @@ class Front {
 		$this->add_internal_search();
 		$this->handle_banner_redirect();
 
-		add_action( 'woocommerce_before_main_content', [ $this, 'show_top_banner' ], 99 );
-		add_action( 'doofinder_for_woocommerce_search_banner_widget', [ $this, 'show_banner' ] );
+		add_action( 'woocommerce_before_main_content', array( $this, 'show_top_banner' ), 99 );
+		add_action( 'doofinder_for_woocommerce_search_banner_widget', array( $this, 'show_banner' ) );
 	}
 
 	/**
@@ -121,7 +121,7 @@ class Front {
 			 * database query, therefore it is unable to figure out pagination parameters on its own,
 			 * and we need to set them up manually.
 			 */
-			$wp_query->found_posts = $results['found_posts'];
+			$wp_query->found_posts   = $results['found_posts'];
 			$wp_query->max_num_pages = $results['max_num_pages'];
 
 			return $results['ids'];
@@ -129,8 +129,8 @@ class Front {
 	}
 
 	/**
-     * Print the search banner, but checking if it's enabled in settings.
-     *
+	 * Print the search banner, but checking if it's enabled in settings.
+	 *
 	 * @since 1.3.0
 	 */
 	public function show_top_banner() {
@@ -140,7 +140,7 @@ class Front {
 		}
 
 		$this->show_banner();
-    }
+	}
 
 	/**
 	 * Display the banner on top of search results.
@@ -272,7 +272,7 @@ class Front {
 	 */
 	private function recoverBannerInfo( $banner_info ) {
 		$decoded = base64_decode( urldecode( $banner_info ) );
-		$split = preg_split( '/\|/', $decoded );
+		$split   = preg_split( '/\|/', $decoded );
 
 		// The obscured string should contain exactly 2 pieces of information:
 		// banner id and the redirect URL.

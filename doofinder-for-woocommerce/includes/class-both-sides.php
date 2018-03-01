@@ -11,15 +11,15 @@ class Both_Sides {
 	/**
 	 * Singleton of this class.
 	 *
-	 * @var Admin
+	 * @var Both_Sides
 	 */
 	private static $_instance;
 
 	/**
-	 * Returns the only instance of Admin.
+	 * Returns the only instance of Both_Sides.
 	 *
 	 * @since 1.3.0
-	 * @return Admin
+	 * @return Both_Sides
 	 */
 	public static function instance() {
 		if ( is_null( self::$_instance ) ) {
@@ -30,7 +30,7 @@ class Both_Sides {
 	}
 
 	/**
-	 * Admin constructor.
+	 * Both_Sides constructor.
 	 *
 	 * @since 1.3.0
 	 */
