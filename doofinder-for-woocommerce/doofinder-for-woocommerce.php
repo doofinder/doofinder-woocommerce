@@ -107,6 +107,9 @@ if (
 				} else {
 					Front::instance();
 				}
+
+				// Some functionalities need to be initialized on both admin side, and frontend.
+				Both_Sides::instance();
 			}
 
 			/**
@@ -117,6 +120,7 @@ if (
 			 * Doofinder\WC\Example_Folder\Example
 			 *
 			 * @since 1.0.0
+			 *
 			 * @param string $dir Root directory of libraries (where to begin lookup).
 			 */
 			public static function autoload( $dir ) {

@@ -19,7 +19,7 @@ class TopTermsIteratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotProcessedResponse()
     {
-        $this->client->managementApiCall('GET', "testHashid/stats/top_fakeTerm", array())
+        $this->client->managementApiCall('GET', "testHashid/stats/top_fakeTerm", [])
                      ->shouldBeCalledTimes(1)
                      ->willReturn(array('statusCode'=>202));
 

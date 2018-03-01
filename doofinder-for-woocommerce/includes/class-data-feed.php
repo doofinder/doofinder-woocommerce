@@ -144,7 +144,7 @@ class Data_Feed {
 
 			'ignore_sticky_posts' => 1,
 
-			'posts_per_page' => -1,
+			'posts_per_page' => - 1,
 
 			'orderby' => 'ID',
 			'order'   => 'ASC',
@@ -233,7 +233,7 @@ class Data_Feed {
 
 		$variations = get_posts( array(
 			'post_type'      => 'product_variation',
-			'posts_per_page' => -1,
+			'posts_per_page' => - 1,
 		) );
 
 		// Index by ID in order to avoid iterating the entire array when we need to retrieve a variation
