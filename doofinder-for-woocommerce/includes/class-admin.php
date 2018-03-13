@@ -47,7 +47,7 @@ class Admin {
 			if ( 'woocommerce_page_wc-settings' === $hook ) {
 				wp_enqueue_style(
 					'woocommerce-doofinder',
-					Doofinder_For_WooCommerce::plugin_url() . 'assets/woocommerce-doofinder.css'
+					Doofinder_For_WooCommerce::plugin_url() . 'assets/admin.css'
 				);
 			}
 		} );

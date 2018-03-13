@@ -6,7 +6,7 @@ use Doofinder\WC\Settings\Settings;
 defined( 'ABSPATH' ) or die;
 
 $multilanguage = Multilanguage::instance();
-$lang_affix = $multilanguage->get_language_prefix();
+$lang_affix    = $multilanguage->get_language_prefix();
 
 $api = array(
 	array(
@@ -34,13 +34,13 @@ $api = array(
 $search_engine = array();
 if (
 	$multilanguage->is_active() && $multilanguage->get_language_code() ||
-    ! $multilanguage->is_active()
+	! $multilanguage->is_active()
 ) {
 	$enable_question = __( 'Enable?', 'woocommerce-doofinder' );
 
 	// If we have internationalization - ask a question for specific language.
 	if ( $multilanguage->is_active() ) {
-		$lang = $multilanguage->get_current_language();
+		$lang            = $multilanguage->get_current_language();
 		$enable_question = sprintf( __( 'Enable for %s?', 'woocommerce-doofinder' ), $lang['name'] );
 	}
 
@@ -67,6 +67,14 @@ if (
 			'type'    => 'text',
 			'css'     => 'width: 100%',
 			'default' => '',
+		),
+
+		array(
+			'title'   => __( 'Display banners above search results', 'woocommerce-doofinder' ),
+			'desc'    => __( '(You can disable this and use the Doofinder Banner widget instead)', 'woocommerce-doofinder' ),
+			'id'      => Settings::option_id( 'internal_search', 'banner', $lang_affix ),
+			'type'    => 'checkbox',
+			'default' => 'no',
 		),
 
 		array(
