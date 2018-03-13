@@ -1,8 +1,9 @@
 .doofinder-wc-additional-attributes th,
 .doofinder-wc-additional-attributes td {
-  padding: 0;
+	padding: 0;
 }
+
 .doofinder-wc-additional-attributes input,
 .doofinder-wc-additional-attributes select {
-  width: 100%;
+	width: 100%;
 }

@@ -46,6 +46,14 @@ class Internal_Search {
 	private $search;
 
 	/**
+	 * Some search results return a banner that should be displayed at the top
+	 * of the results.
+	 *
+	 * @var array
+	 */
+	private $banner;
+
+	/**
 	 * Internal_Search constructor.
 	 *
 	 * @since 1.0.0
@@ -63,7 +71,7 @@ class Internal_Search {
 		}
 
 		$this->api_key = Settings::get( 'internal_search', 'api_key', $language_code );
-		$this->hashid  = Settings::get( 'internal_search', 'hashid' );
+		$this->hashid = Settings::get( 'internal_search', 'hashid' );
 
 		// Check if the search is enabled and API Key and Hash ID are present
 		$this->enabled = false;
@@ -105,9 +113,13 @@ class Internal_Search {
 
 		// Perform a Doofinder search
 		$results = $this->client->query( $this->search, null, array(
-			'rpp' => 10000
+			'rpp' => 10000,
 		) );
 
+		// Store a banner for later use
+		$this->banner = $results->getProperty( 'banner' );
+
+		// Process the search results we got from Doofinder
 		$ids = $this->ids_from_results( $results );
 
 		// Remove WP search - we don't want WP and Doofinder search to overlap.
@@ -124,10 +136,52 @@ class Internal_Search {
 		$skip_internal_search = false;
 
 		return array(
-			'ids' => $posts->posts,
-			'found_posts' => $posts->found_posts,
-			'max_num_pages' => $posts->max_num_pages
+			'ids'           => $posts->posts,
+			'found_posts'   => $posts->found_posts,
+			'max_num_pages' => $posts->max_num_pages,
 		);
+	}
+
+	/**
+	 * Retrieve the banner we obtained when making a Doofinder search.
+	 *
+	 * This will be null if the search did not contain a banner.
+	 *
+	 * @since 1.3.0
+	 * @return array
+	 */
+	public function getBanner() {
+		return $this->banner;
+	}
+
+	/* Tracking *******************************************************************/
+
+	/**
+	 * Track banner impression.
+	 *
+	 * @since 1.3.0
+	 */
+	public function trackBannerImpression() {
+		if ( ! $this->banner || ! $this->banner['id'] ) {
+			return;
+		}
+
+		$this->client->registerBannerDisplay( (int) $this->banner['id'] );
+	}
+
+	/**
+	 * Track banner click.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param int $bannerId
+	 */
+	public function trackBannerClick( $bannerId ) {
+		if ( ! $this->client ) {
+			$this->init();
+		}
+
+		$this->client->registerBannerClick( $bannerId );
 	}
 
 	/* Search parameters **********************************************************/
@@ -154,10 +208,11 @@ class Internal_Search {
 	 * Extract IDs from Doofinder Search Results.
 	 *
 	 * @param Results $results Results returned by Doofinder Search Client.
+	 *
 	 * @return array IDs of products.
 	 */
 	private function ids_from_results( Results $results ) {
-		return array_map( function( $item ) {
+		return array_map( function ( $item ) {
 			return $item['id'];
 		}, $results->getResults() );
 	}

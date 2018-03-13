@@ -300,7 +300,7 @@ class Data_Feed_Item {
 			$this->fields['price'] = $prices['regular'];
 		}
 
-		if ( $prices['sale'] ) {
+		if ( isset( $prices['sale'] ) && $prices['sale'] ) {
 			// If there's no regular price display sale price as regular.
 			$field_name = $prices['regular'] ? 'sale_price' : 'price';
 			$this->fields[ $field_name ] = $prices['sale'];
