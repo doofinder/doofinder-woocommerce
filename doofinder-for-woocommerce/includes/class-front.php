@@ -16,13 +16,6 @@ class Front {
 	private static $_instance;
 
 	/**
-	 * The log file.
-	 *
-	 * @var Log
-	 */
-	private $log;
-
-	/**
 	 * Object handling making the Doofinder search.
 	 *
 	 * @var Internal_Search
@@ -49,8 +42,6 @@ class Front {
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-		$this->log = new Log();
-
 		$this->enqueue_script();
 		$this->add_doofinder_layer_code();
 		$this->add_internal_search();
@@ -100,9 +91,7 @@ class Front {
 	 * @since 1.0.0
 	 */
 	private function add_internal_search() {
-		$log = $this->log;
-
-		add_filter( 'posts_pre_query', function ( $posts, $query ) use ( $log ) {
+		add_filter( 'posts_pre_query', function ( $posts, $query ) {
 			global $wp_query, $skip_internal_search;
 
 			/*
@@ -134,9 +123,6 @@ class Front {
 			 */
 			$wp_query->found_posts   = $results['found_posts'];
 			$wp_query->max_num_pages = $results['max_num_pages'];
-
-			$log->log( 'Internal Search results' );
-			$log->log( $results );
 
 			return $results['ids'];
 		}, 10, 2 );

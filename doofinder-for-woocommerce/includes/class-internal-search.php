@@ -11,13 +11,6 @@ defined( 'ABSPATH' ) or die;
 class Internal_Search {
 
 	/**
-	 * The logger.
-	 *
-	 * @var Log
-	 */
-	private $log;
-
-	/**
 	 * Doofinder Search Client instance.
 	 *
 	 * @var Client
@@ -66,8 +59,6 @@ class Internal_Search {
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-		$this->log = new Log();
-
 		$multilanguage = Multilanguage::instance();
 
 		// Load Internal Search settings
@@ -129,7 +120,6 @@ class Internal_Search {
 		$this->banner = $results->getProperty( 'banner' );
 
 		// Process the search results we got from Doofinder
-		$this->log->log($results->getResults());
 		$ids = $this->ids_from_results( $results );
 
 		// Remove WP search - we don't want WP and Doofinder search to overlap.
