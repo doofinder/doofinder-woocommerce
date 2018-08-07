@@ -83,7 +83,7 @@ class Data_Feed_Item {
 	 */
 	public function __construct( $post, $parent = null, $settings, &$paths_cache, &$terms_cache ) {
 		$this->post = $post;
-		$this->product = WC()->product_factory->get_product( $post );
+		$this->product = WC()->product_factory->get_product( $post->ID );
 		$this->parent = $parent;
 		$this->settings = $settings;
 		$this->attributes = Attributes::instance();
@@ -153,7 +153,7 @@ class Data_Feed_Item {
 	 */
 	private function add_title() {
 		$suffix = '';
-		if ( $this->parent ) {
+		if ( $this->parent && $this->product ) {
 			$attributes = $this->product->get_variation_attributes();
 			$suffix = ' (' . implode( ', ', $attributes ) . ')';
 		}
