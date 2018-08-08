@@ -101,7 +101,7 @@ class Data_Feed {
 	 * @param string $language Language of the feed to show.
 	 */
 	public function __construct() {
-		$multilanguage = Multilanguage::instance();
+		$multilanguage  = Multilanguage::instance();
 		$this->language = $multilanguage->get_language_code();
 
 		// Create XML document to fill out.
@@ -198,17 +198,17 @@ class Data_Feed {
 		// 'limit' and 'offset' parameters create pagination.
 		$limit = 0;
 		if ( isset( $_GET['limit'] ) && ! empty( $_GET['limit'] ) ) {
-			$limit = (int) $_GET['limit'];
+			$limit                  = (int) $_GET['limit'];
 			$args['posts_per_page'] = $_GET['limit'];
 		}
 
 		$offset = 0;
 		if ( isset( $_GET['offset'] ) && ! empty( $_GET['offset'] ) ) {
-			$offset = (int) $_GET['offset'];
+			$offset         = (int) $_GET['offset'];
 			$args['offset'] = $_GET['offset'];
 		}
 
-		$query = new \WP_Query( $args );
+		$query          = new \WP_Query( $args );
 		$this->products = $query->posts;
 
 		// Check if this is the beginning or end of the feed
@@ -271,8 +271,8 @@ class Data_Feed {
 	 * @since 1.0.0
 	 */
 	private function add_store_information() {
-		$this->feed->header['title'] = get_bloginfo( 'name' );
-		$this->feed->header['link'] = Multilanguage::get_home_url( $this->language );
+		$this->feed->header['title']       = get_bloginfo( 'name' );
+		$this->feed->header['link']        = Multilanguage::get_home_url( $this->language );
 		$this->feed->header['description'] = sanitize_text_field( get_bloginfo( 'description' ) );
 	}
 
@@ -289,6 +289,12 @@ class Data_Feed {
 				$children = $product->get_children();
 
 				foreach ( $children as $child ) {
+					// If product variations have non-public status they won't be present
+					// in this array.
+					if ( ! $this->product_variations[ $child ] ) {
+						continue;
+					}
+
 					$item = new Data_Feed_Item(
 						$this->product_variations[ $child ],
 						$product->post,
