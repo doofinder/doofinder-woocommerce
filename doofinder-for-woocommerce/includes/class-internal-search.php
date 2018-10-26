@@ -127,6 +127,13 @@ class Internal_Search {
 
 		// Only take posts with IDs returned from Doofinder.
 		$args['post__in'] = $ids;
+
+		// If we're splitting variable products they are being exported as separate entries
+		// in the feed, and the JS Layer will display them as separate products.
+		// In order to keep Internal Search consistent and display them as separate products
+		// there too we need make sure to query for them too.
+		$args['post_type'] = ['product', 'product_variation'];
+
 		$args['fields'] = 'ids';
 		$args['orderby'] = 'post__in';
 
