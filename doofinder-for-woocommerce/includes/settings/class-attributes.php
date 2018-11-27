@@ -24,7 +24,9 @@ class Attributes {
 	 * @var array
 	 */
 	private $dimensions = array(
-		'length', 'width', 'height'
+		'length',
+		'width',
+		'height',
 	);
 
 	/**
@@ -33,7 +35,7 @@ class Attributes {
 	 * @var array
 	 */
 	private $weight = array(
-		'weight'
+		'weight',
 	);
 
 	/**
@@ -63,10 +65,12 @@ class Attributes {
 	 * Check if the attribute of given name is customized in settings.
 	 *
 	 * @param string $name Name of the attribute to check.
+	 *
 	 * @return bool True if the user configured and saved the attribute, false otherwise.
 	 */
 	public function have( $name ) {
 		$option = Settings::get( 'feed_attributes', $name );
+
 		return ! empty( $option );
 	}
 
@@ -75,6 +79,7 @@ class Attributes {
 	 *
 	 * @param string   $name    Name of the attribute to retrieve.
 	 * @param \WP_Post $product Product to retrieve attribute value from.
+	 *
 	 * @return mixed Attribute value.
 	 */
 	public function get( $name, $product ) {
@@ -91,11 +96,13 @@ class Attributes {
 	 *
 	 * @param string   $attribute_name Attribute name, as present in attributes config.
 	 * @param \WP_Post $product        Product to retrieve attribute value from.
+	 * @param array    $parameters     Additional attribute parameters. Not all attributes use this.
+	 *
 	 * @return mixed Attribute value.
 	 */
-	public function get_attribute_value( $attribute_name, $product ) {
+	public function get_attribute_value( $attribute_name, $product, $parameters = [] ) {
 		$attribute = $this->attributes[ $attribute_name ];
-		$value = '';
+		$value     = '';
 		switch ( $attribute['type'] ) {
 			case 'predefined':
 				$value = $this->get_attribute_predefined( $attribute['source'], $product );
@@ -107,6 +114,10 @@ class Attributes {
 
 			case 'wc_attribute':
 				$value = $this->get_attribute_wc( $attribute['source'], $product );
+				break;
+
+			case 'custom_meta':
+				$value = $this->get_attribute_custom_meta( $parameters, $product );
 				break;
 		}
 
@@ -129,10 +140,11 @@ class Attributes {
 	 *
 	 * @param string   $source  What is the source of the attribute (which part of WP functionality).
 	 * @param \WP_Post $product Product to retrieve attribute from.
+	 *
 	 * @return mixed The attribute value.
 	 */
 	private function get_attribute_predefined( $source, $product ) {
-		switch ($source) {
+		switch ( $source ) {
 			case 'permalink':
 				return get_permalink( $product );
 
@@ -146,6 +158,7 @@ class Attributes {
 	 *
 	 * @param string   $source  Name of the meta field.
 	 * @param \WP_Post $product Product to retrieve attribute from.
+	 *
 	 * @return mixed The attribute value.
 	 */
 	private function get_attribute_meta( $source, $product ) {
@@ -157,12 +170,31 @@ class Attributes {
 	 *
 	 * @param string   $source  Name of the product attribute.
 	 * @param \WP_Post $product Product to retrieve attribute from.
+	 *
 	 * @return mixed The attribute value.
 	 * @since 1.2.2
 	 */
 	private function get_attribute_wc( $source, $product ) {
 		$product_factory = new \WC_Product_Factory();
-		$product_object = $product_factory->get_product( $product->ID );
+		$product_object  = $product_factory->get_product( $product->ID );
+
 		return $product_object->get_attribute( $source );
+	}
+
+	/**
+	 * Get the value of meta field by name specified by the user in
+	 * Doofinder settings.
+	 *
+	 * @param array $parameters
+	 * @param \WP_Post $product
+	 *
+	 * @return string
+	 */
+	private function get_attribute_custom_meta( $parameters, $product ) {
+		if ( ! $parameters || ! isset( $parameters['value'] ) ) {
+			return '';
+		}
+
+		return get_post_meta( $product->ID, $parameters['value'], true );
 	}
 }
