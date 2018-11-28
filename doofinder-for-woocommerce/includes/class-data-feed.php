@@ -297,7 +297,7 @@ class Data_Feed {
 
 					$item = new Data_Feed_Item(
 						$this->product_variations[ $child ],
-						$product->post,
+						get_post($product->get_id()),
 
 						$this->settings,
 						$this->paths_cache,

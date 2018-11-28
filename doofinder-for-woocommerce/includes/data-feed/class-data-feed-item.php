@@ -365,7 +365,20 @@ class Data_Feed_Item {
 
 		$attributes = array_map( 'wp_parse_args', $attributes );
 		foreach ( $attributes as $attribute ) {
-			$this->fields[ $attribute['field'] ] = $this->attributes->get_attribute_value( $attribute['attribute'], $this->post );
+			$this->fields[ $attribute['field'] ] = $this->attributes->get_attribute_value(
+				$attribute['attribute'],
+				$this->post,
+				$attribute
+			);
+
+			// Inherit attributes from parent.
+			if ($this->parent) {
+				$this->fields[ $attribute['field'] ] = $this->attributes->get_attribute_value(
+					$attribute['attribute'],
+					$this->parent,
+					$attribute
+				);
+			}
 		}
 	}
 
