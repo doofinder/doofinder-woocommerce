@@ -38,7 +38,10 @@ class Settings_Page extends \WC_Settings_Page {
 		add_action( 'woocommerce_settings_save_' . $this->id, array( $this, 'save' ) );
 
 		// Add custom field allowing to add Additional Attributes
-		add_action( 'woocommerce_admin_field_doofinder-wc-attributes-repeater', array( $this, 'custom_field_repeater' ) );
+		add_action( 'woocommerce_admin_field_doofinder-wc-attributes-repeater', array(
+			$this,
+			'custom_field_repeater',
+		) );
 	}
 
 	/* WC_Settings_Page overrides *************************************************/
@@ -69,7 +72,7 @@ class Settings_Page extends \WC_Settings_Page {
 	public function get_settings() {
 		global $current_section;
 
-		switch ($current_section) {
+		switch ( $current_section ) {
 			case '':
 				return include 'settings/settings-layer.php';
 
@@ -111,7 +114,7 @@ class Settings_Page extends \WC_Settings_Page {
 		 * Secondly, WooCommerce settings API doesn't handle nested arrays, so we need to save an array
 		 * of plain strings.
 		 */
-		$field = Settings::option_id( 'feed_attributes', 'additional_attributes', $multilanguage->get_language_prefix() );
+		$field  = Settings::option_id( 'feed_attributes', 'additional_attributes', $multilanguage->get_language_prefix() );
 		$delete = null;
 		if ( isset( $_POST[ $field . '_delete' ] ) ) {
 			$delete = $_POST[ $field . '_delete' ];
@@ -119,14 +122,24 @@ class Settings_Page extends \WC_Settings_Page {
 
 		if ( isset( $_POST[ $field ] ) ) {
 			$attributes = $_POST[ $field ];
-			$to_save = array();
+			$to_save    = array();
 
-			for ( $i = 0; $i < count( $attributes['field'] ); $i++ ) {
+			for ( $i = 0; $i < count( $attributes['field'] ); $i ++ ) {
 				if ( empty( $attributes['field'][ $i ] ) || $attributes['field'][ $i ] === $delete ) {
 					continue;
 				}
 
-				$to_save[] = 'field=' . $attributes['field'][ $i ] . '&attribute=' . $attributes['attribute'][ $i ];
+				// "field" is the name it will appear in the generated XML.
+				// "attribute" is the name of the thing to retrieve from the DB
+				// (e.g. name of the meta field)
+				$field_attributes = 'field=' . $attributes['field'][ $i ] . '&attribute=' . $attributes['attribute'][ $i ];
+
+				// Some fields might want to save some additional attributes.
+				if ( $attributes['value'][ $i ] ) {
+					$field_attributes .= '&value=' . $attributes['value'][ $i ];
+				}
+
+				$to_save[] = $field_attributes;
 			}
 
 			update_option( $field, $to_save );
@@ -163,7 +176,7 @@ class Settings_Page extends \WC_Settings_Page {
 			'thumbnail',
 			'medium',
 			'medium-large',
-			'large'
+			'large',
 		);
 
 		$sizes = array();
@@ -199,41 +212,64 @@ class Settings_Page extends \WC_Settings_Page {
 
 		?>
 
-		<tr valign="top">
-			<th scope="row" class="titledesc">
-				<label for="<?php echo esc_attr( $params['id'] ); ?>"><?php echo esc_html( $params['title'] ); ?></label>
-			</th>
+        <tr valign="top">
+            <th scope="row" class="titledesc">
+                <label for="<?php echo esc_attr( $params['id'] ); ?>"><?php echo esc_html( $params['title'] ); ?></label>
+            </th>
 
-			<td class="forminp">
-				<table class="doofinder-wc-additional-attributes">
-					<thead>
-					<tr>
-						<th><?php _e( 'Field', 'woocommerce-doofinder' ); ?></th>
-						<th><?php _e( 'Attribute', 'woocommerce-doofinder' ); ?></th>
-						<th></th>
-					</tr>
-					</thead>
+            <td class="forminp">
+                <table class="doofinder-wc-additional-attributes">
+                    <thead>
+                    <tr>
+                        <th><?php _e( 'Field', 'woocommerce-doofinder' ); ?></th>
+                        <th><?php _e( 'Attribute', 'woocommerce-doofinder' ); ?></th>
+                        <th></th>
+                    </tr>
+                    </thead>
 
-					<tbody>
+                    <tbody>
 					<?php if ( ! empty( $field_value ) ): ?>
 						<?php foreach ( $field_value as $attribute ): ?>
-							<tr>
-								<td><input name="<?php echo $params['id']; ?>[field][]" type="text" value="<?php echo $attribute['field']; ?>"></td>
-								<td><?php $this->_custom_field_repeater_select( $params['id'], $params['options'], $attribute['attribute'] ); ?></td>
-								<td><button type="submit" name="<?php echo $params['id']; ?>_delete" class="button" value="<?php echo $attribute['field']; ?>">Delete</button></td>
-							</tr>
-						<?php endforeach;?>
+                            <tr>
+                                <td><input name="<?php echo $params['id']; ?>[field][]" type="text"
+                                           value="<?php echo $attribute['field']; ?>"></td>
+
+								<?php if ( 'custom' === $attribute['attribute'] ): ?>
+                                    <td>
+                                        <input
+                                                type="hidden"
+                                                name="<?php echo $params['id']; ?>[attribute][]"
+                                                value="custom"
+                                        >
+                                        <input
+                                                type="text"
+                                                name="<?php echo $params['id']; ?>[value][]"
+                                                value="<?php echo $attribute['value']; ?>"
+                                                placeholder="<?php _e( 'Field name in data base', 'woocommerce-doofinder' ); ?>"
+                                        >
+                                    </td>
+								<?php else: ?>
+                                    <td><?php $this->_custom_field_repeater_select( $params['id'], $params['options'], $attribute['attribute'] ); ?></td>
+								<?php endif; ?>
+
+                                <td>
+                                    <button type="submit" name="<?php echo $params['id']; ?>_delete" class="button"
+                                            value="<?php echo $attribute['field']; ?>">Delete
+                                    </button>
+                                </td>
+                            </tr>
+						<?php endforeach; ?>
 					<?php endif; ?>
 
-					<tr>
-						<td><input name="<?php echo $params['id']; ?>[field][]" type="text"></td>
-						<td><?php $this->_custom_field_repeater_select( $params['id'], $params['options'] ); ?></td>
-						<td></td>
-					</tr>
-					</tbody>
-				</table>
-			</td>
-		</tr>
+                    <tr>
+                        <td><input name="<?php echo $params['id']; ?>[field][]" type="text"></td>
+                        <td><?php $this->_custom_field_repeater_select( $params['id'], $params['options'] ); ?></td>
+                        <td></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
 
 		<?php
 	}
@@ -243,6 +279,7 @@ class Settings_Page extends \WC_Settings_Page {
 	 * Outputs a select with options for a repeater row.
 	 *
 	 * @see custom_field_repeater
+	 *
 	 * @param string $id       Field id.
 	 * @param array  $options  List of select options.
 	 * @param string $selected Selected option (if any).
@@ -250,11 +287,13 @@ class Settings_Page extends \WC_Settings_Page {
 	private function _custom_field_repeater_select( $id, $options, $selected = null ) {
 		?>
 
-		<select name="<?php echo $id; ?>[attribute][]">
-			<?php foreach( $options as $value => $label ): ?>
-				<option value="<?php echo $value; ?>" <?php selected( $value, $selected ); ?>><?php echo $label; ?></option>
+        <select name="<?php echo $id; ?>[attribute][]">
+			<?php foreach ( $options as $value => $label ): ?>
+                <option value="<?php echo $value; ?>" <?php selected( $value, $selected ); ?>><?php echo $label; ?></option>
 			<?php endforeach; ?>
-		</select>
+        </select>
+
+        <input type="hidden" name="<?php echo $id; ?>[value][]"/>
 
 		<?php
 	}

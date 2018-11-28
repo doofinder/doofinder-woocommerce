@@ -1,6 +1,7 @@
 <?php
 
-$attributes_array = array(
+// Predefined attributes that will always be present in the dropdown.
+$attributes = array(
 	/*
 	 * WordPress fields
 	 */
@@ -82,14 +83,22 @@ $attributes_array = array(
 	),
 );
 
+// WooCommerce attributes.
+// (the taxonomy registered by WC, in Products > Attributes)
 $wc_attributes = wc_get_attribute_taxonomies();
-
 foreach ( $wc_attributes as $wc_attribute ) {
-	$attributes_array[ 'pa_' . $wc_attribute->attribute_name ] = array(
+	$attributes[ 'pa_' . $wc_attribute->attribute_name ] = array(
 		'title'  => __( 'Custom Attribute:', 'woocommerce-doofinder' ) . ' ' . $wc_attribute->attribute_label,
 		'type'   => 'wc_attribute',
 		'source' => $wc_attribute->attribute_name,
 	);
 }
 
-return $attributes_array;
+// Custom attribute.
+// Allowing user to provide a custom meta field name.
+$attributes['custom'] = array(
+	'title' => __( 'Custom (Post Meta)', 'woocommerce-doofinder' ),
+	'type' => 'custom_meta'
+);
+
+return $attributes;
