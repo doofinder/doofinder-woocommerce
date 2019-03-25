@@ -269,7 +269,7 @@ class Data_Feed_Item {
 	 * @since 1.0.0
 	 */
 	private function add_thumbnail() {
-		$size = 'full';
+		$size = 'thumbnail';
 		$image_id = get_post_thumbnail_id( $this->post->ID );
 
 		if ( $this->settings['image_size'] && has_image_size( $this->settings['image_size'] ) ) {
