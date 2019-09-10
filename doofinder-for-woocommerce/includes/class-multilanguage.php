@@ -44,7 +44,9 @@ class Multilanguage {
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-		if ( function_exists( 'icl_object_id' ) ) {
+		global $sitepress;
+
+		if ( function_exists( 'icl_object_id' ) && isset( $sitepress ) && $sitepress ) {
 			$this->handler = new WPML();
 		}
 	}
