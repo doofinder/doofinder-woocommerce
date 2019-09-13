@@ -1,9 +1,31 @@
 .doofinder-wc-additional-attributes th,
 .doofinder-wc-additional-attributes td {
-	padding: 0;
+  padding: 0;
 }
 
 .doofinder-wc-additional-attributes input,
 .doofinder-wc-additional-attributes select {
-	width: 100% !important;
+  width: 100% !important;
+}
+
+.doofinder-log {
+  padding: 5px 10px;
+
+  font-size: 12px;
+  line-height: 14px;
+
+  border: 1px solid grey;
+  border-radius: 3px;
+}
+
+.doofinder-log .entry {
+  padding: 5px 0;
+
+  white-space: pre-wrap;
+
+  border-bottom: 1px solid rgba(128, 128, 128, 0.3);
+}
+
+.doofinder-log .entry:last-child {
+  border: none;
 }
