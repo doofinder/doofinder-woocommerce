@@ -49,6 +49,12 @@ class Front {
 
 		add_action( 'woocommerce_before_main_content', array( $this, 'show_top_banner' ), 99 );
 		add_action( 'doofinder_for_woocommerce_search_banner_widget', array( $this, 'show_banner' ) );
+
+		// Save logs at the end of the application run.
+		add_action( 'shutdown', function() {
+			$log = Transient_Log::instance();
+			$log->save();
+		} );
 	}
 
 	/**
@@ -92,6 +98,9 @@ class Front {
 	 */
 	private function add_internal_search() {
 		add_filter( 'posts_pre_query', function ( $posts, $query ) {
+			$log = Transient_Log::instance();
+			$log->log( 'start Internal Search' );
+
 			global $wp_query, $skip_internal_search;
 
 			/*
@@ -101,6 +110,14 @@ class Front {
 			 * queries.
 			 */
 			if ( ! is_shop() || 'product' !== $query->query['post_type'] || true === $skip_internal_search ) {
+				if ( ! is_shop() || 'product' !== $query->query['post_type'] ) {
+					$log->log( 'Not a shop search. Aborting.' );
+				}
+
+				if ( $skip_internal_search ) {
+					$log->log( 'Nested search. Aborting.' );
+				}
+
 				return null;
 			}
 
@@ -108,11 +125,15 @@ class Front {
 
 			// Only use Internal Search if it's enabled and keys are present
 			if ( ! $this->search->is_enabled() ) {
+				$log->log( 'Internal Search is disabled. Aborting.' );
+
 				return null;
 			}
 
 			$results = $this->search->search( $wp_query->query_vars );
 			if ( ! $results ) {
+				$log->log( 'Internal search did not return results. Aborting.' );
+
 				return null;
 			}
 
@@ -123,6 +144,12 @@ class Front {
 			 */
 			$wp_query->found_posts   = $results['found_posts'];
 			$wp_query->max_num_pages = $results['max_num_pages'];
+
+			$log->log( sprintf(
+				'Internal Search retrieved %d items from Doofinder.',
+				$results['found_posts']
+			) );
+			$log->log( join(', ', $results['ids'] ) );
 
 			return $results['ids'];
 		}, 10, 2 );
