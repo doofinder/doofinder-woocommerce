@@ -3,7 +3,7 @@ Contributors: doofinder, chop chop
 Tags: search, autocomplete, woo commerce, e-commerce, ecommerce, sales, shop
 Version: 1.2.16
 Requires at least: 4.1
-Tested up to: 4.9.1
+Tested up to: 5.2.3
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
