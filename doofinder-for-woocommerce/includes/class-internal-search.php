@@ -94,6 +94,13 @@ class Internal_Search {
 	 * Initialize Doofinder Search Client.
 	 */
 	private function init() {
+		$log = Transient_Log::instance();
+		$log->log( sprintf(
+			'Creating Doofinder Search client: %s, %s',
+			$this->hashid,
+			$this->api_key
+		) );
+
 		$this->client = new Client( $this->hashid, $this->api_key );
 	}
 
@@ -103,11 +110,16 @@ class Internal_Search {
 	public function search( $args ) {
 		global $skip_internal_search;
 
+		$log = Transient_Log::instance();
+
+		$log->log( 'start Doofinder Search' );
 		$this->init();
 
 		// If we are not searching for anything, then just let WordPress do its thing
 		$this->parse_search_term();
 		if ( null === $this->search ) {
+			$log->log( 'Search term not found. Aborting.' );
+
 			return null;
 		}
 
@@ -115,12 +127,18 @@ class Internal_Search {
 		$results = $this->client->query( $this->search, null, array(
 			'rpp' => 10000,
 		) );
+		$log->log( 'Calling Doofinder API. Results:' );
+		$log->log( $results );
 
 		// Store a banner for later use
 		$this->banner = $results->getProperty( 'banner' );
 
 		// Process the search results we got from Doofinder
 		$ids = $this->ids_from_results( $results );
+		$log->log( sprintf(
+			'Extracted ids: %s',
+			join( ', ', $ids )
+		) );
 
 		// Remove WP search - we don't want WP and Doofinder search to overlap.
 		unset( $args['s'] );
@@ -138,9 +156,13 @@ class Internal_Search {
 		$args['orderby'] = 'post__in';
 
 		// $skip_internal_search is a flag preventing firing the filter in nested queries.
+		$log->log( 'start nested search' );
 		$skip_internal_search = true;
 		$posts = new \WP_Query( $args );
 		$skip_internal_search = false;
+		$log->log( 'end nested search' );
+
+		$log->log( 'Doofinder Search completed.' );
 
 		return array(
 			'ids'           => $posts->posts,
@@ -197,16 +219,26 @@ class Internal_Search {
 	 * Grab the term searched for and transform into value accepted by Doofinder API.
 	 */
 	private function parse_search_term() {
-		if ( is_search() ) {
-			$term = get_query_var( 's' );
+		$log = Transient_Log::instance();
+		$log->log( 'looking for search term' );
 
-			// Doofinder API does not accept empty string. Null displays all products.
-			if ( empty( $term ) ) {
-				$term = null;
-			}
+		if ( ! is_search() ) {
+			$log->log( 'not a search page, aborting' );
 
-			$this->search = $term;
+			return;
 		}
+
+		$term = get_query_var( 's' );
+
+		// Doofinder API does not accept empty string. Null displays all products.
+		if ( empty( $term ) ) {
+			$log->log( 'found empty search' );
+
+			$term = null;
+		}
+
+		$log->log( sprintf( 'search term found: %s', $term ) );
+		$this->search = $term;
 	}
 
 	/* Helpers ********************************************************************/

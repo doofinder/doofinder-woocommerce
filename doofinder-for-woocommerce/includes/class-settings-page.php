@@ -58,6 +58,7 @@ class Settings_Page extends \WC_Settings_Page {
 			'internal_search'      => __( 'Internal Search', 'woocommerce-doofinder' ),
 			'data_feed'            => __( 'Data Feed', 'woocommerce-doofinder' ),
 			'data_feed_attributes' => __( 'Data Feed Attributes', 'woocommerce-doofinder' ),
+			'log'                  => __( 'Log', 'woocommerce-doofinder' ),
 		);
 
 		return $sections;
@@ -84,6 +85,9 @@ class Settings_Page extends \WC_Settings_Page {
 
 			case 'data_feed_attributes':
 				return include 'settings/settings-feed-attributes.php';
+
+			case 'log':
+				return include 'settings/settings-log.php';
 		}
 	}
 
