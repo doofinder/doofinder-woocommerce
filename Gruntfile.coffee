@@ -33,5 +33,6 @@ module.exports = (grunt) ->
           dest: "/"
         }]
 
-  grunt.registerTask "default", ["version"]
   grunt.registerTask "build", ["clean", "copy", "compress"]
+  grunt.registerTask "release", ["version", "build"]
+  grunt.registerTask "default", ["build"]
