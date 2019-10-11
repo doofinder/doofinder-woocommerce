@@ -234,6 +234,11 @@ class Data_Feed {
 		$variations = get_posts( array(
 			'post_type'      => 'product_variation',
 			'posts_per_page' => - 1,
+
+			// Only load variations for the loaded products.
+			'post_parent__in' => array_map( function ( \WP_Post $post ) {
+				return $post->ID;
+			}, $this->products )
 		) );
 
 		// Index by ID in order to avoid iterating the entire array when we need to retrieve a variation
