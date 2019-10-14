@@ -1,7 +1,7 @@
 === Doofinder for WooCommerce ===
 Contributors: doofinder, chop chop
 Tags: search, autocomplete, woo commerce, e-commerce, ecommerce, sales, shop
-Version: 1.2.17
+Version: 1.2.18
 Requires at least: 4.1
 Tested up to: 5.2.3
 Stable tag: trunk
