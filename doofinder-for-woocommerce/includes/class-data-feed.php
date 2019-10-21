@@ -236,7 +236,10 @@ class Data_Feed {
 			'posts_per_page' => - 1,
 
 			// Only load variations for the loaded products.
-			'post_parent__in' => array_map( function ( \WP_Post $post ) {
+			// If there are no products (e.g. offset value is too high, and we are past all
+			// products) passing a negative value will ensure non variations will be loaded.
+			// If we passed an empty array WordPress would load *all* variations.
+			'post_parent__in' => empty( $this->products ) ? [-1] : array_map( function ( \WP_Post $post ) {
 				return $post->ID;
 			}, $this->products )
 		) );
