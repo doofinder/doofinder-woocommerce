@@ -166,7 +166,7 @@ class Attributes {
 	}
 
 	/**
-	 * Get the value of woocommerce product attribute.
+	 * Get the value of WooCommerce product attribute.
 	 *
 	 * @param string   $source  Name of the product attribute.
 	 * @param \WP_Post $product Product to retrieve attribute from.
@@ -178,7 +178,17 @@ class Attributes {
 		$product_factory = new \WC_Product_Factory();
 		$product_object  = $product_factory->get_product( $product->ID );
 
-		return $product_object->get_attribute( $source );
+		$attribute = $product_object->get_attribute( $source );
+
+		// `/` is used to separate values, so it cannot be a part of value.
+		// @see https://www.doofinder.com/support/the-data-feed/facets
+		$attribute = str_replace( '/', '//', $attribute );
+
+		// If there are multiple attribute values, WooCommerce separates
+		// them by `,`, it's hardcoded, and there is no hook for it.
+		// Doofinder requires attributes to be separated by `/`.
+		// @see https://www.doofinder.com/support/the-data-feed/facets
+		return implode( '/', explode( ', ', $attribute ) );
 	}
 
 	/**
