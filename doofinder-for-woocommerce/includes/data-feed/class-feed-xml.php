@@ -21,6 +21,15 @@ class Feed_XML {
 	public $items = array();
 
 	/**
+	 * Generated feed.
+	 *
+	 * Elements will be appended to this variable as the feed is generated.
+	 *
+	 * @var string
+	 */
+	public $feed = '';
+
+	/**
 	 * Print the feed.
 	 *
 	 * @since 1.0.0
@@ -40,12 +49,22 @@ class Feed_XML {
 	}
 
 	/**
+	 * Retrieve the generated XML feed.
+	 *
+	 * @return string
+	 */
+	public function get() {
+		return trim( $this->feed );
+	}
+
+	/**
 	 * Display the opening tags and header of the feed.
 	 *
 	 * @since 1.0.0
 	 */
 	private function open() {
-		echo '<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel>';
+		$this->feed =
+			'<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel>';
 
 		foreach( $this->header as $name => $value ) {
 			$this->add_node( $name, $value );
@@ -58,7 +77,7 @@ class Feed_XML {
 	 * @since 1.0.0
 	 */
 	private function close() {
-		echo '</channel></rss>';
+		$this->feed .= '</channel></rss>';
 	}
 
 	/**
@@ -68,13 +87,13 @@ class Feed_XML {
 	 */
 	private function items() {
 		foreach ( $this->items as $item ) {
-			echo '<item>';
+			$this->feed .= '<item>';
 
 			foreach ( $item as $field => $value ) {
 				$this->add_node( $field, $value );
 			}
 
-			echo '</item>';
+			$this->feed .= '</item>';
 		}
 	}
 
@@ -86,9 +105,9 @@ class Feed_XML {
 	 * @param string $value Value of the node.
 	 */
 	private function add_node( $name, $value ) {
-		echo "<$name>";
+		$this->feed .= "<$name>";
 		$this->cdata( $value );
-		echo "</$name>";
+		$this->feed .= "</$name>";
 	}
 
 	/**
@@ -98,6 +117,6 @@ class Feed_XML {
 	 * @param string $value Content to print.
 	 */
 	private function cdata( $value ) {
-		echo "<![CDATA[$value]]>";
+		$this->feed .= "<![CDATA[$value]]>";
 	}
 }
