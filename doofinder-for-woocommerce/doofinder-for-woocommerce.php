@@ -110,6 +110,21 @@ if (
 
 				// Some functionalities need to be initialized on both admin side, and frontend.
 				Both_Sides::instance();
+
+				self::maybe_suppress_notices();
+			}
+
+			/**
+			 * Suppress notices on production environments.
+			 *
+			 * WP tries to access a property of a `null` when loading plugins,
+			 * which generates a notice, that, when generating an XML feed
+			 * generates a written warning that is not a legal XML.
+			 */
+			public static function maybe_suppress_notices() {
+				if ( is_ssl() || getenv('APP_ENV') === 'production' ) {
+					error_reporting( E_ALL & ~E_NOTICE );
+				}
 			}
 
 			/**

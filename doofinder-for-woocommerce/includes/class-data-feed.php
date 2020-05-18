@@ -348,6 +348,7 @@ class Data_Feed {
 			echo '';
 		} else {
 			$this->feed->render( $this->is_first, $this->is_last );
+			echo $this->feed->get();
 		}
 	}
 }
