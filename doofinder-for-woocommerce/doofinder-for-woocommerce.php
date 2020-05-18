@@ -3,7 +3,7 @@
  * Plugin Name: Doofinder for WooCommerce
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 1.2.20
+ * Version: 1.2.21
  * Author: doofinder
  * Description: Integrate Doofinder Search in your WooCommerce shop.
  * WC requires at least: 2.1.0
@@ -39,7 +39,7 @@ if (
 			 *
 			 * @var string
 			 */
-			public static $version = '1.2.20';
+			public static $version = '1.2.21';
 
 			/**
 			 * The only instance of Doofinder_For_WooCommerce
@@ -110,6 +110,21 @@ if (
 
 				// Some functionalities need to be initialized on both admin side, and frontend.
 				Both_Sides::instance();
+
+				self::maybe_suppress_notices();
+			}
+
+			/**
+			 * Suppress notices on production environments.
+			 *
+			 * WP tries to access a property of a `null` when loading plugins,
+			 * which generates a notice, that, when generating an XML feed
+			 * generates a written warning that is not a legal XML.
+			 */
+			public static function maybe_suppress_notices() {
+				if ( is_ssl() || getenv('APP_ENV') === 'production' ) {
+					error_reporting( E_ALL & ~E_NOTICE );
+				}
 			}
 
 			/**

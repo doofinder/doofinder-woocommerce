@@ -103,14 +103,22 @@ class Front {
 
 			global $wp_query, $skip_internal_search;
 
-			/*
-			 * Only use Internal Search on WooCommerce shop pages.
-			 * Only use it for the main product query.git
-			 * $skip_internal_search is a flag that prevents firing this filter in nested
-			 * queries.
-			 */
-			if ( ! is_shop() || 'product' !== $query->query['post_type'] || true === $skip_internal_search ) {
-				if ( ! is_shop() || 'product' !== $query->query['post_type'] ) {
+			// We only want to hook into and process the shop page searches,
+			// so we'll bail if we're on any other page.
+			if (
+				! is_shop() ||
+				! isset( $query->query['post_type'] ) ||
+				$query->query['post_type'] !== 'product' ||
+
+				// This is set to true to make sure we don't recursively
+				// run this function for nested queries.
+				$skip_internal_search === true
+			) {
+				if (
+					! is_shop() ||
+					! isset( $query->query['post_type'] ) ||
+					$query->query['post_type'] !== 'product'
+				) {
 					$log->log( 'Not a shop search. Aborting.' );
 				}
 

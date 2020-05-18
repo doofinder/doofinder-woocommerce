@@ -1,9 +1,9 @@
 === Doofinder for WooCommerce ===
 Contributors: doofinder, chop chop
 Tags: search, autocomplete, woo commerce, e-commerce, ecommerce, sales, shop
-Version: 1.2.20
+Version: 1.2.21
 Requires at least: 5.0
-Tested up to: 5.3.2
+Tested up to: 5.4.1
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -125,6 +125,9 @@ You can click *Delete* to remove the additional attributes from the feed.
 Just send your questions to <mailto:support@doofinder.com> and we will try to answer as fast as possible with a working solution for you.
 
 == Changelog ==
+
+= 1.2.20 =
+Check for existance of post_type before checking for its value.
 
 = 1.2.20 =
 Fix separation of multiple value attributes.
