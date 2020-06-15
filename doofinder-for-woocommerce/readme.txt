@@ -1,7 +1,7 @@
 === Doofinder for WooCommerce ===
 Contributors: doofinder, chop chop
 Tags: search, autocomplete, woo commerce, e-commerce, ecommerce, sales, shop
-Version: 1.2.21
+Version: 1.2.22
 Requires at least: 5.0
 Tested up to: 5.4.1
 Stable tag: trunk
@@ -126,7 +126,10 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 
 == Changelog ==
 
-= 1.2.20 =
+= 1.2.22 =
+Add support for image sizes.
+
+= 1.2.21 =
 Check for existance of post_type before checking for its value.
 
 = 1.2.20 =
