@@ -14,10 +14,10 @@ if ( $multilanguage->is_active() && ! $multilanguage->get_language_code() ) {
 
 $affix = $multilanguage->get_language_prefix();
 
-//		$sizes = array();
-//		foreach ( $this->get_image_sizes() as $name => $dimensions ) {
-//			$sizes[] = "<code>$name</code> (" . $dimensions['width'] . ' x ' . $dimensions['height'] . ')';
-//		}
+$sizes = array();
+foreach ( $this->get_image_sizes() as $name => $dimensions ) {
+	$sizes[] = "<code>$name</code> (" . $dimensions['width'] . ' x ' . $dimensions['height'] . ')';
+}
 
 return array(
 	array(
@@ -63,17 +63,17 @@ return array(
 	/*
 	 * Image size configuration temporarily omitted.
 	 */
-//			array(
-//				'title'   => __( 'Image size', 'woocommerce-doofinder' ),
-//				'desc'    => sprintf(
-//					__( 'Image size to export products with. If left empty the full size will be exported. Available image sizes are: %s', 'woocommerce-doofinder' ),
-//					'<div style="line-height: 19px">' . implode( ', ', $sizes ) . '</div>'
-//				),
-//				'id'      => Settings::option_id( 'feed', 'image_size', $affix ),
-//				'type'    => 'text',
-//				'css'     => 'width: 100%',
-//				'default' => '',
-//			),
+	array(
+		'title'   => __( 'Image size', 'woocommerce-doofinder' ),
+		'desc'    => sprintf(
+			__( 'Image size to export products with. If left empty the thumbnail size will be exported. Available image sizes are: %s', 'woocommerce-doofinder' ),
+			'<div style="line-height: 19px">' . implode( ', ', $sizes ) . '</div>'
+		),
+		'id'      => Settings::option_id( 'feed', 'image_size', $affix ),
+		'type'    => 'text',
+		'css'     => 'width: 100%',
+		'default' => '',
+	),
 
 	array(
 		'title'   => __( 'Split Variable products', 'woocommerce-doofinder' ),
