@@ -264,7 +264,7 @@ class Data_Feed_Item {
 
 	/**
 	 * Add post thumbnail.
-	 * The size of the thumbnail is configurable in settings, but full size is exported if not set.
+	 * The size of the thumbnail is configurable in settings, but thumbnail size is exported if not set.
 	 *
 	 * @since 1.0.0
 	 */
@@ -272,7 +272,14 @@ class Data_Feed_Item {
 		$size = 'thumbnail';
 		$image_id = get_post_thumbnail_id( $this->post->ID );
 
-		if ( $this->settings['image_size'] && has_image_size( $this->settings['image_size'] ) ) {
+		$default_sizes = array(
+			'thumbnail',
+			'medium',
+			'medium-large',
+			'large',
+		);
+
+		if ( $this->settings['image_size'] && (has_image_size( $this->settings['image_size'] ) || in_array($this->settings['image_size'], $default_sizes) )) {
 			$size = $this->settings['image_size'];
 		}
 
