@@ -2,7 +2,7 @@
 
 Integrate Doofinder in your WooCommerce site with (almost) no effort.
 
-To learn more check the [plugin page](https://wordpress.org/plugins-wp/doofinder-for-woocommerce/) in the WordPress Plugins Repository.
+To learn more check the [plugin page](https://wordpress.org/plugins/doofinder-for-woocommerce/) in the WordPress Plugins Repository.
 
 ## Developers
 
