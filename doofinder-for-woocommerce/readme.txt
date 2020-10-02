@@ -1,5 +1,5 @@
 === Doofinder for WooCommerce ===
-Contributors: doofinder, chop chop
+Contributors: doofinder, chopchoporg
 Tags: search, autocomplete, woo commerce, e-commerce, ecommerce, sales, shop
 Version: 1.2.22
 Requires at least: 5.0

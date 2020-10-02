@@ -3,14 +3,19 @@ module.exports = (grunt) ->
 
   grunt.initConfig
     clean:
-      build: ['build/*']
+      build: ['build/trunk/*', 'build/assets/*']
 
     copy:
       build:
         expand: true
         cwd: "doofinder-for-woocommerce"
         src: ["**/*", "!**/*.scss"]
-        dest: "build"
+        dest: "build/trunk"
+      assets:
+        expand: true
+        cwd: "assets"
+        src: ["**/*"]
+        dest: "build/assets"
 
     version:
       code:
