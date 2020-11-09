@@ -4,6 +4,7 @@ namespace Doofinder\WC;
 
 use Doofinder\WC\Settings\Feed_URL;
 use Doofinder\WC\Settings\Settings;
+use Doofinder\WC\Data_Index;
 
 defined( 'ABSPATH' ) or die;
 
@@ -23,7 +24,7 @@ class Settings_Page extends \WC_Settings_Page {
 	 */
 	public function __construct() {
 		$this->id     = 'doofinder';
-		$this->label  = __( 'Doofinder', 'woocommerce-doofinder' );
+		$this->label  = __( 'Doofinder Search', 'woocommerce-doofinder' );
 		$this->fields = include 'settings/attributes.php';
 
 		// Register settings Tab
@@ -33,6 +34,7 @@ class Settings_Page extends \WC_Settings_Page {
 		add_action( 'woocommerce_sections_' . $this->id, array( $this, 'output_sections' ) );
 		add_action( 'woocommerce_settings_' . $this->id, array( $this, 'before_settings' ) );
 		add_action( 'woocommerce_settings_' . $this->id, array( $this, 'output' ) );
+		add_action( 'woocommerce_after_settings_' . $this->id, array( $this, 'after_settings' ) );
 
 		// Custom overrides for settings saving to fix unwanted WC behavior
 		add_action( 'woocommerce_settings_save_' . $this->id, array( $this, 'save' ) );
@@ -54,11 +56,13 @@ class Settings_Page extends \WC_Settings_Page {
 	 */
 	public function get_sections() {
 		$sections = array(
-			''                     => __( 'Doofinder Layer', 'woocommerce-doofinder' ),
-			'internal_search'      => __( 'Internal Search', 'woocommerce-doofinder' ),
-			'data_feed'            => __( 'Data Feed', 'woocommerce-doofinder' ),
-			'data_feed_attributes' => __( 'Data Feed Attributes', 'woocommerce-doofinder' ),
+			''                     => __( 'Search', 'woocommerce-doofinder' ),
+			'data'				   => __( 'Data', 'woocommerce-doofinder' ),
+			'indexing'			   => __( 'Indexing', 'woocommerce-doofinder' ),
 			'log'                  => __( 'Log', 'woocommerce-doofinder' ),
+			// 'internal_search'      => __( 'Internal Search', 'woocommerce-doofinder' ),
+			// 'data_feed'            => __( 'Data Feed', 'woocommerce-doofinder' ),
+			// 'data_feed_attributes' => __( 'Data Feed Attributes', 'woocommerce-doofinder' ),
 		);
 
 		return $sections;
@@ -77,17 +81,24 @@ class Settings_Page extends \WC_Settings_Page {
 			case '':
 				return include 'settings/settings-layer.php';
 
-			case 'internal_search':
-				return include 'settings/settings-internal-search.php';
+			case 'data':
+				return include 'settings/settings-data.php';
 
-			case 'data_feed':
-				return include 'settings/settings-feed.php';
-
-			case 'data_feed_attributes':
-				return include 'settings/settings-feed-attributes.php';
+			case 'indexing':
+				return include 'settings/settings-indexing.php';
 
 			case 'log':
 				return include 'settings/settings-log.php';
+
+			// case 'internal_search':
+			// 	return include 'settings/settings-internal-search.php';
+
+			// case 'data_feed':
+			// 	return include 'settings/settings-feed.php';
+
+			// case 'data_feed_attributes':
+			// 	return include 'settings/settings-feed-attributes.php';
+
 		}
 	}
 
@@ -98,15 +109,18 @@ class Settings_Page extends \WC_Settings_Page {
 	 */
 	public function save() {
 		$multilanguage = Multilanguage::instance();
-
+	
 		$settings = $this->get_settings();
+
 		\WC_Admin_Settings::save_fields( $settings );
+
+		$lang_prefix = $multilanguage->get_language_prefix();
 
 		/*
 		 * Re-save the script directly. WordPress will add slashes to the code.
 		 * This way we ensure that the <script> tags are saved.
 		 */
-		$field = Settings::option_id( 'layer', 'code', $multilanguage->get_language_prefix() );
+		$field = Settings::option_id( 'layer', 'code', $lang_prefix );
 
 		if ( isset( $_POST[ $field ] ) ) {
 			update_option( $field, $_POST[ $field ] );
@@ -118,7 +132,7 @@ class Settings_Page extends \WC_Settings_Page {
 		 * Secondly, WooCommerce settings API doesn't handle nested arrays, so we need to save an array
 		 * of plain strings.
 		 */
-		$field  = Settings::option_id( 'feed_attributes', 'additional_attributes', $multilanguage->get_language_prefix() );
+		$field  = Settings::option_id( 'feed_attributes', 'additional_attributes', $lang_prefix );
 		$delete = null;
 		if ( isset( $_POST[ $field . '_delete' ] ) ) {
 			$delete = $_POST[ $field . '_delete' ];
@@ -161,9 +175,38 @@ class Settings_Page extends \WC_Settings_Page {
 	public function before_settings() {
 		global $current_section;
 
+		// Hinde settings button in main notice when on Doofinder Settings page
+		echo '<style>.woocommerce-message.doofinder-notice-setup-wizard .button-settings{display:none;}</style>';
+
+		// Display non dissmisable notice about Setup Wizard if Doofidner is not yet configured
+		//echo Setup_Wizard::get_configure_via_setup_wizard_notice_html();
+
+		
+		// Will render non dissmissable warning only when conditions are met (ie. index is out of date)
+		$this->render_reindex_necessary_notice();
+		
+
 		if ( 'data_feed' === $current_section ) {
 			include 'settings/feed-url.php';
 		}
+
+		
+	}
+
+	/**
+	 * Print additional custom elements after the settings added using
+	 * WooCommerce Settings API.
+	 *
+	 * @since 1.0.0
+	 */
+	public function after_settings() {
+		global $current_section;
+
+		if ( '' === $current_section ) {
+			// Render Setup Wizard configuration button
+			echo Setup_Wizard::get_configure_via_setup_wizard_button_html();
+		}
+
 	}
 
 	/* Helpers ********************************************************************/
@@ -236,9 +279,9 @@ class Settings_Page extends \WC_Settings_Page {
 						<?php foreach ( $field_value as $attribute ): ?>
                             <tr>
                                 <td><input name="<?php echo $params['id']; ?>[field][]" type="text"
-                                           value="<?php echo $attribute['field']; ?>"></td>
+                                           value="<?php echo $attribute['field'] ?? ''; ?>"></td>
 
-								<?php if ( 'custom' === $attribute['attribute'] ): ?>
+								<?php if ( 'custom' === ($attribute['attribute'] ?? '') ): ?>
                                     <td>
                                         <input
                                                 type="hidden"
@@ -253,12 +296,12 @@ class Settings_Page extends \WC_Settings_Page {
                                         >
                                     </td>
 								<?php else: ?>
-                                    <td><?php $this->_custom_field_repeater_select( $params['id'], $params['options'], $attribute['attribute'] ); ?></td>
+                                    <td><?php $this->_custom_field_repeater_select( $params['id'], $params['options'], $attribute['attribute'] ?? '' ); ?></td>
 								<?php endif; ?>
 
                                 <td>
                                     <button type="submit" name="<?php echo $params['id']; ?>_delete" class="button"
-                                            value="<?php echo $attribute['field']; ?>">Delete
+                                            value="<?php echo $attribute['field'] ?? ''; ?>">Delete
                                     </button>
                                 </td>
                             </tr>
@@ -301,4 +344,23 @@ class Settings_Page extends \WC_Settings_Page {
 
 		<?php
 	}
+
+	/**
+	 * Render html of notice when reindexing data is necessary
+	 */
+	private function render_reindex_necessary_notice() {
+		$multilanguage = Multilanguage::instance();
+
+		$is_multilang_all =  $multilanguage->is_active() && ! $multilanguage->get_language_code();
+
+		if ( ( Settings::is_internal_search_enabled() || Settings::is_js_layer_enabled() ) && !Data_Index::is_index_data_up_to_date() && !$is_multilang_all ) :
+			?>
+			<div class="notice notice-warning inline">
+				<p><?php _e('Index might be out of date. Please reindex your data for the Doofinder integration to work properly.','woocommerce-doofinder'); ?></p>
+			</div>
+			<?php
+		endif;
+	}
+
+
 }
