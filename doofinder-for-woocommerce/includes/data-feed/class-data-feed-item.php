@@ -278,7 +278,7 @@ class Data_Feed_Item {
 			'medium-large',
 			'large',
 		);
-
+		
 		if ( $this->settings['image_size'] && (has_image_size( $this->settings['image_size'] ) || in_array($this->settings['image_size'], $default_sizes) )) {
 			$size = $this->settings['image_size'];
 		}

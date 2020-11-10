@@ -2,12 +2,15 @@
 
 namespace Doofinder\WC;
 
-use Doofinder\Api\Search\Client;
-use Doofinder\Api\Search\Results;
+use Doofinder\Search\Client;
+use Doofinder\Search\Results;
 use Doofinder\WC\Settings\Settings;
+
+use WP_Error;
 
 defined( 'ABSPATH' ) or die;
 
+// TODO Implement session id creating/handling/storing for stats requests in Doofinder when migrating Banners to API v2
 class Internal_Search {
 
 	/**
@@ -39,6 +42,20 @@ class Internal_Search {
 	private $hashid;
 
 	/**
+	 * Search session ID of the search engine handling current language.
+	 *
+	 * @var string
+	 */
+	private $sessionid = null;
+
+	/**
+	 * Server of the search engine.
+	 *
+	 * @var string
+	 */
+	private $server;
+
+	/**
 	 * Search term (if displaying a search page).
 	 *
 	 * @var string
@@ -54,11 +71,28 @@ class Internal_Search {
 	private $banner;
 
 	/**
+	 * Should api be disabled for local testing
+	 *
+	 * @var bool
+	 */
+	private $disable_api = false;
+
+	/**
 	 * Internal_Search constructor.
 	 *
 	 * @since 1.0.0
 	 */
 	public function __construct() {
+		$log = Transient_Log::instance();
+		$log->log( 'Internal Search  _construct ' );
+
+		// Get global disable_api_calls flag
+		$this->disable_api = Doofinder_For_WooCommerce::$disable_api_calls ?? $this->disable_api;
+
+		if ($this->disable_api) {
+			$log->log( '==== API IS DISABLED ====' );
+		}
+
 		$multilanguage = Multilanguage::instance();
 
 		// Load Internal Search settings
@@ -67,15 +101,17 @@ class Internal_Search {
 		$language_code = '';
 		if ( $multilanguage->is_active() ) {
 			$default_language = $multilanguage->get_default_language();
-			$language_code = $default_language['prefix'];
+			$language_code = $default_language['prefix'] ?? '';
 		}
 
-		$this->api_key = Settings::get( 'internal_search', 'api_key', $language_code );
-		$this->hashid = Settings::get( 'internal_search', 'hashid' );
+		$this->api_key = Settings::get( 'internal_search', 'api_key', 'all'); // Global setting
+		$this->hashid = Settings::get( 'internal_search', 'hashid' ); // Per language setting
+		$this->server = Settings::get( 'internal_search', 'search_server' , 'all'); // Global setting
 
-		// Check if the search is enabled and API Key and Hash ID are present
+
+		// Check if the search is enabled and API Key and Hash ID and Server are present
 		$this->enabled = false;
-		if ( 'yes' === $enabled && ! empty( $this->api_key ) && ! empty( $this->hashid ) ) {
+		if ( 'yes' === $enabled && ! empty( $this->api_key ) && ! empty( $this->hashid ) && ! empty( $this->server ) ) {
 			$this->enabled = true;
 		}
 	}
@@ -96,12 +132,53 @@ class Internal_Search {
 	private function init() {
 		$log = Transient_Log::instance();
 		$log->log( sprintf(
-			'Creating Doofinder Search client: %s, %s',
+			'Creating Doofinder Search client: Hash ID: %s, API-KEY: %s, SERVER: %s',
 			$this->hashid,
-			$this->api_key
+			$this->api_key,
+			$this->server
 		) );
 
-		$this->client = new Client( $this->hashid, $this->api_key );
+		$this->client = new Client( $this->server, $this->api_key );
+
+		$log->log( 'Internal Search - Crate Api Client' );
+	}
+
+	/**
+	 * 
+	 * Starts a session in doofinder search server
+	 * 
+	 */
+	public function initSession(){
+		if ( ! $this->client ) {
+			$this->init();
+		}
+
+		$this->client->registerSession($this->getSessionId(), $this->hash);
+	}
+
+	/**
+	 * Retrieve session id 
+	 * 
+	 * @return mixed Session string or null
+	 */
+	public function getSessionId($refresh = false) {
+		if ( ! $this->client ) {
+			$this->init();
+		}
+
+		if(!$this->sessionId || $refresh){		  
+			$this->sessionId = $this->client->createSessionId();
+		}
+
+		return $this->sessionid;
+	}
+
+	/**
+	 * Clean session id
+	 * 
+	 */
+	public function cleanSession(){
+		$this->sessionId = null;
 	}
 
 	/**
@@ -124,21 +201,54 @@ class Internal_Search {
 		}
 
 		// Perform a Doofinder search
-		$results = $this->client->query( $this->search, null, array(
-			'rpp' => 10000,
-		) );
+		
+		$searchParams = [
+			"hashid" => $this->hashid,
+			"query" => $this->search,
+			"page" => null,
+			'rpp' => 10000
+		];
+		
+		$results = null;
+
+		try {
+			$log->log( 'Internal Search - Search: ' );
+			$log->log( $searchParams );
+
+			if(!$this->disable_api) {
+				$log->log('=== API CALL === ');
+				$results = $this->client->search( $searchParams );
+				$log->log(' Search successfull ');
+				
+			} else {
+				$results = [];
+			}
+
+		} catch (\Exception $exception) {
+			$log->log( 'Internal Search - Exception' );
+			$log->log( 'There is a problem with Doofinder Search. Error:' );
+			$log->log( $exception->getMessage() );
+			
+			wp_die("There is a problem with Doofinder Search. Error: " . $exception->getMessage());
+		}
+		
 		$log->log( 'Calling Doofinder API. Results:' );
 		$log->log( $results );
 
-		// Store a banner for later use
-		$this->banner = $results->getProperty( 'banner' );
+		$ids = [];
+		
+		if ( $results instanceof Results ) {
 
-		// Process the search results we got from Doofinder
-		$ids = $this->ids_from_results( $results );
-		$log->log( sprintf(
-			'Extracted ids: %s',
-			join( ', ', $ids )
-		) );
+			// Store a banner for later use
+			$this->banner = $results->getProperty( 'banner' );
+
+			// Process the search results we got from Doofinder
+			$ids = $this->ids_from_results( $results );
+			$log->log( sprintf(
+				'Extracted ids: %s',
+				join( ', ', $ids )
+			) );
+		}
 
 		// Remove WP search - we don't want WP and Doofinder search to overlap.
 		unset( $args['s'] );
@@ -185,17 +295,19 @@ class Internal_Search {
 
 	/* Tracking *******************************************************************/
 
+	
 	/**
 	 * Track banner impression.
-	 *
+	 * 
 	 * @since 1.3.0
 	 */
 	public function trackBannerImpression() {
-		if ( ! $this->banner || ! $this->banner['id'] ) {
-			return;
-		}
-
-		$this->client->registerBannerDisplay( (int) $this->banner['id'] );
+		// NOTE: This is not used anymore in API v2
+		// if ( ! $this->banner || ! $this->banner['id'] ) {
+		// 	return;
+		// }
+		// $this->client->registerBannerDisplay( (int) $this->banner['id'] );
+		return;
 	}
 
 	/**
@@ -209,8 +321,8 @@ class Internal_Search {
 		if ( ! $this->client ) {
 			$this->init();
 		}
-
-		$this->client->registerBannerClick( $bannerId );
+		// TODO Migrate this to API v2
+		//$this->client->registerBannerClick( $bannerId );
 	}
 
 	/* Search parameters **********************************************************/

@@ -5,8 +5,11 @@ namespace Doofinder\WC;
 use Doofinder\WC\Data_Feed\Data_Feed_Item;
 use Doofinder\WC\Data_Feed\Feed_XML;
 use Doofinder\WC\Settings\Settings;
+use stdClass;
 
 defined( 'ABSPATH' ) or die;
+
+
 
 class Data_Feed {
 
@@ -100,22 +103,32 @@ class Data_Feed {
 	 *
 	 * @param string $language Language of the feed to show.
 	 */
-	public function __construct() {
+	public function __construct($xml = true, $product_ids = null, $language = null) {
+		
 		$multilanguage  = Multilanguage::instance();
-		$this->language = $multilanguage->get_language_code();
 
-		// Create XML document to fill out.
-		$this->feed = new Feed_XML();
+		if ( $language ) {
+			$this->language = $language;
+		} else {
+			$this->language = $multilanguage->get_language_code();
+		}
+
+		if ( $xml ) {
+			// Create XML document to fill out.
+			$this->feed = new Feed_XML();
+		} else {
+			$this->feed = new stdClass();
+		}
 
 		// Load settings.
 		$this->settings = array(
 			// Doofinder settings
-			'export_prices'  => Settings::get( 'feed', 'export_prices', $this->language ),
-			'export_tags'    => Settings::get( 'feed', 'export_tags', $this->language ),
-			'image_size'     => Settings::get( 'feed', 'image_size', $this->language ),
-			'split_variable' => Settings::get( 'feed', 'split_variable', $this->language ),
-			'protected'      => Settings::get( 'feed', 'password_protected', $this->language ),
-			'password'       => Settings::get( 'feed', 'password', $this->language ),
+			'export_prices'  => Settings::get( 'feed', 'export_prices', 'all' ),
+			'export_tags'    => Settings::get( 'feed', 'export_tags', 'all' ),
+			'image_size'     => Settings::get( 'feed', 'image_size', 'all' ),
+			'split_variable' => Settings::get( 'feed', 'split_variable', 'all' ),
+			'protected'      => Settings::get( 'feed', 'password_protected', 'all' ),
+			'password'       => Settings::get( 'feed', 'password', 'all' ),
 
 			// WooCommerce settings
 			'include_taxes'  => ( 'incl' === get_option( 'woocommerce_tax_display_shop' ) ),
@@ -126,8 +139,10 @@ class Data_Feed {
 			$this->terms_cache[ $term->term_id ] = $term;
 		}
 
-		$this->load_products();
+		$this->load_products($product_ids, $language);
 		$this->load_product_variations();
+
+	
 	}
 
 	/**
@@ -135,8 +150,14 @@ class Data_Feed {
 	 *
 	 * @since 1.0.0
 	 */
-	private function load_products() {
+	private function load_products($product_ids = null, $language = null) {
 		global $woocommerce;
+		
+		if ( $language ) {
+			global $sitepress;
+			$current_lang = $sitepress->get_current_language();
+			$sitepress->switch_lang($language);
+		}
 
 		$args = array(
 			'post_type'   => 'product',
@@ -153,6 +174,10 @@ class Data_Feed {
 			'update_post_meta_cache' => false,
 			'update_post_term_cache' => false,
 		);
+
+		if (is_array($product_ids) && !empty($product_ids)) {
+			$args['post__in'] = $product_ids;
+		}
 
 		// Visibility
 		// We should only show products that have catalog visibility set to search.
@@ -219,6 +244,10 @@ class Data_Feed {
 		if ( ! isset( $_GET['limit'] ) || $offset + $limit >= $query->found_posts ) {
 			$this->is_last = true;
 		}
+
+		if ( $language ) {
+			$sitepress->switch_lang($current_lang);
+		}
 	}
 
 	/**
@@ -260,17 +289,34 @@ class Data_Feed {
 	 */
 	public function generate() {
 		header( 'Content-Type: text/plain' );
+		//header( 'Content-Type: text/html' );
 
 		if (
 			'yes' !== $this->settings['protected'] ||
 			( isset( $_GET['secret'] ) && $this->settings['password'] === $_GET['secret'] )
 		) {
+			
 			$this->add_store_information();
 			$this->add_products();
 			$this->render();
 		}
 
 		echo '';
+	}
+
+
+	/**
+	 * Get array of products to index.
+	 *
+	 * @since 1.0.0
+	 */
+	public function get_items() {
+		
+		$this->add_store_information();
+		$this->add_products();
+
+		return $this->feed->items ?? [];
+
 	}
 
 	/**
@@ -311,7 +357,7 @@ class Data_Feed {
 						$this->paths_cache,
 						$this->terms_cache
 					);
-
+					
 					$this->add_item_to_feed( $item->get_fields() );
 				}
 			} else {
@@ -323,7 +369,7 @@ class Data_Feed {
 					$this->paths_cache,
 					$this->terms_cache
 				);
-
+				
 				$this->add_item_to_feed( $item->get_fields() );
 			}
 		}

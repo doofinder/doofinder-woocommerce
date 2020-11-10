@@ -7,12 +7,15 @@
  * Author: doofinder
  * Description: Integrate Doofinder Search in your WooCommerce shop.
  * WC requires at least: 2.1.0
- * WC tested up to: 3.9.2
+ * WC tested up to: 5.4.1
  *
  * @package WordPress
  */
 
+
 namespace Doofinder\WC;
+
+use Doofinder\WC\Settings\Settings;
 
 defined( 'ABSPATH' ) or die;
 
@@ -48,6 +51,8 @@ if (
 			 */
 			protected static $_instance = null;
 
+
+
 			/**
 			 * Returns the only instance of Doofinder_For_WooCommerce
 			 *
@@ -61,6 +66,13 @@ if (
 
 				return self::$_instance;
 			}
+
+			/**
+			 * Should api calls be disabled for local testing
+			 *
+			 * @var bool
+			 */
+			public static $disable_api_calls = false;
 
 			/* Hacking is forbidden *******************************************************/
 
@@ -94,24 +106,47 @@ if (
 
 				// Load classes on demand
 				self::autoload( self::plugin_path() . 'includes/' );
-				include_once 'lib/autoload.php';
+				require_once 'lib/vendor/autoload.php';
+				require_once 'lib/autoload.php';
 
 				// Register all custom URLs
 				add_action( 'init', function() use ( $class ) {
 					call_user_func( array( $class, 'register_urls' ) );
 				} );
 
+
 				// Initialize Admin Panel functionality on admin side, and front functionality on front side
 				if ( is_admin() ) {
+					Thumbnail::prepare_thumbnail_size();
+					Post::add_additional_settings();
+					Post::register_webhooks();
+
+					Setup_Wizard::instance();
 					Admin::instance();
+					Index_Interface::instance();
 				} else {
 					Front::instance();
 				}
+
+				// Register custom WP REST Api endpoint
+				add_action( 'rest_api_init', function () use ( $class ) {
+					register_rest_route( 'doofinder-for-wc/v1', '/connect/', array(
+						'methods' => ['POST', 'GET'],
+						'callback' => array( $class, 'connect')
+					));
+				});
 
 				// Some functionalities need to be initialized on both admin side, and frontend.
 				Both_Sides::instance();
 
 				self::maybe_suppress_notices();
+			}
+
+			/**
+			 * Callback for WP Rest Api custom endpoint
+			 */
+			public static function connect( ) {
+				return Setup_Wizard::connect();
 			}
 
 			/**
@@ -208,6 +243,7 @@ if (
 
 			/* Plugin activation and deactivation *****************************************/
 
+
 			/**
 			 * Activation Hook to configure routes and so on
 			 *
@@ -218,6 +254,14 @@ if (
 				self::autoload( self::plugin_path() . 'includes/' );
 				self::register_urls();
 				flush_rewrite_rules();
+
+				if ( Setup_Wizard::should_activate() ) {
+					Setup_Wizard::activate();
+				}
+
+				if ( Setup_Wizard::should_show_notice() ) {
+					Setup_Wizard::add_notice();
+				}
 			}
 
 			/**
@@ -228,6 +272,19 @@ if (
 			 */
 			public static function plugin_disabled() {
 				flush_rewrite_rules();
+				Setup_Wizard::remove_notice();
+			}
+
+			/**
+			 * Add settings link next to deactivate on plugin's page in admin panel
+			 *
+			 * @since 1.0.0
+			 * @return string
+			 */
+			public static function plugin_add_settings_link( $links ) {
+				$links['settings'] = '<a href="' . Settings::get_url() . '">' . __('Settings','woocommerc-doofinder') . '</a>';
+
+				return array_reverse($links); // array reverse to display "Settings" link first
 			}
 		}
 
@@ -237,5 +294,7 @@ if (
 	register_deactivation_hook( __FILE__, array( '\Doofinder\WC\Doofinder_For_WooCommerce', 'plugin_disabled' ) );
 
 	add_action( 'plugins_loaded', array( '\Doofinder\WC\Doofinder_For_WooCommerce', 'instance' ), 0 );
+
+	add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), array( '\Doofinder\WC\Doofinder_For_WooCommerce', 'plugin_add_settings_link' ));
 
 endif;
