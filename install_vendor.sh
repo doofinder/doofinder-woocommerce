@@ -1,6 +1,7 @@
 #!/bin/bash
 
 pushd doofinder-for-woocommerce/lib
+rm -rf vendor
 composer install
 
 pushd vendor
