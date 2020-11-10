@@ -3,4 +3,3 @@
 *.diff
 *.sublime-project
 *.sublime-workspace
-vendor/*
