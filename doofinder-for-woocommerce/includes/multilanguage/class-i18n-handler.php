@@ -51,6 +51,14 @@ interface I18n_Handler {
 	 */
 	public function get_languages();
 
+
+	/**
+	 * Get all formatted languages.
+	 *
+	 * @return array[string]string List of all languages.
+	 */
+	public function get_formatted_languages();
+
 	/**
 	 * Retrieve array of posts (like "get_posts"), but retrieve posts only from
 	 * a given language.
@@ -60,4 +68,18 @@ interface I18n_Handler {
 	 * @return array Array of WP_Post objects.
 	 */
 	public function get_posts( $args, $language );
+
+	
+	/**
+	 * Retrieve the name of the wordpress option
+	 * for the current languages.
+	 *
+	 * Some fields in Doofinder settings will have different values,
+	 * depending on language.
+	 *
+	 * @param string $base
+	 *
+	 * @return string
+	 */
+	public function get_option_name( $base );
 }

@@ -70,7 +70,7 @@ class Front {
 
 			wp_enqueue_style(
 				'woocommerce-doofinder',
-				Doofinder_For_WooCommerce::plugin_url() . 'assets/styles.css'
+				Doofinder_For_WooCommerce::plugin_url() . 'assets/css/styles.css'
 			);
 		} );
 	}
@@ -206,7 +206,7 @@ class Front {
 		}
 
 		// Track banner impression
-		$this->search->trackBannerImpression();
+		//$this->search->trackBannerImpression(); // Disabled in API v2
 
 		// We need to track down the banner click, so we can't redirect directly
 		// to the specified URL. We redirect to WP to handle tracking.

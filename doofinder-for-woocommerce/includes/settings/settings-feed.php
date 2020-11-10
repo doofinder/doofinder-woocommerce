@@ -8,7 +8,7 @@ defined( 'ABSPATH' ) or die();
 $multilanguage = Multilanguage::instance();
 
 if ( $multilanguage->is_active() && ! $multilanguage->get_language_code() ) {
-	echo '<p>' . __( 'Please choose a language to view the settings.', 'woocommerce-doofinder' ) . '</p>';
+	echo $multilanguage->get_choose_language_notice();
 	return array();
 }
 
