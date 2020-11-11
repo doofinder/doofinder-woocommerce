@@ -270,7 +270,8 @@ class Data_Feed_Item {
 	 */
 	private function add_thumbnail() {
 		$size = 'thumbnail';
-		$image_id = get_post_thumbnail_id( $this->post->ID );
+		$image_id = $this->product->get_image_id();
+
 
 		$default_sizes = array(
 			'thumbnail',
@@ -371,21 +372,26 @@ class Data_Feed_Item {
 		}
 
 		$attributes = array_map( 'wp_parse_args', $attributes );
-		foreach ( $attributes as $attribute ) {
-			$this->fields[ $attribute['field'] ] = $this->attributes->get_attribute_value(
-				$attribute['attribute'],
-				$this->post,
-				$attribute
-			);
 
-			// Inherit attributes from parent.
-			if ($this->parent) {
+		foreach ( $attributes as $attribute ) {
+
+			if( isset($attribute['field']) && isset($attribute['attribute'])) {
 				$this->fields[ $attribute['field'] ] = $this->attributes->get_attribute_value(
 					$attribute['attribute'],
-					$this->parent,
+					$this->post,
 					$attribute
 				);
+
+				// Inherit attributes from parent.
+				if ($this->parent) {
+					$this->fields[ $attribute['field'] ] = $this->attributes->get_attribute_value(
+						$attribute['attribute'],
+						$this->parent,
+						$attribute
+					);
+				}
 			}
+
 		}
 	}
 
