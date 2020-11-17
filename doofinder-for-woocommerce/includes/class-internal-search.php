@@ -84,7 +84,7 @@ class Internal_Search {
 	 */
 	public function __construct() {
 		$log = Transient_Log::instance();
-		$log->log( 'Internal Search  _construct ' );
+		//$log->log( 'Internal Search - Start' );
 
 		// Get global disable_api_calls flag
 		$this->disable_api = Doofinder_For_WooCommerce::$disable_api_calls ?? $this->disable_api;
@@ -96,17 +96,22 @@ class Internal_Search {
 		$multilanguage = Multilanguage::instance();
 
 		// Load Internal Search settings
-		$enabled = Settings::get( 'internal_search', 'enable' );
+		$enabled = Settings::get( 'internal_search', 'enable' ); // Per language setting+
 
 		$language_code = '';
+		$lang = '';
 		if ( $multilanguage->is_active() ) {
 			$default_language = $multilanguage->get_default_language();
 			$language_code = $default_language['prefix'] ?? '';
+			$lang = 'all';
 		}
 
-		$this->api_key = Settings::get( 'internal_search', 'api_key', 'all'); // Global setting
+		$this->api_key = Settings::get( 'internal_search', 'api_key', $lang ); // Global setting
 		$this->hashid = Settings::get( 'internal_search', 'hashid' ); // Per language setting
-		$this->server = Settings::get( 'internal_search', 'search_server' , 'all'); // Global setting
+		$this->server = Settings::get( 'internal_search', 'search_server', $lang ); // Global setting
+
+		$log->log('Hash ID: '.$this->hashid.', API-KEY: '.$this->api_key.', SERVER: ' . $this->server);
+		
 
 
 		// Check if the search is enabled and API Key and Hash ID and Server are present
