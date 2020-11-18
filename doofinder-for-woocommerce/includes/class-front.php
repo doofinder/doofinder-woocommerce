@@ -203,12 +203,14 @@ class Front {
 			// Search Doofinder, and override the query.
 			$search = new Internal_Search();
 
+			
 			// Only use Internal Search if it's enabled and keys are present
-			if ( !$search->is_ok() || !$search->is_enabled()) {
+			if ( !$search->is_enabled()) {
 				$log->log( 'Internal Search is disabled. Aborting.' );
 
 				return $posts;
 			}
+
 			
 			// Determine how many posts per page.
 			if ( $query->get( 'posts_per_page' ) ) {
@@ -227,6 +229,13 @@ class Front {
 
 
 			$search->search_new( $search_query, $page, $per_page );
+
+			// If internal search is not working fall back to defaul search
+			if ( !$search->is_ok()) {
+				$log->log( 'Internal Search is not working. Aborting.' );
+
+				return $posts;
+			}
 			
 
 			// Doofinder found some results.

@@ -425,7 +425,7 @@ class Internal_Search {
 			$log->log( 'Internal Search - Exception' );
 			$log->log( 'There is a problem with Doofinder Search. Error:' );
 			$log->log( $exception->getMessage() );
-			$log->log( 'Falling back to default wordpress search. Aborting.' );
+			$log->log( 'Falling back to default wordpress search.' );
 
 			$this->working = false;
 
