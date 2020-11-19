@@ -78,6 +78,50 @@ class Internal_Search {
 	private $disable_api = false;
 
 	/**
+	 * Is the class set up, everything working
+	 * and we can perform the search?
+	 *
+	 * @var bool
+	 */
+	private $working = true;
+
+	/**
+	 * Results of the performed search.
+	 *
+	 * @var Results
+	 */
+	private $results;
+
+	/**
+	 * How many posts per page are there in the results.
+	 *
+	 * @var int
+	 */
+	private $per_page;
+
+	/**
+	 * How many posts was there in the results in total.
+	 *
+	 * @var int
+	 */
+	private $found_posts;
+
+	/**
+	 * Total number of pages of results
+	 *
+	 * @var int
+	 */
+	private $pages;
+
+	/**
+	 * List of IDs of posts returned by Doofinder.
+	 *
+	 * @var int[]
+	 */
+	private $ids = array();
+
+
+	/**
 	 * Internal_Search constructor.
 	 *
 	 * @since 1.0.0
@@ -143,9 +187,26 @@ class Internal_Search {
 			$this->server
 		) );
 
-		$this->client = new Client( $this->server, $this->api_key );
+		try {
+			$this->client = new Client( $this->server, $this->api_key );
+		} catch ( \Exception $exception ) {
+			$this->working = false;
+			$log->log( $exception );
+		}
 
 		$log->log( 'Internal Search - Crate Api Client' );
+	}
+
+	/**
+	 * Check the status of the search.
+	 *
+	 * If this returns true that means everything is ok and
+	 * it's safe to perform search.
+	 *
+	 * @return bool
+	 */
+	public function is_ok() {
+		return $this->working;
 	}
 
 	/**
@@ -187,6 +248,7 @@ class Internal_Search {
 	}
 
 	/**
+	 * NOTICE: This is older search replaced with search_new
 	 * Perform a Doofinder search and modify WooCommerce query.
 	 */
 	public function search( $args ) {
@@ -200,9 +262,8 @@ class Internal_Search {
 		// If we are not searching for anything, then just let WordPress do its thing
 		$this->parse_search_term();
 		if ( null === $this->search ) {
-			$log->log( 'Search term not found. Aborting.' );
+			$log->log( 'Search term not found.' );
 
-			return null;
 		}
 
 		// Perform a Doofinder search
@@ -210,8 +271,8 @@ class Internal_Search {
 		$searchParams = [
 			"hashid" => $this->hashid,
 			"query" => $this->search,
-			"page" => null,
-			'rpp' => 10000
+			"page" => 1,
+			'rpp' => 100
 		];
 		
 		$results = null;
@@ -253,6 +314,15 @@ class Internal_Search {
 				'Extracted ids: %s',
 				join( ', ', $ids )
 			) );
+
+			// If no ids where found via Doofinder return early with no results
+			if(empty($ids)) {
+				return array(
+					'ids'           => [],
+					'found_posts'   => 0,
+					'max_num_pages' => 0,
+				);
+			}
 		}
 
 		// Remove WP search - we don't want WP and Doofinder search to overlap.
@@ -279,12 +349,139 @@ class Internal_Search {
 
 		$log->log( 'Doofinder Search completed.' );
 
+
 		return array(
 			'ids'           => $posts->posts,
 			'found_posts'   => $posts->found_posts,
 			'max_num_pages' => $posts->max_num_pages,
 		);
 	}
+
+	/* New search ******************************************************************/
+
+	/**
+	 * Perform a Doofinder search, grab results and extract
+	 * from the results all data that will be interesting
+	 * to other classes (list of post ids, number of pages
+	 * of results, etc).
+	 *
+	 * @param string $query
+	 * @param int    $page
+	 * @param int    $per_page
+	 */
+	public function search_new( $query, $page = 1, $per_page = 100 ) {
+
+		$log = Transient_Log::instance();
+		
+		$log->log( 'Start Doofinder search new' );
+		$this->init();
+
+		if ( null === $query ) {
+			$log->log( 'Search term not found.' );
+		}
+
+		$this->per_page = $per_page;
+
+		$log->log( 'Per page: ' .$per_page );
+		// Doofinder API throws exceptions when anything goes wrong./
+		// We don't actually need to handle this in any way. If search
+		// throws an exception, the list of IDs will be empty
+		// and Internal Search will display empty list of results.
+		try {
+
+			$queryParams = [
+				"hashid" => $this->hashid,
+				"query" => $query,
+				"page" => $page,
+				'rpp' => $per_page
+			];
+
+			$log->log( 'Internal Search - Search: ' );
+			$log->log( $queryParams );
+
+			
+			if(!$this->disable_api) {
+				$log->log('=== API CALL === ');
+				$this->results = $this->client->search( $queryParams );
+				$log->log(' Search successfull ');
+				
+			} else {
+				$this->results = [];
+			}
+
+			$this->extract_ids();
+			$this->calculate_totals();
+
+			$log->log( 'Calling Doofinder API. Results:' );
+			$log->log( $this->results  );
+
+			$log->log( sprintf(
+				'Extracted ids: %s',
+				join( ', ', $this->ids )
+			) );
+
+
+		} catch ( \Exception $exception ) {
+			$log->log( 'Internal Search - Exception' );
+			$log->log( 'There is a problem with Doofinder Search. Error:' );
+			$log->log( $exception->getMessage() );
+			$log->log( 'Falling back to default wordpress search.' );
+
+			$this->working = false;
+
+		}
+	}
+
+	/**
+	 * Retrieve the list of ids of posts returned by the search.
+	 *
+	 * @return int[]
+	 */
+	public function get_ids() {
+		return $this->ids;
+	}
+
+	/**
+	 * Retrieve the number of posts found by Doofinder.
+	 *
+	 * @return int
+	 */
+	public function get_total_posts() {
+		return $this->found_posts;
+	}
+
+	/**
+	 * How many pages of posts did Doofinder find?
+	 *
+	 * @return int
+	 */
+	public function get_total_pages() {
+		return $this->pages;
+	}
+
+	/**
+	 * Go through the results from Doofinder and generate
+	 * a list of post IDs based on the returned results.
+	 */
+	private function extract_ids() {
+		$results   = $this->results->getResults();
+		$this->ids = array();
+		foreach ( $results as $result ) {
+			$this->ids[] = $result['id'];
+		}
+	}
+
+	/**
+	 * Determine how many posts the search returned and how many
+	 * pages of results there are.
+	 */
+	private function calculate_totals() {
+		$this->found_posts = $this->results->getProperty( 'total' );
+		$this->pages       = ceil( $this->found_posts / $this->per_page );
+	}
+
+
+	/* Tracking *******************************************************************/
 
 	/**
 	 * Retrieve the banner we obtained when making a Doofinder search.
@@ -298,7 +495,6 @@ class Internal_Search {
 		return $this->banner;
 	}
 
-	/* Tracking *******************************************************************/
 
 	
 	/**

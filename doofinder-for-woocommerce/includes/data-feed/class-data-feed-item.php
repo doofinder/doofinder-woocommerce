@@ -305,13 +305,13 @@ class Data_Feed_Item {
 		$prices = $this->get_prices( $this->product );
 
 		if ( $prices['regular'] ) {
-			$this->fields['price'] = (int) $prices['regular'];
+			$this->fields['price'] = (float) $prices['regular'];
 		}
 
 		if ( isset( $prices['sale'] ) && $prices['sale'] ) {
 			// If there's no regular price display sale price as regular.
 			$field_name = $prices['regular'] ? 'sale_price' : 'price';
-			$this->fields[ $field_name ] = (int) $prices['sale'];
+			$this->fields[ $field_name ] = (float) $prices['sale'];
 		}
 	}
 
