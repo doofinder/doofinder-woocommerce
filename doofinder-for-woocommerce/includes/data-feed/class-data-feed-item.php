@@ -247,8 +247,27 @@ class Data_Feed_Item {
 	 * @since 1.0.0
 	 */
 	private function add_availability() {
-		$availability = $this->product->is_purchasable() && $this->product->is_in_stock() ? 'in stock' : 'out of stock';
+
+		$type = $this->product->get_type();
+
+		if ($type === 'grouped' || $type === 'external') {
+			$availability = $this->product->is_in_stock() ? 'in stock' : 'out of stock';			
+		} else {
+			$availability = $this->product->is_purchasable() && $this->product->is_in_stock() ? 'in stock' : 'out of stock';
+		}
+		
 		$this->fields['availability'] = $availability;
+	}
+
+	/**
+	 * Add product type (simple, variable, etc.).
+	 * 
+	 *
+	 * @since 1.0.0
+	 */
+	private function add_type() {
+		
+		$this->fields['type'] = $this->product->get_type();
 	}
 
 	/**

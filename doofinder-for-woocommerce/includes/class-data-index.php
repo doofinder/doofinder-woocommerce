@@ -538,6 +538,8 @@ class Data_Index {
 
 		if(!empty($this->items)) {
 			$this->log->log( 'Generate items - Items generated : ' . count($this->items) );
+			$this->log->log( 'Generate items - Items : ' );
+			$this->log->log( $this->items );
 		} else {
 			$this->log->log( 'Generate items - No Items generated' );
 		}
