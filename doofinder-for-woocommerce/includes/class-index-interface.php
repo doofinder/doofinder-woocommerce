@@ -291,6 +291,9 @@ class Index_Interface {
 			if ( Doofinder_For_WooCommerce::$disable_api_calls ) {
 				$this->render_html_api_disabled_notice();
 			}
+			if ( Data_Index::$should_fail ) {
+				Setup_Wizard::render_html_should_fail_notice();
+			}
 
 			?>
 			<?php if (!$is_indexing_impossible) : ?>
@@ -551,11 +554,23 @@ class Index_Interface {
 	 */
 	public function render_html_indexing_error() {
 		?>
-
         <p id="doofinder-for-wc-indexing-error" class="doofinder-for-wc-indexing-error">
 			<?php _e( 'An error occurred when indexing posts. Maybe the Doofinder API is down, but maybe it\'s just a temporary hiccup. Try refreshing and resuming indexing in a few minutes. Don\'t worry - posts that have already been indexed will not be lost.', 'woocommerce-doofinder' ); ?>
         </p>
+		<?php
+	}
 
+	/**
+	 * Render the error message that will be displayed if indexing error occurs in setup wizard.
+	 */
+	public function render_html_indexing_error_wizard() {
+		?>
+		<div>
+			<p id="doofinder-for-wc-indexing-error" class="doofinder-for-wc-indexing-error">
+				<?php _e( 'There was an unexpected error. Please try again. If the error persists, please contact us.', 'woocommerce-doofinder' ); ?>
+			</p>
+			<a href="<?php echo Settings::get_url('reset-wizard=1'); ?>" class="button button-primary button-error"><?php _e('Exit setup','woocommerce-doofinder'); ?></a>
+		</div>
 		<?php
 	}
 

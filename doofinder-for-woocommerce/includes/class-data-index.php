@@ -132,6 +132,14 @@ class Data_Index {
 	 */
 	private $process_all_languages = false;
 
+	/**
+	 * Should processing data fail (used for testing)
+	 *
+	 * @var bool
+	 */
+	public static $should_fail = false;
+
+
 	public function __construct() {
 		$this->language      			= Multilanguage::instance();
 		$this->indexing_data 			= Indexing_Data::instance();
@@ -197,6 +205,16 @@ class Data_Index {
 	 * @return bool True if the indexing has finished.
 	 */
 	public function index_posts($language = null) {
+
+		if (self::$should_fail) {
+			$this->ajax_response_error( array(
+				'status'  => Api_Status::$unknown_error,
+				'message' => '',
+				'error'   => true
+			) );
+
+			return;
+		}
 
 		// TODO Maybe make it work with different post types enabled, not only with products
 

@@ -4,6 +4,7 @@ namespace Doofinder\WC;
 use Doofinder\WC\Setup_Wizard;
 
 $wizard = Setup_Wizard::instance();
+$error = $wizard->get_errors_html("wizard-step-4");
 ?>
 
 <form action="<?php echo Setup_Wizard::get_url(['step' => '4']); ?>" method="post"  class="dfwc-setup-step__actions">
@@ -31,6 +32,17 @@ $wizard = Setup_Wizard::instance();
 	<?php endforeach; ?>
 	
 	<input type="hidden" name="process-step" value="4" />
-	<button type="submit" class="button button-primary"><?php _e('Create layer', 'woocommerce-doofinder'); ?></button>
-	<a href="<?php echo Setup_Wizard::get_url(['step'=>'5']); ?>" data-go-to-step="5" class="skip-step"><?php _e("Skip, I'll do it later", 'woocommerce-doofinder'); ?></a>
+	<button type="submit" id="create-doofinder-layer" class="button button-primary" style="display:none;"><?php _e('Create layer', 'woocommerce-doofinder'); ?></button>
+	<a href="<?php echo Setup_Wizard::get_url(['step'=>'5']); ?>" data-go-to-step="5" class="skip-step" style="display:none;'"><?php _e("Skip, I'll do it later", 'woocommerce-doofinder'); ?></a>
+
+	
+	<p class="loading" ><?php _e('Creating layer. Please wait...', 'woocommerce-doofinder'); ?></p>
+	
 </form>
+<?php if(isset($step_state) && $step_state === 4 && !$error) : ?>
+	<script>
+		window.addEventListener('load',()=>{
+			document.getElementById('create-doofinder-layer').click();
+		});
+	</script>
+<?php endif; ?>

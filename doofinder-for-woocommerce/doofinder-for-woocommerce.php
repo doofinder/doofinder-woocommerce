@@ -134,13 +134,14 @@ if (
 						'methods' => ['POST', 'GET'],
 						'callback' => array( $class, 'connect'),
 						'permission_callback' => '__return_true'
-					));
+					),);
 				});
 
 				// Some functionalities need to be initialized on both admin side, and frontend.
 				Both_Sides::instance();
 
 				self::maybe_suppress_notices();
+				
 			}
 
 			/**
@@ -263,6 +264,10 @@ if (
 				if ( Setup_Wizard::should_show_notice() ) {
 					Setup_Wizard::add_notice();
 				}
+				
+				if ( Setup_Wizard::should_migrate() ) {
+					Setup_Wizard::migrate();
+				}
 			}
 
 			/**
@@ -274,6 +279,55 @@ if (
 			public static function plugin_disabled() {
 				flush_rewrite_rules();
 				Setup_Wizard::remove_notice();
+				//Reset migration status
+				Setup_Wizard::remove_migration_notice();
+				update_option(Setup_Wizard::$wizard_migration_option,'');
+			}
+
+			/**
+			 * This function runs when WordPress completes its upgrade process
+			 * It iterates through each plugin updated to see if ours is included
+			 * 
+			 * @param array $upgrader_object
+			 * @param array $options
+			 */
+			public static function upgrader_process_complete($upgrader_object, $options)
+			{
+				$log = new Log();
+				$log->log('upgrader_process - start');
+				// The path to our plugin's main file
+				$our_plugin = plugin_basename(__FILE__);
+
+				$log->log($our_plugin);
+				$log->log($options);
+
+				// If an update has taken place and the updated type is plugins and the plugins element exists
+				if ($options['action'] == 'update' && $options['type'] == 'plugin') {
+					
+					$log->log('upgrader_process - updating plugin');
+
+					if (isset($options['plugins'])) {
+						$plugins = $options['plugins'];
+					} elseif( isset($options['plugin'])) {
+						$plugins = [$options['plugin']] ;
+					}
+
+					$log->log($plugins);
+
+					// Iterate through the plugins being updated and check if ours is there
+					foreach ($plugins as $plugin) {
+						$log->log($plugin);
+
+						if ($plugin == $our_plugin) {
+
+							$log->log('upgrader_process - try to migrate');
+							// Try to migrate settings if possible and necessary
+							if ( Setup_Wizard::should_migrate() ) {
+								Setup_Wizard::migrate();
+							}
+						}
+					}
+				}
 			}
 
 			/**
@@ -295,6 +349,7 @@ if (
 	register_deactivation_hook( __FILE__, array( '\Doofinder\WC\Doofinder_For_WooCommerce', 'plugin_disabled' ) );
 
 	add_action( 'plugins_loaded', array( '\Doofinder\WC\Doofinder_For_WooCommerce', 'instance' ), 0 );
+	add_action( 'upgrader_process_complete', array('\Doofinder\WC\Doofinder_For_WooCommerce','upgrader_process_complete'), 10, 2 );
 
 	add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), array( '\Doofinder\WC\Doofinder_For_WooCommerce', 'plugin_add_settings_link' ));
 
