@@ -16,6 +16,10 @@ $step_state = isset($_GET['step']) ? (int) $_GET['step'] : ($this->get_step() ?:
 
 
 $this->process_wizard_step($step_state); 
+
+if ( Setup_Wizard::$should_fail) {
+    Setup_Wizard::render_html_should_fail_notice();
+}
 ?>
 
 <div class="dfwc-setup-steps <?php echo $step_state < $this::$no_steps ? 'active' : ''; ?>">

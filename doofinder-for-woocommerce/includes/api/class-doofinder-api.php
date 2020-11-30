@@ -339,60 +339,58 @@ class Doofinder_Api implements Api_Wrapper {
 					// If real index does not exists creating temp index will fail,
 					// So we need to create real index first
 					
-					//if ( preg_match( '/not_found/i', $exception->getMessage() ) === 1 ) {
+					$this->log->log('Send batch - Exception - Real Index Not Found' . "\n");
 
-						$this->log->log('Send batch - Exception - Real Index Not Found' . "\n");
+					try {
 
-						try {
+						$this->log->log('Send batch - Try to create Real Index' . "\n");
 
-							$this->log->log('Send batch - Try to create Real Index' . "\n");
+						if (!$this->disable_api) {
+							$this->log->log('=== API CALL === ');
+							// Prepare index data
+							$body = [
+								'name' => $items_type,
+								'preset' => 'product'
+							];
+							$this->client->createIndex( $this->hash, json_encode($body) );
+							$this->api_calls++;
+						}
 
-							if (!$this->disable_api) {
-								$this->log->log('=== API CALL === ');
-								// Prepare index data
-								$body = [
-									'name' => $items_type,
-									'preset' => $items_type
-								];
-								$this->client->createIndex( $this->hash, json_encode($body) );
-								$this->api_calls++;
-							}
+						$this->log->log('Send batch - Real Index Created' . "\n");
 
-							$this->log->log('Send batch - Real Index Created' . "\n");
+					} catch ( \Exception $exception ) {
+						// For some reason Index could not be created.
+						$this->log->log('Send batch - Real Index NOT Created' . "\n");
+						$this->log->log( $exception->getMessage() );
+						return Api_Status::$unknown_error;
+					}
 
-						} catch ( \Exception $exception ) {
+					// Finally try to create temp index
+					try {
+
+						$this->log->log('Send batch - Try to create Temp Index' . "\n");
+
+						if (!$this->disable_api) {
+							$this->log->log('=== API CALL === ');
+							$this->client->createTemporaryIndex( $this->hash,  $items_type );
+							$this->api_calls++;
+						}
+
+						$this->log->log('Send batch - Temp Index Created' . "\n");
+
+						//$this->log->log('Send batch - Set Temp Index Inner State ' . "\n");
+						// Mark it in our status.
+						$indexing_data->set( 'temp_index', $items_type );
+
+					} catch ( \Exception $exception ) {
+
 							// For some reason Index could not be created.
-							$this->log->log('Send batch - Real Index NOT Created' . "\n");
+							$this->log->log('Send batch - Temp Index NOT Created' . "\n");
 							$this->log->log( $exception->getMessage() );
 							return Api_Status::$unknown_error;
-						}
+					}
 
-						// Finally try to create temp index
-						try {
-
-							$this->log->log('Send batch - Try to create Temp Index' . "\n");
-
-							if (!$this->disable_api) {
-								$this->log->log('=== API CALL === ');
-								$this->client->createTemporaryIndex( $this->hash,  $items_type );
-								$this->api_calls++;
-							}
-
-							$this->log->log('Send batch - Temp Index Created' . "\n");
-
-							//$this->log->log('Send batch - Set Temp Index Inner State ' . "\n");
-							// Mark it in our status.
-							$indexing_data->set( 'temp_index', $items_type );
-
-						} catch ( \Exception $exception ) {
-
-								// For some reason Index could not be created.
-								$this->log->log('Send batch - Temp Index NOT Created' . "\n");
-								$this->log->log( $exception->getMessage() );
-								return Api_Status::$unknown_error;
-						}
-
-					//}
+					
 				
 				} catch ( \Exception $exception ) {
 					// Temp Index could not be created it probably exists already. Move on.

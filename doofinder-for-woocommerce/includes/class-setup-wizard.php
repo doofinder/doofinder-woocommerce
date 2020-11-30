@@ -58,9 +58,8 @@ class Setup_Wizard {
 	 *
 	 * @var string
 	 */
-	private static $wizard_step_option = 'doofinder_for_wc_setup_wizard_step';
+	public static $wizard_step_option = 'doofinder_for_wc_setup_wizard_step';
 
-	
 	/**
 	 * Name of the option storing the random token for step 1 verification.
 	 *
@@ -76,6 +75,26 @@ class Setup_Wizard {
 	private static $wizard_notice_name = 'doofinder_show_wizard_notice';
 
 	/**
+	 * Name of the woocommerce notice shown after plugin activation
+	 *
+	 * @var string
+	 */
+	private static $wizard_migration_notice_name = 'doofinder_show_the_migration_complete_notice';
+
+	/**
+	 * Name of the option storing settgins migration info
+	 *
+	 * @var string
+	 */
+	public static $wizard_migration_option = 'woocommerce_doofinder_migration_status';
+
+	/**
+	 * Name of the transient controling wheter to show migration notice
+	 *
+	 * @var string
+	 */
+	public static $wizard_migration_notice_transient = 'doofinder_for_wc_migration_complete';
+/**
 	 * How many steps does the wizard have.
 	 *
 	 * @var int
@@ -147,6 +166,13 @@ class Setup_Wizard {
 	 */
 	private $disable_api = false;
 
+	/**
+	 * Should processing data fail (used for testing)
+	 *
+	 * @var bool
+	 */
+	public static $should_fail = false; 
+
 
 	public function __construct() {
 		
@@ -166,7 +192,7 @@ class Setup_Wizard {
 				$this->errors[$key] = $value;
 
 				// Delete error cookie when reloading wizard page
-				if ($this->is_wizard_page() && !\wp_doing_ajax()) {
+				if (self::is_wizard_page() && !\wp_doing_ajax()) {
 					$this->log->log("Deleting Error Cookies");
 					unset($_COOKIE['doofinderError'][$key]); 
 					setcookie("doofinderError[{$key}]", null, -1, '/');
@@ -176,12 +202,6 @@ class Setup_Wizard {
 
 		// $this->log->log("Setup Wizard Errors: ");
 		// $this->log->log($this->errors);
-
-		// $trace = '';
-		// ob_start();
-		// debug_print_backtrace();
-		// $trace = ob_get_clean();
-		// $this->log->log($trace);
 		
 		if ( current_user_can( 'manage_woocommerce' ) ) {
 			add_action( 'admin_menu', array( $this, 'admin_menus' ) );
@@ -196,10 +216,9 @@ class Setup_Wizard {
 	 * @return bool
 	 */
 
-	public function is_wizard_page() {
+	public static function is_wizard_page() {
 		return (is_admin() && isset($_GET['page']) && $_GET['page'] === 'dfwc-setup');
 	}
-
 
 	/**
 	 * Callback for WP rest api endpoint for connecting doofinder account
@@ -533,6 +552,50 @@ class Setup_Wizard {
 		return $html;
 	}
 
+		/**
+	 * Wizard setup notice html
+	 * 
+	 * @param bool $settings 
+	 * 
+	 * @return string
+	 */
+	public static function get_setup_wizard_migration_notice_html() {
+
+		ob_start();
+
+		?><div id="message" class="woocommerce-message doofinder-migration-notice"><?php
+			?><p class="main"><?php _e('Doofinder settings has been migrated successfully.','woocommerce-doofinder') ?></p><?php
+		?></div><?php
+		
+		$html = ob_get_clean();
+
+		// $log = new Log();
+		// $log->log( 'Migration Notice - Transient' );
+		// $log->log(get_transient(self::$wizard_migration_notice_transient));
+
+		//if (get_transient(self::$wizard_migration_notice_transient)) {
+			//$log->log( 'Migration Notice - Show' );
+			//$log->log( $html );
+			return $html;
+			//$log->log( 'Migration Notice - Delete Transient' );
+			//delete_transient(self::$wizard_migration_notice_transient);
+		//} 
+	}
+
+	
+	/**
+	 * Render a warning that we api is disabled (in code not via settings)
+	 */
+	public static function render_html_should_fail_notice() {
+		?>
+
+        <div class="notice notice-warning inline">
+            <p><?php _e( 'Warning: The \'should_fail\' flag is enabled, and some steps will fail.', 'woocommerce-doofinder' ); ?></p>
+        </div>
+
+		<?php
+	}
+
 	/**
 	 * Not dissmisable Configure via Wizard setup notice html
 	 * 
@@ -612,6 +675,15 @@ class Setup_Wizard {
 	}
 
 	/**
+	 * Remove custom Woocommerce migration notice in admin panel
+	 * 
+	 * @return void
+	 */
+	public static function remove_migration_notice() {
+		\WC_Admin_Notices::remove_notice(self::$wizard_migration_notice_name);
+	}
+
+	/**
 	 * Display the setup wizard view.
 	 */
 	private function show_wizard() {
@@ -647,7 +719,7 @@ class Setup_Wizard {
 	 *
 	 * @return string
 	 */
-	private function get_error( $name ) {
+	public function get_error( $name ) {
 		if ( isset( $this->errors[ $name ] )  ) {
 			return $this->errors[ $name ];
 		} elseif ( isset($_COOKIE['doofinderError'])) {
@@ -668,7 +740,7 @@ class Setup_Wizard {
 	 */
 	public function get_errors_html( $name ) {
 		$error = $this->get_error($name);
-		$error_template = '<div class="error">%s</div>';
+		$error_template = '<div class="error-text">%s</div>';
 
 
 		$html = '';
@@ -887,6 +959,21 @@ class Setup_Wizard {
 
 		$this->log->log( 'Processing Wizard Step 2' );
 
+		// Test error response
+		if (self::$should_fail) {
+			
+			$this->log->log( 'Processing Wizard Step 2 - Failed.' );
+
+			// Send failed ajax response
+			wp_send_json_error(array(
+				'status'  => false,
+				'error' => true,
+				'message' => _('','woocommerce-doofinder'),
+			));
+
+			return;
+		}
+
 		
 		$api_key = Settings::get_api_key();
 		$api_host = Settings::get_api_host();
@@ -1071,6 +1158,9 @@ class Setup_Wizard {
 
 		$this->log->log( 'Processing Wizard Step 3' );
 
+		// Delay the processing so the user can see what is happening
+		sleep(3);
+
 		// If there's no plugin active we still need to process 1 language.
 		$languages = $this->language->get_formatted_languages();
 		
@@ -1117,6 +1207,21 @@ class Setup_Wizard {
 
 		$this->log->log( 'Processing Wizard Step 4' );
 
+		sleep(2);
+
+		// Test error response
+		if (self::$should_fail) {
+			
+			$this->log->log( 'Processing Wizard Step 4 - Failed.' );
+
+			$this->errors['wizard-step-4']['create-layer'] = __( 'Could not retrieve JS layer. Please, try again. If the error persists, please contact us.', 'woocommerce-doofinder' );
+			$this->log->log( 'Processing Wizard Step 4 - Error - Could not retrieve JS layer' );
+			return false;
+		}
+
+		// Delay the processing so the user can see what is happening
+		sleep(3);
+
 		// If there's no plugin active we still need to process 1 language.
 		$languages = $this->language->get_formatted_languages();
 		if ( ! $languages ) {
@@ -1145,7 +1250,7 @@ class Setup_Wizard {
 				$js_layer_code_api_result = $this->create_js_layer($hash);
 
 				if (!$js_layer_code_api_result) {
-					$this->errors['wizard-step-4']['create-layer'] = __( 'Could not retrieve JS layer', 'woocommerce-doofinder' );
+					$this->errors['wizard-step-4']['create-layer'] = __( 'Could not retrieve JS layer. Please, try again. If the error persists, please contact us.', 'woocommerce-doofinder' );
 					$this->log->log( 'Processing Wizard Step 4 - Error - Could not retrieve JS layer' );
 					return false;
 				}
@@ -1335,6 +1440,127 @@ class Setup_Wizard {
 
 	public function create_js_layer($hash) {
 		return $this->manage_js_layer($hash, false);
+	}
+
+
+	/**
+	 * Check if we should migrate settings
+	 *
+	 * @return bool
+	 */
+	public static function should_migrate() {
+
+		$log = new Log();
+		$log->log( 'Should migrate - Start' );
+
+		// Migration was already done, we should abort
+		if ( get_option( self::$wizard_migration_option ) === 'completed') {
+			$log->log( 'Should migrate - Migration already done' );
+			return false;
+		}
+
+		$api_key = Settings::get_api_key();
+
+		if ($api_key) {
+
+			if (preg_match('@-@', $api_key)) {
+				$log->log( 'Should migrate - Migration possible - Api Key' );
+				return true;
+			}
+
+			if(!Settings::get_api_host()) {
+				$log->log( 'Should migrate - Migration possible - Api Host' );
+				return true;
+			}
+	
+			if(!Settings::get_admin_endpoint()) {
+				$log->log( 'Should migrate - Migration possible - Admin Endpoint' );
+				return true;
+			}
+			
+			if(!Settings::get_search_engine_server()) {
+				$log->log( 'Should migrate - Migration possible - Search Server' );
+				return true;
+			}
+		}
+
+		// Migration not possible
+		$log->log( 'Should migrate - Migration not possible' );
+		update_option( 'woocommerce_doofinder_migration_status', 'completed' );
+
+		return false;
+	}
+
+	/**
+	 * Try migrating old settings 
+	 */
+
+	public static function migrate() {
+		$log = new Log();
+		$log->log( 'Migrate - Start' );
+
+		$api_key = Settings::get_api_key();
+		$arr = explode('-',$api_key);
+		//var_dump($arr);
+		
+		$api_key_prefix = $arr[0] ?? null;
+		//var_dump($api_key_prefix);
+		$api_key_value = $arr[1] ?? null;
+		//var_dump($api_key_value);
+
+		//die();
+		
+		if (!$api_key || !$api_key_prefix || !$api_key_value) {
+
+			// Migration not possible
+			$log->log( 'Migrate - Migration Not Possible' );
+			update_option( self::$wizard_migration_option, 'failed' );
+
+			// Disable doofinder search
+			Settings::disable_internal_search();
+			Settings::disable_js_layer();
+		}
+
+		// All good, save api key value
+		$log->log( 'Migrate - Set Api key' );
+		Settings::set_api_key($api_key_value);
+
+		// Check and update api host
+		$api_host_base = '-api.doofinder.com';
+		$api_host = Settings::get_api_host();
+
+		if(!$api_host || !preg_match("@$api_key_prefix-api@", $api_host)) {
+			$log->log( 'Migrate - Set Api Host' );
+			Settings::set_api_host($api_key_prefix . $api_host_base);
+		}
+
+		// Check and update admin endpoint
+		$admin_endpoint_base = '-app.doofinder.com';
+		$admin_endpoint = Settings::get_admin_endpoint();
+
+		if(!$admin_endpoint || !preg_match("@$api_key_prefix-app@", $admin_endpoint)) {
+			$log->log( 'Migrate - Set Admin Endpoint' );
+			Settings::set_admin_endpoint($api_key_prefix . $admin_endpoint_base);
+		}
+
+		// Check and update search server
+		$search_server_base = '-search.doofinder.com';
+		$search_server = Settings::get_search_engine_server();
+
+		if(!$search_server || !preg_match("@$api_key_prefix-search@", $search_server)) {
+			$log->log( 'Migrate - Set Search Server' );
+			Settings::set_search_engine_server($api_key_prefix . $search_server_base);
+		}
+
+		// Add notice about successfull migration
+		$log->log( 'Migrate - Add custom notice' );
+		\WC_Admin_Notices::add_custom_notice(self::$wizard_migration_notice_name, Setup_Wizard::get_setup_wizard_migration_notice_html());
+		//$log->log( 'Migrate - Set Transient' );
+		//set_transient( self::$wizard_migration_notice_transient, 1 );
+
+		// Migration completed
+		$log->log( 'Migrate - Migration Completed' );
+		update_option( self::$wizard_migration_option, 'completed' );
 	}
 
 }

@@ -32,8 +32,9 @@ class Settings_Page extends \WC_Settings_Page {
 
 		// Output sections header and section settings
 		add_action( 'woocommerce_sections_' . $this->id, array( $this, 'output_sections' ) );
-		add_action( 'woocommerce_settings_' . $this->id, array( $this, 'before_settings' ) );
+		add_action( 'woocommerce_settings_' . $this->id, array( $this, 'before_sections' ) );
 		add_action( 'woocommerce_settings_' . $this->id, array( $this, 'output' ) );
+		add_action( 'woocommerce_before_settings_' . $this->id, array( $this, 'before_settings' ) );
 		add_action( 'woocommerce_after_settings_' . $this->id, array( $this, 'after_settings' ) );
 
 		// Custom overrides for settings saving to fix unwanted WC behavior
@@ -44,6 +45,12 @@ class Settings_Page extends \WC_Settings_Page {
 			$this,
 			'custom_field_repeater',
 		) );
+
+
+		// Reset wizard step in DB if GET reset-wizard is set to 1
+		if (isset($_GET['reset-wizard']) && (int) $_GET['reset-wizard'] === 1 ) {
+			update_option( Setup_Wizard::$wizard_step_option, 1 );
+		}
 	}
 
 	/* WC_Settings_Page overrides *************************************************/
@@ -172,10 +179,11 @@ class Settings_Page extends \WC_Settings_Page {
 	 *
 	 * @since 1.0.0
 	 */
-	public function before_settings() {
+	public function before_sections() {
 		global $current_section;
 
-		// Hinde settings button in main notice when on Doofinder Settings page
+		echo '<!-- before settings -->';
+		// Hide settings button in main notice when on Doofinder Settings page
 		echo '<style>.woocommerce-message.doofinder-notice-setup-wizard .button-settings{display:none;}</style>';
 
 		// Display non dissmisable notice about Setup Wizard if Doofidner is not yet configured
@@ -194,6 +202,20 @@ class Settings_Page extends \WC_Settings_Page {
 	}
 
 	/**
+	 * Print additional custom elements before the settings added using
+	 * WooCommerce Settings API.
+	 *
+	 * @since 1.0.0
+	 */
+	public function before_settings() {
+		global $current_section;
+
+		if ( '' === $current_section ) {
+			echo '<div class="doofinder-search-settings-wrap">';
+		}
+	}
+
+	/**
 	 * Print additional custom elements after the settings added using
 	 * WooCommerce Settings API.
 	 *
@@ -205,6 +227,7 @@ class Settings_Page extends \WC_Settings_Page {
 		if ( '' === $current_section ) {
 			// Render Setup Wizard configuration button
 			echo Setup_Wizard::get_configure_via_setup_wizard_button_html();
+			echo '</div><!-- /.doofinder-search-settings-wrap -->';
 		}
 
 	}

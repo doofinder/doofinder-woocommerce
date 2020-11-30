@@ -19,8 +19,8 @@ trait Accessors {
 	 *
 	 * @return string
 	 */
-	public static function get_url() {
-		return admin_url( 'admin.php?page=wc-settings&tab=doofinder' );
+	public static function get_url($param = null) {
+		return admin_url( 'admin.php?page=wc-settings&tab=doofinder' . ($param ? '&'.$param : '') );
 	}
 
 	/**
