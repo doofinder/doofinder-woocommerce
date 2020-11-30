@@ -134,7 +134,7 @@ if (
 						'methods' => ['POST', 'GET'],
 						'callback' => array( $class, 'connect'),
 						'permission_callback' => '__return_true'
-					),);
+					));
 				});
 
 				// Some functionalities need to be initialized on both admin side, and frontend.
