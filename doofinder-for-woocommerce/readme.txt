@@ -1,9 +1,9 @@
 === Doofinder for WooCommerce ===
 Contributors: doofinder
 Tags: search, autocomplete, woocommerce
-Version: 1.2.5
-Requires at least: 4.1
-Tested up to: 4.8
+Version: 1.3.0
+Requires at least: 5.0
+Tested up to: 5.5.3
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -126,7 +126,62 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 
 == Changelog ==
 
-= 1.2.4 =
+= 1.3.0 =
+Big refactor to use our new indexing API. New automatic setup wizard.
+
+= 1.2.22 =
+Add support for image sizes.
+
+= 1.2.21 =
+Check for existance of post_type before checking for its value.
+
+= 1.2.20 =
+Fix separation of multiple value attributes.
+
+= 1.2.19 =
+Bugfixes.
+
+= 1.2.18 =
+Only load variations for loaded products, instead of all.
+
+= 1.2.17 =
+Add some debugging information.
+
+= 1.2.16 =
+Export images in thumbnail size instead of full size.
+
+= 1.2.15 =
+Add the choice of custom meta fields to settings.
+Use variations from parent on feed.
+
+= 1.2.14 =
+Fix inconsitence between internal search and JS Layer
+
+= 1.2.13 =
+Fix issues.
+
+= 1.2.12 =
+Fix issues.
+
+= 1.2.11 =
+Fix issues.
+
+= 1.2.10 =
+Minor changes.
+
+= 1.2.9 =
+Added support for banners in search results.
+
+= 1.2.8 =
+Minor compatibility fixes.
+
+= 1.2.7 =
+Updated price retrieving functions. Correctly handle custom attributes added at product level. Multisite support.
+
+= 1.2.6 =
+Handle taxonomy based catalog visibility for WooCommerce 3+.
+
+= 1.2.5 =
 Just added WooCommerce version checks.
 
 = 1.2.4 =
