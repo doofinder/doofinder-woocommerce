@@ -3,11 +3,11 @@
  * Plugin Name: Doofinder for WooCommerce
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 1.2.22
+ * Version: 1.3.0
  * Author: doofinder
  * Description: Integrate Doofinder Search in your WooCommerce shop.
  * WC requires at least: 2.1.0
- * WC tested up to: 5.4.1
+ * WC tested up to: 4.7.1
  *
  * @package WordPress
  */
@@ -141,7 +141,7 @@ if (
 				Both_Sides::instance();
 
 				self::maybe_suppress_notices();
-				
+
 			}
 
 			/**
@@ -264,7 +264,7 @@ if (
 				if ( Setup_Wizard::should_show_notice() ) {
 					Setup_Wizard::add_notice();
 				}
-				
+
 				if ( Setup_Wizard::should_migrate() ) {
 					Setup_Wizard::migrate();
 				}
@@ -287,7 +287,7 @@ if (
 			/**
 			 * This function runs when WordPress completes its upgrade process
 			 * It iterates through each plugin updated to see if ours is included
-			 * 
+			 *
 			 * @param array $upgrader_object
 			 * @param array $options
 			 */
@@ -303,7 +303,7 @@ if (
 
 				// If an update has taken place and the updated type is plugins and the plugins element exists
 				if ($options['action'] == 'update' && $options['type'] == 'plugin') {
-					
+
 					$log->log('upgrader_process - updating plugin');
 
 					if (isset($options['plugins'])) {
