@@ -141,6 +141,7 @@ if (
 				Both_Sides::instance();
 
 				self::maybe_suppress_notices();
+
 			}
 
 			/**
@@ -263,6 +264,7 @@ if (
 				if ( Setup_Wizard::should_show_notice() ) {
 					Setup_Wizard::add_notice();
 				}
+
 				if ( Setup_Wizard::should_migrate() ) {
 					Setup_Wizard::migrate();
 				}
@@ -301,6 +303,7 @@ if (
 
 				// If an update has taken place and the updated type is plugins and the plugins element exists
 				if ($options['action'] == 'update' && $options['type'] == 'plugin') {
+					
 					$log->log('upgrader_process - updating plugin');
 
 					if (isset($options['plugins'])) {
