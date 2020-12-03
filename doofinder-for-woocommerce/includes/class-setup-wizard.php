@@ -564,7 +564,7 @@ class Setup_Wizard {
 		ob_start();
 
 		?><div id="message" class="woocommerce-message doofinder-migration-notice"><?php
-			?><p class="main"><?php _e('Doofinder settings has been migrated successfully.','woocommerce-doofinder') ?></p><?php
+			?><p class="main"><?php _e('Doofinder settings have been migrated successfully.','woocommerce-doofinder') ?></p><?php
 		?></div><?php
 		
 		$html = ob_get_clean();

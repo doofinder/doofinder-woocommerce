@@ -289,9 +289,9 @@ class Index_Interface {
 			}
 
 			if ( Doofinder_For_WooCommerce::$disable_api_calls ) {
-				$this->render_html_api_disabled_notice();
+				self::render_html_api_disabled_notice();
 			}
-			if ( Data_Index::$should_fail ) {
+			if ( Data_Index::$should_fail || Setup_Wizard::$should_fail ) {
 				Setup_Wizard::render_html_should_fail_notice();
 			}
 
@@ -434,7 +434,7 @@ class Index_Interface {
 	/**
 	 * Render a warning that we api is disabled (in code not via settings)
 	 */
-	public function render_html_api_disabled_notice() {
+	public static function render_html_api_disabled_notice() {
 		?>
 
         <div class="notice notice-warning inline">
@@ -568,8 +568,8 @@ class Index_Interface {
 		<div>
 			<p id="doofinder-for-wc-indexing-error" class="doofinder-for-wc-indexing-error">
 				<?php _e( 'There was an unexpected error. Please try again. If the error persists, please contact us.', 'woocommerce-doofinder' ); ?>
+				<a href="<?php echo Settings::get_url('reset-wizard=1'); ?>" class="button button-primary button-error"><?php _e('Exit setup','woocommerce-doofinder'); ?></a>
 			</p>
-			<a href="<?php echo Settings::get_url('reset-wizard=1'); ?>" class="button button-primary button-error"><?php _e('Exit setup','woocommerce-doofinder'); ?></a>
 		</div>
 		<?php
 	}

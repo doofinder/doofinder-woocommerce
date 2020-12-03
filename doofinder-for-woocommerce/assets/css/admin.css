@@ -61,9 +61,9 @@ p.description { font-style: normal; }
 
 .doofinder-log .entry:last-child { border: none; }
 
-.doofinder-search-settings-wrap input[readonly="readonly"] { border: 0; background: transparent; }
+.doofinder-search-settings-wrap input[readonly="readonly"], .doofinder-search-settings-wrap textarea[readonly="readonly"] { border: 0; background: transparent; }
 
-.doofinder-search-settings-wrap input[readonly="readonly"]:focus { box-shadow: none; }
+.doofinder-search-settings-wrap input[readonly="readonly"]:focus, .doofinder-search-settings-wrap textarea[readonly="readonly"]:focus { box-shadow: none; }
 
 .doofinder-for-wc-welcome-screen { display: flex; flex-flow: column nowrap; align-items: center; padding: 8vw 0; text-align: center; }
 
