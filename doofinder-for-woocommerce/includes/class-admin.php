@@ -46,7 +46,7 @@ class Admin {
 		add_action( 'admin_enqueue_scripts', function( $hook ) {
 			if ( 'woocommerce_page_wc-settings' === $hook ) {
 				wp_enqueue_style(
-					'woocommerce-doofinder',
+					'doofinder-for-wc-styles',
 					Doofinder_For_WooCommerce::plugin_url() . 'assets/css/admin.css'
 				);
 			}

@@ -42,7 +42,7 @@ if (
 			 *
 			 * @var string
 			 */
-			public static $version = '1.2.22';
+			public static $version = '1.3.0';
 
 			/**
 			 * The only instance of Doofinder_For_WooCommerce
@@ -113,6 +113,20 @@ if (
 				add_action( 'init', function() use ( $class ) {
 					call_user_func( array( $class, 'register_urls' ) );
 				} );
+				
+
+				if ( Setup_Wizard::should_activate() ) {
+					Setup_Wizard::activate();
+				}
+
+				if ( Setup_Wizard::should_show_notice() ) {
+					Setup_Wizard::add_notice();
+				}
+
+				// Try to migrate settings if possible and necessary
+				if ( Setup_Wizard::should_migrate() ) {
+					Setup_Wizard::migrate();
+				}
 
 
 				// Initialize Admin Panel functionality on admin side, and front functionality on front side
@@ -257,6 +271,9 @@ if (
 				self::register_urls();
 				flush_rewrite_rules();
 
+				$log = new Log();
+				$log->log('plugin enabled');
+
 				if ( Setup_Wizard::should_activate() ) {
 					Setup_Wizard::activate();
 				}
@@ -278,6 +295,8 @@ if (
 			 */
 			public static function plugin_disabled() {
 				flush_rewrite_rules();
+				$log = new Log();
+				$log->log('plugin disabled');
 				Setup_Wizard::remove_notice();
 				//Reset migration status
 				Setup_Wizard::remove_migration_notice();
@@ -319,6 +338,14 @@ if (
 						$log->log($plugin);
 
 						if ($plugin == $our_plugin) {
+
+							if ( Setup_Wizard::should_activate() ) {
+								Setup_Wizard::activate();
+							}
+			
+							if ( Setup_Wizard::should_show_notice() ) {
+								Setup_Wizard::add_notice();
+							}
 
 							$log->log('upgrader_process - try to migrate');
 							// Try to migrate settings if possible and necessary

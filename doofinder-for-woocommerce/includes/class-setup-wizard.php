@@ -1451,11 +1451,11 @@ class Setup_Wizard {
 	public static function should_migrate() {
 
 		$log = new Log();
-		$log->log( 'Should migrate - Start' );
-
+		$migration_option = get_option( self::$wizard_migration_option );
+		
 		// Migration was already done, we should abort
-		if ( get_option( self::$wizard_migration_option ) === 'completed') {
-			$log->log( 'Should migrate - Migration already done' );
+		if (  $migration_option === 'completed' || $migration_option === 'failed') {
+			//$log->log( 'Should migrate - Migration already done or not possible' );
 			return false;
 		}
 
@@ -1464,28 +1464,28 @@ class Setup_Wizard {
 		if ($api_key) {
 
 			if (preg_match('@-@', $api_key)) {
-				$log->log( 'Should migrate - Migration possible - Api Key' );
+				//$log->log( 'Should migrate - Migration possible - Api Key' );
 				return true;
 			}
 
 			if(!Settings::get_api_host()) {
-				$log->log( 'Should migrate - Migration possible - Api Host' );
+				//$log->log( 'Should migrate - Migration possible - Api Host' );
 				return true;
 			}
 	
 			if(!Settings::get_admin_endpoint()) {
-				$log->log( 'Should migrate - Migration possible - Admin Endpoint' );
+				//$log->log( 'Should migrate - Migration possible - Admin Endpoint' );
 				return true;
 			}
 			
 			if(!Settings::get_search_engine_server()) {
-				$log->log( 'Should migrate - Migration possible - Search Server' );
+				//$log->log( 'Should migrate - Migration possible - Search Server' );
 				return true;
 			}
 		}
 
-		// Migration not possible
-		$log->log( 'Should migrate - Migration not possible' );
+		// Migration not necessary
+		$log->log( 'Should migrate - Migration not necessary' );
 		update_option( 'woocommerce_doofinder_migration_status', 'completed' );
 
 		return false;
@@ -1497,20 +1497,18 @@ class Setup_Wizard {
 
 	public static function migrate() {
 		$log = new Log();
-		$log->log( 'Migrate - Start' );
+		//$log->log( 'Migrate - Start' );
 
 		$api_key = Settings::get_api_key();
-		$arr = explode('-',$api_key);
-		//var_dump($arr);
-		
-		$api_key_prefix = $arr[0] ?? null;
-		//var_dump($api_key_prefix);
-		$api_key_value = $arr[1] ?? null;
-		//var_dump($api_key_value);
 
-		//die();
-		
-		if (!$api_key || !$api_key_prefix || !$api_key_value) {
+		if(preg_match('@-@', $api_key)) {
+			$arr = explode('-',$api_key);
+		}
+
+		$api_key_prefix = $arr[0] ?? null;
+		$api_key_value = $arr[1] ?? null;
+	
+		if (!($api_key && $api_key_prefix && $api_key_value)) {
 
 			// Migration not possible
 			$log->log( 'Migrate - Migration Not Possible' );
@@ -1519,6 +1517,8 @@ class Setup_Wizard {
 			// Disable doofinder search
 			Settings::disable_internal_search();
 			Settings::disable_js_layer();
+
+			return false;
 		}
 
 		// All good, save api key value
