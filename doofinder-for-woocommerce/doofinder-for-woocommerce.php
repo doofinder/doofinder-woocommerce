@@ -303,7 +303,7 @@ if (
 
 				// If an update has taken place and the updated type is plugins and the plugins element exists
 				if ($options['action'] == 'update' && $options['type'] == 'plugin') {
-
+					
 					$log->log('upgrader_process - updating plugin');
 
 					if (isset($options['plugins'])) {

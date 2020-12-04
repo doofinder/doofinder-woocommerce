@@ -17,9 +17,14 @@ $step_state = isset($_GET['step']) ? (int) $_GET['step'] : ($this->get_step() ?:
 
 $this->process_wizard_step($step_state); 
 
-if ( Setup_Wizard::$should_fail) {
+if ( Doofinder_For_WooCommerce::$disable_api_calls ) {
+    Index_Interface::render_html_api_disabled_notice();
+}
+
+if ( Data_Index::$should_fail || Setup_Wizard::$should_fail ) {
     Setup_Wizard::render_html_should_fail_notice();
 }
+
 ?>
 
 <div class="dfwc-setup-steps <?php echo $step_state < $this::$no_steps ? 'active' : ''; ?>">
