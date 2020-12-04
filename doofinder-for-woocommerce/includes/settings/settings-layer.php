@@ -9,11 +9,14 @@ defined( 'ABSPATH' ) or die;
 
 
 
+$show_welcome_screen = !get_option( Setup_Wizard::$wizard_step_option ) && !Settings::is_configuration_complete()  && !Settings::is_api_configuration_complete();
+$show_failed_migration_screen = !(Settings::is_configuration_complete() && Settings::is_api_configuration_complete()) && get_option(Setup_Wizard::$wizard_migration_option) === 'failed';
+
 if ( 
 	//First time user, configuration not completed
-	(!get_option( Setup_Wizard::$wizard_step_option ) && !Settings::is_configuration_complete()  && !Settings::is_api_configuration_complete()) 
+	$show_welcome_screen
 	// Plugin upated but settings migration has failed
-	|| (!Settings::is_configuration_complete() && !Settings::is_api_configuration_complete() && get_option(Setup_Wizard::$wizard_migration_option) === 'failed') 
+	|| $show_failed_migration_screen
 	) :
 ?>
 <style>
@@ -36,7 +39,7 @@ endif;
 
 // Welcome screen for first time users
 
-if ( !get_option( Setup_Wizard::$wizard_step_option ) && !Settings::is_api_configuration_complete()  && !Settings::is_api_configuration_complete() ) :
+if ( $show_welcome_screen ) :
 ?>
 <div class="doofinder-for-wc-welcome-screen">
 	<div class="doofinder-for-wc-welcome-screen__icon">
@@ -55,7 +58,7 @@ return array();
 endif;
 
 // Info screen for users after update when migration failed
-if ( !Settings::is_configuration_complete() && !Settings::is_api_configuration_complete() && get_option(Setup_Wizard::$wizard_migration_option) === 'failed') :
+if ( $show_failed_migration_screen ) :
 ?>
 <div class="doofinder-for-wc-welcome-screen">
 	<div class="doofinder-for-wc-welcome-screen__icon">
