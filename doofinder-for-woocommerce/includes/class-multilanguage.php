@@ -90,7 +90,8 @@ class Multilanguage {
 		}
 
 		$language = $this->handler->get_current_language();
-		return $language['code'];
+
+		return $language['code'] ?? '';
 	}
 
 	/**
@@ -104,7 +105,30 @@ class Multilanguage {
 		}
 
 		$language = $this->handler->get_current_language();
-		return $language['prefix'];
+		return $language['prefix'] ?? '';
+	}
+
+	/**
+	 * Retrieve html for notice when is mulilang site and no language is selected
+	 *
+	 * @return string
+	 */
+	public function get_choose_language_notice($hide_button = true) {
+		if ( ! $this->is_active() ) {
+			return '';
+		}
+
+		if($hide_button) {
+
+			$GLOBALS['hide_save_button']  = true;
+		}
+
+		$notice_html = 
+			'<div class="notice notice-error"><p>' 
+			. __( 'You have a multi-language site. Please choose a language first to configure Doofinder.', 'woocommerce-doofinder' ) 
+			. '</p></div>';
+		
+		return $notice_html;
 	}
 
 	/**

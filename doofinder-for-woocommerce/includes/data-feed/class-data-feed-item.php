@@ -247,8 +247,27 @@ class Data_Feed_Item {
 	 * @since 1.0.0
 	 */
 	private function add_availability() {
-		$availability = $this->product->is_purchasable() && $this->product->is_in_stock() ? 'in stock' : 'out of stock';
+
+		$type = $this->product->get_type();
+
+		if ($type === 'grouped' || $type === 'external') {
+			$availability = $this->product->is_in_stock() ? 'in stock' : 'out of stock';			
+		} else {
+			$availability = $this->product->is_purchasable() && $this->product->is_in_stock() ? 'in stock' : 'out of stock';
+		}
+		
 		$this->fields['availability'] = $availability;
+	}
+
+	/**
+	 * Add product type (simple, variable, etc.).
+	 * 
+	 *
+	 * @since 1.0.0
+	 */
+	private function add_type() {
+		
+		$this->fields['type'] = $this->product->get_type();
 	}
 
 	/**
@@ -270,7 +289,8 @@ class Data_Feed_Item {
 	 */
 	private function add_thumbnail() {
 		$size = 'thumbnail';
-		$image_id = get_post_thumbnail_id( $this->post->ID );
+		$image_id = $this->product->get_image_id();
+
 
 		$default_sizes = array(
 			'thumbnail',
@@ -278,7 +298,7 @@ class Data_Feed_Item {
 			'medium-large',
 			'large',
 		);
-
+		
 		if ( $this->settings['image_size'] && (has_image_size( $this->settings['image_size'] ) || in_array($this->settings['image_size'], $default_sizes) )) {
 			$size = $this->settings['image_size'];
 		}
@@ -304,13 +324,13 @@ class Data_Feed_Item {
 		$prices = $this->get_prices( $this->product );
 
 		if ( $prices['regular'] ) {
-			$this->fields['price'] = $prices['regular'];
+			$this->fields['price'] = (float) $prices['regular'];
 		}
 
 		if ( isset( $prices['sale'] ) && $prices['sale'] ) {
 			// If there's no regular price display sale price as regular.
 			$field_name = $prices['regular'] ? 'sale_price' : 'price';
-			$this->fields[ $field_name ] = $prices['sale'];
+			$this->fields[ $field_name ] = (float) $prices['sale'];
 		}
 	}
 
@@ -371,21 +391,26 @@ class Data_Feed_Item {
 		}
 
 		$attributes = array_map( 'wp_parse_args', $attributes );
-		foreach ( $attributes as $attribute ) {
-			$this->fields[ $attribute['field'] ] = $this->attributes->get_attribute_value(
-				$attribute['attribute'],
-				$this->post,
-				$attribute
-			);
 
-			// Inherit attributes from parent.
-			if ($this->parent) {
+		foreach ( $attributes as $attribute ) {
+
+			if( isset($attribute['field']) && isset($attribute['attribute'])) {
 				$this->fields[ $attribute['field'] ] = $this->attributes->get_attribute_value(
 					$attribute['attribute'],
-					$this->parent,
+					$this->post,
 					$attribute
 				);
+
+				// Inherit attributes from parent.
+				if ($this->parent) {
+					$this->fields[ $attribute['field'] ] = $this->attributes->get_attribute_value(
+						$attribute['attribute'],
+						$this->parent,
+						$attribute
+					);
+				}
 			}
+
 		}
 	}
 

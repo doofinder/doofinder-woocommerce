@@ -23,6 +23,18 @@ wp-content/plugins/woocommerce/sample-data/sample_products.csv
 
 Then click _Run the importer_.
 
+### Update library
+
+The [Doofinder library](https://github.com/doofinder/php-doofinder) has some dependencies.
+
+To install them and perform some cleanup run:
+
+```
+$ ./install_vendor.sh
+```
+
+That will remove `doofinder-for-woocommerce/lib/vendor` and will reinstall dependencies and remove some useless files.
+
 ### Release
 
 ```

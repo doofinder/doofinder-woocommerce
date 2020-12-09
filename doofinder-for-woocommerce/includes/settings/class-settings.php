@@ -2,6 +2,8 @@
 
 namespace Doofinder\WC\Settings;
 
+use Doofinder\WC\Settings\Accessors;
+
 use Doofinder\WC\Multilanguage;
 
 defined( 'ABSPATH' ) or die;
@@ -12,6 +14,7 @@ defined( 'ABSPATH' ) or die;
  * @package Doofinder\WC\Settings
  */
 class Settings {
+	use Accessors;
 
 	/**
 	 * Doofinder options prefix.
@@ -64,6 +67,8 @@ class Settings {
 		if ( $multilanguage->is_active() ) {
 			if ( empty( $language ) ) {
 				$language = $multilanguage->get_language_prefix();
+			} elseif ($language == 'all') {
+				$language = '';
 			} else {
 				$languages = $multilanguage->get_languages();
 				$language  = $languages[ $language ]['prefix'];

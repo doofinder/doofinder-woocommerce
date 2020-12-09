@@ -3,5 +3,3 @@
 *.diff
 *.sublime-project
 *.sublime-workspace
-composer.lock
-vendor/*

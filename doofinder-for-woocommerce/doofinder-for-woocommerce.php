@@ -3,16 +3,19 @@
  * Plugin Name: Doofinder for WooCommerce
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 1.2.22
+ * Version: 1.3.0
  * Author: doofinder
  * Description: Integrate Doofinder Search in your WooCommerce shop.
  * WC requires at least: 2.1.0
- * WC tested up to: 3.9.2
+ * WC tested up to: 4.7.1
  *
  * @package WordPress
  */
 
+
 namespace Doofinder\WC;
+
+use Doofinder\WC\Settings\Settings;
 
 defined( 'ABSPATH' ) or die;
 
@@ -39,7 +42,7 @@ if (
 			 *
 			 * @var string
 			 */
-			public static $version = '1.2.22';
+			public static $version = '1.3.0';
 
 			/**
 			 * The only instance of Doofinder_For_WooCommerce
@@ -47,6 +50,8 @@ if (
 			 * @var Doofinder_For_WooCommerce
 			 */
 			protected static $_instance = null;
+
+
 
 			/**
 			 * Returns the only instance of Doofinder_For_WooCommerce
@@ -61,6 +66,13 @@ if (
 
 				return self::$_instance;
 			}
+
+			/**
+			 * Should api calls be disabled for local testing
+			 *
+			 * @var bool
+			 */
+			public static $disable_api_calls = false;
 
 			/* Hacking is forbidden *******************************************************/
 
@@ -94,24 +106,63 @@ if (
 
 				// Load classes on demand
 				self::autoload( self::plugin_path() . 'includes/' );
-				include_once 'lib/autoload.php';
+				require_once 'lib/vendor/autoload.php';
+				require_once 'lib/autoload.php';
 
 				// Register all custom URLs
 				add_action( 'init', function() use ( $class ) {
 					call_user_func( array( $class, 'register_urls' ) );
 				} );
+				
+
+				if ( Setup_Wizard::should_activate() ) {
+					Setup_Wizard::activate();
+				}
+
+				if ( Setup_Wizard::should_show_notice() ) {
+					Setup_Wizard::add_notice();
+				}
+
+				// Try to migrate settings if possible and necessary
+				if ( Setup_Wizard::should_migrate() ) {
+					Setup_Wizard::migrate();
+				}
+
 
 				// Initialize Admin Panel functionality on admin side, and front functionality on front side
 				if ( is_admin() ) {
+					Thumbnail::prepare_thumbnail_size();
+					Post::add_additional_settings();
+					Post::register_webhooks();
+
+					Setup_Wizard::instance();
 					Admin::instance();
+					Index_Interface::instance();
 				} else {
 					Front::instance();
 				}
+
+				// Register custom WP REST Api endpoint
+				add_action( 'rest_api_init', function () use ( $class ) {
+					register_rest_route( 'doofinder-for-wc/v1', '/connect/', array(
+						'methods' => ['POST', 'GET'],
+						'callback' => array( $class, 'connect'),
+						'permission_callback' => '__return_true'
+					));
+				});
 
 				// Some functionalities need to be initialized on both admin side, and frontend.
 				Both_Sides::instance();
 
 				self::maybe_suppress_notices();
+
+			}
+
+			/**
+			 * Callback for WP Rest Api custom endpoint
+			 */
+			public static function connect( ) {
+				return Setup_Wizard::connect();
 			}
 
 			/**
@@ -208,6 +259,7 @@ if (
 
 			/* Plugin activation and deactivation *****************************************/
 
+
 			/**
 			 * Activation Hook to configure routes and so on
 			 *
@@ -218,6 +270,21 @@ if (
 				self::autoload( self::plugin_path() . 'includes/' );
 				self::register_urls();
 				flush_rewrite_rules();
+
+				$log = new Log();
+				$log->log('plugin enabled');
+
+				if ( Setup_Wizard::should_activate() ) {
+					Setup_Wizard::activate();
+				}
+
+				if ( Setup_Wizard::should_show_notice() ) {
+					Setup_Wizard::add_notice();
+				}
+
+				if ( Setup_Wizard::should_migrate() ) {
+					Setup_Wizard::migrate();
+				}
 			}
 
 			/**
@@ -228,6 +295,78 @@ if (
 			 */
 			public static function plugin_disabled() {
 				flush_rewrite_rules();
+				$log = new Log();
+				$log->log('plugin disabled');
+				Setup_Wizard::remove_notice();
+				//Reset migration status
+				Setup_Wizard::remove_migration_notice();
+				update_option(Setup_Wizard::$wizard_migration_option,'');
+			}
+
+			/**
+			 * This function runs when WordPress completes its upgrade process
+			 * It iterates through each plugin updated to see if ours is included
+			 *
+			 * @param array $upgrader_object
+			 * @param array $options
+			 */
+			public static function upgrader_process_complete($upgrader_object, $options)
+			{
+				$log = new Log();
+				$log->log('upgrader_process - start');
+				// The path to our plugin's main file
+				$our_plugin = plugin_basename(__FILE__);
+
+				$log->log($our_plugin);
+				$log->log($options);
+
+				// If an update has taken place and the updated type is plugins and the plugins element exists
+				if ($options['action'] == 'update' && $options['type'] == 'plugin') {
+					
+					$log->log('upgrader_process - updating plugin');
+
+					if (isset($options['plugins'])) {
+						$plugins = $options['plugins'];
+					} elseif( isset($options['plugin'])) {
+						$plugins = [$options['plugin']] ;
+					}
+
+					$log->log($plugins);
+
+					// Iterate through the plugins being updated and check if ours is there
+					foreach ($plugins as $plugin) {
+						$log->log($plugin);
+
+						if ($plugin == $our_plugin) {
+
+							if ( Setup_Wizard::should_activate() ) {
+								Setup_Wizard::activate();
+							}
+			
+							if ( Setup_Wizard::should_show_notice() ) {
+								Setup_Wizard::add_notice();
+							}
+
+							$log->log('upgrader_process - try to migrate');
+							// Try to migrate settings if possible and necessary
+							if ( Setup_Wizard::should_migrate() ) {
+								Setup_Wizard::migrate();
+							}
+						}
+					}
+				}
+			}
+
+			/**
+			 * Add settings link next to deactivate on plugin's page in admin panel
+			 *
+			 * @since 1.0.0
+			 * @return string
+			 */
+			public static function plugin_add_settings_link( $links ) {
+				$links['settings'] = '<a href="' . Settings::get_url() . '">' . __('Settings','woocommerc-doofinder') . '</a>';
+
+				return array_reverse($links); // array reverse to display "Settings" link first
 			}
 		}
 
@@ -237,5 +376,8 @@ if (
 	register_deactivation_hook( __FILE__, array( '\Doofinder\WC\Doofinder_For_WooCommerce', 'plugin_disabled' ) );
 
 	add_action( 'plugins_loaded', array( '\Doofinder\WC\Doofinder_For_WooCommerce', 'instance' ), 0 );
+	add_action( 'upgrader_process_complete', array('\Doofinder\WC\Doofinder_For_WooCommerce','upgrader_process_complete'), 10, 2 );
+
+	add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), array( '\Doofinder\WC\Doofinder_For_WooCommerce', 'plugin_add_settings_link' ));
 
 endif;

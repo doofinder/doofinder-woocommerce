@@ -44,7 +44,8 @@ class Front {
 	public function __construct() {
 		$this->enqueue_script();
 		$this->add_doofinder_layer_code();
-		$this->add_internal_search();
+		//$this->add_internal_search();
+		$this->filter_search_query();
 		$this->handle_banner_redirect();
 
 		add_action( 'woocommerce_before_main_content', array( $this, 'show_top_banner' ), 99 );
@@ -70,7 +71,7 @@ class Front {
 
 			wp_enqueue_style(
 				'woocommerce-doofinder',
-				Doofinder_For_WooCommerce::plugin_url() . 'assets/styles.css'
+				Doofinder_For_WooCommerce::plugin_url() . 'assets/css/styles.css'
 			);
 		} );
 	}
@@ -91,6 +92,8 @@ class Front {
 	}
 
 	/**
+	 * NOTICE: This is older filter replaced with filter_seach_query
+	 * 
 	 * Hook into WooCommerce search, call Doofinder and modify WC search
 	 * with Doofinder results.
 	 *
@@ -164,6 +167,101 @@ class Front {
 	}
 
 	/**
+	 * Hook into the query, and replace results with results from Doofinder Search.
+	 */
+	private function filter_search_query() {
+
+		add_filter( 'posts_pre_query', function ( $posts, $query ) {
+			$log = Transient_Log::instance();
+			$log->log( 'Filter search query' );
+
+			// Only run it for search.
+			if ( ! $query->is_search() ) {
+				$log->log( 'Not a search. Aborting.' );
+				return $posts;
+			}
+
+			// Only run it for WooCommerce product searches.
+			if ( function_exists( 'is_shop' ) && !is_shop() ) {
+				$log->log( 'Not a shop search. Aborting.' );
+				return $posts;
+			}
+
+			if ( isset( $query->query['post_type'] ) && $query->query['post_type'] !== 'product' ) {
+				$log->log( 'Not a shop search. Aborting.' );
+				return $posts;
+			}
+
+			// Don't fetch default WP results.
+			$search_query = $query->get( 's' );
+			$log->log( 'Search query : ' . $search_query );
+			// Below is disabled becasue it casued search term to not be displayed 
+			// on search results page. Turning it off does not appear to interfere with
+			// doofinder search
+			//$query->set( 's', false );
+
+			// Search Doofinder, and override the query.
+			$search = new Internal_Search();
+
+			
+			// Only use Internal Search if it's enabled and keys are present
+			if ( !$search->is_enabled()) {
+				$log->log( 'Internal Search is disabled. Aborting.' );
+
+				return $posts;
+			}
+
+			
+			// Determine how many posts per page.
+			if ( $query->get( 'posts_per_page' ) ) {
+				$per_page = (int) $query->get( 'posts_per_page' );
+			} else {
+				$per_page = (int) get_option( 'posts_per_page' );
+			}
+
+			// Which page of results to show?
+			$page = 1;
+			if ( $query->get( 'paged' ) ) {
+				$page = (int) $query->get( 'paged' );
+			}
+
+			$log->log( 'Show page : ' . $page );
+
+
+			$search->search_new( $search_query, $page, $per_page );
+
+			// If internal search is not working fall back to defaul search
+			if ( !$search->is_ok()) {
+				$log->log( 'Internal Search is not working. Aborting.' );
+
+				return $posts;
+			}
+			
+
+			// Doofinder found some results.
+			if ( $search->get_ids() ) {
+				$query->found_posts   = $search->get_total_posts();
+				$query->max_num_pages = $search->get_total_pages();
+
+				$log->log( sprintf(
+					'Internal Search retrieved %d items from Doofinder.',
+					$query->found_posts
+				) );
+				$log->log( join(', ', $search->get_ids() ) );
+
+				return $search->get_ids();
+			}
+
+			// Doofinder returned no results.
+			// We should make sure that the query returns no results.
+			// If we ignore this, or set empty array, ALL posts would be returned.
+			$query->found_posts = 0;
+			$query->max_num_pages = 0;
+			return [];
+		}, 10, 2 );
+	}
+
+	/**
 	 * Print the search banner, but checking if it's enabled in settings.
 	 *
 	 * @since 1.3.0
@@ -206,7 +304,7 @@ class Front {
 		}
 
 		// Track banner impression
-		$this->search->trackBannerImpression();
+		//$this->search->trackBannerImpression(); // Disabled in API v2
 
 		// We need to track down the banner click, so we can't redirect directly
 		// to the specified URL. We redirect to WP to handle tracking.
