@@ -40,7 +40,16 @@ $index_interface = Index_Interface::instance();
 <?php if(isset($step_state) && $step_state === 2) : ?>
 	<script>
 		window.addEventListener('load',()=>{
-			document.getElementById('doofinder-for-wc-index-button').click();
+			const clickWhenScriptsLoaded = () => {
+				if(typeof initAjaxIndexContentLoaded === "boolean" && initAjaxIndexContentLoaded) {
+					clearInterval(initializeWhenReady);
+					document.getElementById('doofinder-for-wc-index-button').click();
+				}
+			}
+			
+			const initializeWhenReady = setInterval(clickWhenScriptsLoaded, 100);
+
+			initializeWhenReady();
 		});
 	</script>
 <?php endif; ?>
