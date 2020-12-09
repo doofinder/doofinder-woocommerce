@@ -127,7 +127,7 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 == Changelog ==
 
 = 1.3.0 =
-Big refactor to use our new indexing API. New automatic setup wizard.
+Big refactor to use our new indexing API (v2). New automatic setup wizard.
 
 = 1.2.22 =
 Add support for image sizes.
