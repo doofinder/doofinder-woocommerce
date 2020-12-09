@@ -662,7 +662,9 @@ class Setup_Wizard {
 	 * @return void
 	 */
 	public static function add_notice() {
-		\WC_Admin_Notices::add_custom_notice(self::$wizard_notice_name, Setup_Wizard::get_setup_wizard_notice_html());
+		if (class_exists('WC_Admin_Notices')) {
+			\WC_Admin_Notices::add_custom_notice(self::$wizard_notice_name, Setup_Wizard::get_setup_wizard_notice_html());
+		}
 	}
 
 	/**
@@ -671,7 +673,9 @@ class Setup_Wizard {
 	 * @return void
 	 */
 	public static function remove_notice() {
-		\WC_Admin_Notices::remove_notice(self::$wizard_notice_name);
+		if (class_exists('WC_Admin_Notices')) {
+			\WC_Admin_Notices::remove_notice(self::$wizard_notice_name);
+		}
 	}
 
 	/**
@@ -680,7 +684,9 @@ class Setup_Wizard {
 	 * @return void
 	 */
 	public static function remove_migration_notice() {
-		\WC_Admin_Notices::remove_notice(self::$wizard_migration_notice_name);
+		if (class_exists('WC_Admin_Notices')) {
+			\WC_Admin_Notices::remove_notice(self::$wizard_migration_notice_name);
+		}
 	}
 
 	/**

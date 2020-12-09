@@ -183,6 +183,7 @@ jQuery(() => {
         document.cookie = 'doofinder_wc_show_success_message=true';
     };
     const initAjaxIndexContent = () => {
+        window.initAjaxIndexContentLoaded = true;
         $(button).click(() => {
             indexingError.classList.remove('active');
             button.disabled = true;
