@@ -46,10 +46,7 @@ $index_interface = Index_Interface::instance();
 					document.getElementById('doofinder-for-wc-index-button').click();
 				}
 			}
-			
 			const initializeWhenReady = setInterval(clickWhenScriptsLoaded, 100);
-
-			initializeWhenReady();
 		});
 	</script>
 <?php endif; ?>
