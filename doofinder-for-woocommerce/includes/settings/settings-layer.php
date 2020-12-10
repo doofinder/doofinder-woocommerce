@@ -164,8 +164,7 @@ if (
 			'id'      => Settings::option_id( 'internal_search', 'hashid', $lang_affix ),
 			'type'    => 'text',
 			'css'     => 'width: 100%',
-			'default' => '',
-			'custom_attributes' => array('readonly' => 'readonly'),
+			'default' => ''
 		),
 
 		array(
@@ -182,10 +181,9 @@ if (
 			'title'   => __( 'Layer Snippet', 'woocommerce-doofinder' ),
 			'desc'    => '',//__( 'Paste here the Javascript code you will find in your Doofinder Control Panel under <em><strong>Configuration &gt; Installation Scripts &gt; Doofinder Layer</strong></em>.', 'woocommerce-doofinder' ),
 			'id'      => Settings::option_id( 'layer', 'code', $lang_affix ),
-			'css'     => 'margin-top: 5px; width: 100%; height: 350px; font-family: Consolas,Monaco,monospace; background: rgb(255 255 255 / 39%);',
+			'css'     => 'margin-top: 5px; width: 100%; height: 350px; font-family: Consolas,Monaco,monospace; background: rgb(255 255 255 / 100%);',
 			'type'    => 'textarea',
-			'default' => '',
-			'custom_attributes' => array('readonly' => 'readonly'),
+			'default' => ''
 		),
 
 		array(

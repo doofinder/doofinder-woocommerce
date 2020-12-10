@@ -291,7 +291,7 @@ class Setup_Wizard {
 	public static function should_show_notice() {
 		$show_notice = get_option( self::$wizard_show_notice_option );
 
-		return (bool) $show_notice;
+		return ((bool) $show_notice) && !Settings::is_configuration_complete();
 	}
 
 	/**
@@ -301,9 +301,12 @@ class Setup_Wizard {
 	 * manage options will see custom screen (the setup wizard) instead
 	 * of admin panel.
 	 */
-	public static function activate() {
+	public static function activate($notice = false) {
 		update_option( self::$wizard_active_option, true );
-		update_option( self::$wizard_show_notice_option, true );
+		
+		if($notice) {
+			update_option( self::$wizard_show_notice_option, true );
+		}
 	}
 
 	/**
@@ -411,6 +414,7 @@ class Setup_Wizard {
 		if ( $current_step > self::$no_steps ) {
 
 			//self::deactivate(); // Do not deactive the setup wizard, we need it to work for configure doofinder notice (that shows up when settings are empty)
+			
 			self::remove_notice();
 
 			// Reset wizard to step 1
@@ -676,6 +680,7 @@ class Setup_Wizard {
 		if (class_exists('WC_Admin_Notices')) {
 			\WC_Admin_Notices::remove_notice(self::$wizard_notice_name);
 		}
+		self::dissmiss_notice();
 	}
 
 	/**
