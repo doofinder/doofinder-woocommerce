@@ -7,7 +7,7 @@
  * Author: doofinder
  * Description: Integrate Doofinder Search in your WooCommerce shop.
  * WC requires at least: 2.1.0
- * WC tested up to: 4.7.1
+ * WC tested up to: 4.8
  *
  * @package WordPress
  */
@@ -320,7 +320,7 @@ if (
 
 				// If an update has taken place and the updated type is plugins and the plugins element exists
 				if ($options['action'] == 'update' && $options['type'] == 'plugin') {
-					
+
 					$log->log('upgrader_process - updating plugin');
 
 					if (isset($options['plugins'])) {
@@ -340,7 +340,7 @@ if (
 							if ( Setup_Wizard::should_activate() ) {
 								Setup_Wizard::activate();
 							}
-			
+
 							if ( Setup_Wizard::should_show_notice() ) {
 								Setup_Wizard::add_notice();
 							}
