@@ -114,23 +114,21 @@ if (
 					call_user_func( array( $class, 'register_urls' ) );
 				} );
 
-
-				if ( Setup_Wizard::should_activate() ) {
-					Setup_Wizard::activate();
-				}
-
-				if ( Setup_Wizard::should_show_notice() ) {
-					Setup_Wizard::add_notice();
-				}
-
-				// Try to migrate settings if possible and necessary
-				if ( Setup_Wizard::should_migrate() ) {
-					Setup_Wizard::migrate();
-				}
-
-
 				// Initialize Admin Panel functionality on admin side, and front functionality on front side
 				if ( is_admin() ) {
+					if ( Setup_Wizard::should_activate() ) {
+						Setup_Wizard::activate();
+					}
+
+					// if ( Setup_Wizard::should_show_notice() ) {
+					// 	Setup_Wizard::add_notice();
+					// }
+
+					// Try to migrate settings if possible and necessary
+					if ( Setup_Wizard::should_migrate() ) {
+						Setup_Wizard::migrate();
+					}
+
 					Thumbnail::prepare_thumbnail_size();
 					Post::add_additional_settings();
 					Post::register_webhooks();
@@ -275,7 +273,7 @@ if (
 				$log->log('plugin enabled');
 
 				if ( Setup_Wizard::should_activate() ) {
-					Setup_Wizard::activate();
+					Setup_Wizard::activate(true);
 				}
 
 				if ( Setup_Wizard::should_show_notice() ) {
@@ -322,7 +320,7 @@ if (
 
 				// If an update has taken place and the updated type is plugins and the plugins element exists
 				if ($options['action'] == 'update' && $options['type'] == 'plugin') {
-
+					
 					$log->log('upgrader_process - updating plugin');
 
 					if (isset($options['plugins'])) {
@@ -342,7 +340,7 @@ if (
 							if ( Setup_Wizard::should_activate() ) {
 								Setup_Wizard::activate();
 							}
-
+			
 							if ( Setup_Wizard::should_show_notice() ) {
 								Setup_Wizard::add_notice();
 							}
