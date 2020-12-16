@@ -908,8 +908,12 @@ class Setup_Wizard {
 				$this->log->log( 'Wizard Step 1 - API host: ' . $api_host );
 
 				$response = $client->listSearchEngines();
+				$this->log->log( 'Wizard Step 1 - List Search engines Response: ' );
+				$this->log->log( $response );
+				
 				$this->log->log( 'Wizard Step 1 - List search engines - success ' );
-	
+				$response = true;
+				
 			} catch (\DoofinderManagement\ApiException $exception) {
 				$this->log->log( 'Wizard Step 1: '. $exception->getMessage() );
 				$this->errors['wizard-step-1'] = __( 'Could not connect to the API. API Key or Host is not valid.', 'woocommerce-doofinder' );
