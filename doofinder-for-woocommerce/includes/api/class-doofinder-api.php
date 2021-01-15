@@ -14,6 +14,7 @@ use Doofinder\WC\Multilanguage\Multilanguage;
 use Doofinder\Management\Errors\NotAllowed;
 use Doofinder\Management\Errors\NotFound;
 use Doofinder\Management\Errors\BadRequest;
+use Doofinder\Management\Errors\DoofinderError;
 
 defined( 'ABSPATH' ) or die();
 
@@ -62,14 +63,14 @@ class Doofinder_Api implements Api_Wrapper {
 	 */
 	private $api_host;
 
-	
+
 	/**
 	 * Search enginde Hash ID
 	 *
 	 * @var string
 	 */
 	private $hash;
-	
+
 	/**
 	 * Client we'll index the items with.
 	 *
@@ -89,7 +90,7 @@ class Doofinder_Api implements Api_Wrapper {
 	 *
 	 * @var int;
 	 */
-	private $disable_api = false; 
+	private $disable_api = false;
 
 
 	public function __construct($language = null) {
@@ -97,14 +98,14 @@ class Doofinder_Api implements Api_Wrapper {
 
 		// Get global disable_api_calls flag
 		$this->disable_api = Doofinder_For_WooCommerce::$disable_api_calls ?? $this->disable_api;
-	
+
 		$this->log = new Log('api.txt' );
 		//$this->log->log( '------------- Doofinder API construct ------------' );
 
 		if ($this->disable_api) {
 			$this->log->log( '-------------  API IS DISABLED ------------- ' );
 		}
-		
+
 		$this->api_key = Settings::get_api_key();
 		$this->api_host = Settings::get_api_host();
 		$this->hash = Settings::get_search_engine_hash($language);
@@ -115,7 +116,7 @@ class Doofinder_Api implements Api_Wrapper {
 
 			return Api_Status::$unknown_error;
 		}
-		
+
 		$this->client = false;
 		$this->search_engine = false;
 
@@ -137,15 +138,15 @@ class Doofinder_Api implements Api_Wrapper {
 		} catch ( NotFound $exception ) {
 
 			$this->log->log( 'Could not get search engine - Not Found' );
-			$this->log->log( $exception->getMessage() );	
-			
+			$this->log->log( $exception->getMessage() );
+
 			$this->search_engine_api_status = Api_Status::$invalid_search_engine;
 
 		} catch ( NotAllowed $exception ) {
 
 			$this->log->log( 'Could not get search engine - Not Allowed' );
 			$this->log->log( $exception->getMessage() );
-			
+
 			$this->search_engine_api_status =  Api_Status::$not_authenticated;
 
 		} catch ( \Exception $exception ) {
@@ -153,8 +154,8 @@ class Doofinder_Api implements Api_Wrapper {
 			$this->log->log( 'Could not get search engine - Unknown' );
 			$this->log->log( $exception->getMessage() );
 
-			$this->search_engine_api_status =  Api_Status::$unknown_error;	
-			
+			$this->search_engine_api_status =  Api_Status::$unknown_error;
+
 		}
 
 		//$this->log->log( '-------------  Doofinder API End construct ------------- ' );
@@ -187,7 +188,7 @@ class Doofinder_Api implements Api_Wrapper {
 			$this->log->log( $id );
 			$this->log->log( $data );
 			$this->log->log( $this->hash );
-			
+
 			if (!$this->disable_api) {
 				$this->log->log('=== API CALL === ');
 				$this->client->updateItem($this->hash, $id, $item_type, json_encode($data));
@@ -199,7 +200,7 @@ class Doofinder_Api implements Api_Wrapper {
 			return Api_Status::$success;
 
 		} catch ( BadRequest $exception ) {
-			// If updating item failed it might mean that the post does not exist in the 
+			// If updating item failed it might mean that the post does not exist in the
 			// index yet, so we will try to create it instead
 
 			$this->log->log('Update Item - Exception 1' . "\n");
@@ -207,13 +208,13 @@ class Doofinder_Api implements Api_Wrapper {
 
 			// Item type may not exist, but is required.
 			// Let's create it.
-		
+
 			try {
 				// Lets first try to create type if it doesn't exist
 				$this->maybe_create_type( $item_type );
 
 				$this->log->log('Update Item - Try Create item' . "\n");
-			
+
 				if (!$this->disable_api) {
 					$this->log->log('=== API CALL === ');
 					$this->client->createItem($this->hash, $item_type, json_encode($data));
@@ -232,7 +233,7 @@ class Doofinder_Api implements Api_Wrapper {
 				return Api_Status::$bad_request;
 
 			}
-		
+
 		} catch ( \Exception $exception ) {
 			$this->log->log('Update Item - Exception 2' . "\n");
 			$this->log->log( $exception->getMessage() );
@@ -247,7 +248,7 @@ class Doofinder_Api implements Api_Wrapper {
 	 * @param string $item_type
 	 * @param int    $id
 	 * @param int $update_time Timestamp of the update time
-	 * 
+	 *
 	 * @return mixed
 	 */
 	public function remove_item( $item_type, $id, $update_time = null ) {
@@ -261,7 +262,7 @@ class Doofinder_Api implements Api_Wrapper {
 			}
 
 			// Remove item from Doofinder index.
-			
+
 			$this->log->log('Remove Item - Try delete item' . "\n");
 			$this->log->log( $item_type );
 			$this->log->log( $id );
@@ -276,7 +277,7 @@ class Doofinder_Api implements Api_Wrapper {
 
 			$this->log->log('Remove Item - Item deleted' . "\n");
 			return Api_Status::$success;
-		
+
 		} catch ( \Exception $exception ) {
 			$this->log->log('Remove Item - Exception' . "\n");
 			$this->log->log( $exception->getMessage() );
@@ -315,10 +316,10 @@ class Doofinder_Api implements Api_Wrapper {
 
 				//$this->log->log('Send batch - createTemporaryIndex (:224)' . "\n");
 
-		
+
 				// Create the type.
 				try {
-			
+
 					$this->log->log('Send batch - Try to create Temp Index' . "\n");
 
 					if (!$this->disable_api) {
@@ -332,13 +333,13 @@ class Doofinder_Api implements Api_Wrapper {
 					//$this->log->log('Send batch - Set Temp Index Inner State ' . "\n");
 					// Mark it in our status.
 					$indexing_data->set( 'temp_index', $items_type );
-				
+
 
 				} catch ( NotFound $exception ) {
-					
+
 					// If real index does not exists creating temp index will fail,
 					// So we need to create real index first
-					
+
 					$this->log->log('Send batch - Exception - Real Index Not Found' . "\n");
 
 					try {
@@ -390,18 +391,18 @@ class Doofinder_Api implements Api_Wrapper {
 							return Api_Status::$unknown_error;
 					}
 
-					
-				
+
+
 				} catch ( \Exception $exception ) {
 					// Temp Index could not be created it probably exists already. Move on.
 					$this->log->log('Send batch - Temp Index probably exists already' . "\n");
 					$this->log->log( $exception->getMessage() );
-					
+
 				}
 			}
 
 			$this->log->log( 'Send Batch  - Before Create Bulk Temp Index Status' );
-			
+
 			$temp_index = $indexing_data->get('temp_index');
 
 			$this->log->log( $temp_index );
@@ -426,17 +427,20 @@ class Doofinder_Api implements Api_Wrapper {
 			$this->log->log( 'Send batch - Batch Sent' );
 
 			$this->log->log( 'Send batch - API CALLS ------  : ' . $this->api_calls  );
-			
+
 
 			return Api_Status::$success;
-			
-		} catch ( \Exception $exception ) {
 
+		} catch ( \Exception $exception ) {
 			$this->log->log( 'Send Batch - Exception 1' . "\n" );
 			$this->log->log( $exception->getMessage() );
 
+			if ( $exception instanceof DoofinderError ) {
+				$this->log->log( $exception->getBody() );
+			}
+
 			return Api_Status::$unknown_error;
-		} 
+		}
 
 		$this->log->log('End Send Batch' . "\n");
 	}
@@ -526,13 +530,13 @@ class Doofinder_Api implements Api_Wrapper {
 		}
 
 		$this->log->log('Indices: ' . "\n");
-		
+
 		$typesList = [];
 
 		foreach($types as $type) {
 			$typesList[] = $type->name;
 		}
-		
+
 		$this->log->log( $typesList );
 
 
@@ -562,7 +566,7 @@ class Doofinder_Api implements Api_Wrapper {
 			$this->log->log('Maybe create type - index already exists' . "\n");
 		}
 	}
-	
+
 	/**
 	 * Replace real index with temporary one.
 	 *
@@ -586,7 +590,7 @@ class Doofinder_Api implements Api_Wrapper {
 
 			// Replace index
 			$this->log->log( 'Replace Index - Replace with: ' . $index_name  );
-				
+
 			if (!$this->disable_api) {
 				$this->log->log('=== API CALL === ');
 				$this->client->replace($this->hash, $index_name );
@@ -596,7 +600,7 @@ class Doofinder_Api implements Api_Wrapper {
 
 			$this->log->log( 'Replace Index - "'.$index_name.'" index replaced successfully' );
 			$this->log->log( 'Replace Index - API CALLS ------  : ' . $this->api_calls  );
-			
+
 			return Api_Status::$success;
 
 		} catch ( \Exception $exception ) {
@@ -622,7 +626,7 @@ class Doofinder_Api implements Api_Wrapper {
 		$index_body = json_encode($index_body);
 
 		$this->log->log('Index body: ' . $index_body);
-		
+
 		return $index_body;
 	}
 }
