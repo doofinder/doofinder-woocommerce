@@ -151,21 +151,21 @@ class Data_Index {
 		$this->log->log( '---------------------------------------------------------------------------------------------' );
 		//$this->log->log( '---------------------------------------------------------------------------------------------' );
 		//$this->log->log( 'Data Index _construct ' );
-		
+
 	}
 
 	/**
-	 * 
+	 *
 	 * Handle ajax request
-	 * 
+	 *
 	 * Index active language if $language param is not present.
-	 * 
-	 * @param string $language Language code of posts to index. 
+	 *
+	 * @param string $language Language code of posts to index.
 	 */
 	public function ajax_handler() {
 
 		//$this->log->log( 'Ajax Handler ' );
-		
+
 		$status = $this->indexing_data->get( 'status' );
 
 		// If the indexing has been completed we are reindexing.
@@ -175,15 +175,15 @@ class Data_Index {
 			$this->indexing_data->reset();
 		}
 
-		
+
 		// Index the posts.
 		if ( $this->index_posts() ) {
-		
+
 			$this->ajax_response( true, 'Wrapping up...' );
 
 			return;
 		}
-		
+
 		$post_type = $this->get_post_type_name( $this->indexing_data->get( 'post_type' ) );
 		$lang_message = '';
 
@@ -201,7 +201,7 @@ class Data_Index {
 	 * (if the process of indexing has been completed) as JSON.
 	 *
 	 * @since 1.0.0
-	 * @param string $language Language code of posts to index. 
+	 * @param string $language Language code of posts to index.
 	 * @return bool True if the indexing has finished.
 	 */
 	public function index_posts($language = null) {
@@ -222,9 +222,9 @@ class Data_Index {
 
 		// Change indexing status to 'processing'
 		$this->set_processing_status();
-		
+
 		// This is not needed anymore, in API v2 we utilize temp indexes
-		//$this->maybe_remove_posts(); 
+		//$this->maybe_remove_posts();
 
 		// Load languages
 		$this->log->log( 'Load Languages' );
@@ -275,21 +275,21 @@ class Data_Index {
 
 		//$this->load_posts();
 		//$this->load_posts_meta();
-		
+
 		// Prepare posts to be sent to the API.
 		//$this->log->log( 'Generate Items - Start' );
 		$this->generate_items();
 		//$this->log->log( 'Generate Items - End' );
 		//$this->log->log( $this->items );
 
-	
+
 		// Send posts to the API.
 		// At this point if the posts are sent successfully
 		// we'll advance the "pointer" pointing to the last
 		// indexed post.
-		
+
 		if ( $this->items ) {
-			
+
 			$sent_to_api = $this->api->send_batch(
 				$this->indexing_data->get( 'post_type' ),
 				$this->items,
@@ -301,10 +301,9 @@ class Data_Index {
 
 				$lang_message = '';
 
-				if ($this->process_all_languages) {
+				if ( $this->process_all_languages ) {
 					$language_code = $this->get_language_name($this->indexing_data->get('lang'));
 					$lang_message = " for \"$language_code\" language";
-		
 				}
 
 				// Setting error flag to true will cause indexing to stop without additional retries
@@ -360,7 +359,7 @@ class Data_Index {
 		}
 
 		$types_removed = $this->api->remove_types();
-		
+
 		$this->indexing_data->set( 'status', 'processing' );
 
 		if ( $types_removed !== Api_Status::$success ) {
@@ -380,7 +379,7 @@ class Data_Index {
 		if ( $this->indexing_data->get( 'status' ) === 'processing' ) {
 			return;
 		}
-		
+
 		$this->indexing_data->set( 'status', 'processing' );
 	}
 
@@ -407,12 +406,12 @@ class Data_Index {
 	private function load_languages() {
 
 		if (!$this->process_all_languages) {
-			
+
 			if ( ! $this->indexing_data->get( 'lang' ) ) {
 				$this->indexing_data->set( 'lang', $this->current_language );
 			}
 
-			return; 
+			return;
 		}
 
 		$languages       = $this->language->get_languages();
@@ -427,7 +426,7 @@ class Data_Index {
 		if ( ! $this->indexing_data->get( 'lang' ) ) {
 			$this->indexing_data->set( 'lang', $this->languages[0] );
 		}
-		
+
 	}
 
 	/**
@@ -528,10 +527,10 @@ class Data_Index {
 		$query            = "
 			SELECT post_id, meta_key, meta_value
 			FROM $wpdb->postmeta
-			WHERE $wpdb->postmeta.post_id IN ($posts_ids_list) 
+			WHERE $wpdb->postmeta.post_id IN ($posts_ids_list)
 			AND (
               $wpdb->postmeta.meta_key NOT LIKE '\_%' OR
-              $wpdb->postmeta.meta_key = '$visibility_meta' OR 
+              $wpdb->postmeta.meta_key = '$visibility_meta' OR
               $wpdb->postmeta.meta_key = '$yoast_visibility'
             )
 			ORDER BY $wpdb->postmeta.post_id
@@ -546,10 +545,10 @@ class Data_Index {
 	 * @since 1.0.0
 	 */
 	private function generate_items() {
-		
+
 		// Use functionality from XML data feed to retrieve products
 		//$this->log->log( 'Generate items - indexing lang :  ' . $this->indexing_data->get('lang'));
-		
+
 		$data_feed = new Data_Feed( false, $this->posts_ids, $this->indexing_data->get('lang'));
 
 		$this->items = $data_feed->get_items();
@@ -601,10 +600,10 @@ class Data_Index {
 				$this->log->log( 'Check Next '.$item.'  - Call replace Index' );
 				$this->call_replace_index($get_new_api);
 			}
-			
+
 			$this->indexing_data->set( $item, $container[ $next_item_index ] );
 			$this->indexing_data->set( 'post_id', 0 );
-			
+
 			$current_progress = $this->indexing_data->get( 'current_progress' );
 			$this->log->log( 'Check Next '.$item.' - Current progress: ' , $current_progress );
 
@@ -654,18 +653,18 @@ class Data_Index {
 		// was an error - when sometimes WP cache crashed destructor
 		// was not called, and the pointer information was not saved
 		// in the DB as a result.
-		
+
 		$content = array(
 			'completed' => $completed,
 			'progress'  => $this->calculate_progress(),
 		);
 
 		$this->indexing_data->save();
-		
+
 		if ( $message ) {
 			$content['message'] = $message;
 		}
-		
+
 		wp_send_json_success( $content );
 	}
 
@@ -726,8 +725,8 @@ class Data_Index {
 		$query = "
 			SELECT
 			(
-				SELECT COUNT(*) 
-				FROM $wpdb->posts 
+				SELECT COUNT(*)
+				FROM $wpdb->posts
 			";
 
 		// When mulilang (WPML) is active we need to calculate posts only for
@@ -748,8 +747,8 @@ class Data_Index {
 		}
 
 		$query .= "
-				
-			) 
+
+			)
 			AS 'all_posts'
 			";
 
@@ -777,14 +776,14 @@ class Data_Index {
 			$query .= "
 				, -- Separates this select from previous
 				(
-					SELECT 
-					COUNT(*) 
-					FROM $wpdb->posts 
+					SELECT
+					COUNT(*)
+					FROM $wpdb->posts
 				";
 
 			// When mulilang (WPML) is active we need to calculate posts only for
-			// that language so we need to join translations table to the query	
-						
+			// that language so we need to join translations table to the query
+
 			if ($lang && $sitepress) {
 
 				$query .= "LEFT JOIN {$wpdb->prefix}icl_translations
@@ -803,7 +802,7 @@ class Data_Index {
 				)
 			    AS 'already_processed'
 			";
-			
+
 		}
 
 		// Add posts from the currently processed post type.
@@ -815,7 +814,7 @@ class Data_Index {
 				, -- Separates this select from previous
 				(
 					SELECT COUNT(*)
-					FROM $wpdb->posts 
+					FROM $wpdb->posts
 			";
 
 			// When mulilang (WPML) is active we need to calculate posts only for
@@ -831,13 +830,13 @@ class Data_Index {
 
 			} else {
 				$query .= "
-					WHERE $wpdb->posts.post_type = '$post_type'	
+					WHERE $wpdb->posts.post_type = '$post_type'
 				";
 			}
 
 			$query .= "
 					AND $wpdb->posts.ID <= $last_id
-					
+
 				)
 				AS 'current_progress'
 			";
@@ -872,22 +871,22 @@ class Data_Index {
 		if ( isset( $already_processed ) && $already_processed > $result->current_progress  ) {
 			$processed_posts += $already_processed;
 		}
-		
+
 		if ( isset( $result->current_progress ) ) {
 			$processed_posts += $result->current_progress;
 		}
-		
-		
+
+
 		$this->log->log( 'Calculate Progress - Processed: ' . $processed_posts . ' out of: ' . $result->all_posts );
-		
+
 		$this->indexing_data->set( 'current_progress', $processed_posts );
 
-		
+
 		$current_progress = ( $processed_posts / $result->all_posts ) * 100;
 
 		$this->log->log( 'Calculate Progress - Summary: ' . $current_progress );
-		
-		
+
+
 		return $current_progress ;
 	}
 
@@ -942,7 +941,7 @@ class Data_Index {
 
 	/**
 	 * We are done so replace real index with temp one. Call replace temp index API method.
-	 * 
+	 *
 	 */
 	private function call_replace_index($get_api = false) {
 
@@ -957,7 +956,7 @@ class Data_Index {
 		$api_response = $this->api->replace_index($post_type);
 
 		if ( $api_response !== Api_Status::$success ) {
-			
+
 			$message = __( "Replacing Index \"$post_type\" with temporary one.", 'woocommerce-doofinder' );
 
 			// if ( $sent_to_api === Api_Status::$indexing_in_progress ) {
@@ -980,7 +979,7 @@ class Data_Index {
 	public static function is_index_data_up_to_date() {
 		$last_modified_db = (int) Settings::get_last_modified_db();
 		$last_modified_index = (int) Settings::get_last_modified_index();
-	
+
 		if ($last_modified_db - $last_modified_index <= 5) {
 			return true;
 		} else {
@@ -988,5 +987,5 @@ class Data_Index {
 		}
 	}
 
-	
+
 }
