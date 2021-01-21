@@ -81,6 +81,13 @@ class Data_Feed {
 	private $settings = array();
 
 	/**
+	 * Instance of a class used to log to a file.
+	 *
+	 * @var Log
+	 */
+	private $log;
+
+	/**
 	 * Register the feed with the WordPress feeds.
 	 * Necessary to be able to access the feed URL.
 	 *
@@ -107,6 +114,8 @@ class Data_Feed {
 		
 		$multilanguage  = Multilanguage::instance();
 
+		$this->log = new Log( 'api.txt' );
+
 		if ( $language ) {
 			$this->language = $language;
 		} else {
@@ -123,12 +132,12 @@ class Data_Feed {
 		// Load settings.
 		$this->settings = array(
 			// Doofinder settings
-			'export_prices'  => Settings::get( 'feed', 'export_prices', 'all' ),
-			'export_tags'    => Settings::get( 'feed', 'export_tags', 'all' ),
-			'image_size'     => Settings::get( 'feed', 'image_size', 'all' ),
-			'split_variable' => Settings::get( 'feed', 'split_variable', 'all' ),
-			'protected'      => Settings::get( 'feed', 'password_protected', 'all' ),
-			'password'       => Settings::get( 'feed', 'password', 'all' ),
+			'export_prices'  => Settings::get( 'feed', 'export_prices' ),
+			'export_tags'    => Settings::get( 'feed', 'export_tags' ),
+			'image_size'     => Settings::get( 'feed', 'image_size' ),
+			'split_variable' => Settings::get( 'feed', 'split_variable' ),
+			'protected'      => Settings::get( 'feed', 'password_protected' ),
+			'password'       => Settings::get( 'feed', 'password' ),
 
 			// WooCommerce settings
 			'include_taxes'  => ( 'incl' === get_option( 'woocommerce_tax_display_shop' ) ),
@@ -256,6 +265,10 @@ class Data_Feed {
 	 * @since 1.0.0
 	 */
 	private function load_product_variations() {
+
+		$this->log->log('Load Product Variations');
+		$this->log->log('Load Product Variations - Split Variable: ' . $this->settings['split_variable']);
+
 		if ( 'yes' !== $this->settings['split_variable'] ) {
 			return;
 		}
