@@ -540,13 +540,14 @@ class Doofinder_Api implements Api_Wrapper {
 			$this->log->log('=== API CALL === ');
 			/** @var SearchEngine[] $search_engine */
 			$this->log->log( 'Get search engine - hash: ' . $this->hash);
+			
 			$search_engine = $this->client->getSearchEngine($this->hash);
 			$this->api_calls++;
 		} else {
 			$search_engine = true;
 		}
 
-		$this->log->log('Search Enginge: ');
+		$this->log->log('Search Engine: ');
 		$this->log->log($search_engine);
 
 		if ($search_engine) {
