@@ -126,7 +126,7 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 
 == Changelog ==
 
-= 1.3.4 =
+= 1.3.5 =
 Fixed bug with variants indexing (#48)
 
 = 1.3.4 =
