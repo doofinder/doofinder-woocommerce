@@ -19,6 +19,7 @@ use Doofinder\WC\Index_Interface;
 use GuzzleHttp\Client as GuzzleClient;
 
 use Error;
+use Doofinder\Management\Errors\DoofinderError;
 
 class Setup_Wizard {
 
@@ -913,7 +914,7 @@ class Setup_Wizard {
 				
 				$this->log->log( 'Wizard Step 1 - List search engines - success ' );
 				$response = true;
-				
+
 			} catch (\DoofinderManagement\ApiException $exception) {
 				$this->log->log( 'Wizard Step 1: '. $exception->getMessage() );
 				$this->errors['wizard-step-1'] = __( 'Could not connect to the API. API Key or Host is not valid.', 'woocommerce-doofinder' );
@@ -921,6 +922,10 @@ class Setup_Wizard {
 			} catch (\Exception $exception) {
 				$this->log->log( 'Wizard Step 1 - Exception ' );
 				$this->log->log( $exception );
+
+				if ( $exception instanceof DoofinderError ) {
+					$this->log->log( $exception->getBody() );
+				}
 			}
 		} else {
 			$response = true;
