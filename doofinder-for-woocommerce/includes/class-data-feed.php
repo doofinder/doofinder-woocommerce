@@ -349,6 +349,7 @@ class Data_Feed {
 	 * @since 1.0.0
 	 */
 	private function add_products() {
+		
 		foreach ( $this->products as $post ) {
 			$product = WC()->product_factory->get_product( $post );
 
