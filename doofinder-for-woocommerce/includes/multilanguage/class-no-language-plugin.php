@@ -2,6 +2,9 @@
 
 namespace Doofinder\WC\Multilanguage;
 
+use Doofinder\WC\Log;
+use Doofinder\WC\Settings\Settings;
+
 class No_Language_Plugin extends Language_Plugin {
 
 	/**
@@ -52,16 +55,41 @@ class No_Language_Plugin extends Language_Plugin {
 	public function get_posts_ids( $language_code, $post_type, $ids_greater_than, $number_of_posts ) {
 		global $wpdb;
 
-		$query = "
-			SELECT ID
+		$log = new Log('api.txt');
+
+		// Set post types to query depending on split_variable option
+		if ('yes' === Settings::get( 'feed', 'split_variable' ) && $post_type === 'product') {
+			$query = "
+			SELECT DISTINCT posts.ID
+			FROM $wpdb->posts as posts
+			LEFT JOIN xyz_posts as postparents
+				ON posts.post_parent = postparents.ID
+			WHERE (posts.post_type = '{$post_type}' OR posts.post_type = '{$post_type}_variation')
+			AND posts.post_status = 'publish'
+			AND (postparents.post_status IS NULL OR postparents.post_status = 'publish') 
+			AND posts.ID > $ids_greater_than
+			ORDER BY posts.ID
+			LIMIT $number_of_posts
+		";
+		} else {
+			$query = "
+			SELECT DISTINCT ID
 			FROM $wpdb->posts
 			WHERE $wpdb->posts.post_type = '{$post_type}'
+			AND $wpdb->posts.post_status = 'publish'
 			AND $wpdb->posts.ID > $ids_greater_than
 			ORDER BY $wpdb->posts.ID
 			LIMIT $number_of_posts
 		";
+		}
+
+		
+
+		//$log->log($query);
 
 		$ids = $wpdb->get_results( $query, ARRAY_N );
+
+		//$log->log($ids);
 
 		if ( ! $ids ) {
 			return array();

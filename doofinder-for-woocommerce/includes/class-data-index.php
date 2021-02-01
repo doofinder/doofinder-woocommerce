@@ -39,7 +39,7 @@ class Data_Index {
 	 *
 	 * @var int
 	 */
-	private static $posts_per_page = 100;
+	private static $posts_per_page = 25;
 
 	/**
 	 * Instance of class handling multilanguage environments.
@@ -555,6 +555,9 @@ class Data_Index {
 
 		$this->items = $data_feed->get_items();
 
+		$current_progress = $this->indexing_data->get('current_progress');
+		$this->indexing_data->set('current_progress', $current_progress + count($this->items));
+
 		if(!empty($this->items)) {
 			$this->log->log( 'Generate items - Items generated : ' . count($this->items) );
 			$this->log->log( 'Generate items - Items : ' );
@@ -717,34 +720,107 @@ class Data_Index {
 
 		// Base query - count of all posts of all supported post types.
 		// Essentially - how many total posts are there to index.
+		$split_variable_lang = $sitepress ? 'all' : '';
+
+		$this->log->log('Calculate Progress - Split Variabable: ' . Settings::get( 'feed', 'split_variable', $split_variable_lang ));
+		
+		if ('yes' === Settings::get( 'feed', 'split_variable', $split_variable_lang )) {
+			$this->post_types[] = 'product_variation';
+		}
+
 		$post_types_list = $this->make_sql_list( $this->post_types );
+
+		//$this->log->log( 'Calculate Progress - Post types list : ' . $post_types_list );
 
 		// Get currently processed language
 		$lang = $this->indexing_data->get('lang');
 
-		//$this->log->log( 'Calculate Progress - current lang: "'. $lang .'"' );
+		$this->log->log( 'Calculate Progress - current lang: "'. $lang .'"' );
+		
+		$query = "";
 
-		$query = "
+		if (!$lang || !$sitepress) {
+			// WMPL is not active. Make sure to get product variations that are not child of a product
+			// with 'draft' status
+			$query .= "
 			SELECT
 			(
-				SELECT COUNT(*)
-				FROM $wpdb->posts
+				SELECT COUNT(DISTINCT posts.ID)
+				FROM $wpdb->posts as posts
+				LEFT JOIN xyz_posts as postparents
+                	ON posts.post_parent = postparents.ID
+				WHERE posts.post_type IN ($post_types_list)
+				AND posts.post_status = 'publish'
+				AND (postparents.post_status IS NULL OR postparents.post_status = 'publish') 
+				AND ( 
+					posts.ID NOT IN (
+						SELECT object_id
+						FROM {$wpdb->prefix}term_relationships
+						WHERE term_taxonomy_id IN (
+							SELECT term_id 
+							FROM `{$wpdb->prefix}terms` 
+							WHERE slug = 'exclude-from-search'
+						)
+					)
+				)
 			";
-
-		// When mulilang (WPML) is active we need to calculate posts only for
-		// that language so we need to join translations table to the query
-
-		if ($this->process_all_languages || !$lang || !$sitepress ) {
+		} else if ($this->process_all_languages  ) {
+			// WMPL is active and we want to count posts for all languages. Make sure to get product 
+			// variations that are not child of a product with 'draft' status
 			$query .= "
-				WHERE $wpdb->posts.post_type IN ($post_types_list)
+			SELECT
+			(
+				SELECT COUNT(DISTINCT posts.ID)
+				FROM {$wpdb->prefix}icl_translations as translations
+				LEFT JOIN {$wpdb->prefix}posts as posts
+					ON ( translations.element_id = posts.ID OR translations.element_id = posts.post_parent )
+				LEFT JOIN xyz_posts as postparents
+                	ON posts.post_parent = postparents.ID
+				WHERE posts.post_type IN ($post_types_list)
+				AND posts.post_status = 'publish'
+				AND (postparents.post_status IS NULL OR postparents.post_status = 'publish') 
+				AND ( 
+					posts.ID NOT IN (
+						SELECT object_id
+						FROM {$wpdb->prefix}term_relationships
+						WHERE term_taxonomy_id IN (
+							SELECT term_id 
+							FROM `{$wpdb->prefix}terms` 
+							WHERE slug = 'exclude-from-search'
+						)
+					)
+				)
 			";
 
 		} else {
+			// When mulilang (WPML) is active we need to calculate posts only for
+			// that language so we need to join translations table to the query
+			// and make sure to get product variations that are not child of a product 
+			// with 'draft' status
 			$query .= "
-				LEFT JOIN {$wpdb->prefix}icl_translations
-				ON $wpdb->posts.ID = {$wpdb->prefix}icl_translations.element_id
-				WHERE $wpdb->posts.post_type IN ($post_types_list)
-				AND {$wpdb->prefix}icl_translations.language_code='{$lang}'
+			SELECT
+			(
+				SELECT COUNT(DISTINCT posts.ID)
+				FROM {$wpdb->prefix}icl_translations as translations
+				LEFT JOIN {$wpdb->prefix}posts as posts
+					ON ( translations.element_id = posts.ID OR translations.element_id = posts.post_parent )
+				LEFT JOIN xyz_posts as postparents
+                	ON posts.post_parent = postparents.ID
+				WHERE translations.language_code = '{$lang}'
+				AND posts.post_type IN ($post_types_list)
+				AND posts.post_status = 'publish'
+				AND (postparents.post_status IS NULL OR postparents.post_status = 'publish') 
+				AND ( 
+					posts.ID NOT IN (
+						SELECT object_id
+						FROM {$wpdb->prefix}term_relationships
+						WHERE term_taxonomy_id IN (
+							SELECT term_id 
+							FROM `{$wpdb->prefix}terms` 
+							WHERE slug = 'exclude-from-search'
+						)
+					)
+				)
 			";
 		}
 
@@ -822,17 +898,26 @@ class Data_Index {
 			// When mulilang (WPML) is active we need to calculate posts only for
 			// that language so we need to join translations table to the query
 
+			
+
+			if ('yes' === Settings::get( 'feed', 'split_variable' ) && $post_type === 'product') {
+				$post_type_query = "($wpdb->posts.post_type = '$post_type' OR $wpdb->posts.post_type = '{$post_type}_variation')";
+			} else {
+				$post_type_query = "$wpdb->posts.post_type = '$post_type'";
+			}
+
+
 			if ($lang && $sitepress) {
 				$query .= "
 					LEFT JOIN {$wpdb->prefix}icl_translations
 					ON $wpdb->posts.ID = {$wpdb->prefix}icl_translations.element_id
-					WHERE $wpdb->posts.post_type = '$post_type'
+					WHERE ".$post_type_query."
 					AND {$wpdb->prefix}icl_translations.language_code='{$this->indexing_data->get('lang')}'
 				";
 
 			} else {
 				$query .= "
-					WHERE $wpdb->posts.post_type = '$post_type'
+					WHERE ".$post_type_query."
 				";
 			}
 
@@ -844,8 +929,8 @@ class Data_Index {
 			";
 		}
 
-		// $this->log->log( 'Calculate Progress - Query:' );
-		// $this->log->log( $query );
+		//$this->log->log( 'Calculate Progress - Query:' );
+		//$this->log->log( $query );
 
 		// Check if returned data is valid. It should be array containing one element
 		// (query returns one row of results)
@@ -857,10 +942,10 @@ class Data_Index {
 
 		$result = $result[0];
 
-
 		$already_processed = $this->indexing_data->get( 'processed_posts_count' );
 		$current_progress_get = $this->indexing_data->get( 'current_progress' );
-		//$this->log->log( 'Calculate Progress - Current Progress get: ' . $current_progress_get);
+
+		$this->log->log( 'Calculate Progress - Current Progress get: ' . $current_progress_get);
 		//$this->log->log( 'Calculate Progress - Already Processed get: ' . $already_processed);
 		//$this->log->log( 'Calculate Progress - Result:' );
 		//$this->log->log( $result );
@@ -869,15 +954,16 @@ class Data_Index {
 		// This will be - percentage of  all posts from already processed post types
 		// plus all the posts from post type currently being processed
 		// that were already indexed.
-		$processed_posts = 0;
-		if ( isset( $already_processed ) && $already_processed > $result->current_progress  ) {
-			$processed_posts += $already_processed;
-		}
+		// $processed_posts = 0;
+		// if ( isset( $already_processed ) && $already_processed > $result->current_progress  ) {
+		// 	$processed_posts += $already_processed;
+		// }
 
-		if ( isset( $result->current_progress ) ) {
-			$processed_posts += $result->current_progress;
-		}
+		// if ( isset( $result->current_progress ) ) {
+		// 	$processed_posts += $result->current_progress;
+		// }
 
+		$processed_posts = $current_progress_get;
 
 		$this->log->log( 'Calculate Progress - Processed: ' . $processed_posts . ' out of: ' . $result->all_posts );
 
