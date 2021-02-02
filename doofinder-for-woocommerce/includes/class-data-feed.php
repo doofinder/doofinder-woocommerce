@@ -162,6 +162,8 @@ class Data_Feed {
 	private function load_products($product_ids = null, $language = null) {
 		global $woocommerce;
 		
+		$this->log->log('Load products');
+
 		if ( $language ) {
 			global $sitepress;
 			$current_lang = $sitepress->get_current_language();
@@ -183,6 +185,10 @@ class Data_Feed {
 			'update_post_meta_cache' => false,
 			'update_post_term_cache' => false,
 		);
+
+		if ('yes' === Settings::get( 'feed', 'split_variable' )) {
+			$args['post_type'] = ['product','product_variation'];
+		}
 
 		if (is_array($product_ids) && !empty($product_ids)) {
 			$args['post__in'] = $product_ids;
@@ -243,7 +249,13 @@ class Data_Feed {
 		}
 
 		$query          = new \WP_Query( $args );
+		
+		//$this->log->log('Load products - Query: '); 
+		//$this->log->log($query); 
+
 		$this->products = $query->posts;
+
+		$this->log->log('Load products - Count: ' . count($this->products)); 
 
 		// Check if this is the beginning or end of the feed
 		if ( 0 === $offset ) {
@@ -265,9 +277,6 @@ class Data_Feed {
 	 * @since 1.0.0
 	 */
 	private function load_product_variations() {
-
-		$this->log->log('Load Product Variations');
-		$this->log->log('Load Product Variations - Split Variable: ' . $this->settings['split_variable']);
 
 		if ( 'yes' !== $this->settings['split_variable'] ) {
 			return;
@@ -353,28 +362,30 @@ class Data_Feed {
 		foreach ( $this->products as $post ) {
 			$product = WC()->product_factory->get_product( $post );
 
-			if ( 'yes' === $this->settings['split_variable'] && $product->is_type( 'variable' ) ) {
-				$children = $product->get_children();
+			// Commented out because, the variable split is done differently now, via load_products and get_posts_ids
 
-				foreach ( $children as $child ) {
-					// If product variations have non-public status they won't be present
-					// in this array.
-					if ( ! $this->product_variations[ $child ] ) {
-						continue;
-					}
+			// if ( 'yes' === $this->settings['split_variable'] && $product->is_type( 'variable' ) ) {
+			// 	$children = $product->get_children();
 
-					$item = new Data_Feed_Item(
-						$this->product_variations[ $child ],
-						get_post($product->get_id()),
+			// 	foreach ( $children as $child ) {
+			// 		// If product variations have non-public status they won't be present
+			// 		// in this array.
+			// 		if ( ! $this->product_variations[ $child ] ) {
+			// 			continue;
+			// 		}
 
-						$this->settings,
-						$this->paths_cache,
-						$this->terms_cache
-					);
+			// 		$item = new Data_Feed_Item(
+			// 			$this->product_variations[ $child ],
+			// 			get_post($product->get_id()),
+
+			// 			$this->settings,
+			// 			$this->paths_cache,
+			// 			$this->terms_cache
+			// 		);
 					
-					$this->add_item_to_feed( $item->get_fields() );
-				}
-			} else {
+			// 		$this->add_item_to_feed( $item->get_fields() );
+			// 	}
+			// } else {
 				$item = new Data_Feed_Item(
 					$post,
 					null,
@@ -385,7 +396,7 @@ class Data_Feed {
 				);
 				
 				$this->add_item_to_feed( $item->get_fields() );
-			}
+			//}
 		}
 	}
 

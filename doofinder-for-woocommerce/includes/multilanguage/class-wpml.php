@@ -2,6 +2,9 @@
 
 namespace Doofinder\WC\Multilanguage;
 
+use Doofinder\WC\Log;
+use Doofinder\WC\Settings\Settings;
+
 class WPML implements I18n_Handler {
 
 	/**
@@ -12,10 +15,20 @@ class WPML implements I18n_Handler {
 	private $languages;
 
 	/**
+	 * Instance of a class used to log to a file.
+	 *
+	 * @var Log
+	 */
+	private $log;
+
+	/**
 	 * @since 1.0.0
 	 */
 	public function __construct() {
 		global $sitepress;
+
+		$this->log = new Log('api.txt');
+
 
 		$sitepress->switch_lang( $sitepress->get_default_language() );
 		$active_languages = apply_filters( 'wpml_active_languages', NULL, 'orderby=id&order=desc' );
@@ -188,18 +201,52 @@ class WPML implements I18n_Handler {
 	 */
 	public function get_posts_ids( $language_code, $post_type, $ids_greater_than, $number_of_posts ) {
 		global $wpdb;
+		global $sitepress;
 
-		$query = "
-			SELECT element_id
-			FROM {$wpdb->prefix}icl_translations
-			WHERE {$wpdb->prefix}icl_translations.language_code = '$language_code'
-			AND {$wpdb->prefix}icl_translations.element_type = 'post_{$post_type}'
-			AND {$wpdb->prefix}icl_translations.element_id > $ids_greater_than 
-			ORDER BY {$wpdb->prefix}icl_translations.element_id
-			LIMIT $number_of_posts
-		";
+		$split_variable_lang = $sitepress ? 'all' : '';
+
+		// Set post types to query depending on split_variable option
+		if ('yes' === Settings::get( 'feed', 'split_variable' , $split_variable_lang) && $post_type === 'product') {
+			
+			$query = "
+				SELECT DISTINCT posts.ID
+				FROM {$wpdb->prefix}icl_translations as translations
+				LEFT JOIN {$wpdb->prefix}posts as posts
+					ON ( translations.element_id = posts.ID OR translations.element_id = posts.post_parent )
+				LEFT JOIN xyz_posts as postparents
+                	ON posts.post_parent = postparents.ID
+				WHERE translations.language_code = '$language_code'
+				AND ( translations.element_type = 'post_{$post_type}' OR translations.element_type = 'post_{$post_type}_variation' )
+				AND posts.id > $ids_greater_than 
+				AND posts.post_status = 'publish'
+				AND (postparents.post_status IS NULL OR postparents.post_status = 'publish') 
+				ORDER BY posts.id
+				LIMIT $number_of_posts
+			";
+
+		} else {
+			
+			$query = "
+				SELECT {$wpdb->prefix}icl_translations.element_id
+				FROM {$wpdb->prefix}icl_translations
+				JOIN {$wpdb->prefix}posts
+				ON {$wpdb->prefix}icl_translations.element_id = {$wpdb->prefix}posts.ID
+				WHERE {$wpdb->prefix}icl_translations.language_code = '$language_code'
+				AND {$wpdb->prefix}icl_translations.element_type = 'post_{$post_type}'
+				AND {$wpdb->prefix}icl_translations.element_id > $ids_greater_than 
+				AND {$wpdb->prefix}posts.post_status = 'publish'
+				ORDER BY {$wpdb->prefix}icl_translations.element_id
+				LIMIT $number_of_posts
+			";
+		}
+
+
+
+		//$this->log->log($query);
 
 		$ids = $wpdb->get_results( $query, ARRAY_N );
+
+		//$this->log->log($ids);
 
 		if ( ! $ids ) {
 			return array();
