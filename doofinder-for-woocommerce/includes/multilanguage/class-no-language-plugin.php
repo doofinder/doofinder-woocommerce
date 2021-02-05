@@ -62,7 +62,7 @@ class No_Language_Plugin extends Language_Plugin {
 			$query = "
 			SELECT DISTINCT posts.ID
 			FROM $wpdb->posts as posts
-			LEFT JOIN xyz_posts as postparents
+			LEFT JOIN $wpdb->posts as postparents
 				ON posts.post_parent = postparents.ID
 			WHERE (posts.post_type = '{$post_type}' OR posts.post_type = '{$post_type}_variation')
 			AND posts.post_status = 'publish'
@@ -73,7 +73,7 @@ class No_Language_Plugin extends Language_Plugin {
 		";
 		} else {
 			$query = "
-			SELECT DISTINCT ID
+			SELECT DISTINCT $wpdb->posts.ID
 			FROM $wpdb->posts
 			WHERE $wpdb->posts.post_type = '{$post_type}'
 			AND $wpdb->posts.post_status = 'publish'
@@ -85,11 +85,13 @@ class No_Language_Plugin extends Language_Plugin {
 
 		
 
-		//$log->log($query);
+		$log->log( 'Get Posts IDs - Query:' );
+		$log->log($query);
 
 		$ids = $wpdb->get_results( $query, ARRAY_N );
 
-		//$log->log($ids);
+		$log->log( 'Get Posts IDs - Result:' );
+		$log->log( $ids );
 
 		if ( ! $ids ) {
 			return array();
