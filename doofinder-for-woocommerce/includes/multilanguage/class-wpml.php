@@ -213,7 +213,7 @@ class WPML implements I18n_Handler {
 				FROM {$wpdb->prefix}icl_translations as translations
 				LEFT JOIN {$wpdb->prefix}posts as posts
 					ON ( translations.element_id = posts.ID OR translations.element_id = posts.post_parent )
-				LEFT JOIN xyz_posts as postparents
+				LEFT JOIN {$wpdb->prefix}posts as postparents
                 	ON posts.post_parent = postparents.ID
 				WHERE translations.language_code = '$language_code'
 				AND ( translations.element_type = 'post_{$post_type}' OR translations.element_type = 'post_{$post_type}_variation' )
@@ -241,12 +241,13 @@ class WPML implements I18n_Handler {
 		}
 
 
-
-		//$this->log->log($query);
+		$this->log->log( 'Get Posts IDs - Query:' );
+		$this->log->log($query);
 
 		$ids = $wpdb->get_results( $query, ARRAY_N );
 
-		//$this->log->log($ids);
+		$this->log->log( 'Get Posts IDs - Result:' );
+		$this->log->log( $ids );
 
 		if ( ! $ids ) {
 			return array();

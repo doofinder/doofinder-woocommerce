@@ -747,7 +747,7 @@ class Data_Index {
 			(
 				SELECT COUNT(DISTINCT posts.ID)
 				FROM $wpdb->posts as posts
-				LEFT JOIN xyz_posts as postparents
+				LEFT JOIN {$wpdb->prefix}posts as postparents
                 	ON posts.post_parent = postparents.ID
 				WHERE posts.post_type IN ($post_types_list)
 				AND posts.post_status = 'publish'
@@ -774,7 +774,7 @@ class Data_Index {
 				FROM {$wpdb->prefix}icl_translations as translations
 				LEFT JOIN {$wpdb->prefix}posts as posts
 					ON ( translations.element_id = posts.ID OR translations.element_id = posts.post_parent )
-				LEFT JOIN xyz_posts as postparents
+				LEFT JOIN {$wpdb->prefix}posts as postparents
                 	ON posts.post_parent = postparents.ID
 				WHERE posts.post_type IN ($post_types_list)
 				AND posts.post_status = 'publish'
@@ -804,7 +804,7 @@ class Data_Index {
 				FROM {$wpdb->prefix}icl_translations as translations
 				LEFT JOIN {$wpdb->prefix}posts as posts
 					ON ( translations.element_id = posts.ID OR translations.element_id = posts.post_parent )
-				LEFT JOIN xyz_posts as postparents
+				LEFT JOIN {$wpdb->prefix}posts as postparents
                 	ON posts.post_parent = postparents.ID
 				WHERE translations.language_code = '{$lang}'
 				AND posts.post_type IN ($post_types_list)
@@ -883,6 +883,9 @@ class Data_Index {
 
 		}
 
+		$this->log->log( 'Calculate Progress - Query:' );
+		$this->log->log( $query );
+
 		// Add posts from the currently processed post type.
 		if ( $this->indexing_data->get( 'post_type' ) ) {
 			$post_type = $this->indexing_data->get( 'post_type' );
@@ -929,12 +932,12 @@ class Data_Index {
 			";
 		}
 
-		//$this->log->log( 'Calculate Progress - Query:' );
-		//$this->log->log( $query );
-
 		// Check if returned data is valid. It should be array containing one element
 		// (query returns one row of results)
 		$result = $wpdb->get_results( $query );
+
+		//$this->log->log( 'Calculate Progress - Result:' );
+		//$this->log->log( $result );
 
 		if ( ! $result || ! $result[0] ) {
 			return 0;
@@ -972,7 +975,7 @@ class Data_Index {
 
 		$current_progress = ( $processed_posts / $result->all_posts ) * 100;
 
-		$this->log->log( 'Calculate Progress - Summary: ' . $current_progress );
+		$this->log->log( 'Calculate Progress - Summary: ' . round($current_progress,2) . '%' );
 
 
 		return $current_progress ;
