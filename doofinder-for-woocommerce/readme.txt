@@ -1,7 +1,7 @@
 === Doofinder for WooCommerce ===
 Contributors: doofinder
 Tags: search, autocomplete, woocommerce
-Version: 1.3.8
+Version: 1.3.9
 Requires at least: 5.0
 Tested up to: 5.6
 Stable tag: trunk
@@ -125,6 +125,9 @@ You can click *Delete* to remove the additional attributes from the feed.
 Just send your questions to <mailto:support@doofinder.com> and we will try to answer as fast as possible with a working solution for you.
 
 == Changelog ==
+
+= 1.3.9 =
+Fixed problem creating items in temporary indices via API.
 
 = 1.3.8 =
 Fixed SQL query to get ids. Expanded logs for debugging.
