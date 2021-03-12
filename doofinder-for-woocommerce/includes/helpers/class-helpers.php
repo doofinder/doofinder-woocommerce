@@ -26,6 +26,22 @@ class Helpers {
         return $host;
     }
 
+    public static function get_memory_usage($real = false, $peak = false, $in_megabytes = false) {
+        
+        $unit = $in_megabytes ? ' MB' : ' bytes';
+        $megabyte = 1048576;
+
+        if ($peak) {
+            $amount = $in_megabytes ? round(memory_get_peak_usage($real)/$megabyte,2) : number_format(memory_get_peak_usage($real), 0, ',', ' '); 
+            $amount_in_mb = round(memory_get_peak_usage($real)/$megabyte,2);
+        } else {
+            $amount = $in_megabytes ? round(memory_get_usage($real)/$megabyte,2) : number_format(memory_get_usage($real), 0, ',', ' ');
+            $amount_in_mb = round(memory_get_usage($real)/$megabyte,2);
+        }
+
+        return $amount . $unit . ' ' . ' ('. $amount_in_mb.' MB)';
+    }
+
     /**
      * Recursive in_array() for multidimensional arrays
      *

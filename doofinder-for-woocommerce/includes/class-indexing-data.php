@@ -54,6 +54,9 @@ class Indexing_Data {
 		// How many posts were processed/indexed overall
 		'processed_posts_count' => 0,
 
+		// How many posts in total to process
+		'all_posts_count' => 0,
+
 		// Array of site languages if multisite
 		'languages' => array(),
 		

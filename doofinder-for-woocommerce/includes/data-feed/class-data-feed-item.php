@@ -4,6 +4,7 @@ namespace Doofinder\WC\Data_Feed;
 
 use Doofinder\WC\Settings\Attributes;
 use Doofinder\WC\Settings\Settings;
+use Doofinder\WC\Log;
 
 defined( 'ABSPATH' ) or die;
 
@@ -70,6 +71,14 @@ class Data_Feed_Item {
 	private $terms_cache;
 
 	/**
+	 * Instance of a class used to log to a file.
+	 *
+	 * @var Log
+	 */
+	private $log;
+
+
+	/**
 	 * Data_Feed_Item constructor.
 	 * $parent should be passed only when $post is a product variation.
 	 *
@@ -82,6 +91,9 @@ class Data_Feed_Item {
 	 * @param array    $terms_cache All product categories loaded from DB.
 	 */
 	public function __construct( $post, $parent = null, $settings, &$paths_cache, &$terms_cache ) {
+
+		$this->log = new Log( 'api.txt' );
+
 		$this->post = $post;
 		$this->product = WC()->product_factory->get_product( $post->ID );
 		$this->parent = $parent;
@@ -506,6 +518,7 @@ class Data_Feed_Item {
 		 * Traverse from current term to the oldest ancestor.
 		 * Terms are already loaded to the cache, so there's no need to load them from DB again.
 		 */
+
 		while ( $term->parent ) {
 			$term = $this->terms_cache[ $term->parent ];
 			$path[] = $term->name;

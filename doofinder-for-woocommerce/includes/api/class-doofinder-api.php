@@ -166,6 +166,7 @@ class Doofinder_Api implements Api_Wrapper {
 		} catch ( \Exception $exception ) {
 
 			$this->log->log( 'Could not get search engine - Unknown' );
+			$this->log->log( get_class($exception));
 			$this->log->log( $exception->getMessage() );
 
 			if ( $exception instanceof DoofinderError ) {
@@ -262,6 +263,7 @@ class Doofinder_Api implements Api_Wrapper {
 
 		} catch ( \Exception $exception ) {
 			$this->log->log('Update Item - Exception 2' . "\n");
+			$this->log->log( get_class($exception));
 			$this->log->log( $exception->getMessage() );
 
 			if ( $exception instanceof DoofinderError ) {
@@ -310,6 +312,7 @@ class Doofinder_Api implements Api_Wrapper {
 
 		} catch ( \Exception $exception ) {
 			$this->log->log('Remove Item - Exception' . "\n");
+			$this->log->log( get_class($exception));
 			$this->log->log( $exception->getMessage() );
 
 			if ( $exception instanceof DoofinderError ) {
@@ -396,6 +399,7 @@ class Doofinder_Api implements Api_Wrapper {
 					} catch ( \Exception $exception ) {
 						// For some reason Index could not be created.
 						$this->log->log('Send batch - Real Index NOT Created' . "\n");
+						$this->log->log( get_class($exception));
 						$this->log->log( $exception->getMessage() );
 
 						if ( $exception instanceof DoofinderError ) {
@@ -425,6 +429,7 @@ class Doofinder_Api implements Api_Wrapper {
 
 							// For some reason Index could not be created.
 							$this->log->log('Send batch - Temp Index NOT Created' . "\n");
+							$this->log->log( get_class($exception));
 							$this->log->log( $exception->getMessage() );
 
 							if ( $exception instanceof DoofinderError ) {
@@ -438,6 +443,7 @@ class Doofinder_Api implements Api_Wrapper {
 				} catch ( \Exception $exception ) {
 					// Temp Index could not be created it probably exists already. Move on.
 					$this->log->log('Send batch - Temp Index probably exists already' . "\n");
+					$this->log->log( get_class($exception));
 					$this->log->log( $exception->getMessage() );
 
 					if ( $exception instanceof DoofinderError ) {
@@ -479,10 +485,17 @@ class Doofinder_Api implements Api_Wrapper {
 
 		} catch ( \Exception $exception ) {
 			$this->log->log( 'Send Batch - Exception 1' . "\n" );
+			$this->log->log( get_class($exception));
 			$this->log->log( $exception->getMessage() );
 
 			if ( $exception instanceof DoofinderError ) {
 				$this->log->log( $exception->getBody() );
+				
+				// Show doofinder api response message for user in the backend
+				$response_status = Api_Status::get_api_response_status($exception->getMessage(),$exception->getBody());
+				if ( $response_status ) {
+					return $response_status;
+				}
 			}
 
 			return Api_Status::$unknown_error;
@@ -665,6 +678,7 @@ class Doofinder_Api implements Api_Wrapper {
 
 		} catch ( \Exception $exception ) {
 			$this->log->log('Replace Index - Exception' . "\n");
+			$this->log->log( get_class($exception));
 			$this->log->log( $exception->getMessage() );
 
 			if ( $exception instanceof DoofinderError ) {
