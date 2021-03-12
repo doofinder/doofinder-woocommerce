@@ -5,6 +5,7 @@ namespace Doofinder\WC;
 use Doofinder\WC\Data_Feed\Data_Feed_Item;
 use Doofinder\WC\Data_Feed\Feed_XML;
 use Doofinder\WC\Settings\Settings;
+use Doofinder\WC\Helpers\Helpers;
 use stdClass;
 
 defined( 'ABSPATH' ) or die;
@@ -256,6 +257,8 @@ class Data_Feed {
 		$this->products = $query->posts;
 
 		$this->log->log('Load products - Count: ' . count($this->products)); 
+
+		$this->log->log( 'Current Memory Usage: ' . Helpers::get_memory_usage());
 
 		// Check if this is the beginning or end of the feed
 		if ( 0 === $offset ) {

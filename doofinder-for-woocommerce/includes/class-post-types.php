@@ -3,6 +3,7 @@
 namespace Doofinder\WC;
 
 use Doofinder\WC\Settings\Settings;
+use Doofinder\WC\Log;
 
 defined( 'ABSPATH' ) or die();
 
@@ -24,6 +25,13 @@ class Post_Types {
 	private static $default_post_types = array(
 		'product'
 	);
+
+	/**
+	 * Instance of a class used to log to a file.
+	 *
+	 * @var Log
+	 */
+	private $log;
 
 	/**
 	 * List of (processed, products removed) post type slugs
@@ -58,6 +66,9 @@ class Post_Types {
 	}
 
 	private function __construct() {
+
+		$this->log = new Log( 'api.txt' );
+
 		// get all public post_types
 		$post_types = get_post_types( array( 'public' => true ) );
 
@@ -90,12 +101,13 @@ class Post_Types {
 	public function get_indexable() {
 		$all           = $this->get();
 		$from_settings = Settings::get_post_types_to_index();
-
+		
 		// If there's nothing saved in settings, index
 		// the default post types.
 		if ( ! $from_settings ) {
 			return self::$default_post_types;
 		}
+
 
 		// Double check there's nothing weird saved in settings.
 		$allowed_post_types = array();

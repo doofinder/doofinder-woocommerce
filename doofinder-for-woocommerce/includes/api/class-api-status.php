@@ -54,4 +54,26 @@ class Api_Status {
 	 * @var string
 	 */
 	public static $unknown_error = 'unknown_error';
+
+	/**
+	 * Get status from doofinder api response
+	 * @param string $api_message
+	 * @param object $api_body
+	 * @return array
+	 */
+	public static function get_api_response_status($api_message,$api_body) {
+
+		// Show api response message for user in the backend
+		$exception_body = json_decode($api_body);
+
+		if (isset($exception_body->error->code) && isset($exception_body->error->message)) {
+			return array(
+				'status'  => $exception_body->error->code,
+				'message' => $api_message . ' ' .$exception_body->error->message,
+				'error'   => true
+			);
+		}
+
+		return false;
+	}
 }

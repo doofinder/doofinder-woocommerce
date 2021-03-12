@@ -214,7 +214,8 @@ class Index_Interface {
 	 *
 	 * @return mixed
 	 */
-	public static function are_api_keys_present( bool $process_all_languages, object $language ) {
+	public static function are_api_keys_present( bool $process_all_languages, $language ) {
+
 
 		$api_key = Settings::get_api_key();
 		

@@ -9,6 +9,7 @@ use Doofinder\WC\Multilanguage\Language_Plugin;
 use Doofinder\WC\Multilanguage\Multilanguage;
 use Doofinder\WC\Settings\Settings;
 use Doofinder\WC\Data_Feed;
+use Doofinder\WC\Helpers\Helpers;
 use Doofinder\WC\Log;
 
 defined( 'ABSPATH' ) or die;
@@ -39,7 +40,7 @@ class Data_Index {
 	 *
 	 * @var int
 	 */
-	private static $posts_per_page = 25;
+	private static $posts_per_page = 25; // Max is 100.
 
 	/**
 	 * Instance of class handling multilanguage environments.
@@ -211,7 +212,7 @@ class Data_Index {
 		if (self::$should_fail) {
 			$this->ajax_response_error( array(
 				'status'  => Api_Status::$unknown_error,
-				'message' => '',
+				'message' => 'Some text for forced error',
 				'error'   => true
 			) );
 
@@ -228,6 +229,8 @@ class Data_Index {
 		// This is not needed anymore, in API v2 we utilize temp indexes
 		//$this->maybe_remove_posts();
 
+
+
 		// Load languages
 		$this->log->log( 'Load Languages' );
 		$this->load_languages();
@@ -239,12 +242,18 @@ class Data_Index {
 		$this->load_post_types();
 		$this->log->log( $this->post_types );
 
+
+		// Count have many posts there are to process
+		$this->calculate_progress(true);
+
+
 		// This function also removes the current post type.
 		// This is done because "load_posts_id" can skip a post type
 		// if it contains 0 posts, but we still need to remove
 		// the post type, or the old posts will remain in the DB.
 		$this->log->log( 'Load Post IDs' );
 		$this->load_posts_ids($language);
+		$this->log->log( 'Post IDs : ' );
 		$this->log->log( $this->posts_ids );
 
 
@@ -298,7 +307,16 @@ class Data_Index {
 				$this->indexing_data->get('lang')
 			);
 
-			if ( $sent_to_api !== Api_Status::$success ) {
+			// Show ajax response from api response body
+			if (is_array($sent_to_api)) {
+
+				$this->ajax_response_error( array(
+					'status'  => $sent_to_api['status'] ?? '',
+					'message' => $sent_to_api['message'] ?? '',
+					'error'   => isset($sent_to_api['error']) ? $sent_to_api['error'] : true
+				) );
+
+			} else if ( $sent_to_api !== Api_Status::$success ) {
 				$post_type = $this->get_post_type_name( $this->indexing_data->get( 'post_type' ) );
 
 				$lang_message = '';
@@ -329,6 +347,7 @@ class Data_Index {
 				}
 
 				if ( $sent_to_api === Api_Status::$unknown_error ) {
+					$error = true;
 					$message = __( "An unknown error has occured while indexing data", 'woocommerce-doofinder' );
 				}
 
@@ -416,7 +435,7 @@ class Data_Index {
 			return;
 		}
 
-		$languages       = $this->language->get_languages();
+		$languages = $this->language->get_languages();
 
 		if(is_array($languages)) {
 			$this->languages = array_keys($languages);
@@ -443,6 +462,7 @@ class Data_Index {
 		$lang 		    = $this->indexing_data->get( 'lang' );
 
 		$this->log->log( 'Load Posts Ids - lang : ' . $lang );
+		$this->log->log( 'Load Posts Ids - post_type : ' . $post_type );
 
 		$posts_per_page = self::$posts_per_page;
 
@@ -450,7 +470,8 @@ class Data_Index {
 			$lang_code = $language;
  		} else {
 			$lang_code = $lang;
-		 }
+		}
+
 
 		$this->posts_ids = $this->language->get_posts_ids(
 			$lang_code,
@@ -470,10 +491,11 @@ class Data_Index {
 			// If search engine is invalid we don't want to call the request for replacing index
 			// $skip_replace_index = !$api->search_engine ? true : false;
 
-			if ( $this->check_next_post_type() ) {
-				$this->log->log('Load Posts Ids - check next post type - true ');
-				$this->load_posts_ids();
-			} else if ( $this->process_all_languages && $this->check_next_language(/* $skip_replace_index */) ) {
+			// if ( $this->check_next_post_type() ) {
+			// 	$this->log->log('Load Posts Ids - check next post type - true ');
+			// 	$this->load_posts_ids();
+			// } else 
+			if ( $this->process_all_languages && $this->check_next_language(/* $skip_replace_index */) ) {
 				$this->log->log('Load Posts Ids - check next language - true ');
 				$this->load_posts_ids();
 			}
@@ -549,12 +571,17 @@ class Data_Index {
 	private function generate_items() {
 
 		// Use functionality from XML data feed to retrieve products
-		//$this->log->log( 'Generate items - indexing lang :  ' . $this->indexing_data->get('lang'));
+		$this->log->log( 'Generate items - Start ');
+		$this->log->log( 'Current Memory Usage: ' . Helpers::get_memory_usage()  );
+		//$this->log->log( 'Generate items - Start :  ' . $this->indexing_data->get('lang'));
 
+		$this->log->log( 'Generate items - Get Data Feed Instance ');
 		$data_feed = new Data_Feed( false, $this->posts_ids, $this->indexing_data->get('lang'));
 
+		$this->log->log( 'Generate items - Get Items ');
 		$this->items = $data_feed->get_items();
 
+		$this->log->log( 'Generate items - Set Current Progress ');
 		$current_progress = $this->indexing_data->get('current_progress');
 		$this->indexing_data->set('current_progress', $current_progress + count($this->items));
 
@@ -603,7 +630,9 @@ class Data_Index {
 			if(!$skip_replace_index) {
 				// We are done with this batch, replace temp index
 				$this->log->log( 'Check Next '.$item.'  - Call replace Index' );
-				$this->call_replace_index($get_new_api);
+				if ($this->api) {
+					$this->call_replace_index($get_new_api);
+				}
 			}
 
 			$this->indexing_data->set( $item, $container[ $next_item_index ] );
@@ -712,12 +741,22 @@ class Data_Index {
 	 *
 	 * @return float Percentage of already processed posts.
 	 */
-	private function calculate_progress() {
+	private function calculate_progress($get_count_all = false) {
 		global $wpdb;
 		global $sitepress;
 
-		//$this->log->log( '---- Calculate Progress' );
+		if ($get_count_all) {
+			$this->log->log('Calculate Progress - Get Count All');
+		}
 
+		if (!$get_count_all) {
+			$this->log->log( 'Current Memory Usage: ' . Helpers::get_memory_usage()  );
+			//$this->log->log( 'Real Size OF Memory Allocated From System: ' . round(memory_get_usage(true)/1048576,2) . ' MB' );
+			$this->log->log( 'Peak Memory Usage: ' . Helpers::get_memory_usage(false,true) );
+			//$this->log->log( 'Peak Memory Usage (real): ' . round(memory_get_peak_usage(true)/1048576,2) . ' MB'  );
+
+			//$this->log->log( '---- Calculate Progress' );
+		}
 		// Base query - count of all posts of all supported post types.
 		// Essentially - how many total posts are there to index.
 		$split_variable_lang = $sitepress ? 'all' : '';
@@ -735,7 +774,9 @@ class Data_Index {
 		// Get currently processed language
 		$lang = $this->indexing_data->get('lang');
 
-		$this->log->log( 'Calculate Progress - current lang: "'. $lang .'"' );
+		if (!$get_count_all) {
+			$this->log->log( 'Calculate Progress - current lang: "'. $lang .'"' );
+		}
 		
 		$query = "";
 
@@ -883,9 +924,10 @@ class Data_Index {
 
 		}
 
-		$this->log->log( 'Calculate Progress - Query:' );
-		$this->log->log( $query );
-
+		if (!$get_count_all) {
+			$this->log->log( 'Calculate Progress - Query:' );
+			$this->log->log( $query );
+		}
 		// Add posts from the currently processed post type.
 		if ( $this->indexing_data->get( 'post_type' ) ) {
 			$post_type = $this->indexing_data->get( 'post_type' );
@@ -936,6 +978,8 @@ class Data_Index {
 		// (query returns one row of results)
 		$result = $wpdb->get_results( $query );
 
+
+
 		//$this->log->log( 'Calculate Progress - Result:' );
 		//$this->log->log( $result );
 
@@ -944,6 +988,13 @@ class Data_Index {
 		}
 
 		$result = $result[0];
+
+
+		if ( $get_count_all ) {
+			$this->log->log( 'Calculate Progress - All posts to index: ' . $result->all_posts);
+			$this->indexing_data->set( 'all_posts_count', $result->all_posts );
+			return $result->all_posts;
+		}
 
 		$already_processed = $this->indexing_data->get( 'processed_posts_count' );
 		$current_progress_get = $this->indexing_data->get( 'current_progress' );
@@ -1044,7 +1095,10 @@ class Data_Index {
 		}
 
 		$post_type = $this->indexing_data->get( 'post_type' );
+
 		$api_response = $this->api->replace_index($post_type);
+
+		$this->log->log( $api_response );
 
 		if ( $api_response !== Api_Status::$success ) {
 

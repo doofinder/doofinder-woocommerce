@@ -90,8 +90,8 @@ class No_Language_Plugin extends Language_Plugin {
 
 		$ids = $wpdb->get_results( $query, ARRAY_N );
 
-		$log->log( 'Get Posts IDs - Result:' );
-		$log->log( $ids );
+		//$log->log( 'Get Posts IDs - Result:' );
+		//$log->log( $ids );
 
 		if ( ! $ids ) {
 			return array();
