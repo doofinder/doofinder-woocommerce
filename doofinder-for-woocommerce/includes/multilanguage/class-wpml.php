@@ -246,8 +246,8 @@ class WPML implements I18n_Handler {
 
 		$ids = $wpdb->get_results( $query, ARRAY_N );
 
-		$this->log->log( 'Get Posts IDs - Result:' );
-		$this->log->log( $ids );
+		//$this->log->log( 'Get Posts IDs - Result:' );
+		//$this->log->log( $ids );
 
 		if ( ! $ids ) {
 			return array();

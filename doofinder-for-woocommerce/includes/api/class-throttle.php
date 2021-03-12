@@ -2,7 +2,7 @@
 
 namespace Doofinder\WC\Api;
 
-//use Doofinder\Api\Management\Errors\IndexingInProgress;
+use Doofinder\Api\Management\Errors\IndexingInProgress;
 //use Doofinder\Api\Management\Errors\ThrottledResponse;
 use Doofinder\WC\Log;
 
@@ -85,20 +85,20 @@ class Throttle {
 
 		try {
 			return call_user_func_array( array( $this->target, $method ), $arguments );
-		} catch ( \Exception $exception ) { // TODO Implement ThrottledResponse here when present in php client
-			$log->log( "Throttling $method: $count" );
-			if ( $count >= self::MAX_RETRIES ) {
-				throw $exception;
-			}
-
-			sleep( 1 );
-		} catch ( \Exception $exception ) { // TODO Implement IndexingInProgress here when present in php client
+		} catch ( IndexingInProgress $exception ) { 
 			$log->log( "Throttling when indexing - $method: $count" );
 			if ( $count >= self::MAX_RETRIES ) {
 				throw $exception;
 			}
 
 			sleep( 3 );
+		} catch ( \Exception $exception ) { 
+			$log->log( "Throttling $method: $count" );
+			if ( $count >= self::MAX_RETRIES ) {
+				throw $exception;
+			}
+
+			sleep( 1 );
 		}
 
 		return $this->throttle( $method, $arguments, $count + 1 );
