@@ -468,6 +468,8 @@ class Data_Feed_Item {
 	private function get_categories( $id ) {
 		$paths = array();
 		$terms = get_the_terms( $id, 'product_cat' );
+		//$this->log->log('Data Feed Item - Get Categories: ');
+		//$this->log->log($terms); 
 
 		if ( is_array( $terms ) ) {
 			foreach ( $terms as $term ) {
@@ -500,34 +502,47 @@ class Data_Feed_Item {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param \WP_Term $term
+	 * @param \WP_Term|int $term
 	 *
 	 * @return array|mixed|string
 	 */
-	private function get_category_path( \WP_Term $term ) {
+	private function get_category_path( $term ) {
+
+		if ( is_int($term) ) {
+
+			if ( $term > 0 ) {
+				$term = get_term_by('id',$term,'product_cat');
+			} else {
+				return '';
+			}
+		} 
+		
 		// Don't traverse again if we already have the path cached.
 		if ( isset( $this->paths_cache[ $term->term_id ] ) ) {
 			return $this->paths_cache[ $term->term_id ];
 		}
-
-		$term_id = $term->term_id;
+		
+		$term_id = isset($term->term_id) ? $term->term_id : 0;
 		$path = array();
-		$path[] = $term->name;
+		$path[] = isset($term->name) ? $term->name : null;
 
 		/*
 		 * Traverse from current term to the oldest ancestor.
 		 * Terms are already loaded to the cache, so there's no need to load them from DB again.
 		 */
-
-		while ( $term->parent ) {
-			$term = $this->terms_cache[ $term->parent ];
-			$path[] = $term->name;
+		if (isset($term->parent)) {
+			while ( $term->parent ) {
+				$term = $this->terms_cache[ $term->parent ];
+				$path[] = $term->name;
+			}
+	
+			// Build a path, and cache it for future use.
+			$path = implode( ' > ', array_reverse( $path ) );
+			$this->paths_cache[ $term_id ] = $path;
+		} else {
+			$path = '';
 		}
-
-		// Build a path, and cache it for future use.
-		$path = implode( ' > ', array_reverse( $path ) );
-		$this->paths_cache[ $term_id ] = $path;
-
+		
 		return $path;
 	}
 
