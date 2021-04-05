@@ -113,7 +113,7 @@ class Data_Feed_Item {
 		$this->add_thumbnail();
 		$this->add_prices();
 
-		$this->add_product_type();
+		$this->add_categories();
 		$this->add_tags();
 
 		$this->add_additional_attributes();
@@ -263,22 +263,22 @@ class Data_Feed_Item {
 		$type = $this->product->get_type();
 
 		if ($type === 'grouped' || $type === 'external') {
-			$availability = $this->product->is_in_stock() ? 'in stock' : 'out of stock';			
+			$availability = $this->product->is_in_stock() ? 'in stock' : 'out of stock';
 		} else {
 			$availability = $this->product->is_purchasable() && $this->product->is_in_stock() ? 'in stock' : 'out of stock';
 		}
-		
+
 		$this->fields['availability'] = $availability;
 	}
 
 	/**
 	 * Add product type (simple, variable, etc.).
-	 * 
+	 *
 	 *
 	 * @since 1.0.0
 	 */
 	private function add_type() {
-		
+
 		$this->fields['type'] = $this->product->get_type();
 	}
 
@@ -310,7 +310,7 @@ class Data_Feed_Item {
 			'medium-large',
 			'large',
 		);
-		
+
 		if ( $this->settings['image_size'] && (has_image_size( $this->settings['image_size'] ) || in_array($this->settings['image_size'], $default_sizes) )) {
 			$size = $this->settings['image_size'];
 		}
@@ -354,11 +354,11 @@ class Data_Feed_Item {
 	 *
 	 * @since 1.0.0
 	 */
-	private function add_product_type() {
+	private function add_categories() {
 		if ( $this->parent ) {
-			$this->fields['product_type'] = $this->get_categories( $this->parent->ID );
+			$this->fields['categories'] = $this->get_categories( $this->parent->ID );
 		} else {
-			$this->fields['product_type'] = $this->get_categories( $this->post->ID );
+			$this->fields['categories'] = $this->get_categories( $this->post->ID );
 		}
 	}
 
@@ -469,7 +469,7 @@ class Data_Feed_Item {
 		$paths = array();
 		$terms = get_the_terms( $id, 'product_cat' );
 		//$this->log->log('Data Feed Item - Get Categories: ');
-		//$this->log->log($terms); 
+		//$this->log->log($terms);
 
 		if ( is_array( $terms ) ) {
 			foreach ( $terms as $term ) {
@@ -479,7 +479,7 @@ class Data_Feed_Item {
 
 		$this->clean_paths( $paths );
 
-		return implode( '%%', $paths );
+		return $paths;
 	}
 
 	/**
@@ -515,13 +515,13 @@ class Data_Feed_Item {
 			} else {
 				return '';
 			}
-		} 
-		
+		}
+
 		// Don't traverse again if we already have the path cached.
 		if ( isset( $this->paths_cache[ $term->term_id ] ) ) {
 			return $this->paths_cache[ $term->term_id ];
 		}
-		
+
 		$term_id = isset($term->term_id) ? $term->term_id : 0;
 		$path = array();
 		$path[] = isset($term->name) ? $term->name : null;
@@ -535,14 +535,14 @@ class Data_Feed_Item {
 				$term = $this->terms_cache[ $term->parent ];
 				$path[] = $term->name;
 			}
-	
+
 			// Build a path, and cache it for future use.
 			$path = implode( ' > ', array_reverse( $path ) );
 			$this->paths_cache[ $term_id ] = $path;
 		} else {
 			$path = '';
 		}
-		
+
 		return $path;
 	}
 

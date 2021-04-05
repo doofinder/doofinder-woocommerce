@@ -221,3 +221,15 @@ jQuery(() => {
         });
     });
 });
+jQuery(() => {
+    const deleteButtons = document.querySelectorAll('.doofinder-for-wc-delete-attribute-btn');
+    if (!deleteButtons.length) {
+        return;
+    }
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+            button.closest('tr').remove();
+        });
+    });
+});
