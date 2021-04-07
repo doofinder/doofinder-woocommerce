@@ -468,8 +468,8 @@ class Data_Feed_Item {
 	private function get_categories( $id ) {
 		$paths = array();
 		$terms = get_the_terms( $id, 'product_cat' );
-		//$this->log->log('Data Feed Item - Get Categories: ');
-		//$this->log->log($terms);
+		// $this->log->log('Data Feed Item - Get Categories: ');
+		// $this->log->log($terms);
 
 		if ( is_array( $terms ) ) {
 			foreach ( $terms as $term ) {
@@ -524,7 +524,7 @@ class Data_Feed_Item {
 
 		$term_id = isset($term->term_id) ? $term->term_id : 0;
 		$path = array();
-		$path[] = isset($term->name) ? $term->name : null;
+		$path[] = isset($term->name) ? html_entity_decode($term->name) : null;
 
 		/*
 		 * Traverse from current term to the oldest ancestor.
