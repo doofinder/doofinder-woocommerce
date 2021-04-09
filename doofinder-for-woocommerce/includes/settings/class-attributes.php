@@ -147,7 +147,17 @@ class Attributes {
 		switch ( $source ) {
 			case 'permalink':
 				return get_permalink( $product );
-
+			case 'post_excerpt':
+				// Woo gives Product Variations weird excerpt by default
+				// (just the list of attributes). There's no UI to change it,
+				// but variations have a "description" field.
+				// So we'll take excerpt for regular products, and this
+				// description for variations.
+				if ( $product->post_parent ) {
+					return get_post_meta( $product->ID , '_variation_description', true );
+				} else {
+					return get_the_excerpt( $product );
+				}
 			default:
 				return $product->$source;
 		}
