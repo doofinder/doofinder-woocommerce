@@ -1,8 +1,13 @@
 #!/bin/bash
 
 pushd doofinder-for-woocommerce/lib
-rm -rf vendor
-composer install
+rm -rf swagger vendor .git src/Search/Test
+rm .gitignore .travis.yml CHANGELOG.md index.php NOTAS phpunit.xml
+composer install --no-dev
+
+find . -name "docs" -type d -print0 | xargs -0 rm -rf
+find . -name ".github" -type d -print0 | xargs -0 rm -rf
+find . -name "*.md" -print0 | xargs -0 rm -rf
 
 pushd vendor
 find . -name "*.md" -print0 | xargs -0 rm
