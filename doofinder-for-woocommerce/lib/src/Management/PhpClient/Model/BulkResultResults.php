@@ -299,6 +299,7 @@ self::RESULT_DELETED,        ];
     public function setResult($result)
     {
         $this->container['result'] = $result;
+
         return $this;
     }
     /**
