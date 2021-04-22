@@ -250,7 +250,7 @@ class Doofinder_Api implements Api_Wrapper {
 
 			} catch ( \Exception $exception ) {
 
-				$this->log->log('Update Item - Exception 2' . "\n");
+				$this->log->log('Update Item - Item does not exist or cannot create item.' . "\n");
 				$this->log->log( $exception->getMessage() );
 
 				if ( $exception instanceof DoofinderError ) {
@@ -490,7 +490,7 @@ class Doofinder_Api implements Api_Wrapper {
 
 			if ( $exception instanceof DoofinderError ) {
 				$this->log->log( $exception->getBody() );
-				
+
 				// Show doofinder api response message for user in the backend
 				$response_status = Api_Status::get_api_response_status($exception->getMessage(),$exception->getBody());
 				if ( $response_status ) {
@@ -553,7 +553,7 @@ class Doofinder_Api implements Api_Wrapper {
 			$this->log->log('=== API CALL === ');
 			/** @var SearchEngine[] $search_engine */
 			$this->log->log( 'Get search engine - hash: ' . $this->hash);
-			
+
 			$search_engine = $this->client->getSearchEngine($this->hash);
 			$this->api_calls++;
 		} else {
