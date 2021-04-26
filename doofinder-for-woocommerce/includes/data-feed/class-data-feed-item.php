@@ -364,11 +364,11 @@ class Data_Feed_Item {
 		$parent = wc_get_product( $product->get_parent_id() ) ?: false;
 
 		if ( $product->is_type( 'variable' ) ) {
-			$this->fields[ 'df_group_leader' ] = 'true';
+			$this->fields[ 'df_group_leader' ] = true;
 			$this->fields[ 'df_grouping_id' ] = $id;
 		} else {
 			if ( $parent ) {
-				$this->fields[ 'df_group_leader' ] = 'false';
+				$this->fields[ 'df_group_leader' ] = false;
 				$this->fields[ 'df_grouping_id' ] = $parent->id;
 			}
 		}
