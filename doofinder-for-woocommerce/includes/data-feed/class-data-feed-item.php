@@ -114,6 +114,9 @@ class Data_Feed_Item {
 		$this->add_prices();
 
 		$this->add_categories();
+
+		$this->add_group_leader();
+
 		$this->add_tags();
 
 		$this->add_additional_attributes();
@@ -346,6 +349,31 @@ class Data_Feed_Item {
 		}
 	}
 
+	/**
+	 * Add product leader.
+	 * Product with variations and variations themselves require 'df_group_leader' and 'df grouping_id' fields.
+	 * If product has variations, then variations get his id.
+	 */
+	private function add_group_leader() {
+		if ( 'no' === $this->settings['split_variable'] ) {
+			return;
+		}
+
+		$id = $this->post->ID;
+		$product = wc_get_product( $id );
+		$parent = wc_get_product( $product->get_parent_id() ) ?: false;
+
+		if ( $product->is_type( 'variable' ) ) {
+			$this->fields[ 'df_group_leader' ] = true;
+			$this->fields[ 'df_grouping_id' ] = $id;
+		} else {
+			if ( $parent ) {
+				$this->fields[ 'df_group_leader' ] = false;
+				$this->fields[ 'df_grouping_id' ] = $parent->id;
+			}
+		}
+	}
+
 	/* Taxonomies *****************************************************************/
 
 	/**
@@ -468,18 +496,18 @@ class Data_Feed_Item {
 	private function get_categories( $id ) {
 		$paths = array();
 		$terms = get_the_terms( $id, 'product_cat' );
-		// $this->log->log('Data Feed Item - Get Categories: ');
-		// $this->log->log($terms);
+		$this->log->log('Data Feed Item - Get Categories: ');
+		$this->log->log( $terms );
 
-		if ( is_array( $terms ) ) {
+		if( !empty( $terms ) && is_array( $terms )) {
 			foreach ( $terms as $term ) {
 				$paths[] = $this->get_category_path( $term );
 			}
+			$this->clean_paths( $paths );
+
+			return $paths;
 		}
 
-		$this->clean_paths( $paths );
-
-		return $paths;
 	}
 
 	/**
