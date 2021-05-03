@@ -12,7 +12,7 @@ defined( 'ABSPATH' ) or die;
 $show_welcome_screen = !get_option( Setup_Wizard::$wizard_step_option ) && !Settings::is_configuration_complete()  && !Settings::is_api_configuration_complete();
 $show_failed_migration_screen = !(Settings::is_configuration_complete() && Settings::is_api_configuration_complete()) && get_option(Setup_Wizard::$wizard_migration_option) === 'failed';
 
-if ( 
+if (
 	//First time user, configuration not completed
 	$show_welcome_screen
 	// Plugin upated but settings migration has failed
@@ -23,7 +23,7 @@ if (
 	.subsubsub {
 		display: none;
 	}
-	
+
     p.submit {
         display: none;
 	}
@@ -34,7 +34,7 @@ if (
 <script>
 	document.querySelector('.doofinder-notice-setup-wizard').parentNode.style = "display:none;";
 </script>
-<?php 
+<?php
 endif;
 
 // Welcome screen for first time users
@@ -99,7 +99,7 @@ $auth = array(
 		'type'    => 'text',
 		'css'     => 'width: 100%',
 		'default' => '',
-		'custom_attributes' => array('readonly' => 'readonly'),
+		// 'custom_attributes' => array('readonly' => 'readonly'),
 	),
 
 	// TODO Maybe hide this
@@ -110,7 +110,7 @@ $auth = array(
 		'type'    => 'text',
 		'css'     => 'width: 100%',
 		'default' => '',
-		'custom_attributes' => array('readonly' => 'readonly'),
+		// 'custom_attributes' => array('readonly' => 'readonly'),
 	),
 
 
@@ -122,7 +122,7 @@ $auth = array(
 		'type'    => 'text',
 		'css'     => 'width: 100%',
 		'default' => '',
-		'custom_attributes' => array('readonly' => 'readonly'),
+		// 'custom_attributes' => array('readonly' => 'readonly'),
 	),
 
 	array(
@@ -174,7 +174,7 @@ if (
 			'type'    => 'text',
 			'css'     => 'width: 100%',
 			'default' => '',
-			'custom_attributes' => array('readonly' => 'readonly'),
+			// 'custom_attributes' => array('readonly' => 'readonly'),
 		),
 
 		array(
