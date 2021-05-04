@@ -522,6 +522,7 @@ class Data_Feed_Item {
 			if ( strpos( $paths[ $i ], $paths[ $x ] ) === 0 ) {
 				unset( $paths[ $x ] );
 			}
+			$paths = array_values($paths);
 		}
 	}
 
