@@ -106,7 +106,22 @@ class Feed_XML {
 	 */
 	private function add_node( $name, $value ) {
 		$this->feed .= "<$name>";
-		$this->cdata( $value );
+
+		if( $name === 'categories' && is_array($value) ) {
+			$categoryFeed = '';
+			$arrLength = count($value);
+			$i = 0;
+			foreach( $value as $item ) {
+				$categoryFeed .= $item;
+				if( ++$i !== $arrLength ) {
+					$categoryFeed .= ' %% ';
+				}
+			}
+			$this->cdata( $categoryFeed );
+		} else {
+			$this->cdata( $value );
+		}
+
 		$this->feed .= "</$name>";
 	}
 
