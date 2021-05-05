@@ -133,3 +133,5 @@ a:hover { color: #a94769; }
 .dfwc-setup-finished__title { margin: 1rem auto; font-size: 3.6rem; line-height: 1.16667; }
 
 .dfwc-setup-finished__desc { margin: 0.8rem auto 2rem; font-size: 1.7rem; line-height: 1.35294; }
+
+.dfwc-setup-skip { margin: 0 auto; text-align: center; }
