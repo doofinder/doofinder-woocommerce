@@ -494,7 +494,7 @@ class Data_Index {
 			// if ( $this->check_next_post_type() ) {
 			// 	$this->log->log('Load Posts Ids - check next post type - true ');
 			// 	$this->load_posts_ids();
-			// } else 
+			// } else
 			if ( $this->process_all_languages && $this->check_next_language(/* $skip_replace_index */) ) {
 				$this->log->log('Load Posts Ids - check next language - true ');
 				$this->load_posts_ids();
@@ -762,7 +762,7 @@ class Data_Index {
 		$split_variable_lang = $sitepress ? 'all' : '';
 
 		$this->log->log('Calculate Progress - Split Variabable: ' . Settings::get( 'feed', 'split_variable', $split_variable_lang ));
-		
+
 		if ('yes' === Settings::get( 'feed', 'split_variable', $split_variable_lang )) {
 			$this->post_types[] = 'product_variation';
 		}
@@ -777,7 +777,7 @@ class Data_Index {
 		if (!$get_count_all) {
 			$this->log->log( 'Calculate Progress - current lang: "'. $lang .'"' );
 		}
-		
+
 		$query = "";
 
 		if (!$lang || !$sitepress) {
@@ -792,21 +792,21 @@ class Data_Index {
                 	ON posts.post_parent = postparents.ID
 				WHERE posts.post_type IN ($post_types_list)
 				AND posts.post_status = 'publish'
-				AND (postparents.post_status IS NULL OR postparents.post_status = 'publish') 
-				AND ( 
+				AND (postparents.post_status IS NULL OR postparents.post_status = 'publish')
+				AND (
 					posts.ID NOT IN (
 						SELECT object_id
 						FROM {$wpdb->prefix}term_relationships
 						WHERE term_taxonomy_id IN (
-							SELECT term_id 
-							FROM `{$wpdb->prefix}terms` 
+							SELECT term_id
+							FROM `{$wpdb->prefix}terms`
 							WHERE slug = 'exclude-from-search'
 						)
 					)
 				)
 			";
 		} else if ($this->process_all_languages  ) {
-			// WMPL is active and we want to count posts for all languages. Make sure to get product 
+			// WMPL is active and we want to count posts for all languages. Make sure to get product
 			// variations that are not child of a product with 'draft' status
 			$query .= "
 			SELECT
@@ -819,14 +819,14 @@ class Data_Index {
                 	ON posts.post_parent = postparents.ID
 				WHERE posts.post_type IN ($post_types_list)
 				AND posts.post_status = 'publish'
-				AND (postparents.post_status IS NULL OR postparents.post_status = 'publish') 
-				AND ( 
+				AND (postparents.post_status IS NULL OR postparents.post_status = 'publish')
+				AND (
 					posts.ID NOT IN (
 						SELECT object_id
 						FROM {$wpdb->prefix}term_relationships
 						WHERE term_taxonomy_id IN (
-							SELECT term_id 
-							FROM `{$wpdb->prefix}terms` 
+							SELECT term_id
+							FROM `{$wpdb->prefix}terms`
 							WHERE slug = 'exclude-from-search'
 						)
 					)
@@ -836,7 +836,7 @@ class Data_Index {
 		} else {
 			// When mulilang (WPML) is active we need to calculate posts only for
 			// that language so we need to join translations table to the query
-			// and make sure to get product variations that are not child of a product 
+			// and make sure to get product variations that are not child of a product
 			// with 'draft' status
 			$query .= "
 			SELECT
@@ -850,14 +850,14 @@ class Data_Index {
 				WHERE translations.language_code = '{$lang}'
 				AND posts.post_type IN ($post_types_list)
 				AND posts.post_status = 'publish'
-				AND (postparents.post_status IS NULL OR postparents.post_status = 'publish') 
-				AND ( 
+				AND (postparents.post_status IS NULL OR postparents.post_status = 'publish')
+				AND (
 					posts.ID NOT IN (
 						SELECT object_id
 						FROM {$wpdb->prefix}term_relationships
 						WHERE term_taxonomy_id IN (
-							SELECT term_id 
-							FROM `{$wpdb->prefix}terms` 
+							SELECT term_id
+							FROM `{$wpdb->prefix}terms`
 							WHERE slug = 'exclude-from-search'
 						)
 					)
@@ -943,7 +943,7 @@ class Data_Index {
 			// When mulilang (WPML) is active we need to calculate posts only for
 			// that language so we need to join translations table to the query
 
-			
+
 
 			if ('yes' === Settings::get( 'feed', 'split_variable' ) && $post_type === 'product') {
 				$post_type_query = "($wpdb->posts.post_type = '$post_type' OR $wpdb->posts.post_type = '{$post_type}_variation')";
@@ -1023,13 +1023,15 @@ class Data_Index {
 
 		$this->indexing_data->set( 'current_progress', $processed_posts );
 
-
-		$current_progress = ( $processed_posts / $result->all_posts ) * 100;
+		if ( $processed_posts > 0 ) {
+			$current_progress = ( $processed_posts / $result->all_posts ) * 100;
+		} else {
+			$current_progress = 100;
+			$this->log->log( 'No items found.' );
+		}
 
 		$this->log->log( 'Calculate Progress - Summary: ' . round($current_progress,2) . '%' );
-
-
-		return $current_progress ;
+		return $current_progress;
 	}
 
 	/**
