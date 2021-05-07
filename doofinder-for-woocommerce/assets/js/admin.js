@@ -233,3 +233,16 @@ jQuery(() => {
         });
     });
 });
+jQuery(() => {
+    const skipButtons = document.querySelectorAll('.dfwc-setup-skip');
+    const currentForm = document.querySelector('.dfwc-setup-finished');
+    if (!skipButtons.length && !currentForm) {
+        return;
+    }
+    skipButtons.forEach(button => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+            currentForm.submit();
+        });
+    });
+});
