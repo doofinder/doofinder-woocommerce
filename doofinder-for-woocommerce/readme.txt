@@ -1,7 +1,7 @@
 === Doofinder for WooCommerce ===
 Contributors: doofinder
 Tags: search, autocomplete, woocommerce
-Version: 1.4.0
+Version: 1.4.1
 Requires at least: 5.0
 Tested up to: 5.7
 Stable tag: trunk
@@ -14,7 +14,7 @@ This plugin integrates the Doofinder search service with your WooCommerce shop.
 
 Doofinder provides fast, accurate results based on your website contents. Results appear in your search box at an incredible speed as the user types.
 
-Doofinder can be installed in any website with very little configuration (you give us a data feed and we give you a bit of javascript code).
+[Doofinder](https://www.doofinder.com/en/solutions/woocommerce) can be installed in any website with very little configuration (you give us a data feed and we give you a bit of javascript code).
 
 This extension allows you to easily populate the data feed Doofinder needs to be able to search your database and to insert the Doofinder layer script into your WooCommerce site.
 
@@ -125,6 +125,9 @@ You can click *Delete* to remove the additional attributes from the feed.
 Just send your questions to <mailto:support@doofinder.com> and we will try to answer as fast as possible with a working solution for you.
 
 == Changelog ==
+
+= 1.4.1 =
+Better variants indexing. Better logging. Bugfixes for categories in both API and feed indexing.
 
 = 1.4.0 =
 Updated Doofinder library to the latest version.
