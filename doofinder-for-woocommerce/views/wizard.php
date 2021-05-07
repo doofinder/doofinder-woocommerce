@@ -32,7 +32,7 @@ $wp_styles = wp_styles();
         </div>
         <div class="dfwc-setup-modal-wrapper"></div>
 
-        <a href="<?php echo Settings::get_url(); ?>" class="dfwc-setup-skip"><?php _e('Skip and exit setup','woocommerce-doofinder'); ?></a>
+        <a href="<?php echo Settings::get_url(); ?>" class="dfwc-setup-skip dfwc-setup-skip-main"><?php _e('Skip and exit setup','woocommerce-doofinder'); ?></a>
     </main>
     <script>
         const doofinderCurrentLanguage = '';
