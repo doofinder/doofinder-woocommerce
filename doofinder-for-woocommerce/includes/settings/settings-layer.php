@@ -109,6 +109,7 @@ $auth = array(
 		'id'      => Settings::option_id( 'internal_search', 'api_host' ),
 		'type'    => 'text',
 		'css'     => 'width: 100%',
+		'class'	  => 'dfwc-url-input',
 		'default' => '',
 		// 'custom_attributes' => array('readonly' => 'readonly'),
 	),
@@ -121,6 +122,7 @@ $auth = array(
 		'id'      => Settings::option_id( 'api', 'admin_endpoint' ),
 		'type'    => 'text',
 		'css'     => 'width: 100%',
+		'class'	  => 'dfwc-url-input',
 		'default' => '',
 		// 'custom_attributes' => array('readonly' => 'readonly'),
 	),
@@ -173,6 +175,7 @@ if (
 			'id'      => Settings::option_id( 'internal_search', 'search_server' ), // Lang affix removed to make this setting global
 			'type'    => 'text',
 			'css'     => 'width: 100%',
+			'class'	  => 'dfwc-url-input',
 			'default' => '',
 			// 'custom_attributes' => array('readonly' => 'readonly'),
 		),

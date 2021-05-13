@@ -246,3 +246,19 @@ jQuery(() => {
         });
     });
 });
+jQuery(() => {
+    const inputUrls = document.querySelectorAll('.dfwc-url-input');
+    if (!inputUrls.length) {
+        return;
+    }
+    inputUrls.forEach(item => {
+        const urlPattern = new RegExp(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/);
+        item.onblur = inputBlur;
+        function inputBlur() {
+            if (urlPattern.test(String(item.value).toLowerCase()) == true) {
+                item.value = item.value.replace("https://", "").replace("http://", "");
+                item.value = 'https://' + item.value;
+            }
+        }
+    });
+});
