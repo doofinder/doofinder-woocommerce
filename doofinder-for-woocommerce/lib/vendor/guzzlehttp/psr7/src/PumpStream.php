@@ -1,8 +1,8 @@
 <?php
 
-namespace GuzzleHttp\Psr7;
+namespace Doofinder\GuzzleHttp\Psr7;
 
-use Psr\Http\Message\StreamInterface;
+use Doofinder\Psr\Http\Message\StreamInterface;
 
 /**
  * Provides a read only stream that pumps data from a PHP callable.

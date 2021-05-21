@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Polyfill\Intl\Idn\Resources\unidata;
+namespace Doofinder\Symfony\Polyfill\Intl\Idn\Resources\unidata;
 
 /**
  * @internal

@@ -1,10 +1,10 @@
 <?php
-namespace GuzzleHttp\Exception;
+namespace Doofinder\GuzzleHttp\Exception;
 
-use GuzzleHttp\Promise\PromiseInterface;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\UriInterface;
+use Doofinder\GuzzleHttp\Promise\PromiseInterface;
+use Doofinder\Psr\Http\Message\RequestInterface;
+use Doofinder\Psr\Http\Message\ResponseInterface;
+use Doofinder\Psr\Http\Message\UriInterface;
 
 /**
  * HTTP Request exception
@@ -124,7 +124,7 @@ class RequestException extends TransferException
      */
     public static function getResponseBodySummary(ResponseInterface $response)
     {
-        return \GuzzleHttp\Psr7\get_message_body_summary($response);
+        return \Doofinder\GuzzleHttp\Psr7\get_message_body_summary($response);
     }
 
     /**

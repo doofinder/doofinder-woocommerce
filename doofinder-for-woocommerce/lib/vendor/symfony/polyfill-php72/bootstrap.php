@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Symfony package.
+ * This file is part of the Doofinder\Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-use Symfony\Polyfill\Php72 as p;
+use Doofinder\Symfony\Polyfill\Php72 as p;
 
 if (\PHP_VERSION_ID >= 70200) {
     return;

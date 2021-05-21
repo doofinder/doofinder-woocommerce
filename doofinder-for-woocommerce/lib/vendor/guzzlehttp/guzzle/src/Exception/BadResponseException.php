@@ -1,8 +1,8 @@
 <?php
-namespace GuzzleHttp\Exception;
+namespace Doofinder\GuzzleHttp\Exception;
 
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
+use Doofinder\Psr\Http\Message\RequestInterface;
+use Doofinder\Psr\Http\Message\ResponseInterface;
 
 /**
  * Exception when an HTTP error occurs (4xx or 5xx error)

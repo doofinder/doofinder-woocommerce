@@ -27,12 +27,12 @@
 
 namespace DoofinderManagement\Api;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7\MultipartStream;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\RequestOptions;
+use Doofinder\GuzzleHttp\Client;
+use Doofinder\GuzzleHttp\ClientInterface;
+use Doofinder\GuzzleHttp\Exception\RequestException;
+use Doofinder\GuzzleHttp\Psr7\MultipartStream;
+use Doofinder\GuzzleHttp\Psr7\Request;
+use Doofinder\GuzzleHttp\RequestOptions;
 use DoofinderManagement\ApiException;
 use DoofinderManagement\Configuration;
 use DoofinderManagement\HeaderSelector;
@@ -192,7 +192,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemCreateAsync($body, $hashid, $name)
     {
@@ -214,7 +214,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemCreateAsyncWithHttpInfo($body, $hashid, $name)
     {
@@ -266,7 +266,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function itemCreateRequest($body, $hashid, $name)
     {
@@ -337,7 +337,7 @@ class ItemsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -352,11 +352,11 @@ class ItemsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -382,7 +382,7 @@ class ItemsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'POST',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -474,7 +474,7 @@ class ItemsApi
      * @param  string $item_id Unique identifier of an item inside an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemDeleteAsync($hashid, $name, $item_id)
     {
@@ -496,7 +496,7 @@ class ItemsApi
      * @param  string $item_id Unique identifier of an item inside an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemDeleteAsyncWithHttpInfo($hashid, $name, $item_id)
     {
@@ -534,7 +534,7 @@ class ItemsApi
      * @param  string $item_id Unique identifier of an item inside an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function itemDeleteRequest($hashid, $name, $item_id)
     {
@@ -610,7 +610,7 @@ class ItemsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -625,11 +625,11 @@ class ItemsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -655,7 +655,7 @@ class ItemsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'DELETE',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -773,7 +773,7 @@ class ItemsApi
      * @param  int $rpp _Results per page_. How many items are fetched per page/request. (optional)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemIndexAsync($hashid, $name, $scroll_id = null, $rpp = null)
     {
@@ -796,7 +796,7 @@ class ItemsApi
      * @param  int $rpp _Results per page_. How many items are fetched per page/request. (optional)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemIndexAsyncWithHttpInfo($hashid, $name, $scroll_id = null, $rpp = null)
     {
@@ -849,7 +849,7 @@ class ItemsApi
      * @param  int $rpp _Results per page_. How many items are fetched per page/request. (optional)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function itemIndexRequest($hashid, $name, $scroll_id = null, $rpp = null)
     {
@@ -919,7 +919,7 @@ class ItemsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -934,11 +934,11 @@ class ItemsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -964,7 +964,7 @@ class ItemsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'GET',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -1079,7 +1079,7 @@ class ItemsApi
      * @param  string $item_id Unique identifier of an item inside an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemShowAsync($hashid, $name, $item_id)
     {
@@ -1101,7 +1101,7 @@ class ItemsApi
      * @param  string $item_id Unique identifier of an item inside an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemShowAsyncWithHttpInfo($hashid, $name, $item_id)
     {
@@ -1153,7 +1153,7 @@ class ItemsApi
      * @param  string $item_id Unique identifier of an item inside an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function itemShowRequest($hashid, $name, $item_id)
     {
@@ -1229,7 +1229,7 @@ class ItemsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -1244,11 +1244,11 @@ class ItemsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -1274,7 +1274,7 @@ class ItemsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'GET',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -1389,7 +1389,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemTempCreateAsync($body, $hashid, $name)
     {
@@ -1411,7 +1411,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemTempCreateAsyncWithHttpInfo($body, $hashid, $name)
     {
@@ -1463,7 +1463,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function itemTempCreateRequest($body, $hashid, $name)
     {
@@ -1534,7 +1534,7 @@ class ItemsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -1549,11 +1549,11 @@ class ItemsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -1579,7 +1579,7 @@ class ItemsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'POST',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -1671,7 +1671,7 @@ class ItemsApi
      * @param  string $item_id Unique identifier of an item inside an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemTempDeleteAsync($hashid, $name, $item_id)
     {
@@ -1693,7 +1693,7 @@ class ItemsApi
      * @param  string $item_id Unique identifier of an item inside an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemTempDeleteAsyncWithHttpInfo($hashid, $name, $item_id)
     {
@@ -1731,7 +1731,7 @@ class ItemsApi
      * @param  string $item_id Unique identifier of an item inside an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function itemTempDeleteRequest($hashid, $name, $item_id)
     {
@@ -1807,7 +1807,7 @@ class ItemsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -1822,11 +1822,11 @@ class ItemsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -1852,7 +1852,7 @@ class ItemsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'DELETE',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -1967,7 +1967,7 @@ class ItemsApi
      * @param  string $item_id Unique identifier of an item inside an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemTempShowAsync($hashid, $name, $item_id)
     {
@@ -1989,7 +1989,7 @@ class ItemsApi
      * @param  string $item_id Unique identifier of an item inside an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemTempShowAsyncWithHttpInfo($hashid, $name, $item_id)
     {
@@ -2041,7 +2041,7 @@ class ItemsApi
      * @param  string $item_id Unique identifier of an item inside an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function itemTempShowRequest($hashid, $name, $item_id)
     {
@@ -2117,7 +2117,7 @@ class ItemsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -2132,11 +2132,11 @@ class ItemsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -2162,7 +2162,7 @@ class ItemsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'GET',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -2280,7 +2280,7 @@ class ItemsApi
      * @param  string $item_id Unique identifier of an item inside an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemTempUpdateAsync($body, $hashid, $name, $item_id)
     {
@@ -2303,7 +2303,7 @@ class ItemsApi
      * @param  string $item_id Unique identifier of an item inside an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemTempUpdateAsyncWithHttpInfo($body, $hashid, $name, $item_id)
     {
@@ -2356,7 +2356,7 @@ class ItemsApi
      * @param  string $item_id Unique identifier of an item inside an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function itemTempUpdateRequest($body, $hashid, $name, $item_id)
     {
@@ -2441,7 +2441,7 @@ class ItemsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -2456,11 +2456,11 @@ class ItemsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -2486,7 +2486,7 @@ class ItemsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'PATCH',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -2604,7 +2604,7 @@ class ItemsApi
      * @param  string $item_id Unique identifier of an item inside an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemUpdateAsync($body, $hashid, $name, $item_id)
     {
@@ -2627,7 +2627,7 @@ class ItemsApi
      * @param  string $item_id Unique identifier of an item inside an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemUpdateAsyncWithHttpInfo($body, $hashid, $name, $item_id)
     {
@@ -2680,7 +2680,7 @@ class ItemsApi
      * @param  string $item_id Unique identifier of an item inside an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function itemUpdateRequest($body, $hashid, $name, $item_id)
     {
@@ -2765,7 +2765,7 @@ class ItemsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -2780,11 +2780,11 @@ class ItemsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -2810,7 +2810,7 @@ class ItemsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'PATCH',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -2925,7 +2925,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemsBulkCreateAsync($body, $hashid, $name)
     {
@@ -2947,7 +2947,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemsBulkCreateAsyncWithHttpInfo($body, $hashid, $name)
     {
@@ -2999,7 +2999,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function itemsBulkCreateRequest($body, $hashid, $name)
     {
@@ -3070,7 +3070,7 @@ class ItemsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -3085,11 +3085,11 @@ class ItemsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -3115,7 +3115,7 @@ class ItemsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'POST',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -3230,7 +3230,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemsBulkDeleteAsync($body, $hashid, $name)
     {
@@ -3252,7 +3252,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemsBulkDeleteAsyncWithHttpInfo($body, $hashid, $name)
     {
@@ -3304,7 +3304,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function itemsBulkDeleteRequest($body, $hashid, $name)
     {
@@ -3375,7 +3375,7 @@ class ItemsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -3390,11 +3390,11 @@ class ItemsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -3420,7 +3420,7 @@ class ItemsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'DELETE',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -3535,7 +3535,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemsBulkUpdateAsync($body, $hashid, $name)
     {
@@ -3557,7 +3557,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemsBulkUpdateAsyncWithHttpInfo($body, $hashid, $name)
     {
@@ -3609,7 +3609,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function itemsBulkUpdateRequest($body, $hashid, $name)
     {
@@ -3680,7 +3680,7 @@ class ItemsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -3695,11 +3695,11 @@ class ItemsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -3725,7 +3725,7 @@ class ItemsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'PATCH',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -3840,7 +3840,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemsMgetAsync($body, $hashid, $name)
     {
@@ -3862,7 +3862,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemsMgetAsyncWithHttpInfo($body, $hashid, $name)
     {
@@ -3914,7 +3914,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function itemsMgetRequest($body, $hashid, $name)
     {
@@ -3985,7 +3985,7 @@ class ItemsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -4000,11 +4000,11 @@ class ItemsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -4030,7 +4030,7 @@ class ItemsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'POST',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -4145,7 +4145,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemsTempBulkCreateAsync($body, $hashid, $name)
     {
@@ -4167,7 +4167,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemsTempBulkCreateAsyncWithHttpInfo($body, $hashid, $name)
     {
@@ -4219,7 +4219,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function itemsTempBulkCreateRequest($body, $hashid, $name)
     {
@@ -4290,7 +4290,7 @@ class ItemsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -4305,11 +4305,11 @@ class ItemsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -4335,7 +4335,7 @@ class ItemsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'POST',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -4450,7 +4450,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemsTempBulkDeleteAsync($body, $hashid, $name)
     {
@@ -4472,7 +4472,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemsTempBulkDeleteAsyncWithHttpInfo($body, $hashid, $name)
     {
@@ -4524,7 +4524,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function itemsTempBulkDeleteRequest($body, $hashid, $name)
     {
@@ -4595,7 +4595,7 @@ class ItemsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -4610,11 +4610,11 @@ class ItemsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -4640,7 +4640,7 @@ class ItemsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'DELETE',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -4755,7 +4755,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemsTempBulkUpdateAsync($body, $hashid, $name)
     {
@@ -4777,7 +4777,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemsTempBulkUpdateAsyncWithHttpInfo($body, $hashid, $name)
     {
@@ -4829,7 +4829,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function itemsTempBulkUpdateRequest($body, $hashid, $name)
     {
@@ -4900,7 +4900,7 @@ class ItemsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -4915,11 +4915,11 @@ class ItemsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -4945,7 +4945,7 @@ class ItemsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'PATCH',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -5060,7 +5060,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemsTempMgetAsync($body, $hashid, $name)
     {
@@ -5082,7 +5082,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function itemsTempMgetAsyncWithHttpInfo($body, $hashid, $name)
     {
@@ -5134,7 +5134,7 @@ class ItemsApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function itemsTempMgetRequest($body, $hashid, $name)
     {
@@ -5205,7 +5205,7 @@ class ItemsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -5220,11 +5220,11 @@ class ItemsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -5250,7 +5250,7 @@ class ItemsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'POST',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),

@@ -27,12 +27,12 @@
 
 namespace DoofinderManagement\Api;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7\MultipartStream;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\RequestOptions;
+use Doofinder\GuzzleHttp\Client;
+use Doofinder\GuzzleHttp\ClientInterface;
+use Doofinder\GuzzleHttp\Exception\RequestException;
+use Doofinder\GuzzleHttp\Psr7\MultipartStream;
+use Doofinder\GuzzleHttp\Psr7\Request;
+use Doofinder\GuzzleHttp\RequestOptions;
 use DoofinderManagement\ApiException;
 use DoofinderManagement\Configuration;
 use DoofinderManagement\HeaderSelector;
@@ -189,7 +189,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function getReindexingStatusAsync($hashid, $name)
     {
@@ -210,7 +210,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function getReindexingStatusAsyncWithHttpInfo($hashid, $name)
     {
@@ -261,7 +261,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function getReindexingStatusRequest($hashid, $name)
     {
@@ -323,7 +323,7 @@ class IndicesApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -338,11 +338,11 @@ class IndicesApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -368,7 +368,7 @@ class IndicesApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'GET',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -480,7 +480,7 @@ class IndicesApi
      * @param  string $hashid Unique id of a search engine. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function indexCreateAsync($body, $hashid)
     {
@@ -501,7 +501,7 @@ class IndicesApi
      * @param  string $hashid Unique id of a search engine. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function indexCreateAsyncWithHttpInfo($body, $hashid)
     {
@@ -552,7 +552,7 @@ class IndicesApi
      * @param  string $hashid Unique id of a search engine. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function indexCreateRequest($body, $hashid)
     {
@@ -609,7 +609,7 @@ class IndicesApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -624,11 +624,11 @@ class IndicesApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -654,7 +654,7 @@ class IndicesApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'POST',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -743,7 +743,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function indexDeleteAsync($hashid, $name)
     {
@@ -764,7 +764,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function indexDeleteAsyncWithHttpInfo($hashid, $name)
     {
@@ -801,7 +801,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function indexDeleteRequest($hashid, $name)
     {
@@ -863,7 +863,7 @@ class IndicesApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -878,11 +878,11 @@ class IndicesApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -908,7 +908,7 @@ class IndicesApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'DELETE',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -1017,7 +1017,7 @@ class IndicesApi
      * @param  string $hashid Unique id of a search engine. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function indexIndexAsync($hashid)
     {
@@ -1037,7 +1037,7 @@ class IndicesApi
      * @param  string $hashid Unique id of a search engine. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function indexIndexAsyncWithHttpInfo($hashid)
     {
@@ -1087,7 +1087,7 @@ class IndicesApi
      * @param  string $hashid Unique id of a search engine. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function indexIndexRequest($hashid)
     {
@@ -1135,7 +1135,7 @@ class IndicesApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -1150,11 +1150,11 @@ class IndicesApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -1180,7 +1180,7 @@ class IndicesApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'GET',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -1292,7 +1292,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function indexShowAsync($hashid, $name)
     {
@@ -1313,7 +1313,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function indexShowAsyncWithHttpInfo($hashid, $name)
     {
@@ -1364,7 +1364,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function indexShowRequest($hashid, $name)
     {
@@ -1426,7 +1426,7 @@ class IndicesApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -1441,11 +1441,11 @@ class IndicesApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -1471,7 +1471,7 @@ class IndicesApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'GET',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -1586,7 +1586,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function indexUpdateAsync($body, $hashid, $name)
     {
@@ -1608,7 +1608,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function indexUpdateAsyncWithHttpInfo($body, $hashid, $name)
     {
@@ -1660,7 +1660,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function indexUpdateRequest($body, $hashid, $name)
     {
@@ -1731,7 +1731,7 @@ class IndicesApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -1746,11 +1746,11 @@ class IndicesApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -1776,7 +1776,7 @@ class IndicesApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'PATCH',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -1888,7 +1888,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function reindexToTempAsync($hashid, $name)
     {
@@ -1909,7 +1909,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function reindexToTempAsyncWithHttpInfo($hashid, $name)
     {
@@ -1960,7 +1960,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function reindexToTempRequest($hashid, $name)
     {
@@ -2022,7 +2022,7 @@ class IndicesApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -2037,11 +2037,11 @@ class IndicesApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -2067,7 +2067,7 @@ class IndicesApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'POST',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -2179,7 +2179,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function replaceByTempAsync($hashid, $name)
     {
@@ -2200,7 +2200,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function replaceByTempAsyncWithHttpInfo($hashid, $name)
     {
@@ -2251,7 +2251,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function replaceByTempRequest($hashid, $name)
     {
@@ -2313,7 +2313,7 @@ class IndicesApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -2328,11 +2328,11 @@ class IndicesApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -2358,7 +2358,7 @@ class IndicesApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'POST',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -2470,7 +2470,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function temporaryIndexCreateAsync($hashid, $name)
     {
@@ -2491,7 +2491,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function temporaryIndexCreateAsyncWithHttpInfo($hashid, $name)
     {
@@ -2542,7 +2542,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function temporaryIndexCreateRequest($hashid, $name)
     {
@@ -2604,7 +2604,7 @@ class IndicesApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -2619,11 +2619,11 @@ class IndicesApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -2649,7 +2649,7 @@ class IndicesApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'POST',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -2738,7 +2738,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function temporaryIndexDeleteAsync($hashid, $name)
     {
@@ -2759,7 +2759,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function temporaryIndexDeleteAsyncWithHttpInfo($hashid, $name)
     {
@@ -2796,7 +2796,7 @@ class IndicesApi
      * @param  string $name Name of an index. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function temporaryIndexDeleteRequest($hashid, $name)
     {
@@ -2858,7 +2858,7 @@ class IndicesApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -2873,11 +2873,11 @@ class IndicesApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -2903,7 +2903,7 @@ class IndicesApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'DELETE',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),

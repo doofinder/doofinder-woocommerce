@@ -1,11 +1,11 @@
 <?php
-namespace GuzzleHttp;
+namespace Doofinder\GuzzleHttp;
 
-use GuzzleHttp\Cookie\CookieJarInterface;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Promise\RejectedPromise;
-use GuzzleHttp\Psr7;
-use Psr\Http\Message\ResponseInterface;
+use Doofinder\GuzzleHttp\Cookie\CookieJarInterface;
+use Doofinder\GuzzleHttp\Exception\RequestException;
+use Doofinder\GuzzleHttp\Promise\RejectedPromise;
+use Doofinder\GuzzleHttp\Psr7;
+use Doofinder\Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -28,7 +28,7 @@ final class Middleware
                 if (empty($options['cookies'])) {
                     return $handler($request, $options);
                 } elseif (!($options['cookies'] instanceof CookieJarInterface)) {
-                    throw new \InvalidArgumentException('cookies must be an instance of GuzzleHttp\Cookie\CookieJarInterface');
+                    throw new \InvalidArgumentException('cookies must be an instance of Doofinder\GuzzleHttp\Cookie\CookieJarInterface');
                 }
                 $cookieJar = $options['cookies'];
                 $request = $cookieJar->withCookieHeader($request);
@@ -102,7 +102,7 @@ final class Middleware
                             'error'    => $reason,
                             'options'  => $options
                         ];
-                        return \GuzzleHttp\Promise\rejection_for($reason);
+                        return \Doofinder\GuzzleHttp\Promise\rejection_for($reason);
                     }
                 );
             };
@@ -198,7 +198,7 @@ final class Middleware
                             : null;
                         $message = $formatter->format($request, $response, $reason);
                         $logger->notice($message);
-                        return \GuzzleHttp\Promise\rejection_for($reason);
+                        return \Doofinder\GuzzleHttp\Promise\rejection_for($reason);
                     }
                 );
             };

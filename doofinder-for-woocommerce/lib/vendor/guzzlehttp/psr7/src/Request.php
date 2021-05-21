@@ -1,11 +1,11 @@
 <?php
 
-namespace GuzzleHttp\Psr7;
+namespace Doofinder\GuzzleHttp\Psr7;
 
 use InvalidArgumentException;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\StreamInterface;
-use Psr\Http\Message\UriInterface;
+use Doofinder\Psr\Http\Message\RequestInterface;
+use Doofinder\Psr\Http\Message\StreamInterface;
+use Doofinder\Psr\Http\Message\UriInterface;
 
 /**
  * PSR-7 request implementation.

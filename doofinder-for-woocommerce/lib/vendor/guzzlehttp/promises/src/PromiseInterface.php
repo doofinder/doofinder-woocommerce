@@ -1,6 +1,6 @@
 <?php
 
-namespace GuzzleHttp\Promise;
+namespace Doofinder\GuzzleHttp\Promise;
 
 /**
  * A promise represents the eventual result of an asynchronous operation.

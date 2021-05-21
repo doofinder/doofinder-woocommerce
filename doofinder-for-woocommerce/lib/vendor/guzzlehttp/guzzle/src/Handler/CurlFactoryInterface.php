@@ -1,7 +1,7 @@
 <?php
-namespace GuzzleHttp\Handler;
+namespace Doofinder\GuzzleHttp\Handler;
 
-use Psr\Http\Message\RequestInterface;
+use Doofinder\Psr\Http\Message\RequestInterface;
 
 interface CurlFactoryInterface
 {

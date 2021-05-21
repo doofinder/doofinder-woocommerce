@@ -1,19 +1,19 @@
 <?php
-namespace GuzzleHttp;
+namespace Doofinder\GuzzleHttp;
 
-use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\Exception\TooManyRedirectsException;
-use GuzzleHttp\Promise\PromiseInterface;
-use GuzzleHttp\Psr7;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\UriInterface;
+use Doofinder\GuzzleHttp\Exception\BadResponseException;
+use Doofinder\GuzzleHttp\Exception\TooManyRedirectsException;
+use Doofinder\GuzzleHttp\Promise\PromiseInterface;
+use Doofinder\GuzzleHttp\Psr7;
+use Doofinder\Psr\Http\Message\RequestInterface;
+use Doofinder\Psr\Http\Message\ResponseInterface;
+use Doofinder\Psr\Http\Message\UriInterface;
 
 /**
  * Request redirect middleware.
  *
  * Apply this middleware like other middleware using
- * {@see \GuzzleHttp\Middleware::redirect()}.
+ * {@see \Doofinder\GuzzleHttp\Middleware::redirect()}.
  */
 class RedirectMiddleware
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace GuzzleHttp\Psr7;
+namespace Doofinder\GuzzleHttp\Psr7;
 
-use Psr\Http\Message\StreamInterface;
+use Doofinder\Psr\Http\Message\StreamInterface;
 
 /**
  * Reads from multiple streams, one after the other.
