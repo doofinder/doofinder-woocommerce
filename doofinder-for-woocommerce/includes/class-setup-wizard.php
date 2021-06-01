@@ -172,11 +172,11 @@ class Setup_Wizard {
 	 *
 	 * @var bool
 	 */
-	public static $should_fail = false; 
+	public static $should_fail = false;
 
 
 	public function __construct() {
-		
+
 		// Get global disable_api_calls flag
 		$this->disable_api = Doofinder_For_WooCommerce::$disable_api_calls ?? $this->disable_api;
 
@@ -195,7 +195,7 @@ class Setup_Wizard {
 				// Delete error cookie when reloading wizard page
 				if (self::is_wizard_page() && !\wp_doing_ajax()) {
 					$this->log->log("Deleting Error Cookies");
-					unset($_COOKIE['doofinderError'][$key]); 
+					unset($_COOKIE['doofinderError'][$key]);
 					setcookie("doofinderError[{$key}]", null, -1, '/');
 				}
 			}
@@ -203,7 +203,7 @@ class Setup_Wizard {
 
 		// $this->log->log("Setup Wizard Errors: ");
 		// $this->log->log($this->errors);
-		
+
 		if ( current_user_can( 'manage_woocommerce' ) ) {
 			add_action( 'admin_menu', array( $this, 'admin_menus' ) );
 
@@ -213,7 +213,7 @@ class Setup_Wizard {
 
 	/**
 	 * Check if on setup wizard page
-	 * 
+	 *
 	 * @return bool
 	 */
 
@@ -225,7 +225,7 @@ class Setup_Wizard {
 	 * Callback for WP rest api endpoint for connecting doofinder account
 	 */
 	public static function connect() {
-		
+
 		$setup_wizard = self::instance();
 		$setup_wizard->log->log('Setup Wizard - Connect');
 		$setup_wizard->process_step_1(true);
@@ -304,7 +304,7 @@ class Setup_Wizard {
 	 */
 	public static function activate($notice = false) {
 		update_option( self::$wizard_active_option, true );
-		
+
 		if($notice) {
 			update_option( self::$wizard_show_notice_option, true );
 		}
@@ -318,7 +318,7 @@ class Setup_Wizard {
 		update_option( self::$wizard_active_option, false );
 		update_option( self::$wizard_done_option, true );
 		update_option( self::$wizard_show_notice_option, false );
-		
+
 	}
 
 	/**
@@ -340,7 +340,7 @@ class Setup_Wizard {
 
 	/**
 	 * Generate token used for login/signup via popup
-	 * 
+	 *
 	 * @return string token
 	 */
 	public function generateToken() {
@@ -351,7 +351,7 @@ class Setup_Wizard {
 
 	/**
 	 * Save token used for login/signup in db
-	 * 
+	 *
 	 * @param string $token
 	 */
 	public function saveToken($token) {
@@ -360,7 +360,7 @@ class Setup_Wizard {
 
 	/**
 	 * Get token used for login/signup saved in db
-	 * 
+	 *
 	 * @return string $token
 	 */
 	public function getToken() {
@@ -368,12 +368,12 @@ class Setup_Wizard {
 	}
 
 	/**
-	 * Get the absolute path of the URL to setup wizard that Doofinder will 
+	 * Get the absolute path of the URL to setup wizard that Doofinder will
 	 * use for the POST request. The path will be appended to the origin domain.
-	 * 
+	 *
 	 * @return string path
 	 */
-	public function getReturnPath() {		
+	public function getReturnPath() {
 		$setup_wizard_url= get_rest_url(null,'/doofinder-for-wc/v1/connect/');
 
 		//return urlencode(str_replace($base_url,'',$setup_wizard_url));
@@ -415,7 +415,7 @@ class Setup_Wizard {
 		if ( $current_step > self::$no_steps ) {
 
 			//self::deactivate(); // Do not deactive the setup wizard, we need it to work for configure doofinder notice (that shows up when settings are empty)
-			
+
 			self::remove_notice();
 
 			// Reset wizard to step 1
@@ -428,7 +428,7 @@ class Setup_Wizard {
 
 
 		}
-		
+
 		// Else update step option and move to the next step
 
 		update_option( self::$wizard_step_option, $current_step );
@@ -440,8 +440,8 @@ class Setup_Wizard {
 	}
 
 	/**
-	 * Show wizard 
-	 * 
+	 * Show wizard
+	 *
 	 * @return void
 	 */
 	private function admin_page_init() {
@@ -451,14 +451,14 @@ class Setup_Wizard {
 		}
 
 		global $sitepress;
-		
+
 		if ($sitepress) {
 			$sitepress->switch_lang('all');
 			$this->active_lang = $sitepress->get_current_language();
 		} else {
 			$this->active_lang = '';
 		}
-		
+
 		// Show wizard, if active.
 		if ( self::is_active() ) {
 			$this->show_wizard();
@@ -470,7 +470,7 @@ class Setup_Wizard {
 
 	/**
 	 * Add admin page for setup wizard.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function admin_menus() {
@@ -478,11 +478,11 @@ class Setup_Wizard {
 	}
 
 	/**
-	 * Get url of the setup wizard admin page, 
+	 * Get url of the setup wizard admin page,
 	 * you can add url parameters via $args
-	 * 
-	 * @param array $args Associative array with query parameters key -> value 
-	 * 
+	 *
+	 * @param array $args Associative array with query parameters key -> value
+	 *
 	 * @return string
 	 */
 	public static function get_url($args = []) {
@@ -514,7 +514,7 @@ class Setup_Wizard {
 		} else {
 			$status = 'not-saved';
 		}
-	
+
 		wp_send_json_success([
 			'status' => $status
 		]);
@@ -522,9 +522,9 @@ class Setup_Wizard {
 
 	/**
 	 * Wizard setup notice html
-	 * 
-	 * @param bool $settings 
-	 * 
+	 *
+	 * @param bool $settings
+	 *
 	 * @return string
 	 */
 	public static function get_setup_wizard_notice_html($settings = true) {
@@ -551,7 +551,7 @@ class Setup_Wizard {
 				endif;
 			?></p><?php
 		?></div><?php
-		
+
 		$html = ob_get_clean();
 
 		return $html;
@@ -559,9 +559,9 @@ class Setup_Wizard {
 
 		/**
 	 * Wizard setup notice html
-	 * 
-	 * @param bool $settings 
-	 * 
+	 *
+	 * @param bool $settings
+	 *
 	 * @return string
 	 */
 	public static function get_setup_wizard_migration_notice_html() {
@@ -571,7 +571,7 @@ class Setup_Wizard {
 		?><div id="message" class="woocommerce-message doofinder-migration-notice"><?php
 			?><p class="main"><?php _e('Doofinder settings have been migrated successfully.','woocommerce-doofinder') ?></p><?php
 		?></div><?php
-		
+
 		$html = ob_get_clean();
 
 		// $log = new Log();
@@ -584,10 +584,10 @@ class Setup_Wizard {
 			return $html;
 			//$log->log( 'Migration Notice - Delete Transient' );
 			//delete_transient(self::$wizard_migration_notice_transient);
-		//} 
+		//}
 	}
 
-	
+
 	/**
 	 * Render a warning that we api is disabled (in code not via settings)
 	 */
@@ -603,9 +603,9 @@ class Setup_Wizard {
 
 	/**
 	 * Not dissmisable Configure via Wizard setup notice html
-	 * 
-	 * @param bool $settings 
-	 * 
+	 *
+	 * @param bool $settings
+	 *
 	 * @return string
 	 */
 	public static function get_configure_via_setup_wizard_notice_html() {
@@ -615,17 +615,17 @@ class Setup_Wizard {
 		if (!Settings::is_configuration_complete()) :
 
 			$message = __( ' Configure Doofinder in minutes with Doofinder Setup Wizard', 'woocommerce-doofinder' );
-		
+
 			ob_start();
 
 			?><div class="woocommerce-message notice doofinder-notice-setup-wizard"><?php
-				
+
 				?><p class="main" style="margin-top:1em;"><?php echo $message; ?></p><?php
 				?><p><?php
 					?><a href="<?php echo self::get_url(); ?>" class="button-primary"><?php _e( 'Configure', 'woocommerce-doofinder' ); ?></a><?php
 				?></p><?php
 			?></div><?php
-			
+
 			$html = ob_get_clean();
 
 		endif;
@@ -635,9 +635,9 @@ class Setup_Wizard {
 
 	/**
 	 * Get setup wizard recongigure button html
-	 * 
-	 * @param bool $settings 
-	 * 
+	 *
+	 * @param bool $settings
+	 *
 	 * @return string
 	 */
 	public static function get_configure_via_setup_wizard_button_html() {
@@ -653,7 +653,7 @@ class Setup_Wizard {
 					?><a href="<?php echo self::get_url(); ?>" class="button-secondary"><?php _e( 'Setup Wizard', 'woocommerce-doofinder' ); ?></a><?php
 				?></p><?php
 			?><?php
-			
+
 			$html = ob_get_clean();
 
 		//endif;
@@ -663,7 +663,7 @@ class Setup_Wizard {
 
 	/**
 	 * Add/show custom Woocommerce notice in admin panel
-	 * 
+	 *
 	 * @return void
 	 */
 	public static function add_notice() {
@@ -674,7 +674,7 @@ class Setup_Wizard {
 
 	/**
 	 * Remove custom Woocommerce notice in admin panel
-	 * 
+	 *
 	 * @return void
 	 */
 	public static function remove_notice() {
@@ -686,7 +686,7 @@ class Setup_Wizard {
 
 	/**
 	 * Remove custom Woocommerce migration notice in admin panel
-	 * 
+	 *
 	 * @return void
 	 */
 	public static function remove_migration_notice() {
@@ -736,7 +736,7 @@ class Setup_Wizard {
 			return $this->errors[ $name ];
 		} elseif ( isset($_COOKIE['doofinderError'])) {
 			$cookie = $_COOKIE['doofinderError'];
-			unset($_COOKIE['doofinderError'][$name]); 
+			unset($_COOKIE['doofinderError'][$name]);
 			return $cookie;
 		}
 
@@ -779,12 +779,12 @@ class Setup_Wizard {
 	private function get_languages($set_state = false) {
 
 		if (!$this->process_all_languages) {
-			
+
 			if ( ! $this->indexing_data->get( 'lang' ) && $set_state ) {
 				$this->indexing_data->set( 'lang', $this->active_lang );
 			}
 
-			return; 
+			return;
 		}
 
 		$languages = $this->language->get_languages();
@@ -801,16 +801,16 @@ class Setup_Wizard {
 		}
 
 		return $languages;
-		
+
 	}
 
 	/**
-	 * A callback for processing installation wizard steps. 
+	 * A callback for processing installation wizard steps.
 	 *
 	 * Each step of the wizard is being handled by its own method.
 	 */
 	private function process_wizard_step($step = null) {
-		
+
 		$step = $step ?: self::get_step();
 
 		switch ( $step ) {
@@ -839,8 +839,8 @@ class Setup_Wizard {
 	/**
 	 * Handle the submission of step 1 - Api Key and Api Host .
 	 */
-	private function process_step_1($processing = false) {		
-		
+	private function process_step_1($processing = false) {
+
 		$is_processing = (isset($_REQUEST['process-step']) && $_REQUEST['process-step'] === '1') || $processing === true;
 
 		if (!$is_processing) {
@@ -849,10 +849,10 @@ class Setup_Wizard {
 
 		$this->log->log( 'Processing Wizard Step 1 - Processing...' );
 
-		$token = $_POST['token'] ?? ''; 
+		$token = $_POST['token'] ?? '';
 		$saved_token = $this->getToken();
-		
-		// Exit early if tokens do not match 
+
+		// Exit early if tokens do not match
 		if ($token !== $saved_token) {
 			$this->errors['wizard-step-1'] = __( 'Invalid token', 'woocommerce-doofinder' );
 			setcookie( "doofinderError[wizard-step-1]", __( 'Invalid token', 'woocommerce-doofinder' ),0,'/');
@@ -911,7 +911,7 @@ class Setup_Wizard {
 				$response = $client->listSearchEngines();
 				$this->log->log( 'Wizard Step 1 - List Search engines Response: ' );
 				$this->log->log( $response );
-				
+
 				$this->log->log( 'Wizard Step 1 - List search engines - success ' );
 				$response = true;
 
@@ -933,22 +933,40 @@ class Setup_Wizard {
 
 		if ($response) {
 			// Everything is ok - save the options
-			
+
 			// Check if api key already exists and is the same
 			// If api key is different clear all settings
 			$saved_api_key = Settings::get_api_key();
-			
+
 			if ($saved_api_key !== $api_key) {
 				$this->clear_all_settings();
 			}
-			
+
 			Settings::set_api_key( $api_key );
 			//$this->log->log($api_key);
-			Settings::set_api_host( $api_host );
+
+			// Api Host should contain 'https://' protocol, i.e. https://eu1-api.doofinder.com
+			if(!preg_match("#^((https?://)|www\.?)#i", $api_host)) {
+				Settings::set_api_host('https://' . $api_host);
+			} else {
+				Settings::set_api_host($api_host);
+			}
 			//$this->log->log($api_host);
-			Settings::set_admin_endpoint( $admin_endpoint );
+
+			// Admin Endpoint should contain 'https://' protocol, i.e. https://eu1-api.doofinder.com
+			if(!preg_match("#^((https?://)|www\.?)#i", $admin_endpoint)) {
+				Settings::set_admin_endpoint('https://' . $admin_endpoint);
+			} else {
+				Settings::set_admin_endpoint( $admin_endpoint );
+			}
 			//$this->log->log($admin_endpoint);
-			Settings::set_search_engine_server( $search_endpoint ); 
+
+			// Search Endpoint should contain 'https://' protocol, i.e. https://eu1-api.doofinder.com
+			if(!preg_match("#^((https?://)|www\.?)#i", $search_endpoint)) {
+				Settings::set_search_engine_server('https://' . $search_endpoint);
+			} else {
+				Settings::set_search_engine_server( $search_endpoint );
+			}
 			//$this->log->log($search_endpoint);
 
 			$this->log->log( 'Processing Wizard Step 1 - All data saved' );
@@ -963,7 +981,7 @@ class Setup_Wizard {
 
 			return;
 		}
-		
+
 	}
 
 	/**
@@ -981,7 +999,7 @@ class Setup_Wizard {
 
 		// Test error response
 		if (self::$should_fail) {
-			
+
 			$this->log->log( 'Processing Wizard Step 2 - Failed.' );
 
 			// Send failed ajax response
@@ -994,7 +1012,7 @@ class Setup_Wizard {
 			return;
 		}
 
-		
+
 		$api_key = Settings::get_api_key();
 		$api_host = Settings::get_api_host();
 		$client = false;
@@ -1008,10 +1026,10 @@ class Setup_Wizard {
 		} catch (\DoofinderManagement\ApiException $exception) {
 			$this->log->log( 'Wizard Step 2 - Exception 1' );
 			$this->log->log( $exception->getMessage() );
-			$this->errors['wizard-step-2'] = 
-				__( 
+			$this->errors['wizard-step-2'] =
+				__(
 					'Could not create "ManagementClient" class instance.',
-					'woocommerce-doofinder' 
+					'woocommerce-doofinder'
 				);
 			// Send failed ajax response
 			wp_send_json_error(array(
@@ -1032,7 +1050,7 @@ class Setup_Wizard {
 
 		if ( !$has_api_keys || (is_array($has_api_keys) && Helpers::in_array_r( 'no-hash', $has_api_keys, true )  )) {
 
-			// Api keys are missing for some / all languages. We need to create 
+			// Api keys are missing for some / all languages. We need to create
 			// search engine for that language
 
 			// If hash id is missing create search engine
@@ -1072,21 +1090,21 @@ class Setup_Wizard {
 							$this->log->log( 'Wizard Step 2 - Try Create Search Engine' );
 
 
-							// Create search enginge 
+							// Create search enginge
 
 							if (!$this->disable_api) {
-								
+
 								$this->log->log('=== API CALL === ');
 
 								/** @var \DoofinderManagement\Model\SearchEngine $search_engine */
 
 								$search_engine = $client->createSearchEngine(json_encode($data));
 
-							} 
+							}
 							else {
 								// If api is disabled that means we are testing so we need to set
 								// some fake data in order for the setup wizard to advance to the next
-								// step 
+								// step
 								$search_engine = new \DoofinderManagement\Model\SearchEngine();
 								$search_engine->setHashid('123456789testdatatobechanged');
 								$search_engine->setSearchUrl('https://test-url-to-be-changed.com');
@@ -1094,14 +1112,14 @@ class Setup_Wizard {
 
 							$this->log->log( 'Wizard Step 2 - Created Search Engine: ' );
 							//$this->log->log( $search_engine );
-								
+
 						} catch (\DoofinderManagement\ApiException $exception) {
 							$this->log->log( 'Wizard Step 2 - Exception 2 ' );
 							$this->log->log( $exception->getMessage() );
-							$this->errors['wizard-step-2'] = 
-							__( 
+							$this->errors['wizard-step-2'] =
+							__(
 								'Could not create Search Engine for ' . $item['english_name'] . ' language.',
-								'woocommerce-doofinder' 
+								'woocommerce-doofinder'
 							);
 
 							// Send failed ajax response
@@ -1136,11 +1154,11 @@ class Setup_Wizard {
 
 				}
 
-					
+
 			endif;
-				
+
 		}
-		
+
 
 		if ($is_ajax) {
 
@@ -1153,7 +1171,7 @@ class Setup_Wizard {
 				self::next_step(3, false);
 			}
 
-			// Send success ajax response 
+			// Send success ajax response
 			wp_send_json_success( array(
 				'completed' => true
 			) );
@@ -1183,11 +1201,11 @@ class Setup_Wizard {
 
 		// If there's no plugin active we still need to process 1 language.
 		$languages = $this->language->get_formatted_languages();
-		
+
 		if ( ! $languages ) {
 			$languages[''] = '';
 		}
-	
+
 		foreach ( $languages as $language_code => $language_name ) {
 			// Suffix for options.
 			// This should be empty for default language, and language code
@@ -1205,10 +1223,10 @@ class Setup_Wizard {
 				isset( $_POST["enable-internal-search{$name_suffix}"] ) &&
 				$_POST["enable-internal-search{$name_suffix}"]
 			) {
-				
+
 				Settings::enable_internal_search( $options_suffix );
-			} 
-		
+			}
+
 		}
 
 		self::next_step(4);
@@ -1231,7 +1249,7 @@ class Setup_Wizard {
 
 		// Test error response
 		if (self::$should_fail) {
-			
+
 			$this->log->log( 'Processing Wizard Step 4 - Failed.' );
 
 			$this->errors['wizard-step-4']['create-layer'] = __( 'Could not retrieve JS layer. Please, try again. If the error persists, please contact us.', 'woocommerce-doofinder' );
@@ -1261,9 +1279,9 @@ class Setup_Wizard {
 			}
 
 			$this->log->log( 'Creating JS layer for ' . $language_code );
-			
+
 			if (!$this->disable_api) {
-				
+
 				// Get search engine hash id for current language
 				$hash = Settings::get_search_engine_hash( $options_suffix );
 				// Create JS layer for current search engine
@@ -1281,7 +1299,7 @@ class Setup_Wizard {
 				$js_layer_code_api_result = "<!--//{$language_name} JS layer code from API goes here.-->";
 			}
 
-			
+
 			// Enable JS Layer
 			if ( isset( $_POST["enable-js-layer{$name_suffix}"] ) && $_POST["enable-js-layer{$name_suffix}"] ) {
 				Settings::enable_js_layer( $options_suffix );
@@ -1309,7 +1327,7 @@ class Setup_Wizard {
 		}
 
 		$this->log->log( 'Processing Wizard Step 5' );
-		
+
 		// Move to the next step. Step that exceedes number of steps to deactivate the wizard.
 		self::next_step(self::$no_steps + 1);
 	}
@@ -1326,19 +1344,19 @@ class Setup_Wizard {
 		Settings::set_api_key('');
 		Settings::set_api_host('');
 		Settings::set_admin_endpoint('');
-		Settings::set_search_engine_server(''); 
-		
+		Settings::set_search_engine_server('');
+
 
 
 		// If there's no plugin active we still need to process 1 language.
 		$languages = $this->language->get_formatted_languages();
-		
+
 		if ( ! $languages ) {
 			$languages[''] = '';
 		}
 
 		// Clear per language settings
-	
+
 		foreach ( $languages as $language_code => $language_name ) {
 			// Suffix for options.
 			// This should be empty for default language, and language code
@@ -1361,23 +1379,23 @@ class Setup_Wizard {
 			Settings::disable_js_layer( $options_suffix );
 			// JS Layer Code
 			Settings::set_js_layer( '', $options_suffix );
-			
+
 		}
 
 	}
 
 	/**
-	 * Get or create JS Layer for given search engine 
-	 * 
+	 * Get or create JS Layer for given search engine
+	 *
 	 * @param string $hash Search engine hash id
 	 * @param string $admin_endpoint
 	 * @param bool   $get Request method switch. True for GET false for POST.
-	 * 
+	 *
 	 * @return mixed Code of the JS layer or false on error
  	 */
 
 	public function manage_js_layer($hash, $get) {
-		
+
 		if ($get) {
 			$label = 'Get';
 			$method = 'GET';
@@ -1427,7 +1445,7 @@ class Setup_Wizard {
 					$script = $body->script ?? '';
 				}
 			}
-			
+
 			//$this->log->log( $label . ' JS layer Response - Script'  );
 			//$this->log->log( $script );
 
@@ -1450,12 +1468,12 @@ class Setup_Wizard {
 	 }
 
 	/**
-	 * Alias for creating JS Layer for given search engine 
-	 * 
+	 * Alias for creating JS Layer for given search engine
+	 *
 	 * @param string $hash Search engine hash id
-	 * 
+	 *
 	 * @return mixed  Code of the JS layer or false on error
-	 * 
+	 *
 	 */
 
 	public function create_js_layer($hash) {
@@ -1472,7 +1490,7 @@ class Setup_Wizard {
 
 		$log = new Log();
 		$migration_option = get_option( self::$wizard_migration_option );
-		
+
 		// Migration was already done, we should abort
 		if (  $migration_option === 'completed' || $migration_option === 'failed') {
 			//$log->log( 'Should migrate - Migration already done or not possible' );
@@ -1492,12 +1510,12 @@ class Setup_Wizard {
 				//$log->log( 'Should migrate - Migration possible - Api Host' );
 				return true;
 			}
-	
+
 			if(!Settings::get_admin_endpoint()) {
 				//$log->log( 'Should migrate - Migration possible - Admin Endpoint' );
 				return true;
 			}
-			
+
 			if(!Settings::get_search_engine_server()) {
 				//$log->log( 'Should migrate - Migration possible - Search Server' );
 				return true;
@@ -1512,7 +1530,7 @@ class Setup_Wizard {
 	}
 
 	/**
-	 * Try migrating old settings 
+	 * Try migrating old settings
 	 */
 
 	public static function migrate() {
@@ -1527,7 +1545,7 @@ class Setup_Wizard {
 
 		$api_key_prefix = $arr[0] ?? null;
 		$api_key_value = $arr[1] ?? null;
-	
+
 		if (!($api_key && $api_key_prefix && $api_key_value)) {
 
 			// Migration not possible
