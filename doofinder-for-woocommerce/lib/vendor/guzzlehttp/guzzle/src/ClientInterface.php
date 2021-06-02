@@ -1,11 +1,11 @@
 <?php
-namespace GuzzleHttp;
+namespace Doofinder\GuzzleHttp;
 
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Promise\PromiseInterface;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\UriInterface;
+use Doofinder\GuzzleHttp\Exception\GuzzleException;
+use Doofinder\GuzzleHttp\Promise\PromiseInterface;
+use Doofinder\Psr\Http\Message\RequestInterface;
+use Doofinder\Psr\Http\Message\ResponseInterface;
+use Doofinder\Psr\Http\Message\UriInterface;
 
 /**
  * Client interface for sending HTTP requests.

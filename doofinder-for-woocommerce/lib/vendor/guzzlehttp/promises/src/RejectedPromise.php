@@ -1,6 +1,6 @@
 <?php
 
-namespace GuzzleHttp\Promise;
+namespace Doofinder\GuzzleHttp\Promise;
 
 /**
  * A promise that has been rejected.

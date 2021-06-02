@@ -27,12 +27,12 @@
 
 namespace DoofinderManagement\Api;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7\MultipartStream;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\RequestOptions;
+use Doofinder\GuzzleHttp\Client;
+use Doofinder\GuzzleHttp\ClientInterface;
+use Doofinder\GuzzleHttp\Exception\RequestException;
+use Doofinder\GuzzleHttp\Psr7\MultipartStream;
+use Doofinder\GuzzleHttp\Psr7\Request;
+use Doofinder\GuzzleHttp\RequestOptions;
 use DoofinderManagement\ApiException;
 use DoofinderManagement\Configuration;
 use DoofinderManagement\HeaderSelector;
@@ -204,7 +204,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function bannersClicksAsync($from, $to, $hashid, $id = null, $tz = '+00:00', $device = null, $format = 'json')
     {
@@ -230,7 +230,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function bannersClicksAsyncWithHttpInfo($from, $to, $hashid, $id = null, $tz = '+00:00', $device = null, $format = 'json')
     {
@@ -286,7 +286,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function bannersClicksRequest($from, $to, $hashid, $id = null, $tz = '+00:00', $device = null, $format = 'json')
     {
@@ -366,7 +366,7 @@ class StatsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -381,11 +381,11 @@ class StatsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -411,7 +411,7 @@ class StatsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'GET',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -538,7 +538,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function bannersDisplayAsync($from, $to, $hashid, $id = null, $tz = '+00:00', $device = null, $format = 'json')
     {
@@ -564,7 +564,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function bannersDisplayAsyncWithHttpInfo($from, $to, $hashid, $id = null, $tz = '+00:00', $device = null, $format = 'json')
     {
@@ -620,7 +620,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function bannersDisplayRequest($from, $to, $hashid, $id = null, $tz = '+00:00', $device = null, $format = 'json')
     {
@@ -700,7 +700,7 @@ class StatsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -715,11 +715,11 @@ class StatsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -745,7 +745,7 @@ class StatsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'GET',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -872,7 +872,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function checkoutsByDateAsync($from, $to, $hashid, $tz = '+00:00', $device = null, $interval = '1d', $format = 'json')
     {
@@ -898,7 +898,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function checkoutsByDateAsyncWithHttpInfo($from, $to, $hashid, $tz = '+00:00', $device = null, $interval = '1d', $format = 'json')
     {
@@ -954,7 +954,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function checkoutsByDateRequest($from, $to, $hashid, $tz = '+00:00', $device = null, $interval = '1d', $format = 'json')
     {
@@ -1034,7 +1034,7 @@ class StatsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -1049,11 +1049,11 @@ class StatsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -1079,7 +1079,7 @@ class StatsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'GET',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -1209,7 +1209,7 @@ class StatsApi
      * @param  string $custom_results_id Filter by some custom result. (optional)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function clicksByDateAsync($from, $to, $hashid, $tz = '+00:00', $device = null, $interval = '1d', $format = 'json', $custom_results_id = null)
     {
@@ -1236,7 +1236,7 @@ class StatsApi
      * @param  string $custom_results_id Filter by some custom result. (optional)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function clicksByDateAsyncWithHttpInfo($from, $to, $hashid, $tz = '+00:00', $device = null, $interval = '1d', $format = 'json', $custom_results_id = null)
     {
@@ -1293,7 +1293,7 @@ class StatsApi
      * @param  string $custom_results_id Filter by some custom result. (optional)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function clicksByDateRequest($from, $to, $hashid, $tz = '+00:00', $device = null, $interval = '1d', $format = 'json', $custom_results_id = null)
     {
@@ -1377,7 +1377,7 @@ class StatsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -1392,11 +1392,11 @@ class StatsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -1422,7 +1422,7 @@ class StatsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'GET',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -1549,7 +1549,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function clicksByQueryAsync($from, $to, $hashid, $query, $tz = '+00:00', $device = null, $format = 'json')
     {
@@ -1575,7 +1575,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function clicksByQueryAsyncWithHttpInfo($from, $to, $hashid, $query, $tz = '+00:00', $device = null, $format = 'json')
     {
@@ -1631,7 +1631,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function clicksByQueryRequest($from, $to, $hashid, $query, $tz = '+00:00', $device = null, $format = 'json')
     {
@@ -1721,7 +1721,7 @@ class StatsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -1736,11 +1736,11 @@ class StatsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -1766,7 +1766,7 @@ class StatsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'GET',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -1893,7 +1893,7 @@ class StatsApi
      * @param  string $query Search query term. (optional)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function clicksTopAsync($from, $to, $hashid, $tz = '+00:00', $device = null, $format = 'json', $query = null)
     {
@@ -1919,7 +1919,7 @@ class StatsApi
      * @param  string $query Search query term. (optional)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function clicksTopAsyncWithHttpInfo($from, $to, $hashid, $tz = '+00:00', $device = null, $format = 'json', $query = null)
     {
@@ -1975,7 +1975,7 @@ class StatsApi
      * @param  string $query Search query term. (optional)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function clicksTopRequest($from, $to, $hashid, $tz = '+00:00', $device = null, $format = 'json', $query = null)
     {
@@ -2055,7 +2055,7 @@ class StatsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -2070,11 +2070,11 @@ class StatsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -2100,7 +2100,7 @@ class StatsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'GET',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -2227,7 +2227,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function initsByDateAsync($from, $to, $hashid, $tz = '+00:00', $device = null, $interval = '1d', $format = 'json')
     {
@@ -2253,7 +2253,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function initsByDateAsyncWithHttpInfo($from, $to, $hashid, $tz = '+00:00', $device = null, $interval = '1d', $format = 'json')
     {
@@ -2309,7 +2309,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function initsByDateRequest($from, $to, $hashid, $tz = '+00:00', $device = null, $interval = '1d', $format = 'json')
     {
@@ -2389,7 +2389,7 @@ class StatsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -2404,11 +2404,11 @@ class StatsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -2434,7 +2434,7 @@ class StatsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'GET',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -2561,7 +2561,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function redirectsAsync($from, $to, $hashid, $id = null, $tz = '+00:00', $device = null, $format = 'json')
     {
@@ -2587,7 +2587,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function redirectsAsyncWithHttpInfo($from, $to, $hashid, $id = null, $tz = '+00:00', $device = null, $format = 'json')
     {
@@ -2643,7 +2643,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function redirectsRequest($from, $to, $hashid, $id = null, $tz = '+00:00', $device = null, $format = 'json')
     {
@@ -2723,7 +2723,7 @@ class StatsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -2738,11 +2738,11 @@ class StatsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -2768,7 +2768,7 @@ class StatsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'GET',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -2895,7 +2895,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function searchesByClickAsync($from, $to, $hashid, $dfid, $tz = '+00:00', $device = null, $format = 'json')
     {
@@ -2921,7 +2921,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function searchesByClickAsyncWithHttpInfo($from, $to, $hashid, $dfid, $tz = '+00:00', $device = null, $format = 'json')
     {
@@ -2977,7 +2977,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function searchesByClickRequest($from, $to, $hashid, $dfid, $tz = '+00:00', $device = null, $format = 'json')
     {
@@ -3067,7 +3067,7 @@ class StatsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -3082,11 +3082,11 @@ class StatsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -3112,7 +3112,7 @@ class StatsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'GET',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -3251,7 +3251,7 @@ class StatsApi
      * @param  int $total_hits Filter by the number of search results. (optional)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function searchesByDateAsync($from, $to, $hashid, $tz = '+00:00', $device = null, $interval = '1d', $format = 'json', $custom_results_id = null, $query_name = null, $source = null, $total_hits = null)
     {
@@ -3281,7 +3281,7 @@ class StatsApi
      * @param  int $total_hits Filter by the number of search results. (optional)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function searchesByDateAsyncWithHttpInfo($from, $to, $hashid, $tz = '+00:00', $device = null, $interval = '1d', $format = 'json', $custom_results_id = null, $query_name = null, $source = null, $total_hits = null)
     {
@@ -3341,7 +3341,7 @@ class StatsApi
      * @param  int $total_hits Filter by the number of search results. (optional)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function searchesByDateRequest($from, $to, $hashid, $tz = '+00:00', $device = null, $interval = '1d', $format = 'json', $custom_results_id = null, $query_name = null, $source = null, $total_hits = null)
     {
@@ -3437,7 +3437,7 @@ class StatsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -3452,11 +3452,11 @@ class StatsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -3482,7 +3482,7 @@ class StatsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'GET',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -3615,7 +3615,7 @@ class StatsApi
      * @param  object $exclude Exclude filters (optional)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function searchesTopAsync($from, $to, $hashid, $tz = '+00:00', $device = null, $format = 'json', $query_name = null, $total_hits = null, $exclude = null)
     {
@@ -3643,7 +3643,7 @@ class StatsApi
      * @param  object $exclude Exclude filters (optional)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function searchesTopAsyncWithHttpInfo($from, $to, $hashid, $tz = '+00:00', $device = null, $format = 'json', $query_name = null, $total_hits = null, $exclude = null)
     {
@@ -3701,7 +3701,7 @@ class StatsApi
      * @param  object $exclude Exclude filters (optional)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function searchesTopRequest($from, $to, $hashid, $tz = '+00:00', $device = null, $format = 'json', $query_name = null, $total_hits = null, $exclude = null)
     {
@@ -3789,7 +3789,7 @@ class StatsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -3804,11 +3804,11 @@ class StatsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -3834,7 +3834,7 @@ class StatsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'GET',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -3955,7 +3955,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function usageAsync($from, $to, $hashid, $type = null, $format = 'json')
     {
@@ -3979,7 +3979,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function usageAsyncWithHttpInfo($from, $to, $hashid, $type = null, $format = 'json')
     {
@@ -4033,7 +4033,7 @@ class StatsApi
      * @param  string $format Indicates which response format should be used (optional, default to json)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function usageRequest($from, $to, $hashid, $type = null, $format = 'json')
     {
@@ -4105,7 +4105,7 @@ class StatsApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -4120,11 +4120,11 @@ class StatsApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -4150,7 +4150,7 @@ class StatsApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'GET',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),

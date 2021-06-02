@@ -1,10 +1,10 @@
 <?php
-namespace GuzzleHttp\Handler;
+namespace Doofinder\GuzzleHttp\Handler;
 
-use GuzzleHttp\Promise as P;
-use GuzzleHttp\Promise\Promise;
-use GuzzleHttp\Utils;
-use Psr\Http\Message\RequestInterface;
+use Doofinder\GuzzleHttp\Promise as P;
+use Doofinder\GuzzleHttp\Promise\Promise;
+use Doofinder\GuzzleHttp\Utils;
+use Doofinder\Psr\Http\Message\RequestInterface;
 
 /**
  * Returns an asynchronous response using curl_multi_* functions.

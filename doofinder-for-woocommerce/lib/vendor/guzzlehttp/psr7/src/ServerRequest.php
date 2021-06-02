@@ -1,12 +1,12 @@
 <?php
 
-namespace GuzzleHttp\Psr7;
+namespace Doofinder\GuzzleHttp\Psr7;
 
 use InvalidArgumentException;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\StreamInterface;
-use Psr\Http\Message\UploadedFileInterface;
-use Psr\Http\Message\UriInterface;
+use Doofinder\Psr\Http\Message\ServerRequestInterface;
+use Doofinder\Psr\Http\Message\StreamInterface;
+use Doofinder\Psr\Http\Message\UploadedFileInterface;
+use Doofinder\Psr\Http\Message\UriInterface;
 
 /**
  * Server-side HTTP request

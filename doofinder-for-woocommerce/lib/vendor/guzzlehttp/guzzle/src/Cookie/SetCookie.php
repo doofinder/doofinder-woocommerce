@@ -1,5 +1,5 @@
 <?php
-namespace GuzzleHttp\Cookie;
+namespace Doofinder\GuzzleHttp\Cookie;
 
 /**
  * Set-Cookie object

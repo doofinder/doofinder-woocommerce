@@ -1,9 +1,9 @@
 <?php
-namespace GuzzleHttp;
+namespace Doofinder\GuzzleHttp;
 
-use GuzzleHttp\Promise\PromiseInterface;
-use GuzzleHttp\Psr7;
-use Psr\Http\Message\RequestInterface;
+use Doofinder\GuzzleHttp\Promise\PromiseInterface;
+use Doofinder\GuzzleHttp\Psr7;
+use Doofinder\Psr\Http\Message\RequestInterface;
 
 /**
  * Prepares requests that contain a body, adding the Content-Length,

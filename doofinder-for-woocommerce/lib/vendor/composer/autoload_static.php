@@ -19,19 +19,19 @@ class ComposerStaticInitd0cc4c412d8a1b9b690bbee289a5de6c
     public static $prefixLengthsPsr4 = array (
         'S' => 
         array (
-            'Symfony\\Polyfill\\Php72\\' => 23,
-            'Symfony\\Polyfill\\Intl\\Normalizer\\' => 33,
-            'Symfony\\Polyfill\\Intl\\Idn\\' => 26,
+            'Doofinder\\Symfony\\Polyfill\\Php72\\' => 23,
+            'Doofinder\\Symfony\\Polyfill\\Intl\\Normalizer\\' => 33,
+            'Doofinder\\Symfony\\Polyfill\\Intl\\Idn\\' => 26,
         ),
         'P' => 
         array (
-            'Psr\\Http\\Message\\' => 17,
+            'Doofinder\\Psr\\Http\\Message\\' => 17,
         ),
         'G' => 
         array (
-            'GuzzleHttp\\Psr7\\' => 16,
-            'GuzzleHttp\\Promise\\' => 19,
-            'GuzzleHttp\\' => 11,
+            'Doofinder\\GuzzleHttp\\Psr7\\' => 16,
+            'Doofinder\\GuzzleHttp\\Promise\\' => 19,
+            'Doofinder\\GuzzleHttp\\' => 11,
         ),
         'D' => 
         array (
@@ -42,31 +42,31 @@ class ComposerStaticInitd0cc4c412d8a1b9b690bbee289a5de6c
     );
 
     public static $prefixDirsPsr4 = array (
-        'Symfony\\Polyfill\\Php72\\' => 
+        'Doofinder\\Symfony\\Polyfill\\Php72\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php72',
         ),
-        'Symfony\\Polyfill\\Intl\\Normalizer\\' => 
+        'Doofinder\\Symfony\\Polyfill\\Intl\\Normalizer\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer',
         ),
-        'Symfony\\Polyfill\\Intl\\Idn\\' => 
+        'Doofinder\\Symfony\\Polyfill\\Intl\\Idn\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-intl-idn',
         ),
-        'Psr\\Http\\Message\\' => 
+        'Doofinder\\Psr\\Http\\Message\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
-        'GuzzleHttp\\Psr7\\' => 
+        'Doofinder\\GuzzleHttp\\Psr7\\' => 
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
         ),
-        'GuzzleHttp\\Promise\\' => 
+        'Doofinder\\GuzzleHttp\\Promise\\' => 
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/promises/src',
         ),
-        'GuzzleHttp\\' => 
+        'Doofinder\\GuzzleHttp\\' => 
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
         ),

@@ -1,9 +1,9 @@
 <?php
-namespace GuzzleHttp;
+namespace Doofinder\GuzzleHttp;
 
-use GuzzleHttp\Exception\InvalidArgumentException;
-use Psr\Http\Message\UriInterface;
-use Symfony\Polyfill\Intl\Idn\Idn;
+use Doofinder\GuzzleHttp\Exception\InvalidArgumentException;
+use Doofinder\Psr\Http\Message\UriInterface;
+use Doofinder\Symfony\Polyfill\Intl\Idn\Idn;
 
 final class Utils
 {
