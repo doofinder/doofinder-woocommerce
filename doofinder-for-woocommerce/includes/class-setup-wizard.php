@@ -505,12 +505,12 @@ class Setup_Wizard {
 
 		if ($error_cookie) {
 			$status = 'error';
-		} elseif (Settings::is_api_configuration_complete() && self::get_step() >= 2 ) {
+		} elseif (Settings::is_api_configuration_complete()) {
 			$status = 'saved';
-			// // Check if step was already set to 2, if not do it
-			// if(self::get_step() !== 2) {
-			// 	self::next_step(2,false);
-			// }
+			// Check if step was already set to 2, if not do it
+			if(self::get_step() !== 2) {
+				self::next_step(2,false);
+			}
 		} else {
 			$status = 'not-saved';
 		}
