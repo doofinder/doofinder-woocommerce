@@ -1499,27 +1499,25 @@ class Setup_Wizard {
 
 		$api_key = Settings::get_api_key();
 
+
 		if ($api_key) {
+			//$log->log( 'Should migrate - Migration possible - Api Key' );
+			return true;
+		}
 
-			if ($api_key) {
-				//$log->log( 'Should migrate - Migration possible - Api Key' );
-				return true;
-			}
+		if(!Settings::get_api_host()) {
+			//$log->log( 'Should migrate - Migration possible - Api Host' );
+			return true;
+		}
 
-			if(!Settings::get_api_host()) {
-				//$log->log( 'Should migrate - Migration possible - Api Host' );
-				return true;
-			}
+		if(!Settings::get_admin_endpoint()) {
+			//$log->log( 'Should migrate - Migration possible - Admin Endpoint' );
+			return true;
+		}
 
-			if(!Settings::get_admin_endpoint()) {
-				//$log->log( 'Should migrate - Migration possible - Admin Endpoint' );
-				return true;
-			}
-
-			if(!Settings::get_search_engine_server()) {
-				//$log->log( 'Should migrate - Migration possible - Search Server' );
-				return true;
-			}
+		if(!Settings::get_search_engine_server()) {
+			//$log->log( 'Should migrate - Migration possible - Search Server' );
+			return true;
 		}
 
 		// Migration not necessary
