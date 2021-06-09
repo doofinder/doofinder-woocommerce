@@ -897,6 +897,18 @@ class Setup_Wizard {
 			return;
 		}
 
+		if(!preg_match("#^((https?://)|www\.?)#i", $api_host)) {
+			$api_host = 'https://' . $api_host;
+		}
+
+		if(!preg_match("#^((https?://)|www\.?)#i", $admin_endpoint)) {
+			$admin_endpoint = 'https://' . $admin_endpoint;
+		}
+
+		if(!preg_match("#^((https?://)|www\.?)#i", $search_endpoint)) {
+			$search_endpoint = 'https://' . $search_endpoint;
+		}
+
 		// Check if api key and api host is valid, make test call to API
 
 		$response = false;
@@ -946,27 +958,15 @@ class Setup_Wizard {
 			//$this->log->log($api_key);
 
 			// Api Host should contain 'https://' protocol, i.e. https://eu1-api.doofinder.com
-			if(!preg_match("#^((https?://)|www\.?)#i", $api_host)) {
-				Settings::set_api_host('https://' . $api_host);
-			} else {
-				Settings::set_api_host($api_host);
-			}
+      Settings::set_api_host($api_host);
 			//$this->log->log($api_host);
 
 			// Admin Endpoint should contain 'https://' protocol, i.e. https://eu1-api.doofinder.com
-			if(!preg_match("#^((https?://)|www\.?)#i", $admin_endpoint)) {
-				Settings::set_admin_endpoint('https://' . $admin_endpoint);
-			} else {
-				Settings::set_admin_endpoint( $admin_endpoint );
-			}
+      Settings::set_admin_endpoint( $admin_endpoint );
 			//$this->log->log($admin_endpoint);
 
 			// Search Endpoint should contain 'https://' protocol, i.e. https://eu1-api.doofinder.com
-			if(!preg_match("#^((https?://)|www\.?)#i", $search_endpoint)) {
-				Settings::set_search_engine_server('https://' . $search_endpoint);
-			} else {
-				Settings::set_search_engine_server( $search_endpoint );
-			}
+      Settings::set_search_engine_server( $search_endpoint );
 			//$this->log->log($search_endpoint);
 
 			$this->log->log( 'Processing Wizard Step 1 - All data saved' );
