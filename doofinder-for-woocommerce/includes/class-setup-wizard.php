@@ -897,14 +897,17 @@ class Setup_Wizard {
 			return;
 		}
 
+		// Api Host should contain 'https://' protocol, i.e. https://eu1-api.doofinder.com
 		if(!preg_match("#^((https?://)|www\.?)#i", $api_host)) {
 			$api_host = 'https://' . $api_host;
 		}
 
+		// Admin Endpoint should contain 'https://' protocol, i.e. https://eu1-api.doofinder.com
 		if(!preg_match("#^((https?://)|www\.?)#i", $admin_endpoint)) {
 			$admin_endpoint = 'https://' . $admin_endpoint;
 		}
 
+		// Search Endpoint should contain 'https://' protocol, i.e. https://eu1-api.doofinder.com
 		if(!preg_match("#^((https?://)|www\.?)#i", $search_endpoint)) {
 			$search_endpoint = 'https://' . $search_endpoint;
 		}
@@ -957,16 +960,13 @@ class Setup_Wizard {
 			Settings::set_api_key( $api_key );
 			//$this->log->log($api_key);
 
-			// Api Host should contain 'https://' protocol, i.e. https://eu1-api.doofinder.com
-      Settings::set_api_host($api_host);
+      		Settings::set_api_host($api_host);
 			//$this->log->log($api_host);
 
-			// Admin Endpoint should contain 'https://' protocol, i.e. https://eu1-api.doofinder.com
-      Settings::set_admin_endpoint( $admin_endpoint );
+      		Settings::set_admin_endpoint( $admin_endpoint );
 			//$this->log->log($admin_endpoint);
 
-			// Search Endpoint should contain 'https://' protocol, i.e. https://eu1-api.doofinder.com
-      Settings::set_search_engine_server( $search_endpoint );
+      		Settings::set_search_engine_server( $search_endpoint );
 			//$this->log->log($search_endpoint);
 
 			$this->log->log( 'Processing Wizard Step 1 - All data saved' );
@@ -1501,7 +1501,7 @@ class Setup_Wizard {
 
 		if ($api_key) {
 
-			if (preg_match('@-@', $api_key)) {
+			if ($api_key) {
 				//$log->log( 'Should migrate - Migration possible - Api Key' );
 				return true;
 			}
@@ -1546,7 +1546,7 @@ class Setup_Wizard {
 		$api_key_prefix = $arr[0] ?? null;
 		$api_key_value = $arr[1] ?? null;
 
-		if (!($api_key && $api_key_prefix && $api_key_value)) {
+		if (!$api_key) {
 
 			// Migration not possible
 			$log->log( 'Migrate - Migration Not Possible' );
@@ -1561,33 +1561,61 @@ class Setup_Wizard {
 
 		// All good, save api key value
 		$log->log( 'Migrate - Set Api key' );
-		Settings::set_api_key($api_key_value);
+
+		// Old API key prefix should be removed since new API version is not containing prefixes
+		if($api_key_value) {
+			Settings::set_api_key($api_key_value);
+		} else {
+			Settings::set_api_key($api_key);
+		}
+
+		/*
+		 * Since there may be two different scenarios during plugin migration,
+		 * first if user migrating from older version where api host is not containing 'https://' protocol and
+		 * second scenario if user is migirating form newer version where 'https://' protocol exisist in settings,
+		 * we need to check both cases to isolate prefix.
+		*/
+		$api_host = Settings::get_api_host();
+
+		// Check if api host contains prefix, then isolate prefix
+		if(preg_match('@-@', $api_host)) {
+			$arr = explode('-',$api_host);
+		}
+
+		$api_host_prefix = $arr[0] ?? null;
+
+		// Check if prefix contains protocol, then isolate prefix
+		if(preg_match("#^((https?://)|www\.?)#i", $api_host_prefix)) {
+			$arr = preg_split("#^((https?://)|www\.?)#i",$api_host_prefix);
+			$api_host_prefix = $arr[1] ?? null;
+		}
+
+		$log->log( 'Host: ' . $api_host );
+		$log->log( 'Host prefix: ' . $api_host_prefix );
 
 		// Check and update api host
 		$api_host_base = '-api.doofinder.com';
-		$api_host = Settings::get_api_host();
-
-		if(!$api_host || !preg_match("@$api_key_prefix-api@", $api_host)) {
+		if(!$api_host || !preg_match("@$api_host_prefix-api@", $api_host) || !preg_match("#^((https?://)|www\.?)#i", $api_host)) {
 			$log->log( 'Migrate - Set Api Host' );
-			Settings::set_api_host($api_key_prefix . $api_host_base);
+			Settings::set_api_host('https://' . $api_host_prefix . $api_host_base);
 		}
 
 		// Check and update admin endpoint
 		$admin_endpoint_base = '-app.doofinder.com';
 		$admin_endpoint = Settings::get_admin_endpoint();
 
-		if(!$admin_endpoint || !preg_match("@$api_key_prefix-app@", $admin_endpoint)) {
+		if(!$admin_endpoint || !preg_match("@$api_host_prefix-app@", $admin_endpoint || !preg_match("#^((https?://)|www\.?)#i", $admin_endpoint))) {
 			$log->log( 'Migrate - Set Admin Endpoint' );
-			Settings::set_admin_endpoint($api_key_prefix . $admin_endpoint_base);
+			Settings::set_admin_endpoint('https://' . $api_host_prefix . $admin_endpoint_base);
 		}
 
 		// Check and update search server
 		$search_server_base = '-search.doofinder.com';
 		$search_server = Settings::get_search_engine_server();
 
-		if(!$search_server || !preg_match("@$api_key_prefix-search@", $search_server)) {
+		if(!$search_server || !preg_match("@$api_host_prefix-search@", $search_server || !preg_match("#^((https?://)|www\.?)#i", $search_server))) {
 			$log->log( 'Migrate - Set Search Server' );
-			Settings::set_search_engine_server($api_key_prefix . $search_server_base);
+			Settings::set_search_engine_server('https://' . $api_host_prefix . $search_server_base);
 		}
 
 		// Add notice about successfull migration
