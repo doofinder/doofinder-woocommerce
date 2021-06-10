@@ -302,6 +302,19 @@ if (
 			}
 
 			/**
+			 * Uninstall hook to remove database
+			 *
+			 * @since 1.5.0
+			 * @return void
+			*/
+			public static function plugin_uninstall() {
+				global $wpdb;
+				$db_table_name = $wpdb->prefix . 'options';
+
+				$wpdb->query("DELETE FROM $db_table_name WHERE option_name LIKE 'woocommerce_doofinder%'");
+			}
+
+			/**
 			 * This function runs when WordPress completes its upgrade process
 			 * It iterates through each plugin updated to see if ours is included
 			 *
@@ -372,6 +385,7 @@ if (
 
 	register_activation_hook( __FILE__, array( '\Doofinder\WC\Doofinder_For_WooCommerce', 'plugin_enabled' ) );
 	register_deactivation_hook( __FILE__, array( '\Doofinder\WC\Doofinder_For_WooCommerce', 'plugin_disabled' ) );
+	register_uninstall_hook( __FILE__, array( '\Doofinder\WC\Doofinder_For_WooCommerce', 'plugin_uninstall' ) );
 
 	add_action( 'plugins_loaded', array( '\Doofinder\WC\Doofinder_For_WooCommerce', 'instance' ), 0 );
 	add_action( 'upgrader_process_complete', array('\Doofinder\WC\Doofinder_For_WooCommerce','upgrader_process_complete'), 10, 2 );
