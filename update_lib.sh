@@ -58,4 +58,7 @@ find . -type f -name "*.php" -exec sed -i .bak -f $SED_FILE {} +
 find . -name "*.bak" -exec rm {} +
 
 popd  # lib
+
+cp -p autoload.php lib/autoload.php
+
 popd  # doofinder-for-woocommerce
