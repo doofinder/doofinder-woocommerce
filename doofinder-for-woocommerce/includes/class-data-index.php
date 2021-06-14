@@ -40,7 +40,7 @@ class Data_Index {
 	 *
 	 * @var int
 	 */
-	private static $posts_per_page = 25; // Max is 100.
+	private static $posts_per_page = 100; // Max is 100.
 
 	/**
 	 * Instance of class handling multilanguage environments.
