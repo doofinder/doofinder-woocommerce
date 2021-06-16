@@ -35,7 +35,7 @@ pushd lib
 composer update --no-dev
 
 rm -rf .gitignore swagger .git src/Search/Test
-rm .travis.yml CHANGELOG.md index.php NOTAS phpunit.xml
+rm .travis.yml CHANGELOG.md phpunit.xml
 find . -name "docs" -type d -print0 | xargs -0 rm -rf
 find . -name ".github" -type d -print0 | xargs -0 rm -rf
 find . -name "*.md" -print0 | xargs -0 rm -rf
