@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Symfony package.
+ * This file is part of the Doofinder\Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com> and Trevor Rowbotham <trevor.rowbotham@pm.me>
  *
@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Polyfill\Intl\Idn;
+namespace Doofinder\Symfony\Polyfill\Intl\Idn;
 
 use Exception;
 use Normalizer;
-use Symfony\Polyfill\Intl\Idn\Resources\unidata\DisallowedRanges;
-use Symfony\Polyfill\Intl\Idn\Resources\unidata\Regex;
+use Doofinder\Symfony\Polyfill\Intl\Idn\Resources\unidata\DisallowedRanges;
+use Doofinder\Symfony\Polyfill\Intl\Idn\Resources\unidata\Regex;
 
 /**
  * @see https://www.unicode.org/reports/tr46/

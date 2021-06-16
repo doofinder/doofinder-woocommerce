@@ -1,8 +1,8 @@
 <?php
-namespace GuzzleHttp\Handler;
+namespace Doofinder\GuzzleHttp\Handler;
 
-use GuzzleHttp\RequestOptions;
-use Psr\Http\Message\RequestInterface;
+use Doofinder\GuzzleHttp\RequestOptions;
+use Doofinder\Psr\Http\Message\RequestInterface;
 
 /**
  * Provides basic proxies for handlers.

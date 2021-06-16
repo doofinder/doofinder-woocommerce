@@ -1,10 +1,10 @@
 <?php
 
-namespace GuzzleHttp\Psr7;
+namespace Doofinder\GuzzleHttp\Psr7;
 
 use InvalidArgumentException;
-use Psr\Http\Message\StreamInterface;
-use Psr\Http\Message\UploadedFileInterface;
+use Doofinder\Psr\Http\Message\StreamInterface;
+use Doofinder\Psr\Http\Message\UploadedFileInterface;
 use RuntimeException;
 
 class UploadedFile implements UploadedFileInterface

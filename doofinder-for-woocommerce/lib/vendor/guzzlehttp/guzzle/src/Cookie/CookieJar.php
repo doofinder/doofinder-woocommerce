@@ -1,8 +1,8 @@
 <?php
-namespace GuzzleHttp\Cookie;
+namespace Doofinder\GuzzleHttp\Cookie;
 
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
+use Doofinder\Psr\Http\Message\RequestInterface;
+use Doofinder\Psr\Http\Message\ResponseInterface;
 
 /**
  * Cookie jar that stores cookies as an array

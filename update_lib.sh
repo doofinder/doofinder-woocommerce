@@ -1,5 +1,17 @@
 #!/bin/bash
 
+CWD=`pwd`
+SED_FILE="${CWD}/update_lib.sed"
+echo $SED_FILE
+
+function pushd {
+    command pushd "$@" > /dev/null
+}
+
+function popd {
+    command popd "$@" > /dev/null
+}
+
 function check_commands {
   for app in "curl" "jq";
   do
@@ -23,7 +35,7 @@ pushd lib
 composer update --no-dev
 
 rm -rf .gitignore swagger .git src/Search/Test
-rm .travis.yml CHANGELOG.md index.php NOTAS phpunit.xml
+rm .travis.yml CHANGELOG.md phpunit.xml
 find . -name "docs" -type d -print0 | xargs -0 rm -rf
 find . -name ".github" -type d -print0 | xargs -0 rm -rf
 find . -name "*.md" -print0 | xargs -0 rm -rf
@@ -39,6 +51,11 @@ find . -name "phpstan*" -print0 | xargs -0 rm
 find . -name "Makefile" -print0 | xargs -0 rm
 find . -name "*.xml" -print0 | xargs -0 rm
 
-popd
-popd
-popd
+popd # vendor
+
+# prefix dependencies namespaces with Doofinder\
+find . -type f -name "*.php" -exec sed -i .bak -f $SED_FILE {} +
+find . -name "*.bak" -exec rm {} +
+
+popd  # lib
+popd  # doofinder-for-woocommerce

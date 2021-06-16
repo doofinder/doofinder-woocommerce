@@ -13,7 +13,7 @@ use DoofinderManagement\Api\ItemsApi;
 use DoofinderManagement\Api\IndicesApi;
 use DoofinderManagement\Configuration;
 use DoofinderManagement\ApiException;
-use GuzzleHttp\Client;
+use Doofinder\GuzzleHttp\Client;
 
 
 class ManagementClient {

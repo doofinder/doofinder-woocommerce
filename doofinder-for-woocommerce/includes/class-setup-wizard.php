@@ -16,7 +16,7 @@ use Doofinder\WC\Api\Api_Wrapper;
 use Doofinder\WC\Api\Api_Status;
 use Doofinder\WC\Index_Interface;
 
-use GuzzleHttp\Client as GuzzleClient;
+use Doofinder\GuzzleHttp\Client as GuzzleClient;
 
 use Error;
 use Doofinder\Management\Errors\DoofinderError;

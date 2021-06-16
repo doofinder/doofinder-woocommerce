@@ -1,5 +1,5 @@
 <?php
-namespace GuzzleHttp\Exception;
+namespace Doofinder\GuzzleHttp\Exception;
 
 use Throwable;
 

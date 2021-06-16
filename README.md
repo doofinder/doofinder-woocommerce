@@ -30,10 +30,15 @@ The [Doofinder library](https://github.com/doofinder/php-doofinder) has some dep
 To install them and perform some cleanup run:
 
 ```
-$ ./install_vendor.sh
+$ ./update_lib.sh
 ```
 
-That will remove `doofinder-for-woocommerce/lib/vendor` and will reinstall dependencies and remove some useless files.
+That will:
+
+- Remove `doofinder-for-woocommerce/lib/vendor`
+- Reinstall dependencies
+- Remove some useless files
+- Prefix libraries so they are all under the `Doofinder\` namespace to prevent conflicts with other plugins
 
 ### Release
 
