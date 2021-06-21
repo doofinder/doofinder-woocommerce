@@ -95,7 +95,38 @@ class Setup_Wizard {
 	 * @var string
 	 */
 	public static $wizard_migration_notice_transient = 'doofinder_for_wc_migration_complete';
-/**
+
+	/**
+	 * Name of the option storing the current status of using wizard.
+	 * Possible values are: 'pending', 'started' or 'finished'.
+	 *
+	 * @var string
+	 */
+	public static $wizard_status = 'doofinder_for_wc_setup_wizard_status';
+
+	/**
+	 * 'Pending' status of wizard - if the user never started the wizard (and it's not finished).
+	 *
+	 * @var string
+	 */
+	public static $wizard_status_pending = 'pending';
+
+	/**
+	 * 'Started' status of wizard - if the user started the wizard but it's not finished.
+	 *
+	 * @var string
+	 */
+	public static $wizard_status_started = 'started';
+
+	/**
+	 * 'Finished' status of wizad - if the user finished the wizard successfully or data has been indexed via API
+	 * (indicating a manual configuration after skipping the wizard).
+	 *
+	 * @var string
+	 */
+	public static $wizard_status_finished = 'finished';
+
+	/**
 	 * How many steps does the wizard have.
 	 *
 	 * @var int
@@ -421,6 +452,11 @@ class Setup_Wizard {
 			// Reset wizard to step 1
 			update_option( self::$wizard_step_option, 1 );
 
+			// Update wizard status to finished if configuration is complete
+			if (Settings::is_configuration_complete()) {
+				update_option( self::$wizard_status, self::$wizard_status_finished );
+			}
+
 			if ( $redirect ) {
 				wp_safe_redirect( Settings::get_url() );
 				die();
@@ -702,6 +738,8 @@ class Setup_Wizard {
 		if ( empty( $_GET['page'] ) || 'dfwc-setup' !== $_GET['page'] ) {
 			return;
 		}
+
+		update_option( self::$wizard_status, self::$wizard_status_started );
 
 		include Doofinder_For_WooCommerce::plugin_path() . '/views/wizard.php';
 
