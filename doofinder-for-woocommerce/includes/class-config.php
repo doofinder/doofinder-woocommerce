@@ -3,6 +3,7 @@
 namespace Doofinder\WC;
 
 use Doofinder\WC\Settings\Settings;
+use Doofinder\WC\Setup_Wizard;
 
 defined( 'ABSPATH' ) or die;
 
@@ -57,6 +58,8 @@ class Config {
 				),
 
 				'version' => Doofinder_For_WooCommerce::$version,
+
+				'wizard' => $this->get_wizard_status(),
 			),
 		);
 	}
@@ -136,5 +139,21 @@ class Config {
 		}
 
 		return array( $this->get_locale_language_code() );
+	}
+
+	/**
+	 * Get wizard status for configuration
+	 *
+	 * @return string
+	 */
+	private function get_wizard_status() {
+		$wizard = get_option(Setup_Wizard::$wizard_status);
+		if ( $wizard ) {
+			return $wizard;
+		}
+
+		return Settings::is_configuration_complete()
+			? Setup_Wizard::$wizard_status_finished
+			: Setup_Wizard::$wizard_status_pending;
 	}
 }
