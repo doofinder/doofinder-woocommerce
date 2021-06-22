@@ -389,12 +389,16 @@ class Internal_Search {
 		// and Internal Search will display empty list of results.
 		try {
 
-			$queryParams = [
-				"hashid" => $this->hashid,
-				"query" => $query,
-				"page" => $page,
-				'rpp' => $per_page
-			];
+			$queryParams = apply_filters(
+				'woocommerce_doofinder_internal_search_params', 
+				[
+					"hashid" => $this->hashid,
+					"query" => $query,
+					"page" => $page,
+					'rpp' => $per_page
+				],
+				$this
+			);
 
 			$log->log( 'Internal Search - Search: ' );
 			$log->log( $queryParams );
