@@ -1,84 +1,9 @@
 <?php
 
-use Doofinder\WC\Doofinder_For_WooCommerce;
 use Doofinder\WC\Multilanguage;
 use Doofinder\WC\Settings\Settings;
-use Doofinder\WC\Setup_Wizard;
 
 defined( 'ABSPATH' ) or die;
-
-
-
-$show_welcome_screen = !get_option( Setup_Wizard::$wizard_step_option ) && !Settings::is_configuration_complete()  && !Settings::is_api_configuration_complete();
-$show_failed_migration_screen = !(Settings::is_configuration_complete() && Settings::is_api_configuration_complete()) && get_option(Setup_Wizard::$wizard_migration_option) === 'failed';
-
-if (
-	//First time user, configuration not completed
-	$show_welcome_screen
-	// Plugin upated but settings migration has failed
-	|| $show_failed_migration_screen
-	) :
-?>
-<style>
-	.subsubsub {
-		display: none;
-	}
-
-    p.submit {
-        display: none;
-	}
-	.doofinder-button-setup-wizard {
-		display: none;
-	}
-</style>
-<script>
-	document.querySelector('.doofinder-notice-setup-wizard').parentNode.style = "display:none;";
-</script>
-<?php
-endif;
-
-// Welcome screen for first time users
-
-if ( $show_welcome_screen ) :
-?>
-<div class="doofinder-for-wc-welcome-screen">
-	<div class="doofinder-for-wc-welcome-screen__icon">
-		<img src="<?php echo Doofinder_For_WooCommerce::plugin_url() . 'assets/img/waving-hand_light-skin-tone.png'; ?>" alt="👋🏻" />
-	</div>
-	<h2 class="doofinder-for-wc-welcome-screen__heading">
-		<?php _e('Welcome to Doofinder!','woocommerce-doofinder'); ?>
-	</h2>
-	<div class="doofinder-for-wc-welcome-screen__text">
-		<h4><?php _e("Let's start by improving your store search.",'woocommerce-doofinder'); ?></h4>
-	</div>
-	<a class="button button-primary" href="<?php echo Setup_Wizard::get_url(); ?>"><?php _e('Start','woocommerce-doofinder'); ?></a>
-</div>
-<?php
-return array();
-endif;
-
-// Info screen for users after update when migration failed
-if ( $show_failed_migration_screen ) :
-?>
-<div class="doofinder-for-wc-welcome-screen">
-	<div class="doofinder-for-wc-welcome-screen__icon">
-		<img src="<?php echo Doofinder_For_WooCommerce::plugin_url() . 'assets/img/waving-hand_light-skin-tone.png'; ?>" alt="👋🏻" />
-	</div>
-	<h2 class="doofinder-for-wc-welcome-screen__heading">
-		<?php _e('Hi again!','woocommerce-doofinder'); ?>
-	</h2>
-	<div class="doofinder-for-wc-welcome-screen__text">
-		<h4><?php _e("We changed some stuff under the hood...<br><strong>...but your settings are not compatible</strong> 😅",'woocommerce-doofinder'); ?></h4>
-	</div>
-	<a class="button button-primary" href="<?php echo Setup_Wizard::get_url(); ?>"><?php _e('Setup Wizard','woocommerce-doofinder'); ?></a>
-	<div class="doofinder-for-wc-welcome-screen__text">
-		<p class=""><?php _e('This will create new search engines and settings','woocommerce-doofinder'); ?></p>
-	</div>
-</div>
-<?php
-return array();
-endif;
-
 
 $multilanguage = Multilanguage::instance();
 $lang_affix    = $multilanguage->get_language_prefix();
