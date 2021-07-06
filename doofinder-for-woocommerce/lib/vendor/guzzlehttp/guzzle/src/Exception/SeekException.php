@@ -1,7 +1,7 @@
 <?php
-namespace GuzzleHttp\Exception;
+namespace Doofinder\GuzzleHttp\Exception;
 
-use Psr\Http\Message\StreamInterface;
+use Doofinder\Psr\Http\Message\StreamInterface;
 
 /**
  * Exception thrown when a seek fails on a stream.

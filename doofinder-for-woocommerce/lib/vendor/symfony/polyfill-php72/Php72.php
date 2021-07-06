@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Symfony package.
+ * This file is part of the Doofinder\Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Polyfill\Php72;
+namespace Doofinder\Symfony\Polyfill\Php72;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -182,7 +182,7 @@ final class Php72
             $s = \chr(0xF0 | $code >> 18).\chr(0x80 | $code >> 12 & 0x3F).\chr(0x80 | $code >> 6 & 0x3F).\chr(0x80 | $code & 0x3F);
         }
 
-        if ('UTF-8' !== $encoding) {
+        if ('UTF-8' !== $encoding = $encoding ?? mb_internal_encoding()) {
             $s = mb_convert_encoding($s, $encoding, 'UTF-8');
         }
 

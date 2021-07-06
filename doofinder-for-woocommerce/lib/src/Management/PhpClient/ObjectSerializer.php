@@ -268,7 +268,7 @@ class ObjectSerializer
             settype($data, $class);
             return $data;
         } elseif ($class === '\SplFileObject') {
-            /** @var \Psr\Http\Message\StreamInterface $data */
+            /** @var \Doofinder\Psr\Http\Message\StreamInterface $data */
 
             // determine file name
             if (array_key_exists('Content-Disposition', $httpHeaders) &&

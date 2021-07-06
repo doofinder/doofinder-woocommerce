@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Symfony package.
+ * This file is part of the Doofinder\Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
@@ -9,10 +9,14 @@
  * file that was distributed with this source code.
  */
 
-use Symfony\Polyfill\Intl\Idn as p;
+use Doofinder\Symfony\Polyfill\Intl\Idn as p;
 
 if (extension_loaded('intl')) {
     return;
+}
+
+if (\PHP_VERSION_ID >= 80000) {
+    return require __DIR__.'/bootstrap80.php';
 }
 
 if (!defined('U_IDNA_PROHIBITED_ERROR')) {

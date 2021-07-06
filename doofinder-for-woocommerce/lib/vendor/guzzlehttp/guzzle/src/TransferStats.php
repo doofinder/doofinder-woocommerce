@@ -1,9 +1,9 @@
 <?php
-namespace GuzzleHttp;
+namespace Doofinder\GuzzleHttp;
 
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\UriInterface;
+use Doofinder\Psr\Http\Message\RequestInterface;
+use Doofinder\Psr\Http\Message\ResponseInterface;
+use Doofinder\Psr\Http\Message\UriInterface;
 
 /**
  * Represents data at the point after it was transferred either successfully

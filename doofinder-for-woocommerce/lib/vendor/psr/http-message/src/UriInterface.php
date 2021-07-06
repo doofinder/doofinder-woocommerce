@@ -1,5 +1,5 @@
 <?php
-namespace Psr\Http\Message;
+namespace Doofinder\Psr\Http\Message;
 
 /**
  * Value object representing a URI.

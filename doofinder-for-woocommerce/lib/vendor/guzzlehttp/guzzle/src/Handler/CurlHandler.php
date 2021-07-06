@@ -1,8 +1,8 @@
 <?php
-namespace GuzzleHttp\Handler;
+namespace Doofinder\GuzzleHttp\Handler;
 
-use GuzzleHttp\Psr7;
-use Psr\Http\Message\RequestInterface;
+use Doofinder\GuzzleHttp\Psr7;
+use Doofinder\Psr\Http\Message\RequestInterface;
 
 /**
  * HTTP handler that uses cURL easy handles as a transport layer.

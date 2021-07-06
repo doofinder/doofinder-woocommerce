@@ -1,7 +1,7 @@
 <?php
-namespace GuzzleHttp\Exception;
+namespace Doofinder\GuzzleHttp\Exception;
 
-use Psr\Http\Message\RequestInterface;
+use Doofinder\Psr\Http\Message\RequestInterface;
 
 /**
  * Exception thrown when a connection cannot be established.

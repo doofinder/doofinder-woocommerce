@@ -3,11 +3,11 @@
  * Plugin Name: Doofinder for WooCommerce
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 1.5.0
+ * Version: 1.5.8
  * Author: doofinder
  * Description: Integrate Doofinder Search in your WooCommerce shop.
- * WC requires at least: 2.1.0
- * WC tested up to: 5.2
+ * WC requires at least: 3.0
+ * WC tested up to: 5.4
  *
  * @package WordPress
  */
@@ -42,7 +42,7 @@ if (
 			 *
 			 * @var string
 			 */
-			public static $version = '1.5.0';
+			public static $version = '1.5.8';
 
 			/**
 			 * The only instance of Doofinder_For_WooCommerce
@@ -302,19 +302,6 @@ if (
 			}
 
 			/**
-			 * Uninstall hook to remove database
-			 *
-			 * @since 1.5.0
-			 * @return void
-			*/
-			public static function plugin_uninstall() {
-				global $wpdb;
-				$db_table_name = $wpdb->prefix . 'options';
-
-				$wpdb->query("DELETE FROM $db_table_name WHERE option_name LIKE 'woocommerce_doofinder%'");
-			}
-
-			/**
 			 * This function runs when WordPress completes its upgrade process
 			 * It iterates through each plugin updated to see if ours is included
 			 *
@@ -385,7 +372,6 @@ if (
 
 	register_activation_hook( __FILE__, array( '\Doofinder\WC\Doofinder_For_WooCommerce', 'plugin_enabled' ) );
 	register_deactivation_hook( __FILE__, array( '\Doofinder\WC\Doofinder_For_WooCommerce', 'plugin_disabled' ) );
-	register_uninstall_hook( __FILE__, array( '\Doofinder\WC\Doofinder_For_WooCommerce', 'plugin_uninstall' ) );
 
 	add_action( 'plugins_loaded', array( '\Doofinder\WC\Doofinder_For_WooCommerce', 'instance' ), 0 );
 	add_action( 'upgrader_process_complete', array('\Doofinder\WC\Doofinder_For_WooCommerce','upgrader_process_complete'), 10, 2 );

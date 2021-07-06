@@ -1,9 +1,9 @@
 <?php
 
-namespace GuzzleHttp\Psr7;
+namespace Doofinder\GuzzleHttp\Psr7;
 
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamInterface;
+use Doofinder\Psr\Http\Message\ResponseInterface;
+use Doofinder\Psr\Http\Message\StreamInterface;
 
 /**
  * PSR-7 response implementation.

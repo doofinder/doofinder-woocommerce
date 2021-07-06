@@ -1,11 +1,11 @@
 <?php
 
-namespace GuzzleHttp\Psr7;
+namespace Doofinder\GuzzleHttp\Psr7;
 
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\StreamInterface;
-use Psr\Http\Message\UriInterface;
+use Doofinder\Psr\Http\Message\RequestInterface;
+use Doofinder\Psr\Http\Message\ServerRequestInterface;
+use Doofinder\Psr\Http\Message\StreamInterface;
+use Doofinder\Psr\Http\Message\UriInterface;
 
 final class Utils
 {
@@ -217,7 +217,7 @@ final class Utils
             ->withQueryParams($request->getQueryParams())
             ->withCookieParams($request->getCookieParams())
             ->withUploadedFiles($request->getUploadedFiles());
-        
+
             foreach ($request->getAttributes() as $key => $value) {
                 $new = $new->withAttribute($key, $value);
             }
@@ -272,7 +272,7 @@ final class Utils
      * - size: Size of the stream.
      *
      * This method accepts the following `$resource` types:
-     * - `Psr\Http\Message\StreamInterface`: Returns the value as-is.
+     * - `Doofinder\Psr\Http\Message\StreamInterface`: Returns the value as-is.
      * - `string`: Creates a stream object that uses the given string as the contents.
      * - `resource`: Creates a stream object that wraps the given PHP stream resource.
      * - `Iterator`: If the provided value implements `Iterator`, then a read-only
@@ -317,7 +317,8 @@ final class Utils
                  * The 'php://input' is a special stream with quirks and inconsistencies.
                  * We avoid using that stream by reading it into php://temp
                  */
-                if (\stream_get_meta_data($resource)['uri'] === 'php://input') {
+                $metaData = \stream_get_meta_data($resource);
+                if (isset($metaData['uri']) && $metaData['uri'] === 'php://input') {
                     $stream = self::tryFopen('php://temp', 'w+');
                     fwrite($stream, stream_get_contents($resource));
                     fseek($stream, 0);

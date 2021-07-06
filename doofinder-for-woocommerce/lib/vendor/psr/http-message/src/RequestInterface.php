@@ -1,6 +1,6 @@
 <?php
 
-namespace Psr\Http\Message;
+namespace Doofinder\Psr\Http\Message;
 
 /**
  * Representation of an outgoing, client-side request.

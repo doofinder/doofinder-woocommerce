@@ -27,12 +27,12 @@
 
 namespace DoofinderManagement\Api;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7\MultipartStream;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\RequestOptions;
+use Doofinder\GuzzleHttp\Client;
+use Doofinder\GuzzleHttp\ClientInterface;
+use Doofinder\GuzzleHttp\Exception\RequestException;
+use Doofinder\GuzzleHttp\Psr7\MultipartStream;
+use Doofinder\GuzzleHttp\Psr7\Request;
+use Doofinder\GuzzleHttp\RequestOptions;
 use DoofinderManagement\ApiException;
 use DoofinderManagement\Configuration;
 use DoofinderManagement\HeaderSelector;
@@ -186,7 +186,7 @@ class SearchEnginesApi
      * @param  string $hashid Unique id of a search engine. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function processAsync($hashid)
     {
@@ -206,7 +206,7 @@ class SearchEnginesApi
      * @param  string $hashid Unique id of a search engine. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function processAsyncWithHttpInfo($hashid)
     {
@@ -256,7 +256,7 @@ class SearchEnginesApi
      * @param  string $hashid Unique id of a search engine. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function processRequest($hashid)
     {
@@ -304,7 +304,7 @@ class SearchEnginesApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -319,11 +319,11 @@ class SearchEnginesApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -349,7 +349,7 @@ class SearchEnginesApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'POST',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -458,7 +458,7 @@ class SearchEnginesApi
      * @param  string $hashid Unique id of a search engine. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function processStatusAsync($hashid)
     {
@@ -478,7 +478,7 @@ class SearchEnginesApi
      * @param  string $hashid Unique id of a search engine. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function processStatusAsyncWithHttpInfo($hashid)
     {
@@ -528,7 +528,7 @@ class SearchEnginesApi
      * @param  string $hashid Unique id of a search engine. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function processStatusRequest($hashid)
     {
@@ -576,7 +576,7 @@ class SearchEnginesApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -591,11 +591,11 @@ class SearchEnginesApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -621,7 +621,7 @@ class SearchEnginesApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'GET',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -730,7 +730,7 @@ class SearchEnginesApi
      * @param  \DoofinderManagement\Model\SearchEngine $body (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function searchEngineCreateAsync($body)
     {
@@ -750,7 +750,7 @@ class SearchEnginesApi
      * @param  \DoofinderManagement\Model\SearchEngine $body (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function searchEngineCreateAsyncWithHttpInfo($body)
     {
@@ -800,7 +800,7 @@ class SearchEnginesApi
      * @param  \DoofinderManagement\Model\SearchEngine $body (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function searchEngineCreateRequest($body)
     {
@@ -843,7 +843,7 @@ class SearchEnginesApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -858,11 +858,11 @@ class SearchEnginesApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -888,7 +888,7 @@ class SearchEnginesApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'POST',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -974,7 +974,7 @@ class SearchEnginesApi
      * @param  string $hashid Unique id of a search engine. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function searchEngineDeleteAsync($hashid)
     {
@@ -994,7 +994,7 @@ class SearchEnginesApi
      * @param  string $hashid Unique id of a search engine. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function searchEngineDeleteAsyncWithHttpInfo($hashid)
     {
@@ -1030,7 +1030,7 @@ class SearchEnginesApi
      * @param  string $hashid Unique id of a search engine. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function searchEngineDeleteRequest($hashid)
     {
@@ -1078,7 +1078,7 @@ class SearchEnginesApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -1093,11 +1093,11 @@ class SearchEnginesApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -1123,7 +1123,7 @@ class SearchEnginesApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'DELETE',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -1229,7 +1229,7 @@ class SearchEnginesApi
      *
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function searchEngineListAsync()
     {
@@ -1248,7 +1248,7 @@ class SearchEnginesApi
      *
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function searchEngineListAsyncWithHttpInfo()
     {
@@ -1297,7 +1297,7 @@ class SearchEnginesApi
      *
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function searchEngineListRequest()
     {
@@ -1331,7 +1331,7 @@ class SearchEnginesApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -1346,11 +1346,11 @@ class SearchEnginesApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -1376,7 +1376,7 @@ class SearchEnginesApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'GET',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -1485,7 +1485,7 @@ class SearchEnginesApi
      * @param  string $hashid Unique id of a search engine. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function searchEngineShowAsync($hashid)
     {
@@ -1505,7 +1505,7 @@ class SearchEnginesApi
      * @param  string $hashid Unique id of a search engine. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function searchEngineShowAsyncWithHttpInfo($hashid)
     {
@@ -1555,7 +1555,7 @@ class SearchEnginesApi
      * @param  string $hashid Unique id of a search engine. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function searchEngineShowRequest($hashid)
     {
@@ -1603,7 +1603,7 @@ class SearchEnginesApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -1618,11 +1618,11 @@ class SearchEnginesApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -1648,7 +1648,7 @@ class SearchEnginesApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'GET',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
@@ -1760,7 +1760,7 @@ class SearchEnginesApi
      * @param  string $hashid Unique id of a search engine. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function searchEngineUpdateAsync($body, $hashid)
     {
@@ -1781,7 +1781,7 @@ class SearchEnginesApi
      * @param  string $hashid Unique id of a search engine. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \Doofinder\GuzzleHttp\Promise\PromiseInterface
      */
     public function searchEngineUpdateAsyncWithHttpInfo($body, $hashid)
     {
@@ -1832,7 +1832,7 @@ class SearchEnginesApi
      * @param  string $hashid Unique id of a search engine. (required)
      *
      * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
+     * @return \Doofinder\GuzzleHttp\Psr7\Request
      */
     protected function searchEngineUpdateRequest($body, $hashid)
     {
@@ -1889,7 +1889,7 @@ class SearchEnginesApi
             $httpBody = $_tempBody;
             // \stdClass has no __toString(), so we should encode it manually
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($httpBody);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($httpBody);
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -1904,11 +1904,11 @@ class SearchEnginesApi
                 $httpBody = new MultipartStream($multipartContents);
 
             } elseif ($headers['Content-Type'] === 'application/json') {
-                $httpBody = \GuzzleHttp\json_encode($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\json_encode($formParams);
 
             } else {
                 // for HTTP post (form)
-                $httpBody = \GuzzleHttp\Psr7\build_query($formParams);
+                $httpBody = \Doofinder\GuzzleHttp\Psr7\build_query($formParams);
             }
         }
 
@@ -1934,7 +1934,7 @@ class SearchEnginesApi
             $headers
         );
 
-        $query = \GuzzleHttp\Psr7\build_query($queryParams);
+        $query = \Doofinder\GuzzleHttp\Psr7\build_query($queryParams);
         return new Request(
             'PATCH',
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),

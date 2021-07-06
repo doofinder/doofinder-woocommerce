@@ -1,10 +1,10 @@
 <?php
-namespace GuzzleHttp;
+namespace Doofinder\GuzzleHttp;
 
-use GuzzleHttp\Promise\EachPromise;
-use GuzzleHttp\Promise\PromiseInterface;
-use GuzzleHttp\Promise\PromisorInterface;
-use Psr\Http\Message\RequestInterface;
+use Doofinder\GuzzleHttp\Promise\EachPromise;
+use Doofinder\GuzzleHttp\Promise\PromiseInterface;
+use Doofinder\GuzzleHttp\Promise\PromisorInterface;
+use Doofinder\Psr\Http\Message\RequestInterface;
 
 /**
  * Sends an iterator of requests concurrently using a capped pool size.
@@ -51,7 +51,7 @@ class Pool implements PromisorInterface
             $opts = [];
         }
 
-        $iterable = \GuzzleHttp\Promise\iter_for($requests);
+        $iterable = \Doofinder\GuzzleHttp\Promise\iter_for($requests);
         $requests = function () use ($iterable, $client, $opts) {
             foreach ($iterable as $key => $rfn) {
                 if ($rfn instanceof RequestInterface) {
@@ -91,7 +91,7 @@ class Pool implements PromisorInterface
      * @param ClientInterface $client   Client used to send the requests
      * @param array|\Iterator $requests Requests to send concurrently.
      * @param array           $options  Passes through the options available in
-     *                                  {@see GuzzleHttp\Pool::__construct}
+     *                                  {@see Doofinder\GuzzleHttp\Pool::__construct}
      *
      * @return array Returns an array containing the response or an exception
      *               in the same order that the requests were sent.
