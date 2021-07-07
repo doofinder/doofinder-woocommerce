@@ -140,11 +140,13 @@ class Doofinder_Api implements Api_Wrapper {
 
 		try {
 			$this->search_engine = $this->get_search_engine();
-			//$this->log->log($this->search_engine);
+			$this->log->log($this->search_engine);
 		} catch ( NotFound $exception ) {
 
 			$this->log->log( 'Could not get search engine - Not Found' );
+			$this->log->log( 'Status code: ' . $exception->getCode() );
 			$this->log->log( $exception->getMessage() );
+			$this->log->log( get_class($exception));
 
 			if ( $exception instanceof DoofinderError ) {
 				$this->log->log( $exception->getBody() );
@@ -155,7 +157,9 @@ class Doofinder_Api implements Api_Wrapper {
 		} catch ( NotAllowed $exception ) {
 
 			$this->log->log( 'Could not get search engine - Not Allowed' );
+			$this->log->log( 'Status code: ' . $exception->getCode() );
 			$this->log->log( $exception->getMessage() );
+			$this->log->log( get_class($exception));
 
 			if ( $exception instanceof DoofinderError ) {
 				$this->log->log( $exception->getBody() );
@@ -166,8 +170,9 @@ class Doofinder_Api implements Api_Wrapper {
 		} catch ( \Exception $exception ) {
 
 			$this->log->log( 'Could not get search engine - Unknown' );
-			$this->log->log( get_class($exception));
+			$this->log->log( 'Status code: ' . $exception->getCode() );
 			$this->log->log( $exception->getMessage() );
+			$this->log->log( get_class($exception));
 
 			if ( $exception instanceof DoofinderError ) {
 				$this->log->log( $exception->getBody() );
