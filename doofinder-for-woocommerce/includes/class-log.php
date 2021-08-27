@@ -2,7 +2,8 @@
 
 namespace Doofinder\WC;
 
-class Log {
+class Log
+{
 
 	/**
 	 * Name of the file we'll be logging data into.
@@ -19,11 +20,18 @@ class Log {
 	 *
 	 * @var int
 	 */
-	private $max_size = 1048576;
+	private $max_size = 10485760; // 10 MB
 
-	public function __construct( $file_name = null ) {
-		if ( $file_name ) {
+	private $compact = false;
+
+	public function __construct($file_name = null, $compact = null)
+	{
+		if ($file_name) {
 			$this->file_name = $file_name;
+		}
+
+		if ($compact) {
+			$this->compact = $compact;
 		}
 	}
 
@@ -35,34 +43,39 @@ class Log {
 	 *
 	 * @param mixed $value
 	 */
-	public function log( $value ) {
+	public function log($value)
+	{
 		// Check if logs directory exits. Create it if it doesn't.
-		if ( ! is_dir( Doofinder_For_WooCommerce::plugin_path() . 'logs' ) ) {
-			mkdir( Doofinder_For_WooCommerce::plugin_path() . 'logs' );
+		if (!is_dir(Doofinder_For_WooCommerce::plugin_path() . 'logs')) {
+			mkdir(Doofinder_For_WooCommerce::plugin_path() . 'logs');
 		}
 
 		$log_file = Doofinder_For_WooCommerce::plugin_path() . 'logs/' . $this->file_name;
 
 		// We don't want the log file to grow to large, so clear it
 		// if it takes up more than 1 mb of disk space.
-		if ( is_file( $log_file ) && filesize( $log_file ) > $this->max_size ) {
-			$file_handler = fopen( $log_file, 'w' );
-			fclose( $file_handler );
+		if (is_file($log_file) && filesize($log_file) > $this->max_size) {
+			$file_handler = fopen($log_file, 'w');
+			fclose($file_handler);
 		}
 
 		// Line break before entries.
-		$to_log = "\n";
+		if (!$this->compact) {
+			$to_log = "\n";
+		}
 
 		// Current time.
-		$to_log .= date( 'j M y, H:i' ) . "\n";
+		if (!$this->compact) {
+			$to_log .= date('j M y, H:i:s') . "\n";
+		}
 
 		// We want to store value in the log file in a nice format.
 		// print_r formats complex types nicely, but fails when trying
 		// to print out simple values.
-		if ( is_array( $value ) || is_object( $value ) ) {
-			$to_log .= print_r( $value, true );
+		if (is_array($value) || is_object($value)) {
+			$to_log .= print_r($value, true);
 		} else {
-			$to_log .= var_export( $value, true ) . "\n";
+			$to_log .= var_export($value, true) . "\n";
 		}
 
 		// Append the things we fake send to API to the log file.

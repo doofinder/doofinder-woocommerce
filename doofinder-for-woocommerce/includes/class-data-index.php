@@ -11,8 +11,9 @@ use Doofinder\WC\Settings\Settings;
 use Doofinder\WC\Data_Feed;
 use Doofinder\WC\Helpers\Helpers;
 use Doofinder\WC\Log;
+use Doofinder\WC\Profiler;
 
-defined( 'ABSPATH' ) or die;
+defined('ABSPATH') or die;
 
 /**
  * Handles the process of indexing the posts.
@@ -33,7 +34,8 @@ defined( 'ABSPATH' ) or die;
  * @see Index_Interface
  * @see Indexing_Data
  */
-class Data_Index {
+class Data_Index
+{
 
 	/**
 	 * Number of posts per page.
@@ -69,6 +71,13 @@ class Data_Index {
 	 * @var Log
 	 */
 	private $log;
+
+	/**
+	 * Instance of a class used to log execution time.
+	 *
+	 * @var Profiler
+	 */
+	private $profiler;
 
 	/**
 	 * List of posts prepared to be indexed.
@@ -140,21 +149,26 @@ class Data_Index {
 	 */
 	public static $should_fail = false;
 
+	private $elapsed_time;
 
-	public function __construct() {
+
+	public function __construct()
+	{
+
+
 		$this->language      			= Multilanguage::instance();
 		$this->indexing_data 			= Indexing_Data::instance();
-		$this->current_language   		= $_POST[ 'lang' ] ?? '';
+		$this->current_language   		= $_POST['lang'] ?? '';
 		$this->process_all_languages 	= $this->language->get_languages() && $this->current_language === '';
 
-		$this->log 			 			= new Log( 'api.txt' );
+		$this->log 			 			= new Log('api.txt');
+		$this->profiler_log 			= new Log('profiler.txt', true);
+		$this->profiler					= new Profiler('profiler.txt');
 
-		$this->log->log( '-------------------------------------------------------------------------------------------------------------------------------------' );
-		$this->log->log( '-------------------------------------------------------------------------------------------------------------------------------------' );
-		$this->log->log( '-------------------------------------------------------------------------------------------------------------------------------------' );
-		//$this->log->log( '---------------------------------------------------------------------------------------------' );
-		//$this->log->log( 'Data Index _construct ' );
-
+		// Api logs
+		$this->log->log('-------------------------------------------------------------------------------------------------------------------------------------');
+		$this->log->log('-------------------------------------------------------------------------------------------------------------------------------------');
+		$this->log->log('-------------------------------------------------------------------------------------------------------------------------------------');
 	}
 
 	/**
@@ -165,29 +179,35 @@ class Data_Index {
 	 *
 	 * @param string $language Language code of posts to index.
 	 */
-	public function ajax_handler() {
-
-		//$this->log->log( 'Ajax Handler ' );
-
-		$status = $this->indexing_data->get( 'status' );
+	public function ajax_handler()
+	{
+		$status = $this->indexing_data->get('status');
 
 		// If the indexing has been completed we are reindexing.
 		// Reset the status of indexing.
-		if ( $status === 'completed' ) {
-			$this->log->log( 'Ajax Handler - Reset indexing data ' );
+		if ($status === 'completed') {
+			$this->profiler->log('=====================================================================================================================================');
+			$this->profiler->log('Reindexing...');
+			$this->profiler->log_time('Indexing Started', true);
+
+			$this->log->log('Ajax Handler - Reset indexing data ');
+
 			$this->indexing_data->reset();
 		}
 
 
 		// Index the posts.
-		if ( $this->index_posts() ) {
+		if ($this->index_posts()) {
+			$this->profiler->log('Wrapping up...');
+			$this->profiler->log('-------------------------------------------------------------------------------------------------------------------------------------');
+			$this->profiler->log_time('Indexing Finished');
 
-			$this->ajax_response( true, 'Wrapping up...' );
+			$this->ajax_response(true, 'Wrapping up...');
 
 			return;
 		}
 
-		$post_type = $this->get_post_type_name( $this->indexing_data->get( 'post_type' ) );
+		$post_type = $this->get_post_type_name($this->indexing_data->get('post_type'));
 		$lang_message = '';
 
 		if ($this->process_all_languages) {
@@ -196,7 +216,7 @@ class Data_Index {
 		}
 
 
-		$this->ajax_response( false, "Indexing \"$post_type\" type contents".$lang_message."..." );
+		$this->ajax_response(false, "Indexing \"$post_type\" type contents" . $lang_message . "...");
 	}
 
 	/**
@@ -207,14 +227,20 @@ class Data_Index {
 	 * @param string $language Language code of posts to index.
 	 * @return bool True if the indexing has finished.
 	 */
-	public function index_posts($language = null) {
+	public function index_posts($language = null)
+	{
+
+		// Profiler Start
+		$this->profiler->start();
+		$this->profiler->log('-------------------------------------------------------------------------------------------------------------------------------------');
+		$this->profiler->log_time('Indexing Batch started');
 
 		if (self::$should_fail) {
-			$this->ajax_response_error( array(
+			$this->ajax_response_error(array(
 				'status'  => Api_Status::$unknown_error,
 				'message' => 'Some text for forced error',
 				'error'   => true
-			) );
+			));
 
 			return;
 		}
@@ -230,17 +256,16 @@ class Data_Index {
 		//$this->maybe_remove_posts();
 
 
-
 		// Load languages
-		$this->log->log( 'Load Languages' );
+		$this->log->log('Load Languages');
 		$this->load_languages();
-		$this->log->log( $this->languages );
+		$this->log->log($this->languages);
 
 
 		// Load the data that we'll use to fetch posts.
-		$this->log->log( 'Load Post Types' );
+		$this->log->log('Load Post Types');
 		$this->load_post_types();
-		$this->log->log( $this->post_types );
+		$this->log->log($this->post_types);
 
 
 		// Count have many posts there are to process
@@ -251,16 +276,16 @@ class Data_Index {
 		// This is done because "load_posts_id" can skip a post type
 		// if it contains 0 posts, but we still need to remove
 		// the post type, or the old posts will remain in the DB.
-		$this->log->log( 'Load Post IDs' );
+		$this->log->log('Load Post IDs');
 		$this->load_posts_ids($language);
-		$this->log->log( 'Post IDs : ' );
-		$this->log->log( $this->posts_ids );
+		$this->log->log('Post IDs : ');
+		$this->log->log($this->posts_ids);
 
 
 		// Get API client instance (for current language)
 		$language = $this->indexing_data->get('lang');
-		$this->log->log( 'Index Posts  - lang: ' . $language );
-		$this->log->log( 'Index Posts  - Get API Client Instance' );
+		$this->log->log('Index Posts  - lang: ' . $language);
+		$this->log->log('Index Posts  - Get API Client Instance');
 		$this->api = Api_Factory::get($language, true);
 
 		// We fetch next batch of post IDs, from the current post type,
@@ -268,15 +293,19 @@ class Data_Index {
 		// If we hit 0 posts at this point that means we checked current
 		// post type, advanced to the next one, there was none, which
 		// means we are done.
-		if ( $this->post_count === 0 ) {
+		if ($this->post_count === 0) {
 
 			// We are done so replace real index with temp one.
 			// If replacing is not successfull will send api error response.
-			$this->log->log( 'Index Posts  - Call replace Index' );
+			$this->log->log('Index Posts  - Call replace Index');
 			$this->call_replace_index();
 
 			// Set indexing status if above is successfull
-			$this->indexing_data->set( 'status', 'completed' );
+			$this->indexing_data->set('status', 'completed');
+
+			// End profiler and log data
+			$this->profiler->end();
+			$this->profiler->log_time('Indexing Batch ended', false, true);
 
 			return true;
 		}
@@ -299,10 +328,13 @@ class Data_Index {
 		// we'll advance the "pointer" pointing to the last
 		// indexed post.
 
-		if ( $this->items ) {
+		if ($this->items) {
+
+			// Profiler Start
+			$this->profiler->start();
 
 			$sent_to_api = $this->api->send_batch(
-				$this->indexing_data->get( 'post_type' ),
+				$this->indexing_data->get('post_type'),
 				$this->items,
 				$this->indexing_data->get('lang')
 			);
@@ -310,18 +342,17 @@ class Data_Index {
 			// Show ajax response from api response body
 			if (is_array($sent_to_api)) {
 
-				$this->ajax_response_error( array(
+				$this->ajax_response_error(array(
 					'status'  => $sent_to_api['status'] ?? '',
 					'message' => $sent_to_api['message'] ?? '',
 					'error'   => isset($sent_to_api['error']) ? $sent_to_api['error'] : true
-				) );
-
-			} else if ( $sent_to_api !== Api_Status::$success ) {
-				$post_type = $this->get_post_type_name( $this->indexing_data->get( 'post_type' ) );
+				));
+			} else if ($sent_to_api !== Api_Status::$success) {
+				$post_type = $this->get_post_type_name($this->indexing_data->get('post_type'));
 
 				$lang_message = '';
 
-				if ( $this->process_all_languages ) {
+				if ($this->process_all_languages) {
 					$language_code = $this->get_language_name($this->indexing_data->get('lang'));
 					$lang_message = " for \"$language_code\" language";
 				}
@@ -330,33 +361,35 @@ class Data_Index {
 				// For example when api key or hash id is invalid we do not need to retry the request
 				$error = false;
 
-				$message = __( "Indexing \"$post_type\" type contents". $lang_message ."...", 'woocommerce-doofinder' );
+				$message = __("Indexing \"$post_type\" type contents" . $lang_message . "...", 'woocommerce-doofinder');
 
-				if ( $sent_to_api === Api_Status::$indexing_in_progress ) {
-					$message = __( "Processing \"$post_type\" index". $lang_message ."...", 'woocommerce-doofinder' );
+				if ($sent_to_api === Api_Status::$indexing_in_progress) {
+					$message = __("Processing \"$post_type\" index" . $lang_message . "...", 'woocommerce-doofinder');
 				}
 
-				if ( $sent_to_api === Api_Status::$invalid_search_engine ) {
+				if ($sent_to_api === Api_Status::$invalid_search_engine) {
 					$error = true;
-					$message = __( "Invalid search engine. Please check hash id". $lang_message, 'woocommerce-doofinder' );
+					$message = __("Invalid search engine. Please check hash id" . $lang_message, 'woocommerce-doofinder');
 				}
 
-				if ( $sent_to_api === Api_Status::$not_authenticated ) {
+				if ($sent_to_api === Api_Status::$not_authenticated) {
 					$error = true;
-					$message = __( "Request not authenticated. Please check API key". $lang_message, 'woocommerce-doofinder' );
+					$message = __("Request not authenticated. Please check API key" . $lang_message, 'woocommerce-doofinder');
 				}
 
-				if ( $sent_to_api === Api_Status::$unknown_error ) {
+				if ($sent_to_api === Api_Status::$unknown_error) {
 					$error = true;
-					$message = __( "An unknown error has occured while indexing data", 'woocommerce-doofinder' );
+					$message = __("An unknown error has occured while indexing data", 'woocommerce-doofinder');
 				}
 
-				$this->ajax_response_error( array(
+				$this->ajax_response_error(array(
 					'status'  => $sent_to_api,
 					'message' => $message,
 					'error'   => $error
-				) );
+				));
 			}
+			// End profiler and log data
+			$this->profiler->end('API', 'Batch sent', false);
 		}
 
 		// We land here in two cases:
@@ -365,8 +398,12 @@ class Data_Index {
 		// 2. There were no items. This happens when for example we hit
 		//    a batch of posts that all have settings preventing them
 		//    from being indexed.
-		$this->log->log( 'Push Pointer Forwards' );
+		$this->log->log('Push Pointer Forwards');
 		$this->push_pointer_forwards();
+
+		// End profiler and log data
+		$this->profiler->end();
+		$this->profiler->log_time('Indexing Batch ended', false, true);
 
 		return false;
 	}
@@ -374,34 +411,40 @@ class Data_Index {
 	/**
 	 * Remove all post types, but only once, at the beginning of indexing process.
 	 */
-	private function maybe_remove_posts() {
-		if ( $this->indexing_data->get( 'status' ) === 'processing' ) {
+	private function maybe_remove_posts()
+	{
+		if ($this->indexing_data->get('status') === 'processing') {
 			return;
 		}
 
 		$types_removed = $this->api->remove_types();
 
-		$this->indexing_data->set( 'status', 'processing' );
+		$this->indexing_data->set('status', 'processing');
 
-		if ( $types_removed !== Api_Status::$success ) {
-			$this->ajax_response_error( array(
+		if ($types_removed !== Api_Status::$success) {
+			$this->ajax_response_error(array(
 				'status'  => $types_removed,
-				'message' => __( 'Deleting objects...', 'woocommerce-doofinder' ),
-			) );
+				'message' => __('Deleting objects...', 'woocommerce-doofinder'),
+			));
 		}
 
-		$this->indexing_data->set( 'post_types_removed', Settings::get_post_types_to_index() );
+		$this->indexing_data->set('post_types_removed', Settings::get_post_types_to_index());
 	}
 
 	/**
 	 * Set status to prcessing at the beginning of indexing process.
 	 */
-	private function set_processing_status() {
-		if ( $this->indexing_data->get( 'status' ) === 'processing' ) {
+	private function set_processing_status()
+	{
+		$this->profiler->start();
+
+		if ($this->indexing_data->get('status') === 'processing') {
 			return;
 		}
 
-		$this->indexing_data->set( 'status', 'processing' );
+		$this->indexing_data->set('status', 'processing');
+
+		$this->profiler->end('PHP', 'Processing status set');
 	}
 
 	/**
@@ -409,14 +452,21 @@ class Data_Index {
 	 *
 	 * @since 1.0.0
 	 */
-	private function load_post_types() {
+	private function load_post_types()
+	{
+		// Profiler Start
+		$this->profiler->start();
+
 		$post_types       = Post_Types::instance();
 		$this->post_types = $post_types->get_indexable();
 
 		// if we start indexing, then post type is not set, so we get first post type from list
-		if ( ! $this->indexing_data->get( 'post_type' ) ) {
-			$this->indexing_data->set( 'post_type', $this->post_types[0] );
+		if (!$this->indexing_data->get('post_type')) {
+			$this->indexing_data->set('post_type', $this->post_types[0]);
 		}
+
+		// End profiler and log data
+		$this->profiler->end('PHP', 'Post types loaded');
 	}
 
 	/**
@@ -424,30 +474,38 @@ class Data_Index {
 	 *
 	 * @since 1.0.0
 	 */
-	private function load_languages() {
+	private function load_languages()
+	{
+		// Profiler Start
+		$this->profiler->start();
 
 		if (!$this->process_all_languages) {
 
-			if ( ! $this->indexing_data->get( 'lang' ) ) {
-				$this->indexing_data->set( 'lang', $this->current_language );
+			if (!$this->indexing_data->get('lang')) {
+				$this->indexing_data->set('lang', $this->current_language);
 			}
+
+			// End profiler and log data
+			$this->profiler->end('DB', 'Languages loaded');
 
 			return;
 		}
 
 		$languages = $this->language->get_languages();
 
-		if(is_array($languages)) {
+		if (is_array($languages)) {
 			$this->languages = array_keys($languages);
 		} else {
 			$this->languages = [''];
 		}
 
 		// if we start indexing, then language is not set, so we get first language from list
-		if ( ! $this->indexing_data->get( 'lang' ) ) {
-			$this->indexing_data->set( 'lang', $this->languages[0] );
+		if (!$this->indexing_data->get('lang')) {
+			$this->indexing_data->set('lang', $this->languages[0]);
 		}
 
+		// End profiler and log data
+		$this->profiler->end('DB', 'Languages loaded');
 	}
 
 	/**
@@ -455,20 +513,24 @@ class Data_Index {
 	 *
 	 * @since 1.0.0
 	 */
-	private function load_posts_ids($language = null) {
-		$last_id        = $this->indexing_data->get( 'post_id' );
-		$post_type      = $this->indexing_data->get( 'post_type' );
+	private function load_posts_ids($language = null)
+	{
+		// Start Profiler
+		$this->profiler->start();
 
-		$lang 		    = $this->indexing_data->get( 'lang' );
+		$last_id        = $this->indexing_data->get('post_id');
+		$post_type      = $this->indexing_data->get('post_type');
 
-		$this->log->log( 'Load Posts Ids - lang : ' . $lang );
-		$this->log->log( 'Load Posts Ids - post_type : ' . $post_type );
+		$lang 		    = $this->indexing_data->get('lang');
+
+		$this->log->log('Load Posts Ids - lang : ' . $lang);
+		$this->log->log('Load Posts Ids - post_type : ' . $post_type);
 
 		$posts_per_page = self::$posts_per_page;
 
 		if ($language) {
 			$lang_code = $language;
- 		} else {
+		} else {
 			$lang_code = $lang;
 		}
 
@@ -480,13 +542,13 @@ class Data_Index {
 			$posts_per_page
 		);
 
-		$this->post_count = count( $this->posts_ids );
+		$this->post_count = count($this->posts_ids);
 
 		// Get API Class instance so we can check if search engine is valid
 		// If not then we skip to next type / language
 		//$api = Api_Factory::get();
 
-		if ( $this->post_count === 0 /* || !$api->search_engine  */) {
+		if ($this->post_count === 0 /* || !$api->search_engine  */) {
 
 			// If search engine is invalid we don't want to call the request for replacing index
 			// $skip_replace_index = !$api->search_engine ? true : false;
@@ -495,11 +557,14 @@ class Data_Index {
 			// 	$this->log->log('Load Posts Ids - check next post type - true ');
 			// 	$this->load_posts_ids();
 			// } else
-			if ( $this->process_all_languages && $this->check_next_language(/* $skip_replace_index */) ) {
+			if ($this->process_all_languages && $this->check_next_language(/* $skip_replace_index */)) {
 				$this->log->log('Load Posts Ids - check next language - true ');
 				$this->load_posts_ids();
 			}
 		}
+
+		// End profiler and log data
+		$this->profiler->end('DB', 'Posts IDs Loaded');
 	}
 
 	/**
@@ -507,19 +572,20 @@ class Data_Index {
 	 *
 	 * @since 1.0.0
 	 */
-	private function load_posts() {
+	private function load_posts()
+	{
 		// Whilst the default WP_Query post_status is "publish",
 		// attachments have a default post_status of "inherit".
 		// This means no attachments will be returned unless we
 		// also explicitly set post_status to "inherit" or "any".
-		if ( $this->indexing_data->get( 'post_type' ) === 'attachment' ) {
+		if ($this->indexing_data->get('post_type') === 'attachment') {
 			$post_status = 'inherit';
 		} else {
 			$post_status = 'publish';
 		}
 
 		$args = array(
-			'post_type'   => $this->indexing_data->get( 'post_type' ),
+			'post_type'   => $this->indexing_data->get('post_type'),
 			'post__in'    => $this->posts_ids,
 			'post_status' => $post_status,
 
@@ -532,7 +598,7 @@ class Data_Index {
 			'update_post_term_cache' => false,
 		);
 
-		$query = new \WP_Query( $args );
+		$query = new \WP_Query($args);
 
 		$this->posts = $query->posts;
 	}
@@ -542,9 +608,10 @@ class Data_Index {
 	 *
 	 * @since 1.0.0
 	 */
-	private function load_posts_meta() {
+	private function load_posts_meta()
+	{
 		global $wpdb;
-		$posts_ids_list = implode( ', ', $this->posts_ids );
+		$posts_ids_list = implode(', ', $this->posts_ids);
 
 		$visibility_meta  = Post::$options['visibility']['meta_name'];
 		$yoast_visibility = Post::$options['yoast_visibility']['meta_name'];
@@ -560,7 +627,7 @@ class Data_Index {
 			ORDER BY $wpdb->postmeta.post_id
 		 ";
 
-		$this->posts_meta = $wpdb->get_results( $query, OBJECT );
+		$this->posts_meta = $wpdb->get_results($query, OBJECT);
 	}
 
 	/**
@@ -568,31 +635,37 @@ class Data_Index {
 	 *
 	 * @since 1.0.0
 	 */
-	private function generate_items() {
+	private function generate_items()
+	{
 
-		// Use functionality from XML data feed to retrieve products
-		$this->log->log( 'Generate items - Start ');
-		$this->log->log( 'Current Memory Usage: ' . Helpers::get_memory_usage()  );
+		// Start Profiler
+		$this->profiler->start();
+
+		$this->log->log('Generate items - Start ');
+		$this->log->log('Current Memory Usage: ' . Helpers::get_memory_usage());
 		//$this->log->log( 'Generate items - Start :  ' . $this->indexing_data->get('lang'));
 
-		$this->log->log( 'Generate items - Get Data Feed Instance ');
-		$data_feed = new Data_Feed( false, $this->posts_ids, $this->indexing_data->get('lang'));
+		$this->log->log('Generate items - Get Data Feed Instance ');
+		// Use functionality from XML data feed to retrieve products
+		$data_feed = new Data_Feed(false, $this->posts_ids, $this->indexing_data->get('lang'));
 
-		$this->log->log( 'Generate items - Get Items ');
+		$this->log->log('Generate items - Get Items ');
 		$this->items = $data_feed->get_items();
 
-		$this->log->log( 'Generate items - Set Current Progress ');
+		$this->log->log('Generate items - Set Current Progress ');
 		$current_progress = $this->indexing_data->get('current_progress');
 		$this->indexing_data->set('current_progress', $current_progress + count($this->items));
 
-		if(!empty($this->items)) {
-			$this->log->log( 'Generate items - Items generated : ' . count($this->items) );
-			$this->log->log( 'Generate items - Items : ' );
-			$this->log->log( $this->items );
+		if (!empty($this->items)) {
+			$this->log->log('Generate items - Items generated : ' . count($this->items));
+			$this->log->log('Generate items - Items : ');
+			$this->log->log($this->items);
 		} else {
-			$this->log->log( 'Generate items - No Items generated' );
+			$this->log->log('Generate items - No Items generated');
 		}
 
+		// End profiler and log data
+		$this->profiler->end('DB', 'Items (products) generated');
 	}
 
 	/**
@@ -603,14 +676,15 @@ class Data_Index {
 	 * to the API, because if API call fails, and we move forward
 	 * despite that, then we will miss some posts.
 	 */
-	private function push_pointer_forwards() {
-		if ( ! $this->posts_ids ) {
+	private function push_pointer_forwards()
+	{
+		if (!$this->posts_ids) {
 			return;
 		}
 
 		$this->indexing_data->set(
 			'post_id',
-			$this->posts_ids[ count( $this->posts_ids ) - 1 ]
+			$this->posts_ids[count($this->posts_ids) - 1]
 		);
 	}
 
@@ -621,27 +695,30 @@ class Data_Index {
 	 * @since 1.0.0
 	 * @return bool
 	 */
-	private function check_next_($item, $container, $get_new_api = false, $skip_replace_index = false) {
-		$current_item_index = array_search( $this->indexing_data->get( $item ), $container );
+	private function check_next_($item, $container, $get_new_api = false, $skip_replace_index = false)
+	{
+
+
+		$current_item_index = array_search($this->indexing_data->get($item), $container);
 		$next_item_index    = $current_item_index + 1;
 
-		if ( isset( $container[ $next_item_index ] ) && $container[ $next_item_index ] ) {
+		if (isset($container[$next_item_index]) && $container[$next_item_index]) {
 
-			if(!$skip_replace_index) {
+			if (!$skip_replace_index) {
 				// We are done with this batch, replace temp index
-				$this->log->log( 'Check Next '.$item.'  - Call replace Index' );
+				$this->log->log('Check Next ' . $item . '  - Call replace Index');
 				if ($this->api) {
 					$this->call_replace_index($get_new_api);
 				}
 			}
 
-			$this->indexing_data->set( $item, $container[ $next_item_index ] );
-			$this->indexing_data->set( 'post_id', 0 );
+			$this->indexing_data->set($item, $container[$next_item_index]);
+			$this->indexing_data->set('post_id', 0);
 
-			$current_progress = $this->indexing_data->get( 'current_progress' );
-			$this->log->log( 'Check Next '.$item.' - Current progress: ' , $current_progress );
+			$current_progress = $this->indexing_data->get('current_progress');
+			$this->log->log('Check Next ' . $item . ' - Current progress: ', $current_progress);
 
-			$this->indexing_data->set( 'processed_posts_count', $current_progress );
+			$this->indexing_data->set('processed_posts_count', $current_progress);
 
 			return true;
 		}
@@ -657,8 +734,9 @@ class Data_Index {
 	 * @param bool $skip_replace_index
 	 * @return bool
 	 */
-	private function check_next_post_type($skip_replace_index = false) {
-		return $this->check_next_( 'post_type', $this->post_types, false, $skip_replace_index );
+	private function check_next_post_type($skip_replace_index = false)
+	{
+		return $this->check_next_('post_type', $this->post_types, false, $skip_replace_index);
 	}
 
 	/**
@@ -669,8 +747,9 @@ class Data_Index {
 	 * @param bool $skip_replace_index
 	 * @return bool
 	 */
-	private function check_next_language($skip_replace_index = false) {
-		return $this->check_next_( 'lang', $this->languages, true, $skip_replace_index );
+	private function check_next_language($skip_replace_index = false)
+	{
+		return $this->check_next_('lang', $this->languages, true, $skip_replace_index);
 	}
 
 	/**
@@ -681,7 +760,8 @@ class Data_Index {
 	 * @param bool   $completed Status of indexing posts.
 	 * @param string $message Additional message to pass to front.
 	 */
-	private function ajax_response( $completed, $message = '' ) {
+	private function ajax_response($completed, $message = '')
+	{
 		// We're about to call "die", so we need to make sure our data
 		// gets saved. Originally this was in the destructor but there
 		// was an error - when sometimes WP cache crashed destructor
@@ -690,16 +770,16 @@ class Data_Index {
 
 		$content = array(
 			'completed' => $completed,
-			'progress'  => $this->calculate_progress(),
+			'progress'  => $this->calculate_progress(false, true),
 		);
 
 		$this->indexing_data->save();
 
-		if ( $message ) {
+		if ($message) {
 			$content['message'] = $message;
 		}
 
-		wp_send_json_success( $content );
+		wp_send_json_success($content);
 	}
 
 	/**
@@ -708,7 +788,8 @@ class Data_Index {
 	 *
 	 * @param array $args Arguments for "wp_send_json_error".
 	 */
-	private function ajax_response_error( $args = array() ) {
+	private function ajax_response_error($args = array())
+	{
 		// We're about to call "die", so we need to make sure our data
 		// gets saved. Originally this was in the destructor but there
 		// was an error - when sometimes WP cache crashed destructor
@@ -716,7 +797,7 @@ class Data_Index {
 		// in the DB as a result.
 		$this->indexing_data->save();
 
-		wp_send_json_error( $args );
+		wp_send_json_error($args);
 	}
 
 	/**
@@ -741,7 +822,11 @@ class Data_Index {
 	 *
 	 * @return float Percentage of already processed posts.
 	 */
-	private function calculate_progress($get_count_all = false) {
+	private function calculate_progress($get_count_all = false, $completed = false)
+	{
+		// Start Profiler
+		$this->profiler->start();
+
 		global $wpdb;
 		global $sitepress;
 
@@ -750,9 +835,9 @@ class Data_Index {
 		}
 
 		if (!$get_count_all) {
-			$this->log->log( 'Current Memory Usage: ' . Helpers::get_memory_usage()  );
+			$this->log->log('Current Memory Usage: ' . Helpers::get_memory_usage());
 			//$this->log->log( 'Real Size OF Memory Allocated From System: ' . round(memory_get_usage(true)/1048576,2) . ' MB' );
-			$this->log->log( 'Peak Memory Usage: ' . Helpers::get_memory_usage(false,true) );
+			$this->log->log('Peak Memory Usage: ' . Helpers::get_memory_usage(false, true));
 			//$this->log->log( 'Peak Memory Usage (real): ' . round(memory_get_peak_usage(true)/1048576,2) . ' MB'  );
 
 			//$this->log->log( '---- Calculate Progress' );
@@ -761,13 +846,13 @@ class Data_Index {
 		// Essentially - how many total posts are there to index.
 		$split_variable_lang = $sitepress ? 'all' : '';
 
-		$this->log->log('Calculate Progress - Split Variabable: ' . Settings::get( 'feed', 'split_variable', $split_variable_lang ));
+		$this->log->log('Calculate Progress - Split Variabable: ' . Settings::get('feed', 'split_variable', $split_variable_lang));
 
-		if ('yes' === Settings::get( 'feed', 'split_variable', $split_variable_lang )) {
+		if ('yes' === Settings::get('feed', 'split_variable', $split_variable_lang)) {
 			$this->post_types[] = 'product_variation';
 		}
 
-		$post_types_list = $this->make_sql_list( $this->post_types );
+		$post_types_list = $this->make_sql_list($this->post_types);
 
 		//$this->log->log( 'Calculate Progress - Post types list : ' . $post_types_list );
 
@@ -775,7 +860,7 @@ class Data_Index {
 		$lang = $this->indexing_data->get('lang');
 
 		if (!$get_count_all) {
-			$this->log->log( 'Calculate Progress - current lang: "'. $lang .'"' );
+			$this->log->log('Calculate Progress - current lang: "' . $lang . '"');
 		}
 
 		$query = "";
@@ -805,7 +890,7 @@ class Data_Index {
 					)
 				)
 			";
-		} else if ($this->process_all_languages  ) {
+		} else if ($this->process_all_languages) {
 			// WMPL is active and we want to count posts for all languages. Make sure to get product
 			// variations that are not child of a product with 'draft' status
 			$query .= "
@@ -832,7 +917,6 @@ class Data_Index {
 					)
 				)
 			";
-
 		} else {
 			// When mulilang (WPML) is active we need to calculate posts only for
 			// that language so we need to join translations table to the query
@@ -878,8 +962,8 @@ class Data_Index {
 
 		// Take all post types that are before the post type we're
 		// currently working on.
-		foreach ( $this->post_types as $post_type ) {
-			if ( $post_type === $this->indexing_data->get( 'post_type' ) ) {
+		foreach ($this->post_types as $post_type) {
+			if ($post_type === $this->indexing_data->get('post_type')) {
 				break;
 			}
 
@@ -888,8 +972,8 @@ class Data_Index {
 
 
 		// Ok, if we have already indexed post types, add them to query.
-		if ( $indexed_post_types ) {
-			$indexed_post_types_list = $this->make_sql_list( $indexed_post_types );
+		if ($indexed_post_types) {
+			$indexed_post_types_list = $this->make_sql_list($indexed_post_types);
 
 
 			$query .= "
@@ -910,7 +994,6 @@ class Data_Index {
 				WHERE $wpdb->posts.post_type IN ($indexed_post_types_list)
 				AND {$wpdb->prefix}icl_translations.language_code='{$this->indexing_data->get('lang')}'
 				";
-
 			} else {
 				$query .= "
 					WHERE $wpdb->posts.post_type IN ($indexed_post_types_list)
@@ -921,17 +1004,16 @@ class Data_Index {
 				)
 			    AS 'already_processed'
 			";
-
 		}
 
 		if (!$get_count_all) {
-			$this->log->log( 'Calculate Progress - Query:' );
-			$this->log->log( $query );
+			$this->log->log('Calculate Progress - Query:');
+			$this->log->log($query);
 		}
 		// Add posts from the currently processed post type.
-		if ( $this->indexing_data->get( 'post_type' ) ) {
-			$post_type = $this->indexing_data->get( 'post_type' );
-			$last_id   = $this->indexing_data->get( 'post_id' );
+		if ($this->indexing_data->get('post_type')) {
+			$post_type = $this->indexing_data->get('post_type');
+			$last_id   = $this->indexing_data->get('post_id');
 
 			$query .= "
 				, -- Separates this select from previous
@@ -945,7 +1027,7 @@ class Data_Index {
 
 
 
-			if ('yes' === Settings::get( 'feed', 'split_variable' ) && $post_type === 'product') {
+			if ('yes' === Settings::get('feed', 'split_variable') && $post_type === 'product') {
 				$post_type_query = "($wpdb->posts.post_type = '$post_type' OR $wpdb->posts.post_type = '{$post_type}_variation')";
 			} else {
 				$post_type_query = "$wpdb->posts.post_type = '$post_type'";
@@ -956,13 +1038,12 @@ class Data_Index {
 				$query .= "
 					LEFT JOIN {$wpdb->prefix}icl_translations
 					ON $wpdb->posts.ID = {$wpdb->prefix}icl_translations.element_id
-					WHERE ".$post_type_query."
+					WHERE " . $post_type_query . "
 					AND {$wpdb->prefix}icl_translations.language_code='{$this->indexing_data->get('lang')}'
 				";
-
 			} else {
 				$query .= "
-					WHERE ".$post_type_query."
+					WHERE " . $post_type_query . "
 				";
 			}
 
@@ -976,30 +1057,38 @@ class Data_Index {
 
 		// Check if returned data is valid. It should be array containing one element
 		// (query returns one row of results)
-		$result = $wpdb->get_results( $query );
+		$result = $wpdb->get_results($query);
 
 
 
 		//$this->log->log( 'Calculate Progress - Result:' );
 		//$this->log->log( $result );
 
-		if ( ! $result || ! $result[0] ) {
+		if (!$result || !$result[0]) {
+
+			// End profiler and log data
+			$this->profiler->end('DB', 'Progress Calculated');
+
 			return 0;
 		}
 
 		$result = $result[0];
 
 
-		if ( $get_count_all ) {
-			$this->log->log( 'Calculate Progress - All posts to index: ' . $result->all_posts);
-			$this->indexing_data->set( 'all_posts_count', $result->all_posts );
+		if ($get_count_all) {
+			$this->log->log('Calculate Progress - All posts to index: ' . $result->all_posts);
+			$this->indexing_data->set('all_posts_count', $result->all_posts);
+
+			// End profiler and log data
+			$this->profiler->end('DB', 'Progress Calculated');
+
 			return $result->all_posts;
 		}
 
-		$already_processed = $this->indexing_data->get( 'processed_posts_count' );
-		$current_progress_get = $this->indexing_data->get( 'current_progress' );
+		$already_processed = $this->indexing_data->get('processed_posts_count');
+		$current_progress_get = $this->indexing_data->get('current_progress');
 
-		$this->log->log( 'Calculate Progress - Current Progress get: ' . $current_progress_get);
+		$this->log->log('Calculate Progress - Current Progress get: ' . $current_progress_get);
 		//$this->log->log( 'Calculate Progress - Already Processed get: ' . $already_processed);
 		//$this->log->log( 'Calculate Progress - Result:' );
 		//$this->log->log( $result );
@@ -1019,18 +1108,22 @@ class Data_Index {
 
 		$processed_posts = $current_progress_get;
 
-		$this->log->log( 'Calculate Progress - Processed: ' . $processed_posts . ' out of: ' . $result->all_posts );
+		$this->log->log('Calculate Progress - Processed: ' . $processed_posts . ' out of: ' . $result->all_posts);
 
-		$this->indexing_data->set( 'current_progress', $processed_posts );
+		$this->indexing_data->set('current_progress', $processed_posts);
 
-		if ( $processed_posts > 0 ) {
-			$current_progress = ( $processed_posts / $result->all_posts ) * 100;
+		if ($processed_posts > 0) {
+			$current_progress = ($processed_posts / $result->all_posts) * 100;
 		} else {
 			$current_progress = 100;
-			$this->log->log( 'No items found.' );
+			$this->log->log('No items found.');
 		}
 
-		$this->log->log( 'Calculate Progress - Summary: ' . round($current_progress,2) . '%' );
+		$this->log->log('Calculate Progress - Summary: ' . round($current_progress, 2) . '%');
+
+		// End profiler and log data
+		$this->profiler->end('DB', 'Progress Calculated', false, $completed === true ? true : false);
+
 		return $current_progress;
 	}
 
@@ -1043,10 +1136,11 @@ class Data_Index {
 	 *
 	 * @return string
 	 */
-	private function make_sql_list( array $items ) {
-		return implode( ',', array_map( function ( $item ) {
+	private function make_sql_list(array $items)
+	{
+		return implode(',', array_map(function ($item) {
 			return "'$item'";
-		}, $items ) );
+		}, $items));
 	}
 
 	/**
@@ -1056,9 +1150,10 @@ class Data_Index {
 	 *
 	 * @return string
 	 */
-	private function get_post_type_name( $slug ) {
-		$post_type = get_post_type_object( $slug );
-		if ( ! $post_type ) {
+	private function get_post_type_name($slug)
+	{
+		$post_type = get_post_type_object($slug);
+		if (!$post_type) {
 			return $slug;
 		}
 
@@ -1072,10 +1167,11 @@ class Data_Index {
 	 *
 	 * @return string
 	 */
-	private function get_language_name( $code ) {
+	private function get_language_name($code)
+	{
 		$languages = $this->language->get_languages();
 
-		if ( ! $languages ) {
+		if (!$languages) {
 			return $code;
 		}
 
@@ -1087,43 +1183,48 @@ class Data_Index {
 	 * We are done so replace real index with temp one. Call replace temp index API method.
 	 *
 	 */
-	private function call_replace_index($get_api = false) {
+	private function call_replace_index($get_api = false)
+	{
+		// Start Profiler
+		$this->profiler->start();
 
 		if ($get_api) {
 			$language = $this->indexing_data->get('lang');
 			//$this->log->log( 'Call Replace Index  - lang: ' . $language );
-			$this->log->log( 'Call Replace Index  - Get API Client Instance' );
+			$this->log->log('Call Replace Index  - Get API Client Instance');
 			$this->api = Api_Factory::get($language);
 		}
 
-		$post_type = $this->indexing_data->get( 'post_type' );
+		$post_type = $this->indexing_data->get('post_type');
 
 		$api_response = $this->api->replace_index($post_type);
 
-		$this->log->log( $api_response );
+		$this->log->log($api_response);
 
-		if ( $api_response !== Api_Status::$success ) {
+		if ($api_response !== Api_Status::$success) {
 
-			$message = __( "Replacing Index \"$post_type\" with temporary one.", 'woocommerce-doofinder' );
+			$message = __("Replacing Index \"$post_type\" with temporary one.", 'woocommerce-doofinder');
 
 			// if ( $sent_to_api === Api_Status::$indexing_in_progress ) {
 			// 	$message = __( "Deleting \"$post_type\" type...", 'woocommerce-doofinder' );
 			// }
 
-			$this->ajax_response_error( array(
+			$this->ajax_response_error(array(
 				'status'  => $api_response,
 				'message' => $message,
-			) );
+			));
 		}
+
+		// End profiler and log data
+		$this->profiler->end('API', 'Index replaced');
 	}
-
-
 	/**
 	 * Check index status if it is up to date with db changes. Compare last modified dates
 	 * for index and db changes.
 	 *
 	 */
-	public static function is_index_data_up_to_date() {
+	public static function is_index_data_up_to_date()
+	{
 		$last_modified_db = (int) Settings::get_last_modified_db();
 		$last_modified_index = (int) Settings::get_last_modified_index();
 
@@ -1133,6 +1234,4 @@ class Data_Index {
 			return false;
 		}
 	}
-
-
 }
