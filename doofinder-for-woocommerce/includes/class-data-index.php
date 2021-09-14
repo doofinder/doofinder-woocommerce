@@ -665,7 +665,7 @@ class Data_Index
 		}
 
 		// End profiler and log data
-		$this->profiler->end('DB', 'Items (products) generated');
+		$this->profiler->end('DB', 'Items (products)(' . count($this->items) . ') generated');
 	}
 
 	/**
@@ -899,7 +899,7 @@ class Data_Index
 				SELECT COUNT(DISTINCT posts.ID)
 				FROM {$wpdb->prefix}icl_translations as translations
 				LEFT JOIN {$wpdb->prefix}posts as posts
-					ON ( translations.element_id = posts.ID OR translations.element_id = posts.post_parent )
+					ON ( translations.element_id = posts.ID )
 				LEFT JOIN {$wpdb->prefix}posts as postparents
                 	ON posts.post_parent = postparents.ID
 				WHERE posts.post_type IN ($post_types_list)
@@ -928,7 +928,7 @@ class Data_Index
 				SELECT COUNT(DISTINCT posts.ID)
 				FROM {$wpdb->prefix}icl_translations as translations
 				LEFT JOIN {$wpdb->prefix}posts as posts
-					ON ( translations.element_id = posts.ID OR translations.element_id = posts.post_parent )
+					ON ( translations.element_id = posts.ID  )
 				LEFT JOIN {$wpdb->prefix}posts as postparents
                 	ON posts.post_parent = postparents.ID
 				WHERE translations.language_code = '{$lang}'
@@ -1054,6 +1054,9 @@ class Data_Index
 				AS 'current_progress'
 			";
 		}
+
+		//$this->log->log('Calculate Progress - Query:');
+		//$this->log->log($query);
 
 		// Check if returned data is valid. It should be array containing one element
 		// (query returns one row of results)
