@@ -138,6 +138,7 @@ if (
 					Index_Interface::instance();
 				} else {
 					Front::instance();
+					Post::register_rest_api_webhooks();
 				}
 
 				// Register custom WP REST Api endpoint
