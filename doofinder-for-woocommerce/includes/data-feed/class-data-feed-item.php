@@ -113,9 +113,9 @@ class Data_Feed_Item {
 		$this->add_thumbnail();
 		$this->add_prices();
 
-		$this->add_categories();
-
 		$this->add_group_leader();
+
+		$this->add_categories();
 
 		$this->add_tags();
 
@@ -351,8 +351,10 @@ class Data_Feed_Item {
 
 	/**
 	 * Add product leader.
-	 * Product with variations and variations themselves require 'df_group_leader' and 'df grouping_id' fields.
-	 * If product has variations, then variations get his id.
+	 * Product with variations and variations themselves require
+	 * 'df_group_leader' and 'df grouping_id' fields.
+	 * Product with variations is group leader but variations aren`t.
+	 * Variation gets his parent id as a reference.
 	 */
 	private function add_group_leader() {
 		if ( 'no' === $this->settings['split_variable'] ) {
@@ -361,15 +363,19 @@ class Data_Feed_Item {
 
 		$id = $this->post->ID;
 		$product = wc_get_product( $id );
-		$parent = wc_get_product( $product->get_parent_id() ) ?: false;
+		$variation = wc_get_product( $product->get_parent_id() );
 
-		if ( $product->is_type( 'variable' ) ) {
-			$this->fields[ 'df_group_leader' ] = true;
-			$this->fields[ 'df_grouping_id' ] = $id;
+
+		if ( $variation ) {
+			$this->fields[ 'df_group_leader' ] = false;
+			$this->fields[ 'group_id' ] = $variation->get_id();
 		} else {
-			if ( $parent ) {
+			if ( $product->is_type( 'variable' ) ) {
+				$this->fields[ 'df_group_leader' ] = true;
+				$this->fields[ 'group_id' ] = $id;
+			} else {
 				$this->fields[ 'df_group_leader' ] = false;
-				$this->fields[ 'df_grouping_id' ] = $parent->id;
+				$this->fields[ 'group_id' ] = false;
 			}
 		}
 	}

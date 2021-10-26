@@ -1,9 +1,9 @@
 === Doofinder for WooCommerce ===
 Contributors: doofinder
 Tags: search, autocomplete, woocommerce
-Version: 1.5.9
+Version: 1.5.11
 Requires at least: 5.0
-Tested up to: 5.7
+Tested up to: 5.8
 Requires PHP: 5.6
 Stable tag: trunk
 License: GPLv2 or later
@@ -126,25 +126,31 @@ You can click *Delete* to remove the additional attributes from the feed.
 Just send your questions to <mailto:support@doofinder.com> and we will try to answer as fast as possible with a working solution for you.
 
 == Changelog ==
+= 1.5.11 =
+Fix problem on delting products.
+
+= 1.5.10 =
+Fix variants indexing. Fix indexing taking too long time.
+
 = 1.5.9 =
 Extend API Exception logs
 
 = 1.5.8 =
 Set settings form always visible
 
-= 1.5.7 = 
+= 1.5.7 =
 Fix autoloader conflicts
 
-= 1.5.6 = 
+= 1.5.6 =
 Add query params hooks filter
 
-= 1.5.5 = 
+= 1.5.5 =
 Downgrade PHP version requirements
 
 = 1.5.4 =
 Remove uninstall hook
 
-= 1.5.3 = 
+= 1.5.3 =
 Updated PHP version
 
 = 1.5.2 =

@@ -6,11 +6,19 @@ use Doofinder\WC\Api\Api_Factory;
 use Doofinder\WC\Data_Feed;
 use Doofinder\WC\Settings\Settings;
 use Doofinder\WC\Multilanguage\Multilanguage;
+use Doofinder\WC\Log;
 
 
 defined( 'ABSPATH' ) or die();
 
 class Post {
+
+	/**
+	 * Instance of a class used to log to a file.
+	 *
+	 * @var Log
+	 */
+	public static $log;
 
 	/**
 	 * A list of option names/indexes for the additional options of the plugin.
@@ -118,14 +126,49 @@ class Post {
 	 */
 	public static function register_webhooks() {
 		add_action( 'wp_insert_post', function ( $post_id, \WP_Post $post, $updated ) {
-			// Only handle posts from allowed post types.
-			$post_types = Post_Types::instance();
-			if ( ! in_array( $post->post_type, $post_types->get_indexable() ) ) {
-				return;
-			}
-
-			self::webhook_update_post( $post, $updated );
+			self::check_indexable( $post, $updated );
 		}, 99, 3 );
+	}
+
+	/**
+	 * Register api webhooks for creating, modyfing, and removing the post
+	 * via REST API requests. In the case of modification of
+	 * products by REST API requests, the index should be updated
+	 * to avoid displaying outdated or non-existent products.
+	 */
+	public static function register_rest_api_webhooks() {
+		self::$log = new Log( 'api.txt' );
+
+		add_action( 'woocommerce_rest_delete_product_object', function ( $post, $request )  {
+			$post = get_post( $request->data['id'] );
+
+			self::$log->log( 'API request - delete action.' );
+			self::check_indexable( $post, true );
+		}, 99, 2 );
+
+		add_action( 'woocommerce_rest_insert_product_object', function ( $post, $request )  {
+			$post = get_post( $post->get_id() );
+
+			self::$log->log( 'API request - insert action.' );
+			self::check_indexable( $post, true );
+		}, 99, 2 );
+	}
+
+	/**
+	 * Only allowed post types should be indexable.
+	 *
+	 * @param \WP_Post $post
+	 * @param bool $updated
+	 */
+	private static function check_indexable( $post, $updated ) {
+		// $api = Api_Factory::get(null, false, true);
+		$post_types = Post_Types::instance();
+
+		if ( ! in_array( $post->post_type, $post_types->get_indexable() ) ) {
+			return;
+		}
+
+		self::webhook_update_post( $post, $updated );
 	}
 
 	/**
@@ -194,38 +237,38 @@ class Post {
 	 */
 	private static function webhook_update_post( $post, $updated ) {
 
-		// Get update time. Pass this to api methods below so the index update time is 
+		// Get update time. Pass this to api methods below so the index update time is
 		// equal to db update time.
 		$update_time = time();
 
 		// Update last modified date for posts in db
 		Settings::set_last_modified_db('', $update_time);
-		
-		// IF Doofinder search and Doofinder JS layer is disabled we don't want to send 
-		// request to the API so we exit early 
+
+		// IF Doofinder search and Doofinder JS layer is disabled we don't want to send
+		// request to the API so we exit early
 		if ( !Settings::is_internal_search_enabled() && !Settings::is_js_layer_enabled()  ) {
-			
+
 			return;
 		}
-		
+
 		$doofinder_post = new Post( $post );
-		
+
 		// When we create a new post in Wordpress, it is automatically saved
 		// with post status 'auto-draft', so to prevent unnecessary API calls
 		// check if post has status 'auto-draft' and exit early if true
 		if ( $doofinder_post->post->post_status === 'auto-draft' ) {
 			return;
 		}
-		
-		
+
+
 		$api            = Api_Factory::get();
 		$lang 			= Multilanguage::instance();
 		$active_lang 	= $lang->get_active_language();
 
-		
-		// If post is of type 'product' we want to collect post data via 
+
+		// If post is of type 'product' we want to collect post data via
 		// Data_Feed class and get_items() method insead of Post class and
-		// format_for_api() method. 
+		// format_for_api() method.
 
 		if ($doofinder_post->post->post_type === 'product') {
 			$data_feed = new Data_Feed( false, [$doofinder_post->post->ID], $active_lang);
@@ -278,7 +321,7 @@ class Post {
 
 		$this->language = Multilanguage::instance();
 
-		
+
 	}
 
 	/**
@@ -669,10 +712,10 @@ class Post {
 		$query            = "
 			SELECT post_id, meta_key, meta_value
 			FROM $wpdb->postmeta
-			WHERE $wpdb->postmeta.post_id = $post_id 
+			WHERE $wpdb->postmeta.post_id = $post_id
 			AND (
               $wpdb->postmeta.meta_key NOT LIKE '\_%' OR
-              $wpdb->postmeta.meta_key = '$visibility_meta' OR 
+              $wpdb->postmeta.meta_key = '$visibility_meta' OR
               $wpdb->postmeta.meta_key = '$yoast_visibility'
             )
 			ORDER BY $wpdb->postmeta.post_id
