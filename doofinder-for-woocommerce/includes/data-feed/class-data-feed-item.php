@@ -183,7 +183,7 @@ class Data_Feed_Item {
 			$title = $this->attributes->get( 'title', $post );
 		}
 
-		$this->add_field( 'title', $title . $suffix );
+		$this->add_field( 'title', html_entity_decode($title) . $suffix );
 	}
 
 	/**
@@ -199,9 +199,9 @@ class Data_Feed_Item {
 		}
 
 		if ( $this->attributes->have( 'description' ) ) {
-			$this->add_field( 'description', $this->attributes->get( 'description', $post ) );
+			$this->add_field( 'description', html_entity_decode( $this->attributes->get( 'description', $post ) ) );
 		} else {
-			$this->add_field( 'description', $post->post_content );
+			$this->add_field( 'description', html_entity_decode( $post->post_content ) );
 		}
 	}
 
@@ -570,7 +570,7 @@ class Data_Feed_Item {
 		if (isset($term->parent)) {
 			while ( $term->parent ) {
 				$term = $this->terms_cache[ $term->parent ];
-				$path[] = $term->name;
+				$path[] = html_entity_decode($term->name);
 			}
 
 			// Build a path, and cache it for future use.
