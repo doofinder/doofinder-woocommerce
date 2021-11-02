@@ -183,7 +183,7 @@ class Data_Feed_Item {
 			$title = $this->attributes->get( 'title', $post );
 		}
 
-		$this->add_field( 'title', $title . $suffix );
+		$this->add_field( 'title', html_entity_decode($title) . $suffix );
 	}
 
 	/**
@@ -199,9 +199,9 @@ class Data_Feed_Item {
 		}
 
 		if ( $this->attributes->have( 'description' ) ) {
-			$this->add_field( 'description', $this->attributes->get( 'description', $post ) );
+			$this->add_field( 'description', html_entity_decode( $this->attributes->get( 'description', $post ) ) );
 		} else {
-			$this->add_field( 'description', $post->post_content );
+			$this->add_field( 'description', html_entity_decode( $post->post_content ) );
 		}
 	}
 
@@ -352,9 +352,11 @@ class Data_Feed_Item {
 	/**
 	 * Add product leader.
 	 * Product with variations and variations themselves require
-	 * 'df_group_leader' and 'df grouping_id' fields.
+	 * 'df_group_leader' and 'group_id' fields.
 	 * Product with variations is group leader but variations aren`t.
 	 * Variation gets his parent id as a reference.
+	 * 
+	 * @since 1.5.11
 	 */
 	private function add_group_leader() {
 		if ( 'no' === $this->settings['split_variable'] ) {
@@ -368,11 +370,11 @@ class Data_Feed_Item {
 
 		if ( $variation ) {
 			$this->fields[ 'df_group_leader' ] = false;
-			$this->fields[ 'group_id' ] = $variation->get_id();
+			$this->fields[ 'group_id' ] = (string) $variation->get_id();
 		} else {
 			if ( $product->is_type( 'variable' ) ) {
 				$this->fields[ 'df_group_leader' ] = true;
-				$this->fields[ 'group_id' ] = $id;
+				$this->fields[ 'group_id' ] = (string) $id;
 			} else {
 				$this->fields[ 'df_group_leader' ] = false;
 				$this->fields[ 'group_id' ] = false;
@@ -568,7 +570,7 @@ class Data_Feed_Item {
 		if (isset($term->parent)) {
 			while ( $term->parent ) {
 				$term = $this->terms_cache[ $term->parent ];
-				$path[] = $term->name;
+				$path[] = html_entity_decode($term->name);
 			}
 
 			// Build a path, and cache it for future use.
