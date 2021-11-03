@@ -1,7 +1,7 @@
 === Doofinder for WooCommerce ===
 Contributors: doofinder
 Tags: search, autocomplete, woocommerce
-Version: 1.5.11
+Version: 1.5.12
 Requires at least: 5.0
 Tested up to: 5.8
 Requires PHP: 5.6
@@ -126,6 +126,11 @@ You can click *Delete* to remove the additional attributes from the feed.
 Just send your questions to <mailto:support@doofinder.com> and we will try to answer as fast as possible with a working solution for you.
 
 == Changelog ==
+
+= 1.5.12 =
+Fix special chars indexed through api.
+Fix group_id and df_group_id sent as string.
+
 = 1.5.11 =
 Fix problem on delting products.
 
