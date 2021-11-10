@@ -237,6 +237,7 @@ class Data_Feed_Item {
 			foreach ( $values as $key => $val ) {
 				$val = str_replace('/', '//', $val );
 				$values[ $key ] = str_replace( ' | ', '/', $val );
+				$values[ $key ] = html_entity_decode( $val );
 			}
 
 			// Custom attributes added at the product level can have
@@ -355,7 +356,7 @@ class Data_Feed_Item {
 	 * 'df_group_leader' and 'group_id' fields.
 	 * Product with variations is group leader but variations aren`t.
 	 * Variation gets his parent id as a reference.
-	 * 
+	 *
 	 * @since 1.5.11
 	 */
 	private function add_group_leader() {
@@ -421,8 +422,9 @@ class Data_Feed_Item {
 		}
 
 		$tags = array_map( function ( $tag ) {
-			return $tag->name;
+			return html_entity_decode($tag->name);
 		}, $tags );
+
 
 		$this->fields['tags'] = implode( '/', $tags );
 	}
@@ -443,19 +445,19 @@ class Data_Feed_Item {
 		foreach ( $attributes as $attribute ) {
 
 			if( isset($attribute['field']) && isset($attribute['attribute'])) {
-				$this->fields[ $attribute['field'] ] = $this->attributes->get_attribute_value(
+				$this->fields[ $attribute['field'] ] = html_entity_decode($this->attributes->get_attribute_value(
 					$attribute['attribute'],
 					$this->post,
 					$attribute
-				);
+				));
 
 				// Inherit attributes from parent.
 				if ($this->parent) {
-					$this->fields[ $attribute['field'] ] = $this->attributes->get_attribute_value(
+					$this->fields[ $attribute['field'] ] = html_entity_decode($this->attributes->get_attribute_value(
 						$attribute['attribute'],
 						$this->parent,
 						$attribute
-					);
+					));
 				}
 			}
 
@@ -527,9 +529,13 @@ class Data_Feed_Item {
 	private function clean_paths( &$paths ) {
 		sort( $paths );
 		for ( $x = 0, $i = 1, $j = count( $paths ); $i < $j; $x = $i ++ ) {
-			if ( strpos( $paths[ $i ], $paths[ $x ] ) === 0 ) {
-				unset( $paths[ $x ] );
+
+			if ( isset( $paths[ $i ] ) && isset( $paths[ $x ] ) ) {
+				if ( strpos( $paths[ $i ], $paths[ $x ] ) === 0 ) {
+					unset( $paths[ $x ] );
+				}
 			}
+
 			$paths = array_values($paths);
 		}
 	}
