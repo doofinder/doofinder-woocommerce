@@ -112,16 +112,12 @@ class Data_Feed_Item {
 		$this->add_sku();
 		$this->add_thumbnail();
 		$this->add_prices();
-
 		$this->add_group_leader();
-
 		$this->add_categories();
-
 		$this->add_tags();
-
 		$this->add_additional_attributes();
-
 		$this->remove_empty_fields();
+		$this->decode_fields();
 	}
 
 	/**
@@ -183,7 +179,7 @@ class Data_Feed_Item {
 			$title = $this->attributes->get( 'title', $post );
 		}
 
-		$this->add_field( 'title', html_entity_decode($title) . $suffix );
+		$this->add_field( 'title', $title . $suffix );
 	}
 
 	/**
@@ -199,9 +195,9 @@ class Data_Feed_Item {
 		}
 
 		if ( $this->attributes->have( 'description' ) ) {
-			$this->add_field( 'description', html_entity_decode( $this->attributes->get( 'description', $post ) ) );
+			$this->add_field( 'description', $this->attributes->get( 'description', $post ) );
 		} else {
-			$this->add_field( 'description', html_entity_decode( $post->post_content ) );
+			$this->add_field( 'description', $post->post_content );
 		}
 	}
 
@@ -237,7 +233,6 @@ class Data_Feed_Item {
 			foreach ( $values as $key => $val ) {
 				$val = str_replace('/', '//', $val );
 				$values[ $key ] = str_replace( ' | ', '/', $val );
-				$values[ $key ] = html_entity_decode( $val );
 			}
 
 			// Custom attributes added at the product level can have
@@ -422,7 +417,7 @@ class Data_Feed_Item {
 		}
 
 		$tags = array_map( function ( $tag ) {
-			return html_entity_decode($tag->name);
+			return $tag->name;
 		}, $tags );
 
 
@@ -445,19 +440,19 @@ class Data_Feed_Item {
 		foreach ( $attributes as $attribute ) {
 
 			if( isset($attribute['field']) && isset($attribute['attribute'])) {
-				$this->fields[ $attribute['field'] ] = html_entity_decode($this->attributes->get_attribute_value(
+				$this->fields[ $attribute['field'] ] = $this->attributes->get_attribute_value(
 					$attribute['attribute'],
 					$this->post,
 					$attribute
-				));
+				);
 
 				// Inherit attributes from parent.
 				if ($this->parent) {
-					$this->fields[ $attribute['field'] ] = html_entity_decode($this->attributes->get_attribute_value(
+					$this->fields[ $attribute['field'] ] = $this->attributes->get_attribute_value(
 						$attribute['attribute'],
 						$this->parent,
 						$attribute
-					));
+					);
 				}
 			}
 
@@ -475,6 +470,25 @@ class Data_Feed_Item {
 				unset( $this->fields[ $key ] );
 			}
 		}
+	}
+
+	/**
+	 * Decode fields from special chars
+	 *
+	 * @since 1.5.15
+	 */
+	private function decode_fields() {
+		// $this->log->log('Decode fields: ');
+		// $this->log->log($this->fields);
+
+		$temp_arr = json_encode($this->fields);
+		$temp_arr = mb_convert_encoding($temp_arr, 'UTF-8', 'HTML-ENTITIES');
+		$temp_arr = json_decode($temp_arr, true);
+
+		$this->fields = $temp_arr;
+
+		// $this->log->log('Decoded fields: ');
+		// $this->log->log($this->fields);
 	}
 
 	/* Helpers ********************************************************************/
@@ -576,7 +590,7 @@ class Data_Feed_Item {
 		if (isset($term->parent)) {
 			while ( $term->parent ) {
 				$term = $this->terms_cache[ $term->parent ];
-				$path[] = html_entity_decode($term->name);
+				$path[] = $term->name;
 			}
 
 			// Build a path, and cache it for future use.
