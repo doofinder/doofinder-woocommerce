@@ -479,13 +479,11 @@ class Data_Feed_Item {
 	 */
 	private function decode_fields() {
 		// $this->log->log('Decode fields: ');
-		// $this->log->log($this->fields);
+		// $this->log->log( $this->fields );
 
-		$temp_arr = json_encode($this->fields);
-		$temp_arr = mb_convert_encoding($temp_arr, 'UTF-8', 'HTML-ENTITIES');
-		$temp_arr = json_decode($temp_arr, true);
-
-		$this->fields = $temp_arr;
+		array_walk_recursive($this->fields, function( &$item ) {
+			$item = html_entity_decode( $item, ENT_QUOTES );
+		} );
 
 		// $this->log->log('Decoded fields: ');
 		// $this->log->log($this->fields);
