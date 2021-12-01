@@ -126,8 +126,9 @@ You can click *Delete* to remove the additional attributes from the feed.
 Just send your questions to <mailto:support@doofinder.com> and we will try to answer as fast as possible with a working solution for you.
 
 == Changelog ==
+
 = 1.5.15 =
-Fixed GuzzleHTTP import problems.
+More fixes in API indexation.
 
 = 1.5.13 =
 More fixes in special chars indexed through api.
