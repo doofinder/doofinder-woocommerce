@@ -365,14 +365,14 @@ class Data_Feed_Item {
 
 
 		if ( $variation ) {
-			$this->fields[ 'df_group_leader' ] = false;
+			$this->fields[ 'df_group_leader' ] = 'false';
 			$this->fields[ 'group_id' ] = (string) $variation->get_id();
 		} else {
 			if ( $product->is_type( 'variable' ) ) {
-				$this->fields[ 'df_group_leader' ] = true;
+				$this->fields[ 'df_group_leader' ] = 'true';
 				$this->fields[ 'group_id' ] = (string) $id;
 			} else {
-				$this->fields[ 'df_group_leader' ] = false;
+				$this->fields[ 'df_group_leader' ] = 'false';
 				$this->fields[ 'group_id' ] = false;
 			}
 		}
