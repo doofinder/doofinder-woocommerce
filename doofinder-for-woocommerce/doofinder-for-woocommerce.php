@@ -6,8 +6,10 @@
  * Version: 1.5.16
  * Author: doofinder
  * Description: Integrate Doofinder Search in your WooCommerce shop.
+ *
+ * Woo: Woo Plugin Header For Updates (ref: https://woocommerce.com/document/create-a-plugin/#section-12)
  * WC requires at least: 3.0
- * WC tested up to: 5.7
+ * WC tested up to: 5.9
  *
  * @package WordPress
  */
@@ -24,8 +26,12 @@ if (
 	// Check if plugin is installed on the current site
 	in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ||
 
-	// Check if plugin is installed site-wide in multi-site environment
-	array_key_exists( 'woocommerce/woocommerce.php', apply_filters( 'active_sitewide_plugins', get_site_option( 'active_sitewide_plugins' ) ) )
+	/**
+	 * Check if plugin is installed site-wide in multi-site environment.
+	 * First we need to check if apply_filters is array, if no multisite
+	 * environment it will return false and produce error.
+	 */
+	( is_array( apply_filters( 'active_sitewide_plugins', get_site_option( 'active_sitewide_plugins' ) ) ) && array_key_exists( 'woocommerce/woocommerce.php', apply_filters( 'active_sitewide_plugins', get_site_option( 'active_sitewide_plugins' ) ) ) )
 ):
 
 	if ( ! class_exists( '\Doofinder\WC\Doofinder_For_WooCommerce' ) ):
@@ -294,6 +300,7 @@ if (
 			 */
 			public static function plugin_disabled() {
 				flush_rewrite_rules();
+
 				$log = new Log();
 				$log->log('plugin disabled');
 				Setup_Wizard::remove_notice();
@@ -378,5 +385,16 @@ if (
 	add_action( 'upgrader_process_complete', array('\Doofinder\WC\Doofinder_For_WooCommerce','upgrader_process_complete'), 10, 2 );
 
 	add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), array( '\Doofinder\WC\Doofinder_For_WooCommerce', 'plugin_add_settings_link' ));
+
+else:
+
+	// Doofinder requires WooCommerce plugin installed
+	add_action( 'admin_notices', function() {
+
+		?><div id="message" class="error notice is-dismissible"><?php
+			?><p class="main"><?php _e('Doofinder for WooCommerce: No active WooCommerce plugin was found. Please install/activate WooCommerce.','woocommerce-doofinder') ?></p><?php
+		?></div><?php
+
+	} );
 
 endif;
