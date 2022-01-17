@@ -7,14 +7,12 @@ defined( 'ABSPATH' ) or die();
 
 $multilanguage = Multilanguage::instance();
 
-// Below is commented becasue we will now use the same global data setting for each language
+if ( $multilanguage->is_active() && ! $multilanguage->get_language_code() ) {
+	echo $multilanguage->get_choose_language_notice();
+	return array();
+}
 
-// if ( $multilanguage->is_active() && ! $multilanguage->get_language_code() ) {
-// 	echo $multilanguage->get_choose_language_notice();
-// 	return array();
-// }
-
-$affix = ''; // $multilanguage->get_language_prefix();
+$affix = $multilanguage->get_language_prefix();
 
 $sizes = array();
 
@@ -175,7 +173,7 @@ $indexing_settings = array(
 		'default' => 'no',
 	),
 
-	
+
 	array(
 		'type' => 'sectionend',
 		'id'   => Multilanguage::code_suffix( 'indexing_options', $affix ),
