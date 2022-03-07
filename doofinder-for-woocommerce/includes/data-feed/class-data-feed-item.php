@@ -318,6 +318,8 @@ class Data_Feed_Item {
 			if ( $image_url = wp_get_attachment_image_src( $image_id, $size ) ) {
 				$this->fields['image_link'] = $image_url[0];
 			}
+		} else {
+			$this->fields['image_link'] = wc_placeholder_img_src( $size );		
 		}
 	}
 
