@@ -48,7 +48,7 @@ if (
 			 *
 			 * @var string
 			 */
-			public static $version = '1.5.18';
+			public static $version = '1.5.19';
 
 			/**
 			 * The only instance of Doofinder_For_WooCommerce
