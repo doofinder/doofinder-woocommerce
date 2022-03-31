@@ -79,7 +79,7 @@ $feed_settings = array(
 
 	/**
 	 * This setting would have be better implemented in indexing-settings but it is not
-	 * possible because that section is used to show de indexation interface.
+	 * possible because that section is used to show the indexation interface.
 	 */
 
 	array(
