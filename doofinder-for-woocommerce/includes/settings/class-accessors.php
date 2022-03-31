@@ -426,6 +426,43 @@ trait Accessors {
 		), 'no' );
 	}
 
+	
+	/**
+	 * Determine if the update on save is enabled.
+	 *
+	 * Just an alias for "get_option", because ideally we don't
+	 * want to replace the option name in multiple files.
+	 *
+	 * @return bool
+	 */
+	public static function is_update_on_save_enabled() {
+
+		$option = get_option( 'woocommerce_doofinder_indexing_update_on_save' );
+		//var_dump($option);
+
+		return  $option === 'yes' ? true : false;
+	}
+
+	/**
+	 * Enable update on save.
+	 *
+	 * Just an alias for "update_option", because ideally we don't
+	 * want to replace the option name in multiple files.
+	 */
+	public static function enable_update_on_save() {
+		update_option('woocommerce_doofinder_indexing_update_on_save', 'yes' );
+	}
+
+	/**
+	 * Disable update on save.
+	 *
+	 * Just an alias for "update_option", because ideally we don't
+	 * want to replace the option name in multiple files.
+	 */
+	public static function disable_update_on_save() {
+		update_option( 'woocommerce_doofinder_indexing_update_on_save', 'no' );
+	}
+
 	/**
 	 * Retrieve additional attributes to be added to the index
 	 * by the user.

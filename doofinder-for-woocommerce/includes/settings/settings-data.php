@@ -77,6 +77,19 @@ $feed_settings = array(
 		'default' => 'no',
 	),
 
+	/**
+	 * This setting would have be better implemented in indexing-settings but it is not
+	 * possible because that section is used to show de indexation interface.
+	 */
+
+	array(
+		'title'   => __( 'Update on save', 'woocommerce-doofinder' ),
+		'desc'    => 'The index will be updated every time you make a change in your product',
+		'id'      => Settings::option_id( 'indexing', 'update_on_save' ),
+        'type'    => 'checkbox',
+		'default' => 'yes',
+	),
+
 	/*
 	 * Image size configuration temporarily omitted.
 	 */
