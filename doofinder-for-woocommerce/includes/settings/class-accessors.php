@@ -436,10 +436,7 @@ trait Accessors {
 	 * @return bool
 	 */
 	public static function is_update_on_save_enabled() {
-
 		$option = get_option( 'woocommerce_doofinder_indexing_update_on_save' );
-		//var_dump($option);
-
 		return  $option === 'yes' ? true : false;
 	}
 

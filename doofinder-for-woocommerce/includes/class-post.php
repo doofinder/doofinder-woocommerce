@@ -162,7 +162,6 @@ class Post {
      */
     private static function check_indexable($post, $updated)
     {
-        // $api = Api_Factory::get(null, false, true);
         $post_types = Post_Types::instance();
 
         /**
