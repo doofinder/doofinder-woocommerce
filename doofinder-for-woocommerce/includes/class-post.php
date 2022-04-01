@@ -155,21 +155,25 @@ class Post {
 	}
 
 	/**
-	 * Only allowed post types should be indexable.
-	 *
-	 * @param \WP_Post $post
-	 * @param bool $updated
-	 */
-	private static function check_indexable( $post, $updated ) {
-		// $api = Api_Factory::get(null, false, true);
-		$post_types = Post_Types::instance();
+     * Only allowed post types should be indexable.
+     *
+     * @param \WP_Post $post
+     * @param bool $updated
+     */
+    private static function check_indexable($post, $updated)
+    {
+        $post_types = Post_Types::instance();
 
-		if ( ! in_array( $post->post_type, $post_types->get_indexable() ) ) {
-			return;
-		}
-
-		self::webhook_update_post( $post, $updated );
-	}
+        /**
+         * If the post is not indexable OR update on save is disabled we don't
+         * want to send request to the API so we skip the update_post process
+         */
+        if (! in_array($post->post_type, $post_types->get_indexable())
+            || !Settings::is_update_on_save_enabled()) {
+            return;
+        }
+        self::webhook_update_post($post, $updated);
+    }
 
 	/**
 	 * Render the contents of the metabox containing the visibility settings.
