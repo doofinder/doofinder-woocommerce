@@ -52,8 +52,7 @@ class Doomanager_Api
 		if (is_array($api_keys)) {
 			$primary_language = explode("_", get_locale())[0];
 			if ($this->language->is_active()) {
-				$language = $this->language->get_base_language();
-				$primary_language = $language["code"];
+				$primary_language = $this->language->get_base_language();
 			}
 
 			$domain = str_ireplace('www.', '', parse_url(get_bloginfo('url'), PHP_URL_HOST));
