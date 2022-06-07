@@ -424,6 +424,8 @@ class Setup_Wizard
 	{
 		$setup_wizard_url = get_rest_url(null, '/doofinder-for-wc/v1/connect/');
 
+		$setup_wizard_url = get_site_url(null, 'wp-json/doofinder-for-wc/v1/connect/');
+
 		//return urlencode(str_replace($base_url,'',$setup_wizard_url));
 		return $setup_wizard_url;
 	}
@@ -905,7 +907,7 @@ class Setup_Wizard
 				break;
 
 			case 5:
-				$this->process_step_5();
+				$this->process_step_4();
 				break;
 		}
 	}
