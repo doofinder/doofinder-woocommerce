@@ -24,7 +24,7 @@ class Doomanager_Api
 		// Get global disable_api_calls flag
 		$this->disable_api = Doofinder_For_WooCommerce::$disable_api_calls ?? $this->disable_api;
 
-		$this->log = new Log('api.txt');
+		$this->log = new Log('doomanager-api.txt');
 		//$this->log->log( '------------- Doofinder API construct ------------' );
 
 		if ($this->disable_api) {
@@ -52,7 +52,8 @@ class Doomanager_Api
 		if (is_array($api_keys)) {
 			$primary_language = explode("_", get_locale())[0];
 			if ($this->language->is_active()) {
-				$primary_language = $this->language->get_base_language();
+				$language = $this->language->get_base_language();
+				$primary_language = $language["code"];
 			}
 
 			$domain = str_ireplace('www.', '', parse_url(get_bloginfo('url'), PHP_URL_HOST));
@@ -60,14 +61,14 @@ class Doomanager_Api
 			$store_data = [
 				"name" =>  get_bloginfo('name'),
 				"platform" => "woocommerce",
-				"primary_language" => $primary_language["code"],
+				"primary_language" => $primary_language,
 				"skip_indexation" => true,
 				"search_engines" => []
 			];
 
 			foreach ($api_keys as $item) {
 				if ($item['hash'] === 'no-hash') {
-					$code = $item['lang']['code'] ?? $primary_language["code"];
+					$code = $item['lang']['code'] ?? $primary_language;
 
 
 					// Prepare search engine body
