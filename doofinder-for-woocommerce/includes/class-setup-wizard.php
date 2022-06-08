@@ -20,7 +20,7 @@ use Doofinder\GuzzleHttp\Client as GuzzleClient;
 
 use Error;
 use Doofinder\Management\Errors\DoofinderError;
-use Doofinder\WC\Api\Doomanager_Api;
+use Doofinder\WC\Api\Store_Api;
 use Exception;
 
 class Setup_Wizard
@@ -1111,10 +1111,10 @@ class Setup_Wizard
 				// Create search engine
 				$this->log->log('Wizard Step 2 - Try Create the Store');
 				if (!$this->disable_api) {
-					$this->log->log('=== DOOMANAGER API CALL === ');
+					$this->log->log('=== Store API CALL === ');
 					try {
-						$doomanager_api = new Doomanager_Api();
-						$store_data = $doomanager_api->create_store($has_api_keys);
+						$store_api = new Store_Api();
+						$store_data = $store_api->create_store($has_api_keys);
 
 						$this->log->log('Store create result:');
 						$this->log->log(print_r($store_data, true));

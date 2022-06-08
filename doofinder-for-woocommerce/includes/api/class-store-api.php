@@ -12,7 +12,7 @@ use Exception;
 
 defined('ABSPATH') or die();
 
-class Doomanager_Api
+class Store_Api
 {
 
 	private $log;
@@ -24,7 +24,7 @@ class Doomanager_Api
 		// Get global disable_api_calls flag
 		$this->disable_api = Doofinder_For_WooCommerce::$disable_api_calls ?? $this->disable_api;
 
-		$this->log = new Log('doomanager-api.txt');
+		$this->log = new Log('stores-api.txt');
 		//$this->log->log( '------------- Doofinder API construct ------------' );
 
 		if ($this->disable_api) {
@@ -32,6 +32,7 @@ class Doomanager_Api
 		}
 
 		$this->api_key = Settings::get_api_key();
+		//TODO: Replace this with get_api_host
 		$this->api_host = Settings::get_doomanager_api_host();
 
 		$this->log->log('-------------  API HOST ------------- ');
