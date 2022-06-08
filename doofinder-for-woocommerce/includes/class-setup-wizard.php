@@ -422,11 +422,7 @@ class Setup_Wizard
 	 */
 	public function getReturnPath()
 	{
-		$setup_wizard_url = get_rest_url(null, '/doofinder-for-wc/v1/connect/');
-
 		$setup_wizard_url = get_site_url(null, 'wp-json/doofinder-for-wc/v1/connect/');
-
-		//return urlencode(str_replace($base_url,'',$setup_wizard_url));
 		return $setup_wizard_url;
 	}
 
