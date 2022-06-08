@@ -25,7 +25,6 @@ class Store_Api
 		$this->disable_api = Doofinder_For_WooCommerce::$disable_api_calls ?? $this->disable_api;
 
 		$this->log = new Log('stores-api.txt');
-		//$this->log->log( '------------- Doofinder API construct ------------' );
 
 		if ($this->disable_api) {
 			$this->log->log('-------------  API IS DISABLED ------------- ');
@@ -96,7 +95,6 @@ class Store_Api
 			$response = $this->sendRequest("POST", "plugins/create-store", $store_data);
 			$body = $response->getBody()->getContents();
 			if ($response->getStatusCode() > 199 && $response->getStatusCode() <= 299) {
-				//echo "statuscode: ". $response->getStatusCode();
 				$json_response = json_decode($body);
 				return $json_response;
 			} else {
