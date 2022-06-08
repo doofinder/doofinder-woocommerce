@@ -81,23 +81,6 @@ trait Accessors
 	}
 
 	/**
-	 * Retrieve the doomanager API Host.
-	 *
-	 * Just an alias for "get_option" to avoid repeating the string
-	 * (option name) in multiple files.
-	 *
-	 * @return string
-	 */
-	public static function get_doomanager_api_host()
-	{
-		if (defined('WC_DF_DOOMANAGER_API_HOST')) {
-			return WC_DF_DOOMANAGER_API_HOST;
-		}
-		$default_host = get_option('woocommerce_doofinder_internal_search_api_host');
-		return str_replace("api", "doomanager", $default_host);
-	}
-
-	/**
 	 * Set the value of the API Admin Endpooint.
 	 *
 	 * Just an alias for "update_option" to avoid repeating the string

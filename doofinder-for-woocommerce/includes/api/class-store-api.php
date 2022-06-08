@@ -33,7 +33,7 @@ class Store_Api
 
 		$this->api_key = Settings::get_api_key();
 		//TODO: Replace this with get_api_host
-		$this->api_host = Settings::get_doomanager_api_host();
+		$this->api_host = Settings::get_api_host();
 
 		$this->log->log('-------------  API HOST ------------- ');
 		$this->log->log($this->api_host);
