@@ -31,8 +31,7 @@ class Store_Api
 		}
 
 		$this->api_key = Settings::get_api_key();
-		//TODO: Replace this with get_api_host
-		$this->api_host = Settings::get_api_host();
+		$this->admin_host = Settings::get_admin_endpoint(); //This api 
 
 		$this->log->log('-------------  API HOST ------------- ');
 		$this->log->log($this->api_host);
@@ -77,7 +76,6 @@ class Store_Api
 						'name' => $domain . ($code ? ' (' . strtoupper($code) . ')' : ''),
 						'language' => $code,
 						'currency' => get_woocommerce_currency(),
-						//TODO: maybe get the main url for the current language using multilanguage class
 						'site_url' => get_bloginfo('url'),
 						'datatypes' => [
 							[
@@ -108,7 +106,7 @@ class Store_Api
 	public function sendRequest($method, $endpoint, $body)
 	{
 		$client = new GuzzleClient();
-		$uri = "{$this->api_host}/{$endpoint}";
+		$uri = "{$this->admin_host}/{$endpoint}";
 		$options = [
 			'headers' => [
 				'Authorization' => "Token {$this->api_key}"
