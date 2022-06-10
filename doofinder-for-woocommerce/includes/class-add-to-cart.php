@@ -8,7 +8,7 @@ class Add_To_Cart
     /**
      * Singleton of this class.
      *
-     * @var Both_Sides
+     * @var Add_To_Cart
      */
     private static $_instance;
 
@@ -16,7 +16,7 @@ class Add_To_Cart
      * Returns the only instance of Add_To_Cart.
      *
      * @since 1.5.22
-     * @return Both_Sides
+     * @return Add_To_Cart
      */
     public static function instance()
     {
@@ -28,7 +28,7 @@ class Add_To_Cart
     }
 
     /**
-     * Both_Sides constructor.
+     * Add_To_Cart constructor.
      *
      * @since 1.5.22
      */
@@ -76,7 +76,7 @@ class Add_To_Cart
             }
         }
 
-        //The product is variable and doesn't have a default variation, so it cant be added to the cart
+        //The product is variable and doesn't have a default variation, so it can't be added to the cart
         if (!empty($variations) && $data['default_variation'] == 0) {
             $data['add_to_cart'] = false;
         }

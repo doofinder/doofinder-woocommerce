@@ -62,8 +62,6 @@ jQuery(() => {
               response.cart_hash,
               $fakebutton,
             ]);
-
-            console.log($fakebutton);
             $("#df-spinner").remove();
           } else {
             //No woocommerce cart, reload the page
