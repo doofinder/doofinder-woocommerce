@@ -91,13 +91,7 @@ class Store_Api
 			$this->log->log($store_data);
 
 			$response = $this->sendRequest("POST", "plugins/create-store", $store_data);
-			$body = $response->getBody()->getContents();
-			if ($response->getStatusCode() > 199 && $response->getStatusCode() <= 299) {
-				$json_response = json_decode($body);
-				return $json_response;
-			} else {
-				throw new Exception("Error #{$response->getStatusCode()} creating store structure. $body", $response->getStatusCode());
-			}
+			return $this->process_response($response);
 		}
 
 		throw new Exception("API keys must be an array");
@@ -116,5 +110,15 @@ class Store_Api
 		$res = $client->request($method, $uri, $options);
 
 		return $res;
+	}
+
+	public function process_response($response)
+	{
+		$body = $response->getBody()->getContents();
+		if ($response->getStatusCode() > 199 && $response->getStatusCode() <= 299) {
+			return json_decode($body);
+		} else {
+			throw new Exception("Error #{$response->getStatusCode()} creating store structure. $body", $response->getStatusCode());
+		}
 	}
 }
