@@ -7,20 +7,22 @@ use Doofinder\WC;
 use Doofinder\WC\Multilanguage\Multilanguage;
 use Doofinder\WC\Helpers\Helpers;
 
-defined( 'ABSPATH' ) or die();
+defined('ABSPATH') or die();
 
 /**
  * Contains all methods used to retrieve or save option values.
  */
-trait Accessors {
+trait Accessors
+{
 
 	/**
 	 * Retrieve the URL to the Doofinder settings page.
 	 *
 	 * @return string
 	 */
-	public static function get_url($param = null) {
-		return admin_url( 'admin.php?page=wc-settings&tab=doofinder' . ($param ? '&'.$param : '') );
+	public static function get_url($param = null)
+	{
+		return admin_url('admin.php?page=wc-settings&tab=doofinder' . ($param ? '&' . $param : ''));
 	}
 
 	/**
@@ -31,8 +33,9 @@ trait Accessors {
 	 *
 	 * @return string
 	 */
-	public static function get_api_key() {
-		return get_option( 'woocommerce_doofinder_internal_search_api_key' );
+	public static function get_api_key()
+	{
+		return get_option('woocommerce_doofinder_internal_search_api_key');
 	}
 
 	/**
@@ -43,8 +46,9 @@ trait Accessors {
 	 *
 	 * @param string $api_key
 	 */
-	public static function set_api_key( $api_key ) {
-		update_option( 'woocommerce_doofinder_internal_search_api_key', $api_key );
+	public static function set_api_key($api_key)
+	{
+		update_option('woocommerce_doofinder_internal_search_api_key', $api_key);
 	}
 
 	/**
@@ -55,8 +59,12 @@ trait Accessors {
 	 *
 	 * @return string
 	 */
-	public static function get_api_host() {
-		return get_option( 'woocommerce_doofinder_internal_search_api_host' );
+	public static function get_api_host()
+	{
+		if (defined('WC_DF_API_HOST')) {
+			return WC_DF_API_HOST;
+		}
+		return get_option('woocommerce_doofinder_internal_search_api_host');
 	}
 
 	/**
@@ -67,8 +75,9 @@ trait Accessors {
 	 *
 	 * @param string $api_key
 	 */
-	public static function set_api_host( $api_host ) {
-		update_option( 'woocommerce_doofinder_internal_search_api_host', $api_host );
+	public static function set_api_host($api_host)
+	{
+		update_option('woocommerce_doofinder_internal_search_api_host', $api_host);
 	}
 
 	/**
@@ -79,8 +88,9 @@ trait Accessors {
 	 *
 	 * @param string $admin_endpoint
 	 */
-	public static function set_admin_endpoint( $admin_endpoint ) {
-		update_option( 'woocommerce_doofinder_api_admin_endpoint', $admin_endpoint );
+	public static function set_admin_endpoint($admin_endpoint)
+	{
+		update_option('woocommerce_doofinder_api_admin_endpoint', $admin_endpoint);
 	}
 
 	/**
@@ -91,8 +101,9 @@ trait Accessors {
 	 *
 	 * @return string
 	 */
-	public static function get_admin_endpoint() {
-		return get_option( 'woocommerce_doofinder_api_admin_endpoint' );
+	public static function get_admin_endpoint()
+	{
+		return get_option('woocommerce_doofinder_api_admin_endpoint');
 	}
 
 
@@ -106,11 +117,12 @@ trait Accessors {
 	 *
 	 * @return string
 	 */
-	public static function get_search_engine_hash( $language = '' ) {
-		return get_option( self::option_name_for_language(
+	public static function get_search_engine_hash($language = '')
+	{
+		return get_option(self::option_name_for_language(
 			'woocommerce_doofinder_internal_search_hashid',
 			$language
-		) );
+		));
 	}
 
 	/**
@@ -122,11 +134,12 @@ trait Accessors {
 	 * @param string $hash
 	 * @param string $language Language code to set the hash for.
 	 */
-	public static function set_search_engine_hash( $hash, $language = '' ) {
-		update_option( self::option_name_for_language(
+	public static function set_search_engine_hash($hash, $language = '')
+	{
+		update_option(self::option_name_for_language(
 			'woocommerce_doofinder_internal_search_hashid',
 			$language
-		), $hash );
+		), $hash);
 	}
 
 	/**
@@ -139,11 +152,12 @@ trait Accessors {
 	 *
 	 * @return string
 	 */
-	public static function get_search_engine_server( $language = '' ) {
-		return get_option( self::option_name_for_language(
+	public static function get_search_engine_server($language = '')
+	{
+		return get_option(self::option_name_for_language(
 			'woocommerce_doofinder_internal_search_search_server',
 			$language
-		) );
+		));
 	}
 
 	/**
@@ -155,11 +169,12 @@ trait Accessors {
 	 * @param string $server
 	 * @param string $language Language code to set the hash for.
 	 */
-	public static function set_search_engine_server( $server, $language = '' ) {
-		update_option( self::option_name_for_language(
+	public static function set_search_engine_server($server, $language = '')
+	{
+		update_option(self::option_name_for_language(
 			'woocommerce_doofinder_internal_search_search_server',
 			$language
-		), $server );
+		), $server);
 	}
 
 	/**
@@ -171,9 +186,10 @@ trait Accessors {
 	 *
 	 * @return string
 	 */
-	public static function get_enable_debug_mode( ) {
-		
-		$debug_mode = get_option( 'woocommerce_doofinder_indexing_enable_debug_mode' );
+	public static function get_enable_debug_mode()
+	{
+
+		$debug_mode = get_option('woocommerce_doofinder_indexing_enable_debug_mode');
 
 		return $debug_mode === 'yes' ? true : false;
 	}
@@ -188,16 +204,17 @@ trait Accessors {
 	 *
 	 * @return string[]
 	 */
-	public static function get_post_types_to_index( $language = '' ) {
-		$post_types = get_option( self::option_name_for_language(
+	public static function get_post_types_to_index($language = '')
+	{
+		$post_types = get_option(self::option_name_for_language(
 			'doofinder_for_wc_post_types_to_index',
 			$language
-		) );
-		if ( ! $post_types ) {
+		));
+		if (!$post_types) {
 			return array();
 		}
 
-		return array_keys( $post_types );
+		return array_keys($post_types);
 	}
 
 	/**
@@ -209,11 +226,12 @@ trait Accessors {
 	 * @param array [string => 'on'] $post_types
 	 * @param string $language Language code.
 	 */
-	public static function set_post_types_to_index( $post_types, $language = '' ) {
-		update_option( self::option_name_for_language(
+	public static function set_post_types_to_index($post_types, $language = '')
+	{
+		update_option(self::option_name_for_language(
 			'doofinder_for_wc_post_types_to_index',
 			$language
-		), $post_types );
+		), $post_types);
 	}
 
 	/**
@@ -226,11 +244,12 @@ trait Accessors {
 	 *
 	 * @return bool
 	 */
-	public static function get_index_categories( $language = '' ) {
-		return (bool) get_option( self::option_name_for_language(
+	public static function get_index_categories($language = '')
+	{
+		return (bool) get_option(self::option_name_for_language(
 			'doofinder_for_wc_index_categories',
 			$language
-		) );
+		));
 	}
 
 	/**
@@ -243,11 +262,12 @@ trait Accessors {
 	 *
 	 * @return bool
 	 */
-	public static function get_index_tags( $language = '' ) {
-		return (bool) get_option( self::option_name_for_language(
+	public static function get_index_tags($language = '')
+	{
+		return (bool) get_option(self::option_name_for_language(
 			'doofinder_for_wc_index_tags',
 			$language
-		) );
+		));
 	}
 
 	/**
@@ -257,8 +277,9 @@ trait Accessors {
 	 *
 	 * @return bool
 	 */
-	public static function is_configuration_complete() {
-		return (bool) ( self::get_api_key() && self::get_search_engine_hash());
+	public static function is_configuration_complete()
+	{
+		return (bool) (self::get_api_key() && self::get_search_engine_hash());
 	}
 
 	/**
@@ -268,8 +289,9 @@ trait Accessors {
 	 *
 	 * @return bool
 	 */
-	public static function is_api_configuration_complete() {
-		return (bool) ( self::get_api_key() && self::get_api_host() && self::get_admin_endpoint() );
+	public static function is_api_configuration_complete()
+	{
+		return (bool) (self::get_api_key() && self::get_api_host() && self::get_admin_endpoint());
 	}
 
 	/**
@@ -282,14 +304,15 @@ trait Accessors {
 	 *
 	 * @return bool
 	 */
-	public static function is_js_layer_enabled( $language = '' ) {
+	public static function is_js_layer_enabled($language = '')
+	{
 		$option_name = self::option_name_for_language(
 			'woocommerce_doofinder_layer_enabled',
 			$language
 		);
 		//var_dump($option_name);
-		
-		$option =  get_option( $option_name );
+
+		$option =  get_option($option_name);
 		//var_dump($option);
 
 		return $option === 'yes' ? true : false;
@@ -305,11 +328,12 @@ trait Accessors {
 	 *
 	 * @return bool
 	 */
-	public static function is_js_layer_from_doofinder_enabled( $language = '' ) {
-		return (bool) get_option( self::option_name_for_language(
+	public static function is_js_layer_from_doofinder_enabled($language = '')
+	{
+		return (bool) get_option(self::option_name_for_language(
 			'doofinder_for_wc_load_js_layer_from_doofinder',
 			$language
-		) );
+		));
 	}
 
 	/**
@@ -320,11 +344,12 @@ trait Accessors {
 	 *
 	 * @param string $language Language code.
 	 */
-	public static function enable_js_layer( $language = '' ) {
-		update_option( self::option_name_for_language(
+	public static function enable_js_layer($language = '')
+	{
+		update_option(self::option_name_for_language(
 			'woocommerce_doofinder_layer_enabled',
 			$language
-		), 'yes' );
+		), 'yes');
 	}
 
 	/**
@@ -335,11 +360,12 @@ trait Accessors {
 	 *
 	 * @param string $language Language code.
 	 */
-	public static function disable_js_layer( $language = '' ) {
-		update_option( self::option_name_for_language(
+	public static function disable_js_layer($language = '')
+	{
+		update_option(self::option_name_for_language(
 			'woocommerce_doofinder_layer_enabled',
 			$language
-		), 'no' );
+		), 'no');
 	}
 
 	/**
@@ -352,11 +378,12 @@ trait Accessors {
 	 *
 	 * @return string
 	 */
-	public static function get_js_layer( $language = '' ) {
-		return wp_unslash( get_option( self::option_name_for_language(
+	public static function get_js_layer($language = '')
+	{
+		return wp_unslash(get_option(self::option_name_for_language(
 			'woocommerce_doofinder_layer_code',
 			$language
-		) ) );
+		)));
 	}
 
 	/**
@@ -368,8 +395,9 @@ trait Accessors {
 	 * @param string $value
 	 * @param string $language Language code.
 	 */
-	public static function set_js_layer( $value, $language = '' ) {
-		update_option( self::option_name_for_language( 'woocommerce_doofinder_layer_code', $language ), $value );
+	public static function set_js_layer($value, $language = '')
+	{
+		update_option(self::option_name_for_language('woocommerce_doofinder_layer_code', $language), $value);
 	}
 
 	/**
@@ -382,7 +410,8 @@ trait Accessors {
 	 *
 	 * @return bool
 	 */
-	public static function is_internal_search_enabled( $language = '' ) {
+	public static function is_internal_search_enabled($language = '')
+	{
 
 		$option_name = self::option_name_for_language(
 			'woocommerce_doofinder_internal_search_enable',
@@ -390,7 +419,7 @@ trait Accessors {
 		);
 		//var_dump($option_name);
 
-		$option = get_option( $option_name );
+		$option = get_option($option_name);
 		//var_dump($option);
 
 		return  $option === 'yes' ? true : false;
@@ -404,11 +433,12 @@ trait Accessors {
 	 *
 	 * @param string $language Language code.
 	 */
-	public static function enable_internal_search( $language = '' ) {
-		update_option( self::option_name_for_language(
+	public static function enable_internal_search($language = '')
+	{
+		update_option(self::option_name_for_language(
 			'woocommerce_doofinder_internal_search_enable',
 			$language
-		), 'yes' );
+		), 'yes');
 	}
 
 	/**
@@ -419,14 +449,15 @@ trait Accessors {
 	 *
 	 * @param string $language Language code.
 	 */
-	public static function disable_internal_search( $language = '' ) {
-		update_option( self::option_name_for_language(
+	public static function disable_internal_search($language = '')
+	{
+		update_option(self::option_name_for_language(
 			'woocommerce_doofinder_internal_search_enable',
 			$language
-		), 'no' );
+		), 'no');
 	}
 
-	
+
 	/**
 	 * Determine if the update on save is enabled.
 	 *
@@ -435,8 +466,9 @@ trait Accessors {
 	 *
 	 * @return bool
 	 */
-	public static function is_update_on_save_enabled() {
-		$option = get_option( 'woocommerce_doofinder_indexing_update_on_save' );
+	public static function is_update_on_save_enabled()
+	{
+		$option = get_option('woocommerce_doofinder_indexing_update_on_save');
 		return  $option === 'yes' ? true : false;
 	}
 
@@ -446,8 +478,9 @@ trait Accessors {
 	 * Just an alias for "update_option", because ideally we don't
 	 * want to replace the option name in multiple files.
 	 */
-	public static function enable_update_on_save() {
-		update_option('woocommerce_doofinder_indexing_update_on_save', 'yes' );
+	public static function enable_update_on_save()
+	{
+		update_option('woocommerce_doofinder_indexing_update_on_save', 'yes');
 	}
 
 	/**
@@ -456,8 +489,9 @@ trait Accessors {
 	 * Just an alias for "update_option", because ideally we don't
 	 * want to replace the option name in multiple files.
 	 */
-	public static function disable_update_on_save() {
-		update_option( 'woocommerce_doofinder_indexing_update_on_save', 'no' );
+	public static function disable_update_on_save()
+	{
+		update_option('woocommerce_doofinder_indexing_update_on_save', 'no');
 	}
 
 	/**
@@ -471,11 +505,12 @@ trait Accessors {
 	 *
 	 * @return array
 	 */
-	public static function get_additional_attributes( $language = '' ) {
-		return get_option( self::option_name_for_language(
+	public static function get_additional_attributes($language = '')
+	{
+		return get_option(self::option_name_for_language(
 			'woocommerce_doofinder_feed_attributes_additional_attributes',
 			$language
-		) );
+		));
 	}
 
 	/**
@@ -486,11 +521,12 @@ trait Accessors {
 	 *
 	 * @param string $language Language code.
 	 */
-	public static function get_last_modified_index( $language = '' ) {
-		return get_option( self::option_name_for_language(
+	public static function get_last_modified_index($language = '')
+	{
+		return get_option(self::option_name_for_language(
 			'woocommerce_doofinder_last_modified_index',
 			$language
-		) );
+		));
 	}
 
 	/**
@@ -502,17 +538,18 @@ trait Accessors {
 	 * @param string $language Language code.
 	 * @param int $update_time Timestamp of the update time
 	 */
-	public static function set_last_modified_index( $language = '', $update_time = null ) {
-		
+	public static function set_last_modified_index($language = '', $update_time = null)
+	{
+
 		$update_time = $update_time ?: time();
 
-		update_option( self::option_name_for_language(
+		update_option(self::option_name_for_language(
 			'woocommerce_doofinder_last_modified_index',
 			$language
 		), $update_time);
 	}
 
-	
+
 	/**
 	 * Retrieve last modified date for db data 
 	 *
@@ -521,11 +558,12 @@ trait Accessors {
 	 *
 	 * @param string $language Language code.
 	 */
-	public static function get_last_modified_db( $language = '' ) {
-		return get_option( self::option_name_for_language(
+	public static function get_last_modified_db($language = '')
+	{
+		return get_option(self::option_name_for_language(
 			'woocommerce_doofinder_last_modified_db',
 			$language
-		) );
+		));
 	}
 
 	/**
@@ -537,14 +575,15 @@ trait Accessors {
 	 * @param string $language Language code.
 	 * @param int $update_time Timestamp of the update time
 	 */
-	public static function set_last_modified_db( $language = '', $update_time = null ) {
-		
+	public static function set_last_modified_db($language = '', $update_time = null)
+	{
+
 		$update_time = $update_time ?: time();
 
-		update_option( self::option_name_for_language(
+		update_option(self::option_name_for_language(
 			'woocommerce_doofinder_last_modified_db',
 			$language
-		), $update_time );
+		), $update_time);
 	}
 
 	/**
@@ -560,12 +599,13 @@ trait Accessors {
 	 *
 	 * @return string Option name with optionally added suffix.
 	 */
-	private static function option_name_for_language( $option_name, $language = '' ) {
-		if ( $language ) {
+	private static function option_name_for_language($option_name, $language = '')
+	{
+		if ($language) {
 			$option_name .= "_{$language}";
 		} else {
 			$language    = Multilanguage::instance();
-			$option_name = $language->get_option_name( $option_name );
+			$option_name = $language->get_option_name($option_name);
 		}
 
 		return $option_name;
