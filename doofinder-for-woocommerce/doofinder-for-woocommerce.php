@@ -4,7 +4,7 @@
  * Plugin Name: Doofinder for WooCommerce
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 1.5.22
+ * Version: 1.5.21
  * Author: doofinder
  * Description: Integrate Doofinder Search in your WooCommerce shop.
  *
@@ -50,7 +50,7 @@ if (
              *
              * @var string
              */
-            public static $version = '1.5.22';
+            public static $version = '1.5.21';
 
             /**
              * The only instance of Doofinder_For_WooCommerce
@@ -164,7 +164,6 @@ if (
 
                 // Some functionalities need to be initialized on both admin side, and frontend.
                 Both_Sides::instance();
-                Add_To_Cart::instance();
 
                 self::maybe_suppress_notices();
             }
@@ -408,8 +407,8 @@ else :
 
 ?><div id="message" class="error notice is-dismissible"><?php
                                                         ?><p class="main"><?php _e('Doofinder for WooCommerce: No active WooCommerce plugin was found. Please install/activate WooCommerce.', 'woocommerce-doofinder') ?></p><?php
-                                                                                                                                                                                                                                ?></div><?php
+                                                                                                                                                                                                                                        ?></div><?php
 
-                                                                                                                                                                                                                                    });
+                                                                                                                                                                                    });
 
-                                                                                                                                                                                                                                endif;
+                                                                                                                                                                                endif;
