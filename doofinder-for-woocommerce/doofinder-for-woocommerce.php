@@ -407,8 +407,8 @@ else :
 
 ?><div id="message" class="error notice is-dismissible"><?php
                                                         ?><p class="main"><?php _e('Doofinder for WooCommerce: No active WooCommerce plugin was found. Please install/activate WooCommerce.', 'woocommerce-doofinder') ?></p><?php
-                                                                                                                                                                                                                                        ?></div><?php
+                                                                                                                                                                                                                                ?></div><?php
 
-                                                                                                                                                                                    });
+                                                                                                                                                                                                                                    });
 
-                                                                                                                                                                                endif;
+                                                                                                                                                                                                                                endif;
