@@ -125,10 +125,6 @@ class Add_To_Cart
     {
         add_action('wp_enqueue_scripts', function () {
             if ('yes' === Settings::get('layer', 'enabled')) {
-                wp_enqueue_style(
-                    'doofinder-add-to-cart',
-                    Doofinder_For_WooCommerce::plugin_url() . 'assets/css/df-add-to-cart.css'
-                );
                 wp_enqueue_script(
                     'doofinder-add-to-cart',
                     Doofinder_For_WooCommerce::plugin_url() . 'assets/js/df-add-to-cart.js',
