@@ -4,7 +4,11 @@
  * Plugin Name: Doofinder for WooCommerce
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
+<<<<<<< HEAD
  * Version: 1.5.23
+=======
+ * Version: 1.5.22
+>>>>>>> d2b7508a962b2b2688f4deebabbcdcea7a636218
  * Author: doofinder
  * Description: Integrate Doofinder Search in your WooCommerce shop.
  *

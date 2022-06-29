@@ -130,6 +130,9 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 = 1.5.23 =
 Added Live Layer "Add to cart" compatibility
 
+= 1.5.22 =
+Fixed issue with delete attribute button
+
 = 1.5.21 =
 Simplified Installation Wizard
 
