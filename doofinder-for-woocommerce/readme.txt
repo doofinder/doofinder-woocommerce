@@ -1,7 +1,7 @@
 === Doofinder for WooCommerce ===
 Contributors: doofinder
 Tags: search, autocomplete, woocommerce
-Version: 1.5.22
+Version: 1.5.23
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 5.6
@@ -127,7 +127,7 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 
 == Changelog ==
 
-= 1.5.22 =
+= 1.5.23 =
 Added Live Layer "Add to cart" compatibility
 
 = 1.5.21 =

@@ -15,7 +15,7 @@ class Add_To_Cart
     /**
      * Returns the only instance of Add_To_Cart.
      *
-     * @since 1.5.22
+     * @since 1.5.23
      * @return Add_To_Cart
      */
     public static function instance()
@@ -30,7 +30,7 @@ class Add_To_Cart
     /**
      * Add_To_Cart constructor.
      *
-     * @since 1.5.22
+     * @since 1.5.23
      */
     public function __construct()
     {
