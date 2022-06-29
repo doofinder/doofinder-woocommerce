@@ -3,15 +3,11 @@ jQuery(() => {
   $(document).ready(function () {
     document.addEventListener("doofinder.cart.add", function (event) {
       //Show the loader
-      $("body").append('<div id="df-spinner" class="loading"></div>');
+      //$("body").append('<div id="df-spinner" class="loading"></div>');
       const { item_id, amount } = event.detail;
       addProductToCart(item_id, amount);
     });
   });
-
-  function closeDoofinderLayer() {
-    $('button[dfd-click="close-layer"').click();
-  }
 
   function addProductToCart(item_id, amount) {
     amount = !amount ? 1 : parseInt(amount);
@@ -23,7 +19,7 @@ jQuery(() => {
       dataType: "json",
       success: function (response) {
         if (response.add_to_cart) {
-          wc_add_to_cart(item_id, response.default_variation, amount);
+          wc_add_to_cart(response.product, response.variation, amount);
         } else {
           window.location = response.product_url;
           return;
@@ -43,7 +39,6 @@ jQuery(() => {
 
     $fakebutton = $("<input type='button'/>");
 
-    closeDoofinderLayer();
     $(document.body).trigger("adding_to_cart", [$fakebutton, data]);
 
     $.ajax({
@@ -62,7 +57,7 @@ jQuery(() => {
               response.cart_hash,
               $fakebutton,
             ]);
-            $("#df-spinner").remove();
+            //$("#df-spinner").remove();
           } else {
             //No woocommerce cart, reload the page
             location.reload();

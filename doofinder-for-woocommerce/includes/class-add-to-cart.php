@@ -2,6 +2,9 @@
 
 namespace Doofinder\WC;
 
+use Doofinder\GuzzleHttp\Promise\Is;
+use Doofinder\WC\Settings\Settings;
+
 class Add_To_Cart
 {
 
@@ -34,6 +37,8 @@ class Add_To_Cart
      */
     public function __construct()
     {
+        $this->enqueue_script();
+
         add_action('wp_ajax_woocommerce_ajax_add_to_cart',  array(__CLASS__, 'woocommerce_ajax_add_to_cart'));
         add_action('wp_ajax_nopriv_woocommerce_ajax_add_to_cart',  array(__CLASS__, 'woocommerce_ajax_add_to_cart'));
 
@@ -54,36 +59,24 @@ class Add_To_Cart
     {
         $post_id = $request->get_param("id");
         $product = wc_get_product($post_id);
-        $variations = $product->get_children();
-        $default_variation_attributes = $product->get_default_attributes();
+        $variation_id = 0;
+
+        if (is_a($product, 'WC_Product_Variation')) {
+            $post_id =  $product->get_parent_id();
+            $variation_id =  $product->get_id();
+        }
 
         $data = [
-            "variations" => $variations,
+            "product" => $post_id,
             "product_url" => get_the_permalink($post_id),
-            "default_variation" => 0,
+            "variation" => $variation_id,
             "add_to_cart" => true
         ];
-
-        if (is_a($product, 'WC_Product_Variable') && !empty($variations)) {
-            foreach ($variations as $variation_ID) {
-                // get variations meta
-                $product_variation = new \WC_Product_Variation($variation_ID);
-                $variation_data = $product_variation->get_data();
-                $attributes = $variation_data["attributes"];
-                if (empty(array_diff($attributes, $default_variation_attributes))) {
-                    $data['default_variation'] = $variation_ID;
-                }
-            }
-        }
-
-        //The product is variable and doesn't have a default variation, so it can't be added to the cart
-        if (!empty($variations) && $data['default_variation'] == 0) {
-            $data['add_to_cart'] = false;
-        }
 
         if ($data['add_to_cart']) {
             switch (get_class($product)) {
                 case 'WC_Product_External':
+                case 'WC_Product_Variable':
                 case 'WC_Product_Grouped':
                     $data['add_to_cart'] = false;
                     break;
@@ -121,5 +114,33 @@ class Add_To_Cart
         }
 
         wp_die();
+    }
+
+    /**
+     * Enqueue plugin styles and scripts.
+     *
+     * @since 1.5.23
+     */
+    public function enqueue_script()
+    {
+        add_action('wp_enqueue_scripts', function () {
+            if ('yes' === Settings::get('layer', 'enabled')) {
+                wp_enqueue_style(
+                    'doofinder-add-to-cart',
+                    Doofinder_For_WooCommerce::plugin_url() . 'assets/css/df-add-to-cart.css'
+                );
+                wp_enqueue_script(
+                    'doofinder-add-to-cart',
+                    Doofinder_For_WooCommerce::plugin_url() . 'assets/js/df-add-to-cart.js',
+                    ['jquery'],
+                    false,
+                    true
+                );
+                wp_localize_script('doofinder-add-to-cart', 'df_cart', [
+                    'ajax_url' => admin_url('admin-ajax.php'),
+                    'item_info_endpoint' =>  get_site_url(null, '/wp-json/doofinder-for-wc/v1/product-info/')
+                ]);
+            }
+        });
     }
 }
