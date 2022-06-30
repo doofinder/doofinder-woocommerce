@@ -2,8 +2,6 @@ jQuery(() => {
   const $ = jQuery.noConflict();
   $(document).ready(function () {
     document.addEventListener("doofinder.cart.add", function (event) {
-      //Show the loader
-      //$("body").append('<div id="df-spinner" class="loading"></div>');
       const { item_id, amount } = event.detail;
       addProductToCart(item_id, amount);
     });
@@ -57,7 +55,6 @@ jQuery(() => {
               response.cart_hash,
               $fakebutton,
             ]);
-            //$("#df-spinner").remove();
           } else {
             //No woocommerce cart, reload the page
             location.reload();
