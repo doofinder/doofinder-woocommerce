@@ -42,7 +42,6 @@ $selected_sector = Settings::get_sector('')
             }
             ?>
         </select>
-        <!-- <a class="button button-primary" href="#"><?php _e('Next', 'woocommerce-doofinder'); ?></a>-->
         <button type="submit"><?php _e('Next', 'woocommerce-doofinder'); ?></button>
         <input type="hidden" id="process-step-input" name="process-step" value="1" />
         <input type="hidden" id="next-step-input" name="next-step" value="2" />
