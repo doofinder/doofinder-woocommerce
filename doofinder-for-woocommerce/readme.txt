@@ -1,7 +1,7 @@
 === Doofinder for WooCommerce ===
 Contributors: doofinder
 Tags: search, autocomplete, woocommerce
-Version: 1.5.23
+Version: 1.5.24
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 5.6
@@ -126,6 +126,9 @@ You can click *Delete* to remove the additional attributes from the feed.
 Just send your questions to <mailto:support@doofinder.com> and we will try to answer as fast as possible with a working solution for you.
 
 == Changelog ==
+
+= 1.5.24 =
+Added sector selection step in installation wizard
 
 = 1.5.23 =
 Added Live Layer "Add to cart" compatibility
