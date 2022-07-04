@@ -13,9 +13,6 @@ $index_interface = Index_Interface::instance();
 	<div class="dfwc-setup-step__actions">
 		<button type="button" id="doofinder-for-wc-index-button" class="button button-primary" style="display:none;"><?php _e('Start', 'woocommerce-doofinder'); ?></button>
 		<div id="doofinder-for-wc-spinner" class="doofinder-for-wc-spinner spinner" style="display:none;"></div>
-		<?php /* 
-		<a href="<?php echo Settings::get_url(); ?>"><?php _e('Skip and exit setup','woocommerce-doofinder'); ?></a>
-		*/ ?>
 	</div>
 
 	<div class="dfwc-setup-step__progress-bar-wrapper">
