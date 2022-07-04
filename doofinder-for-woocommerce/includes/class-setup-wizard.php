@@ -990,7 +990,6 @@ class Setup_Wizard
 	 */
 	private function process_step_3($is_ajax = false, $data = null)
 	{
-		return;
 		$is_processing = isset($_REQUEST['process_step']) && $_REQUEST['process_step'] === '3';
 
 		if (!$is_processing) {
