@@ -39,8 +39,8 @@ class Add_To_Cart
     {
         $this->enqueue_script();
 
-        add_action('wp_ajax_woocommerce_ajax_add_to_cart',  array(__CLASS__, 'woocommerce_ajax_add_to_cart'));
-        add_action('wp_ajax_nopriv_woocommerce_ajax_add_to_cart',  array(__CLASS__, 'woocommerce_ajax_add_to_cart'));
+        add_action('wp_ajax_doofinder_ajax_add_to_cart',  array(__CLASS__, 'doofinder_ajax_add_to_cart'));
+        add_action('wp_ajax_nopriv_doofinder_ajax_add_to_cart',  array(__CLASS__, 'doofinder_ajax_add_to_cart'));
 
         // Register custom WP REST Api endpoint
         add_action('rest_api_init', function () {
@@ -87,7 +87,7 @@ class Add_To_Cart
     }
 
 
-    public static function woocommerce_ajax_add_to_cart()
+    public static function doofinder_ajax_add_to_cart()
     {
         $product_id = apply_filters('woocommerce_add_to_cart_product_id', absint($_POST['product_id']));
         $quantity = empty($_POST['quantity']) ? 1 : wc_stock_amount($_POST['quantity']);

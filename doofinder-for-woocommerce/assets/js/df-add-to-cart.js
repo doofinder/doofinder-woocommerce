@@ -1,5 +1,4 @@
-jQuery(() => {
-  const $ = jQuery.noConflict();
+(function ($) {
   $(document).ready(function () {
     document.addEventListener("doofinder.cart.add", function (event) {
       const { item_id, amount } = event.detail;
@@ -28,9 +27,8 @@ jQuery(() => {
 
   function wc_add_to_cart(product_id, variation_id, product_qty) {
     var data = {
-      action: "woocommerce_ajax_add_to_cart",
+      action: "doofinder_ajax_add_to_cart",
       product_id: product_id,
-      product_sku: "",
       quantity: product_qty,
       variation_id: variation_id,
     };
@@ -63,4 +61,4 @@ jQuery(() => {
       },
     });
   }
-});
+})(jQuery);
