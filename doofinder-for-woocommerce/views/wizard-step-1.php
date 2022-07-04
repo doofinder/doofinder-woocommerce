@@ -30,8 +30,8 @@ $selected_sector = Settings::get_sector('')
 ?>
 <form action="<?php echo Setup_Wizard::get_url(['step' => '1']); ?>" method="post">
     <div class="dfwc-setup-step__actions">
-        <select id="sector-select" name="sector">
-            <option> - <?php _e('Choose a sector', 'woocommerce-doofinder'); ?> - </option>
+        <select id="sector-select" name="sector" required>
+            <option value="" selected disabled hidden> - <?php _e('Choose a sector', 'woocommerce-doofinder'); ?> - </option>
             <?php
             foreach ($sectors as $sector => $key) {
                 $selected = "";
