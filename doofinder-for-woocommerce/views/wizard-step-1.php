@@ -38,7 +38,7 @@ $selected_sector = Settings::get_sector('')
                 if ($selected_sector === $key) {
                     $selected = ' selected="selected"';
                 }
-                echo '<option value="' . $key . '"' . $selected . '>' . _($sector, 'woocommerce-doofinder') . '</option>';
+                echo '<option value="' . $key . '"' . $selected . '>' . __($sector, 'woocommerce-doofinder') . '</option>';
             }
             ?>
         </select>
