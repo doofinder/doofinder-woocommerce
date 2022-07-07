@@ -1,18 +1,25 @@
 <?php
 
-/**
- * Final step of the wizard
- */
-
 namespace Doofinder\WC;
 
 use Doofinder\WC\Setup_Wizard;
 
+$wizard = Setup_Wizard::instance();
+
+
 ?>
-<div class="dfwc-setup-finished <?php echo $step_state >= $no_steps ? 'active' : ''; ?>">
-    <figure class="dfwc-setup-finished__icon">🏆</figure>
-    <h2 class="dfwc-setup-finished__title"><?php _e('Congrats!', 'woocommerce-doofinder'); ?></h2>
-    <h4 class="dfwc-setup-finished__desc"><?php _e('Your store has been optimized with the best search experience', 'woocommerce-doofinder'); ?></h4>
-    <input type="hidden" name="process-step" value="4" />
-    <a class="button button-primary" href="/wp-admin/admin.php?page=wc-settings&tab=doofinder"><?php _e('Close', 'woocommerce-doofinder'); ?></a>
-</div>
+
+<form action="<?php echo Setup_Wizard::get_url(['step' => '4']); ?>" method="post" class="dfwc-setup-step__actions">
+	<p class="loading"><?php _e('Enabling doofinder search. Please wait...', 'woocommerce-doofinder'); ?></p>
+</form>
+<?php if (isset($step_state) && $step_state === 4) : ?>
+	<script>
+		window.addEventListener('load', () => {
+			//document.getElementById('enable-doofinder-search').click();
+
+			setTimeout(function() {
+				document.location.href = "/wp-admin/admin.php?page=dfwc-setup&step=5"
+			}, 3000)
+		});
+	</script>
+<?php endif; ?>

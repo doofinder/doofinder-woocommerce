@@ -61,7 +61,8 @@ class Store_Api
                 "platform" => "woocommerce",
                 "primary_language" => $primary_language,
                 "skip_indexation" => true,
-                "search_engines" => []
+                "search_engines" => [],
+                "sector" => Settings::get_sector()
             ];
 
             foreach ($api_keys as $item) {

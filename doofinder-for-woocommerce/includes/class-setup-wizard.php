@@ -236,6 +236,13 @@ class Setup_Wizard
 			}
 		}
 
+		$errors = $this->get_wizard_errors();
+
+		if (self::is_wizard_page() && !\wp_doing_ajax()) {
+			$this->set_wizard_errors([]);
+		}
+
+
 		// $this->log->log("Setup Wizard Errors: ");
 		// $this->log->log($this->errors);
 
@@ -265,7 +272,7 @@ class Setup_Wizard
 
 		$setup_wizard = self::instance();
 		$setup_wizard->log->log('Setup Wizard - Connect');
-		$setup_wizard->process_step_1(true);
+		$setup_wizard->process_step_2(true);
 
 		return new \WP_REST_Response("ok", 200);
 	}
@@ -296,10 +303,8 @@ class Setup_Wizard
 
 		//$this->log->log('Setup Wizard - Register ajax actons');
 
-		add_action('wp_ajax_doofinder_for_wc_process_step_2', function () {
-			// $data = Setup_Wizard::instance();
-			// $data->process_step_2(true, $_REQUEST);
-			$this->process_step_2(true, $_REQUEST);
+		add_action('wp_ajax_doofinder_for_wc_process_step_3', function () {
+			$this->process_step_3(true, $_REQUEST);
 		});
 
 		add_action('wp_ajax_doofinder_for_wc_check_data', function () {
@@ -556,22 +561,29 @@ class Setup_Wizard
 	public static function check_data()
 	{
 
-		$error_cookie = $_COOKIE['doofinderError']['wizard-step-1'] ?? false;
+		$has_error = FALSE;
+		$error = '';
+		$errors = self::get_wizard_errors();
+		if (isset($errors['wizard-step-2']) && !empty($errors['wizard-step-2'])) {
+			$has_error = true;
+			$error = $errors['wizard-step-2'];
+		}
 
-		if ($error_cookie) {
+		if ($has_error) {
 			$status = 'error';
 		} elseif (Settings::is_api_configuration_complete()) {
 			$status = 'saved';
-			// Check if step was already set to 2, if not do it
-			if (self::get_step() !== 2) {
-				self::next_step(2, false);
+			// Check if step was already set to 3, if not do it
+			if (self::get_step() !== 3) {
+				self::next_step(3, false);
 			}
 		} else {
 			$status = 'not-saved';
 		}
 
 		wp_send_json_success([
-			'status' => $status
+			'status' => $status,
+			'error' =>  $error
 		]);
 	}
 
@@ -715,7 +727,7 @@ class Setup_Wizard
 		<p class="doofinder-button-setup-wizard" style="width:100px;float:right;position:relative;top:-68px;">
 			<a href="<?php echo self::get_url(); ?>" class="button-secondary"><?php _e('Setup Wizard', 'woocommerce-doofinder'); ?></a>
 		</p>
-<?php
+	<?php
 
 		$html = ob_get_clean();
 
@@ -903,175 +915,93 @@ class Setup_Wizard
 				break;
 
 			case 5:
-				$this->process_step_4();
+				$this->process_step_5();
 				break;
 		}
 	}
 
 	/**
-	 * Handle the submission of step 1 - Api Key and Api Host .
+	 * Handle the submission of step 1 - Sector collection
 	 */
 	private function process_step_1($processing = false)
 	{
-
 		$is_processing = (isset($_REQUEST['process-step']) && $_REQUEST['process-step'] === '1') || $processing === true;
-
+		$step = 1;
 		if (!$is_processing) {
 			return;
 		}
 
 		$this->log->log('Processing Wizard Step 1 - Processing...');
 
-		$token = $_POST['token'] ?? '';
-		$saved_token = $this->getToken();
-
-		// Exit early if tokens do not match
-		if ($token !== $saved_token) {
-			$this->errors['wizard-step-1'] = __('Invalid token', 'woocommerce-doofinder');
-			setcookie("doofinderError[wizard-step-1]", __('Invalid token', 'woocommerce-doofinder'), 0, '/');
-			$this->log->log('Processing Wizard Step 1 - Error - Invalid token');
-			$this->log->log('Processing Wizard Step 1 - Recieved Token - ' . $token);
-			$this->log->log('Processing Wizard Step 1 - Saved Token - ' . $saved_token);
-			return;
-		}
-
-		$api_key = $_REQUEST['api_token'] ?? null;
-		$api_host = isset($_REQUEST['api_endpoint']) ? $_REQUEST['api_endpoint'] : null; // i.e: eu1-api.doofinder.com for API v2.0
-		$admin_endpoint = isset($_REQUEST['admin_endpoint']) ? $_REQUEST['admin_endpoint'] : null; // i.e: eu1-app.doofinder.com for API v2.0
-		$search_endpoint = isset($_REQUEST['search_endpoint']) ? $_REQUEST['search_endpoint'] : null; // i.e: eu1-search.doofinder.com for API v2.0
-
-		// Required fields are not present or empty.
-		if (!isset($api_key) || !$api_key || !isset($api_host) || !$api_host || !isset($admin_endpoint) || !$admin_endpoint || !isset($search_endpoint) || !$search_endpoint) {
-
-			if (!isset($api_key) || !$api_key) {
-				$this->errors['wizard-step-1']['api-key'] = __('API key is missing.', 'woocommerce-doofinder');
-				setcookie("doofinderError[wizard-step-1][api-key]", __('API key is missing.', 'woocommerce-doofinder'), 0, '/');
-				$this->log->log('Processing Wizard Step 1 - Error -  API key is missing.');
-			}
-
-			if (!isset($api_host) || !$api_host) {
-				$this->errors['wizard-step-1']['api-host'] = __('API host is missing.', 'woocommerce-doofinder');
-				setcookie("doofinderError[wizard-step-1][api-host]", __('API host is missing.', 'woocommerce-doofinder'), 0, '/');
-				$this->log->log('Processing Wizard Step 1 - Error - API host is missing.');
-			}
-
-			if (!isset($admin_endpoint) || !$admin_endpoint) {
-				$this->errors['wizard-step-1']['admin-endpoint'] = __('Admin endpoint is missing.', 'woocommerce-doofinder');
-				setcookie("doofinderError[wizard-step-1][admin-endpoint]", __('Admin endpoint is missing.', 'woocommerce-doofinder'), 0, '/');
-				$this->log->log('Processing Wizard Step 1 - Error - Admin endpoint is missing.');
-			}
-
-			if (!isset($search_endpoint) || !$search_endpoint) {
-				$this->errors['wizard-step-1']['search-endpoint'] = __('Search endpoint is missing.', 'woocommerce-doofinder');
-				setcookie("doofinderError[wizard-step-1][search-endpoint]", __('Search endpoint is missing.', 'woocommerce-doofinder'), 0, '/');
-				$this->log->log('Processing Wizard Step 1 - Error - Search endpoint is missing.');
-			}
-
-			return;
-		}
-
-		// Api Host should contain 'https://' protocol, i.e. https://eu1-api.doofinder.com
-		if (!preg_match("#^((https?://)|www\.?)#i", $api_host)) {
-			$api_host = 'https://' . $api_host;
-		}
-
-		// Admin Endpoint should contain 'https://' protocol, i.e. https://eu1-api.doofinder.com
-		if (!preg_match("#^((https?://)|www\.?)#i", $admin_endpoint)) {
-			$admin_endpoint = 'https://' . $admin_endpoint;
-		}
-
-		// Search Endpoint should contain 'https://' protocol, i.e. https://eu1-api.doofinder.com
-		if (!preg_match("#^((https?://)|www\.?)#i", $search_endpoint)) {
-			$search_endpoint = 'https://' . $search_endpoint;
-		}
-
-		// Check if api key and api host is valid, make test call to API
-
-		$response = false;
-
-		if (!$this->disable_api) {
-			try {
-				$client = new ManagementClient($api_host, $api_key);
-				$this->log->log('Wizard Step 1 - Call Api - List search engines ');
-				$this->log->log('Wizard Step 1 - API key: ' . $api_key);
-				$this->log->log('Wizard Step 1 - API host: ' . $api_host);
-
-				$response = $client->listSearchEngines();
-				$this->log->log('Wizard Step 1 - List Search engines Response: ');
-				$this->log->log($response);
-
-				$this->log->log('Wizard Step 1 - List search engines - success ');
-				$response = true;
-			} catch (\DoofinderManagement\ApiException $exception) {
-				$this->log->log('Wizard Step 1: ' . $exception->getMessage());
-				$this->errors['wizard-step-1'] = __('Could not connect to the API. API Key or Host is not valid.', 'woocommerce-doofinder');
-				setcookie("doofinderError[wizard-step-1]", __('Could not connect to the API. API Key or Host is not valid.', 'woocommerce-doofinder'), 0, '/');
-			} catch (\Exception $exception) {
-				$this->log->log('Wizard Step 1 - Exception ');
-				$this->log->log($exception);
-
-				if ($exception instanceof DoofinderError) {
-					$this->log->log($exception->getBody());
-				}
-			}
+		$sector = isset($_REQUEST['sector']) ? $_REQUEST['sector'] : null;
+		if (!empty($sector)) {
+			Settings::set_sector($sector);
+			$this->js_go_to_step(2);
 		} else {
-			$response = true;
-		}
-
-		if ($response) {
-			// Everything is ok - save the options
-
-			// Check if api key already exists and is the same
-			// If api key is different clear all settings
-			$saved_api_key = Settings::get_api_key();
-
-			if ($saved_api_key !== $api_key) {
-				$this->clear_all_settings();
-			}
-
-			Settings::set_api_key($api_key);
-			//$this->log->log($api_key);
-
-			Settings::set_api_host($api_host);
-			//$this->log->log($api_host);
-
-			Settings::set_admin_endpoint($admin_endpoint);
-			//$this->log->log($admin_endpoint);
-
-			Settings::set_search_engine_server($search_endpoint);
-			//$this->log->log($search_endpoint);
-
-			$this->log->log('Processing Wizard Step 1 - All data saved');
-			// ...and move to the next step.
-			self::next_step(2);
-		} else {
-
-			$this->errors['wizard-step-1'] = __('Something went wrong.', 'woocommerce-doofinder');
-			setcookie("doofinderError[wizard-step-1]", __('Something went wrong.', 'woocommerce-doofinder'), 0, '/');
-			$this->log->log('Processing Wizard Step 1 - Error - Something went wrong.');
-
-			return;
+			$this->add_wizard_step_error($step, 'sector', __('Please select a sector.', 'woocommerce-doofinder'));
 		}
 	}
 
+
 	/**
-	 * Handle the submission of step 2 - Search Engine Hash and Indexing.
+	 * Handle the submission of step 2 - Api Key and Api Host .
 	 */
-	private function process_step_2($is_ajax = false, $data = null)
+	private function process_step_2($processing = false)
 	{
 
-		$is_processing = isset($_REQUEST['process_step']) && $_REQUEST['process_step'] === '2';
+		$is_processing = (isset($_REQUEST['process-step']) && $_REQUEST['process-step'] === '2') || $processing === true;
+		$step = 2;
 
 		if (!$is_processing) {
 			return;
 		}
 
-		$this->log->log('Processing Wizard Step 2');
+		$this->log->log('Processing Wizard Step 2 - Processing...');
+
+		if (!$this->is_valid_token($step)) {
+			return;
+		}
+
+		$api_settings = $this->check_api_settings($step);
+		if (!is_array($api_settings)) {
+			return;
+		}
+
+		// Check if api key and api host is valid, make test call to API
+		if ($this->test_api_settings($api_settings)) {
+			extract($api_settings);
+			$this->remove_wizard_step_error($step, 'api-endpoint-connection-failed');
+			$this->remove_wizard_step_error($step, 'api-endpoint');
+			// Everything is ok - save the options
+
+			$this->save_api_settings($api_settings);
+
+			$this->log->log('Processing Wizard Step 2 - All data saved');
+			// ...and move to the next step.
+			self::next_step(3);
+		} else {
+			$this->add_wizard_step_error($step, 'admin-endpoint', __('Something went wrong.', 'woocommerce-doofinder'));
+			return;
+		}
+	}
+
+	/**
+	 * Handle the submission of step 3 - Search Engine Hash and Indexing.
+	 */
+	private function process_step_3($is_ajax = false, $data = null)
+	{
+		$is_processing = isset($_REQUEST['process_step']) && $_REQUEST['process_step'] === '3';
+
+		if (!$is_processing) {
+			return;
+		}
+
+		$this->log->log('Processing Wizard Step 3');
 
 		// Test error response
 		if (self::$should_fail) {
 
-			$this->log->log('Processing Wizard Step 2 - Failed.');
+			$this->log->log('Processing Wizard Step 3 - Failed.');
 
 			// Send failed ajax response
 			wp_send_json_error(array(
@@ -1084,7 +1014,7 @@ class Setup_Wizard
 		}
 
 
-		$this->log->log('Wizard Step 2');
+		$this->log->log('Wizard Step 3');
 		// Try to create API client instance
 		// Check if search engines (Hash ID in DB) already exists (for each language if multilang)
 
@@ -1105,7 +1035,7 @@ class Setup_Wizard
 
 			if (is_array($has_api_keys)) {
 				// Create search engine
-				$this->log->log('Wizard Step 2 - Try Create the Store');
+				$this->log->log('Wizard Step 3 - Try Create the Store');
 				if (!$this->disable_api) {
 					$this->log->log('=== Store API CALL === ');
 					try {
@@ -1118,9 +1048,9 @@ class Setup_Wizard
 						$this->set_search_engines($store_data->search_engines);
 						$this->enable_layer($store_data->script);
 					} catch (Exception $exception) {
-						$this->log->log('Wizard Step 2 - Exception');
+						$this->log->log('Wizard Step 3 - Exception');
 						$this->log->log($exception->getMessage());
-						$this->errors['wizard-step-2'] =
+						$this->errors['wizard-step-3'] =
 							__(
 								sprintf("Couldn't create Store. Error: %s", $exception->getMessage()),
 								'woocommerce-doofinder'
@@ -1130,15 +1060,15 @@ class Setup_Wizard
 						wp_send_json_error(array(
 							'status'  => false,
 							'error' => true,
-							'message' => $this->errors['wizard-step-2'],
+							'message' => $this->errors['wizard-step-3'],
 						));
 
 						return;
 					}
 				}
-				$this->log->log('Wizard Step 2 - Created Search Engine: ');
+				$this->log->log('Wizard Step 3 - Created Search Engine: ');
 			} else {
-				$this->log->log('Wizard Step 2 - Store Already found, skipping');
+				$this->log->log('Wizard Step 3 - Store Already found, skipping');
 			}
 		}
 
@@ -1149,8 +1079,8 @@ class Setup_Wizard
 
 			if ($has_api_keys) {
 				// Move pointer to the next step, so when indexing is finished
-				// and the page is reloaded via JS we show step 3
-				self::next_step(3, false);
+				// and the page is reloaded via JS we show step 4
+				self::next_step(4, false);
 			}
 
 			// Send success ajax response
@@ -1159,17 +1089,17 @@ class Setup_Wizard
 			));
 		} else {
 			// Move to the next step.
-			self::next_step(3);
+			self::next_step(4);
 		}
 	}
 
 	/**
-	 * Handle the submit of step 3 - Internal search.
+	 * Handle the submit of step 4 - Internal search.
 	 */
-	private function process_step_3()
+	private function process_step_4()
 	{
 
-		$this->log->log('Processing Wizard Step 3');
+		$this->log->log('Processing Wizard Step 4');
 		// If there's no plugin active we still need to process 1 language.
 		$languages = $this->language->get_formatted_languages();
 
@@ -1196,21 +1126,34 @@ class Setup_Wizard
 	}
 
 	/**
-	 * Handle the submit of step 4 - JS Layer.
+	 * Handle the submit of step 5
 	 */
-	private function process_step_4()
+	private function process_step_5()
 	{
 
-		$is_processing = isset($_POST['process-step']) && $_POST['process-step'] === '4';
+		$is_processing = isset($_POST['process-step']) && $_POST['process-step'] === '5';
 
 		if (!$is_processing) {
 			return;
 		}
 
-		$this->log->log('Processing Wizard Step 4');
+		$this->log->log('Processing Wizard Step 5');
 
 		// Move to the next step. Step that exceedes number of steps to deactivate the wizard.
 		self::next_step(self::$no_steps + 1);
+	}
+
+	/**
+	 * Redirect using JS to avoid alredy sent headers issue
+	 */
+
+	private function js_go_to_step($step)
+	{
+	?>
+		<script>
+			document.location.href = 'admin.php?page=dfwc-setup&step=<?php echo $step; ?>'
+		</script>
+<?php
 	}
 
 	/**
@@ -1348,6 +1291,170 @@ class Setup_Wizard
 			return false;
 		}
 	}
+
+
+	private function check_api_settings($step)
+	{
+		$api_key = $_REQUEST['api_token'] ?? null;
+		$api_host = $_REQUEST['api_endpoint'] ?? null; // i.e: eu1-api.doofinder.com for API v2.0
+		$admin_endpoint = $_REQUEST['admin_endpoint'] ?? null; // i.e: eu1-app.doofinder.com for API v2.0
+		$search_endpoint = $_REQUEST['search_endpoint'] ?? null; // i.e: eu1-search.doofinder.com for API v2.0
+
+		if (empty($api_key)) {
+			$this->add_wizard_step_error($step, 'api-key', __('API key is missing.', 'woocommerce-doofinder'));
+		} else {
+			$this->remove_wizard_step_error($step, 'api-key');
+		}
+
+		if (empty($api_host)) {
+			$this->add_wizard_step_error($step, 'api-host', __('API host is missing.', 'woocommerce-doofinder'));
+		} else {
+			$this->remove_wizard_step_error($step, 'api-host');
+		}
+
+		if (empty($admin_endpoint)) {
+			$this->add_wizard_step_error($step, 'admin-endpoint', __('Admin endpoint is missing.', 'woocommerce-doofinder'));
+		} else {
+			$this->remove_wizard_step_error($step, 'admin-endpoint');
+		}
+
+		if (empty($search_endpoint)) {
+			$this->add_wizard_step_error($step, 'search-endpoint', __('Search endpoint is missing.', 'woocommerce-doofinder'));
+		} else {
+			$this->remove_wizard_step_error($step, 'search-endpoint');
+		}
+
+		if (!empty($this->errors['wizard-step-' . $step])) {
+			return FALSE;
+		}
+
+		// Api Host should contain 'https://' protocol, i.e. https://eu1-api.doofinder.com
+		if (!preg_match("#^((https?://)|www\.?)#i", $api_host)) {
+			$api_host = 'https://' . $api_host;
+		}
+
+		// Admin Endpoint should contain 'https://' protocol, i.e. https://eu1-api.doofinder.com
+		if (!preg_match("#^((https?://)|www\.?)#i", $admin_endpoint)) {
+			$admin_endpoint = 'https://' . $admin_endpoint;
+		}
+
+		// Search Endpoint should contain 'https://' protocol, i.e. https://eu1-api.doofinder.com
+		if (!preg_match("#^((https?://)|www\.?)#i", $search_endpoint)) {
+			$search_endpoint = 'https://' . $search_endpoint;
+		}
+
+		return [
+			'api_key' => $api_key,
+			'api_host' => $api_host,
+			'admin_endpoint' => $admin_endpoint,
+			'search_endpoint' => $search_endpoint
+		];
+	}
+
+	private function is_valid_token($step)
+	{
+		$token = $_POST['token'] ?? '';
+		$saved_token = $this->getToken();
+
+		// Exit early if tokens do not match
+		if ($token !== $saved_token) {
+			$this->log->log('Processing Wizard Step 2 - Recieved Token - ' . $token);
+			$this->log->log('Processing Wizard Step 2 - Saved Token - ' . $saved_token);
+			$this->add_wizard_step_error($step, 'token', __('Invalid token', 'woocommerce-doofinder'));
+			return false;
+		} else {
+			$this->remove_wizard_step_error($step, 'token');
+		}
+		return true;
+	}
+
+	private function test_api_settings($api_settings)
+	{
+		extract($api_settings);
+
+		if (!$this->disable_api) {
+			try {
+				$client = new ManagementClient($api_host, $api_key);
+				$this->log->log('Wizard Step 2 - Call Api - List search engines ');
+				$this->log->log('Wizard Step 2 - API key: ' . $api_key);
+				$this->log->log('Wizard Step 2 - API host: ' . $api_host);
+
+				$response = $client->listSearchEngines();
+				$this->log->log('Wizard Step 2 - List Search engines Response: ');
+				$this->log->log($response);
+
+				$this->log->log('Wizard Step 2 - List search engines - success ');
+				return true;
+			} catch (\DoofinderManagement\ApiException $exception) {
+				$this->log->log('Wizard Step 2: ' . $exception->getMessage());
+				$this->add_wizard_step_error($step, 'api-endpoint-connection-failed', __('Could not connect to the API. API Key or Host is not valid.', 'woocommerce-doofinder'));
+			} catch (\Exception $exception) {
+				$this->log->log('Wizard Step 2 - Exception ');
+				$this->log->log($exception);
+
+				if ($exception instanceof DoofinderError) {
+					$this->log->log($exception->getBody());
+				}
+			}
+		} else {
+			return true;
+		}
+		return false;
+	}
+
+	private function save_api_settings($api_settings)
+	{
+		extract($api_settings);
+		// Check if api key already exists and is the same
+		// If api key is different clear all settings
+		$saved_api_key = Settings::get_api_key();
+
+		if ($saved_api_key !== $api_key) {
+			$this->clear_all_settings();
+		}
+
+		Settings::set_api_key($api_key);
+		Settings::set_api_host($api_host);
+		Settings::set_admin_endpoint($admin_endpoint);
+		Settings::set_search_engine_server($search_endpoint);
+	}
+
+
+	private function get_wizard_errors()
+	{
+		return get_option('woocommerce_doofinder_wizard_errors', []);
+	}
+
+	private function set_wizard_errors($errors)
+	{
+		return update_option('woocommerce_doofinder_wizard_errors', $errors);
+	}
+
+	private function add_wizard_step_error($step, $field_name, $error)
+	{
+		$this->log->log('Processing Wizard Step ' . $step . ' - Error - ' . $error);
+
+		$errors = $this->get_wizard_errors();
+		$this->errors['wizard-step-' . $step][$field_name] = $error;
+
+		if (!isset($errors['wizard-step-' . $step])) {
+			$errors['wizard-step-' . $step] = [];
+		}
+
+		$errors['wizard-step-' . $step][$field_name] = $error;
+		$this->set_wizard_errors($errors);
+	}
+
+	private function remove_wizard_step_error($step, $field_name)
+	{
+		$errors = $this->get_wizard_errors();
+		if (isset($errors['wizard-step-' . $step]) && isset($errors['wizard-step-' . $step][$field_name])) {
+			unset($errors['wizard-step-' . $step][$field_name]);
+			$this->set_wizard_errors($errors);
+		}
+	}
+
+
 
 	/**
 	 * Alias for creating JS Layer for given search engine

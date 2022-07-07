@@ -586,6 +586,40 @@ trait Accessors
 		), $update_time);
 	}
 
+
+	/**
+	 * Retrieve the Business Sector
+	 *
+	 * Just an alias for "get_option", because ideally we don't
+	 * want to replace the option name in multiple files.
+	 *
+	 * @param string $language Language code.
+	 *
+	 * @return bool
+	 */
+	public static function get_sector($language = '')
+	{
+		return get_option(self::option_name_for_language(
+			'doofinder_for_wc_sector',
+			$language
+		));
+	}
+
+
+	/**
+	 * Update the value of the Business Sector
+	 *
+	 * Just an alias for "update_option", because ideally we don't
+	 * want to replace the option name in multiple files.
+	 *
+	 * @param string $value
+	 * @param string $language Language code.
+	 */
+	public static function set_sector($value, $language = '')
+	{
+		update_option(self::option_name_for_language('doofinder_for_wc_sector', $language), $value);
+	}
+
 	/**
 	 * Generate the name of the option for a given language.
 	 *
