@@ -48,7 +48,7 @@ jQuery(() => {
       window.onbeforeunload = () => null;
     }
   };
-
+  /*
   const ajaxCheckData = () => {
     jQuery
       .ajax({
@@ -93,7 +93,7 @@ jQuery(() => {
         }
       });
   };
-
+*/
   $("#doofinder-for-wc-index-button").click(() => {
     const progressBarWrapper = $(".dfwc-setup-step__progress-bar-wrapper").get(
       0
@@ -104,15 +104,77 @@ jQuery(() => {
 
   $(".open-window").click((e) => {
     const pageType = $(e.currentTarget).attr("data-type");
+    doofinderAdminEndpoint = "https://pedro-doomanager.ngrok.doofinder.com";
 
     connectModal = popupCenter({
-      url: `https://app.doofinder.com/plugins/${pageType}/woocommerce?email=${doofinderConnectEmail}&token=${doofinderConnectToken}&return_path=${doofinderConnectReturnPath}`,
+      url: `${doofinderAdminEndpoint}/plugins/${pageType}/woocommerce?email=${doofinderConnectEmail}&token=${doofinderConnectToken}`,
       title: "DoofinderConnect",
       w: 600,
       h: 700,
     });
 
-    clearInterval(checkInterval);
-    checkInterval = setInterval(ajaxCheckData, 1000);
+    //clearInterval(checkInterval);
+    //checkInterval = setInterval(ajaxCheckData, 1000);
   });
+
+  window.addEventListener(
+    "message",
+    (event) => {
+      // Do we trust the sender of this message?  (might be
+      // different from what we originally opened, for example).
+      if (event.origin !== doofinderAdminEndpoint) return;
+      console.log(event.source, "Source");
+      console.log(event.data, "data");
+      if (event.data) {
+        data = event.data.split("|");
+        event_name = data[0];
+        event_data = JSON.parse(atob(data[1]));
+        processMessage(event_name, event_data);
+      }
+    },
+    false
+  );
+
+  function processMessage(name, data) {
+    switch (name) {
+      case "set_doofinder_data":
+        console.log("Send ajax request to save the doofinder connection data");
+        console.log(data);
+        send_connect_data(data);
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  function send_connect_data(data) {
+    data["action"] = "doofinder_set_connection_data";
+    jQuery
+      .ajax({
+        type: "POST",
+        dataType: "json",
+        url: DoofinderForWC.ajaxUrl,
+        data: data,
+      })
+      .then((response) => {
+        if (response.success) {
+          confirmLeavePage(false);
+          window.location.href = doofinderSetupWizardUrl;
+          return;
+        } else {
+          $(".errors-wrapper ul").remove();
+          if (response.errors) {
+            errors = "<ul>";
+            for (er in response.errors) {
+              error = response.errors[er];
+              errors += "<li>" + error + "</li>";
+            }
+            errors += "</ul>";
+            $(".errors-wrapper").append(errors);
+            $(".errors-wrapper").show();
+          }
+        }
+      });
+  }
 });

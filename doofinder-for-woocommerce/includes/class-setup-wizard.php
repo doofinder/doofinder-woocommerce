@@ -22,6 +22,7 @@ use Error;
 use Doofinder\Management\Errors\DoofinderError;
 use Doofinder\WC\Api\Store_Api;
 use Exception;
+use WP_REST_Response;
 
 class Setup_Wizard
 {
@@ -272,9 +273,7 @@ class Setup_Wizard
 
 		$setup_wizard = self::instance();
 		$setup_wizard->log->log('Setup Wizard - Connect');
-		$setup_wizard->process_step_2(true);
-
-		return new \WP_REST_Response("ok", 200);
+		return $setup_wizard->process_step_2(true);
 	}
 
 	/**
@@ -311,6 +310,21 @@ class Setup_Wizard
 			//$data = Setup_Wizard::instance();
 			//$this->log->log('Doing ajax - doofinder_for_wc_check_data');
 			self::check_data();
+		});
+
+		add_action('wp_ajax_doofinder_set_connection_data', function () {
+			$this->log->log('Setup Wizard - Connect');
+			$this->process_step_2(true);
+			$resp = ["success" => Settings::is_api_configuration_complete()];
+
+			if (!empty($this->errors['wizard-step-2'])) {
+				$resp = [
+					"success" => false,
+					"errors" => $this->errors['wizard-step-2']
+				];
+			}
+
+			die(json_encode($resp));
 		});
 	}
 
@@ -427,6 +441,13 @@ class Setup_Wizard
 	 */
 	public function getReturnPath()
 	{
+
+		/*
+		$setup_wizard_url = get_site_url(null, 'wp-content/plugins/doofinder-for-woocommerce/api/connect/');
+		$blog_id = get_current_blog_id();
+		$setup_wizard_url .= $blog_id === 1 ? "": "?site_id=".$blog_id;
+		*/
+
 		$setup_wizard_url = get_site_url(null, 'wp-json/doofinder-for-wc/v1/connect/');
 		return $setup_wizard_url;
 	}
@@ -978,9 +999,9 @@ class Setup_Wizard
 
 			$this->log->log('Processing Wizard Step 2 - All data saved');
 			// ...and move to the next step.
-			self::next_step(3);
+			self::next_step(3, false);
 		} else {
-			$this->add_wizard_step_error($step, 'admin-endpoint', __('Something went wrong.', 'woocommerce-doofinder'));
+			$this->add_wizard_step_error($step, 'admin-endpoint', __("Couldn't connect with the API. Try again later. If the problem persists, contact us at support@doofinder.com", 'woocommerce-doofinder'));
 			return;
 		}
 	}
@@ -990,6 +1011,7 @@ class Setup_Wizard
 	 */
 	private function process_step_3($is_ajax = false, $data = null)
 	{
+		return;
 		$is_processing = isset($_REQUEST['process_step']) && $_REQUEST['process_step'] === '3';
 
 		if (!$is_processing) {
@@ -1300,6 +1322,7 @@ class Setup_Wizard
 		$admin_endpoint = $_REQUEST['admin_endpoint'] ?? null; // i.e: eu1-app.doofinder.com for API v2.0
 		$search_endpoint = $_REQUEST['search_endpoint'] ?? null; // i.e: eu1-search.doofinder.com for API v2.0
 
+		$api_host = '//aaa.com';
 		if (empty($api_key)) {
 			$this->add_wizard_step_error($step, 'api-key', __('API key is missing.', 'woocommerce-doofinder'));
 		} else {
@@ -1387,7 +1410,7 @@ class Setup_Wizard
 				return true;
 			} catch (\DoofinderManagement\ApiException $exception) {
 				$this->log->log('Wizard Step 2: ' . $exception->getMessage());
-				$this->add_wizard_step_error($step, 'api-endpoint-connection-failed', __('Could not connect to the API. API Key or Host is not valid.', 'woocommerce-doofinder'));
+				$this->add_wizard_step_error(2, 'api-endpoint-connection-failed', __('Could not connect to the API. API Key or Host is not valid.', 'woocommerce-doofinder'));
 			} catch (\Exception $exception) {
 				$this->log->log('Wizard Step 2 - Exception ');
 				$this->log->log($exception);
