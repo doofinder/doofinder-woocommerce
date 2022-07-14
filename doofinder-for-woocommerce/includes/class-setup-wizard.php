@@ -452,6 +452,11 @@ class Setup_Wizard
 		return $setup_wizard_url;
 	}
 
+	public function getAdminPath()
+	{
+		return  "https://app.doofinder.com";
+	}
+
 	/**
 	 * What the current step of the wizard is? This is the last step
 	 * that the user have seen and not submitted yet.
@@ -1011,7 +1016,6 @@ class Setup_Wizard
 	 */
 	private function process_step_3($is_ajax = false, $data = null)
 	{
-		return;
 		$is_processing = isset($_REQUEST['process_step']) && $_REQUEST['process_step'] === '3';
 
 		if (!$is_processing) {
@@ -1322,7 +1326,6 @@ class Setup_Wizard
 		$admin_endpoint = $_REQUEST['admin_endpoint'] ?? null; // i.e: eu1-app.doofinder.com for API v2.0
 		$search_endpoint = $_REQUEST['search_endpoint'] ?? null; // i.e: eu1-search.doofinder.com for API v2.0
 
-		$api_host = '//aaa.com';
 		if (empty($api_key)) {
 			$this->add_wizard_step_error($step, 'api-key', __('API key is missing.', 'woocommerce-doofinder'));
 		} else {
