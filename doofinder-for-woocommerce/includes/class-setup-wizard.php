@@ -4,25 +4,16 @@ namespace Doofinder\WC;
 
 use Doofinder\WC\Multilanguage\Language_Plugin;
 use Doofinder\WC\Multilanguage\Multilanguage;
-use Doofinder\WC\Multilanguage as Multilang;
-
 use Doofinder\WC\Settings\Settings;
-use Doofinder\WC\Helpers\Template_Engine;
 use Doofinder\WC\Helpers\Helpers;
 use Doofinder\Management\ManagementClient;
 use Doofinder\WC\Log;
-use Doofinder\WC\Api\Api_Factory;
 use Doofinder\WC\Api\Api_Wrapper;
-use Doofinder\WC\Api\Api_Status;
 use Doofinder\WC\Index_Interface;
-
 use Doofinder\GuzzleHttp\Client as GuzzleClient;
-
-use Error;
 use Doofinder\Management\Errors\DoofinderError;
 use Doofinder\WC\Api\Store_Api;
 use Exception;
-use WP_REST_Response;
 
 class Setup_Wizard
 {
