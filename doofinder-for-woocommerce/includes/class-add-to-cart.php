@@ -51,7 +51,15 @@ class Add_To_Cart
     public static function product_info()
     {
         $post_id = $_REQUEST['id'] ?? NULL;
+        if (empty($post_id)) {
+            return '';
+        }
+
         $product = wc_get_product($post_id);
+        if (empty($product)) {
+            return '';
+        }
+
         $variation_id = 0;
 
         if (is_a($product, 'WC_Product_Variation')) {
