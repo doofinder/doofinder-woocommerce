@@ -209,6 +209,13 @@ class Setup_Wizard
 	 */
 	public static $should_fail = false;
 
+	/**
+	 * Admin path used to get the connection details
+	 * 
+	 * @var string
+	 */
+	const ADMIN_PATH = 'https://app.doofinder.com';
+
 
 	public function __construct()
 	{
@@ -441,20 +448,13 @@ class Setup_Wizard
 	 */
 	public function getReturnPath()
 	{
-
-		/*
-		$setup_wizard_url = get_site_url(null, 'wp-content/plugins/doofinder-for-woocommerce/api/connect/');
-		$blog_id = get_current_blog_id();
-		$setup_wizard_url .= $blog_id === 1 ? "": "?site_id=".$blog_id;
-		*/
-
 		$setup_wizard_url = get_site_url(null, 'wp-json/doofinder-for-wc/v1/connect/');
 		return $setup_wizard_url;
 	}
 
 	public function getAdminPath()
 	{
-		return  "https://app.doofinder.com";
+		return self::ADMIN_PATH;
 	}
 
 	/**
@@ -994,7 +994,7 @@ class Setup_Wizard
 		}
 
 		// Check if api key and api host is valid, make test call to API
-		if ($this->test_api_settings($api_settings)) {
+		if ($this->test_api_settings($api_settings, $step)) {
 			extract($api_settings);
 			$this->remove_wizard_step_error($step, 'api-endpoint-connection-failed');
 			$this->remove_wizard_step_error($step, 'api-endpoint');
@@ -1394,28 +1394,28 @@ class Setup_Wizard
 		return true;
 	}
 
-	private function test_api_settings($api_settings)
+	private function test_api_settings($api_settings, $step)
 	{
 		extract($api_settings);
 
 		if (!$this->disable_api) {
 			try {
 				$client = new ManagementClient($api_host, $api_key);
-				$this->log->log('Wizard Step 2 - Call Api - List search engines ');
-				$this->log->log('Wizard Step 2 - API key: ' . $api_key);
-				$this->log->log('Wizard Step 2 - API host: ' . $api_host);
+				$this->log->log('Wizard Step ' . $step . ' - Call Api - List search engines ');
+				$this->log->log('Wizard Step ' . $step . ' - API key: ' . $api_key);
+				$this->log->log('Wizard Step ' . $step . ' - API host: ' . $api_host);
 
 				$response = $client->listSearchEngines();
-				$this->log->log('Wizard Step 2 - List Search engines Response: ');
+				$this->log->log('Wizard Step ' . $step . ' - List Search engines Response: ');
 				$this->log->log($response);
 
-				$this->log->log('Wizard Step 2 - List search engines - success ');
+				$this->log->log('Wizard Step ' . $step . ' - List search engines - success ');
 				return true;
 			} catch (\DoofinderManagement\ApiException $exception) {
-				$this->log->log('Wizard Step 2: ' . $exception->getMessage());
-				$this->add_wizard_step_error(2, 'api-endpoint-connection-failed', __('Could not connect to the API. API Key or Host is not valid.', 'woocommerce-doofinder'));
+				$this->log->log('Wizard Step ' . $step . ': ' . $exception->getMessage());
+				$this->add_wizard_step_error($step, 'api-endpoint-connection-failed', __('Could not connect to the API. API Key or Host is not valid.', 'woocommerce-doofinder'));
 			} catch (\Exception $exception) {
-				$this->log->log('Wizard Step 2 - Exception ');
+				$this->log->log('Wizard Step ' . $step . ' - Exception ');
 				$this->log->log($exception);
 
 				if ($exception instanceof DoofinderError) {
