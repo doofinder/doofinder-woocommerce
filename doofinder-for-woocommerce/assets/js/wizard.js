@@ -69,8 +69,9 @@ jQuery(() => {
   window.addEventListener(
     "message",
     (event) => {
+      const doofinder_regex = /.*\.doofinder\.com/gm;
       //Check that the sender is doofinder
-      if (event.origin !== doofinderAdminPath) return;
+      if (!doofinder_regex.test(event.origin)) return;
       if (event.data) {
         data = event.data.split("|");
         event_name = data[0];
@@ -82,14 +83,7 @@ jQuery(() => {
   );
 
   function processMessage(name, data) {
-    switch (name) {
-      case "set_doofinder_data":
-        send_connect_data(data);
-        break;
-
-      default:
-        break;
-    }
+    if (name === "set_doofinder_data") send_connect_data(data);
   }
 
   function send_connect_data(data) {
@@ -99,24 +93,29 @@ jQuery(() => {
       dataType: "json",
       url: DoofinderForWC.ajaxUrl,
       data: data,
-    }).then((response) => {
-      if (response.success) {
-        confirmLeavePage(false);
-        window.location.href = doofinderSetupWizardUrl;
-        return;
-      } else {
-        $(".errors-wrapper ul").remove();
-        if (response.errors) {
-          errors = "<ul>";
-          for (er in response.errors) {
-            error = response.errors[er];
-            errors += "<li>" + error + "</li>";
-          }
-          errors += "</ul>";
-          $(".errors-wrapper").append(errors);
-          $(".errors-wrapper").show();
+      success: function (response) {
+        if (response.success) {
+          confirmLeavePage(false);
+          window.location.href = doofinderSetupWizardUrl;
+          return;
+        } else {
+          set_errors(response.errors);
         }
-      }
+      },
     });
+  }
+
+  function set_errors(errors) {
+    $(".errors-wrapper ul").remove();
+    if (errors) {
+      errors_html = "<ul>";
+      for (er in errors) {
+        error = errors[er];
+        errors_html += "<li>" + error + "</li>";
+      }
+      errors_html += "</ul>";
+      $(".errors-wrapper").append(errors_html);
+      $(".errors-wrapper").show();
+    }
   }
 });
