@@ -205,7 +205,7 @@ class Setup_Wizard
 	 * 
 	 * @var string
 	 */
-	const ADMIN_PATH = 'https://app.doofinder.com';
+	const ADMIN_PATH = 'https://admin.doofinder.com';
 
 
 	public function __construct()
@@ -1314,7 +1314,7 @@ class Setup_Wizard
 	{
 		$api_key = $_REQUEST['api_token'] ?? null;
 		$api_host = $_REQUEST['api_endpoint'] ?? null; // i.e: eu1-api.doofinder.com for API v2.0
-		$admin_endpoint = $_REQUEST['admin_endpoint'] ?? null; // i.e: eu1-app.doofinder.com for API v2.0
+		$admin_endpoint = $_REQUEST['admin_endpoint'] ?? null; // i.e: eu1-admin.doofinder.com for API v2.0
 		$search_endpoint = $_REQUEST['search_endpoint'] ?? null; // i.e: eu1-search.doofinder.com for API v2.0
 
 		if (empty($api_key)) {
@@ -1608,10 +1608,10 @@ class Setup_Wizard
 		}
 
 		// Check and update admin endpoint
-		$admin_endpoint_base = '-app.doofinder.com';
+		$admin_endpoint_base = '-admin.doofinder.com';
 		$admin_endpoint = Settings::get_admin_endpoint();
 
-		if (!$admin_endpoint || !preg_match("@$api_host_prefix-app@", $admin_endpoint || !preg_match("#^((https?://)|www\.?)#i", $admin_endpoint))) {
+		if (!$admin_endpoint || !preg_match("@$api_host_prefix-admin@", $admin_endpoint || !preg_match("#^((https?://)|www\.?)#i", $admin_endpoint))) {
 			$log->log('Migrate - Set Admin Endpoint');
 			Settings::set_admin_endpoint('https://' . $api_host_prefix . $admin_endpoint_base);
 		}
