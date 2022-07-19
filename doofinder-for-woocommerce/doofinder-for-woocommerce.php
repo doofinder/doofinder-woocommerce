@@ -153,15 +153,6 @@ if (
                     Post::register_rest_api_webhooks();
                 }
 
-                // Register custom WP REST Api endpoint
-                add_action('rest_api_init', function () use ($class) {
-                    register_rest_route('doofinder-for-wc/v1', '/connect/', array(
-                        'methods' => ['POST', 'GET'],
-                        'callback' => array($class, 'connect'),
-                        'permission_callback' => '__return_true'
-                    ));
-                });
-
                 // Some functionalities need to be initialized on both admin side, and frontend.
                 Both_Sides::instance();
                 Add_To_Cart::instance();
