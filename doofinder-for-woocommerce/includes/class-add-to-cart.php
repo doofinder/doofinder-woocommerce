@@ -41,24 +41,25 @@ class Add_To_Cart
 
         add_action('wp_ajax_doofinder_ajax_add_to_cart',  array(__CLASS__, 'doofinder_ajax_add_to_cart'));
         add_action('wp_ajax_nopriv_doofinder_ajax_add_to_cart',  array(__CLASS__, 'doofinder_ajax_add_to_cart'));
-
-        // Register custom WP REST Api endpoint
-        add_action('rest_api_init', function () {
-            register_rest_route('doofinder-for-wc/v1', '/product-info/(?P<id>\d+)', array(
-                'methods' => ['GET'],
-                'callback' => array(__CLASS__, 'product_info'),
-                'permission_callback' => '__return_true'
-            ));
-        });
+        add_action('wp_ajax_doofinder_get_product_info',  array(__CLASS__, 'product_info'));
+        add_action('wp_ajax_nopriv_doofinder_get_product_info',  array(__CLASS__, 'product_info'));
     }
 
     /**
-     * Callback for WP Rest Api item-info endpoint
+     * Returns the product info for a given id
      */
-    public static function product_info(\WP_REST_Request $request)
+    public static function product_info()
     {
-        $post_id = $request->get_param("id");
+        $post_id = $_REQUEST['id'] ?? NULL;
+        if (empty($post_id)) {
+            return '';
+        }
+
         $product = wc_get_product($post_id);
+        if (empty($product)) {
+            return '';
+        }
+
         $variation_id = 0;
 
         if (is_a($product, 'WC_Product_Variation')) {

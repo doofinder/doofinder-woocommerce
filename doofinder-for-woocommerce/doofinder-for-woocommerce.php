@@ -4,7 +4,7 @@
  * Plugin Name: Doofinder for WooCommerce
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 1.5.27
+ * Version: 1.5.28
  * Author: doofinder
  * Description: Integrate Doofinder Search in your WooCommerce shop.
  *
@@ -50,7 +50,7 @@ if (
              *
              * @var string
              */
-            public static $version = '1.5.27';
+            public static $version = '1.5.28';
 
             /**
              * The only instance of Doofinder_For_WooCommerce
@@ -152,15 +152,6 @@ if (
                     Front::instance();
                     Post::register_rest_api_webhooks();
                 }
-
-                // Register custom WP REST Api endpoint
-                add_action('rest_api_init', function () use ($class) {
-                    register_rest_route('doofinder-for-wc/v1', '/connect/', array(
-                        'methods' => ['POST', 'GET'],
-                        'callback' => array($class, 'connect'),
-                        'permission_callback' => '__return_true'
-                    ));
-                });
 
                 // Some functionalities need to be initialized on both admin side, and frontend.
                 Both_Sides::instance();

@@ -49,6 +49,7 @@ $wp_styles = wp_styles();
         ?>
         const doofinderConnectToken = '<?php echo $token; ?>';
         const doofinderConnectReturnPath = '<?php echo $this->getReturnPath(); ?>';
+        const doofinderAdminPath = '<?php echo $this->getAdminPath(); ?>';
         const doofinderSetupWizardUrl = '<?php echo $this->get_url(); ?>';
     </script>
     <script src="<?php echo $wp_scripts->base_url . $wp_scripts->registered['jquery-core']->src; ?>"></script>

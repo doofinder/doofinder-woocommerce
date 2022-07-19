@@ -11,9 +11,13 @@
     item_id = parseInt(item_id);
 
     $.ajax({
-      type: "get",
-      url: df_cart.item_info_endpoint + item_id,
+      type: "post",
+      url: df_cart.ajax_url,
       dataType: "json",
+      data: {
+        action: "doofinder_get_product_info",
+        id: item_id,
+      },
       success: function (response) {
         if (response.add_to_cart) {
           wc_add_to_cart(response.product, response.variation, amount);
