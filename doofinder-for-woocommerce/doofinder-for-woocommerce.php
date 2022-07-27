@@ -4,7 +4,7 @@
  * Plugin Name: Doofinder for WooCommerce
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 1.5.28
+ * Version: 1.5.29
  * Author: doofinder
  * Description: Integrate Doofinder Search in your WooCommerce shop.
  *
@@ -44,13 +44,19 @@ if (
          */
         class Doofinder_For_WooCommerce
         {
+            /**
+             * Previous error level.
+             *
+             * @var int
+             */
+            public static $prev_errors;
 
             /**
              * Plugin version.
              *
              * @var string
              */
-            public static $version = '1.5.28';
+            public static $version = '1.5.29';
 
             /**
              * The only instance of Doofinder_For_WooCommerce
@@ -157,7 +163,6 @@ if (
                 Both_Sides::instance();
                 Add_To_Cart::instance();
 
-                self::maybe_suppress_notices();
             }
 
             /**
@@ -177,8 +182,16 @@ if (
              */
             public static function maybe_suppress_notices()
             {
-                if (is_ssl() || getenv('APP_ENV') === 'production') {
-                    error_reporting(E_ALL & ~E_NOTICE);
+                if (is_ssl() || getenv('APP_ENV') === 'production' && !isset(static::$prev_errors)) {
+                    static::$prev_errors = error_reporting();
+                    error_reporting(static::$prev_errors & ~E_NOTICE);
+                }
+            }
+
+            public static function maybe_restore_notices()
+            {                
+                if (is_ssl() || getenv('APP_ENV') === 'production' && isset(static::$prev_errors)) {
+                    error_reporting(static::$prev_errors);                    
                 }
             }
 
