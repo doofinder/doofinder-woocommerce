@@ -313,6 +313,7 @@ class Data_Feed {
 	 * @since 1.0.0
 	 */
 	public function generate() {
+		Doofinder_For_WooCommerce::maybe_suppress_notices();
 		header( 'Content-Type: text/plain' );
 		//header( 'Content-Type: text/html' );
 
@@ -325,8 +326,8 @@ class Data_Feed {
 			$this->add_products();
 			$this->render();
 		}
-
 		echo '';
+		Doofinder_For_WooCommerce::maybe_restore_notices();
 	}
 
 
