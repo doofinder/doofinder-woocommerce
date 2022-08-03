@@ -4,7 +4,7 @@
  * Plugin Name: Doofinder for WooCommerce
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 1.5.29
+ * Version: 1.5.30
  * Author: doofinder
  * Description: Integrate Doofinder Search in your WooCommerce shop.
  *
@@ -56,7 +56,7 @@ if (
              *
              * @var string
              */
-            public static $version = '1.5.29';
+            public static $version = '1.5.30';
 
             /**
              * The only instance of Doofinder_For_WooCommerce
@@ -132,6 +132,8 @@ if (
                     call_user_func(array($class, 'register_urls'));
                 });
 
+                add_action('plugins_loaded', array($class, 'plugin_update'));
+
                 // Initialize Admin Panel functionality on admin side, and front functionality on front side
                 if (is_admin()) {
                     if (Setup_Wizard::should_activate()) {
@@ -162,7 +164,6 @@ if (
                 // Some functionalities need to be initialized on both admin side, and frontend.
                 Both_Sides::instance();
                 Add_To_Cart::instance();
-
             }
 
             /**
@@ -189,9 +190,9 @@ if (
             }
 
             public static function maybe_restore_notices()
-            {                
+            {
                 if (is_ssl() || getenv('APP_ENV') === 'production' && isset(static::$prev_errors)) {
-                    error_reporting(static::$prev_errors);                    
+                    error_reporting(static::$prev_errors);
                 }
             }
 
@@ -392,6 +393,13 @@ if (
                 $links['settings'] = '<a href="' . Settings::get_url() . '">' . __('Settings', 'woocommerc-doofinder') . '</a>';
 
                 return array_reverse($links); // array reverse to display "Settings" link first
+            }
+
+            public static function plugin_update()
+            {
+                if (Settings::get_plugin_version() != self::$version) {
+                    Update_Manager::check_updates(self::$version);
+                }
             }
         }
 
