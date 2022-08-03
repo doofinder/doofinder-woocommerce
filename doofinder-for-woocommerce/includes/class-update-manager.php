@@ -40,19 +40,17 @@ class Update_Manager
 				$result = NULL;
 				try {
 					$result = call_user_func(array(Update_Manager::class, $update_function));
-					if (!$result) {
-						//Throw an empty error to add a default notice
-						throw new \Exception("");
-					}
 				} catch (\Exception $ex) {
-					self::log("The update $update_function Failed with message: " .  $ex->getMessage());
-					self::add_admin_notice(self::format_normalized_plugin_version($version_number), $ex->getMessage());
+					self::update_failed($version_number, $ex->getMessage());
 					break;
 				}
 
 				if ($result) {
-					//Remove the current update notice if in case it exists
-					self::remove_admin_notice(self::format_normalized_plugin_version($version_number));
+					//Remove the current update notice in case it exists
+					self::remove_admin_notice($version_number);
+				} else {
+					self::update_failed($version_number);
+					break;
 				}
 
 				self::log("The update $update_function Succeeded");
@@ -91,6 +89,15 @@ class Update_Manager
 		}, $version);
 
 		return implode(".", $version);
+	}
+
+	/**
+	 * Logs the error and adds an admin notice
+	 */
+	private static function update_failed($version, $message = "")
+	{
+		self::log("ERROR: The update $version failed with message: " .  $message);
+		self::add_admin_notice($version, $message);
 	}
 
 	/**
