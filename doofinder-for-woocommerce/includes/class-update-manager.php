@@ -144,8 +144,7 @@ class Update_Manager
 
 		</div>
 <?php
-		$html = ob_get_clean();
-		return $html;
+		return ob_get_clean();
 	}
 
 	private static function log($message)
