@@ -468,7 +468,7 @@ trait Accessors
 	 */
 	public static function is_update_on_save_enabled()
 	{
-		$option = get_option('woocommerce_doofinder_indexing_update_on_save');
+		$option = get_option('woocommerce_doofinder_indexing_update_on_save', 'yes');
 		return  $option === 'yes' ? true : false;
 	}
 
