@@ -364,43 +364,19 @@ class Data_Feed {
 	private function add_products() {
 		
 		foreach ( $this->products as $post ) {
-			$product = WC()->product_factory->get_product( $post );
-
-			// Commented out because, the variable split is done differently now, via load_products and get_posts_ids
-
-			// if ( 'yes' === $this->settings['split_variable'] && $product->is_type( 'variable' ) ) {
-			// 	$children = $product->get_children();
-
-			// 	foreach ( $children as $child ) {
-			// 		// If product variations have non-public status they won't be present
-			// 		// in this array.
-			// 		if ( ! $this->product_variations[ $child ] ) {
-			// 			continue;
-			// 		}
-
-			// 		$item = new Data_Feed_Item(
-			// 			$this->product_variations[ $child ],
-			// 			get_post($product->get_id()),
-
-			// 			$this->settings,
-			// 			$this->paths_cache,
-			// 			$this->terms_cache
-			// 		);
-					
-			// 		$this->add_item_to_feed( $item->get_fields() );
-			// 	}
-			// } else {
-				$item = new Data_Feed_Item(
-					$post,
-					null,
-
-					$this->settings,
-					$this->paths_cache,
-					$this->terms_cache
-				);
-				
-				$this->add_item_to_feed( $item->get_fields() );
-			//}
+			$df_post = new Post($post);
+			if (!$df_post->is_indexable()) {
+				continue;
+			}
+			$item = new Data_Feed_Item(
+				$post,
+				null,
+				$this->settings,
+				$this->paths_cache,
+				$this->terms_cache
+			);
+			
+			$this->add_item_to_feed( $item->get_fields() );
 		}
 	}
 
