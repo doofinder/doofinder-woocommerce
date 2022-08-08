@@ -644,4 +644,33 @@ trait Accessors
 
 		return $option_name;
 	}
+
+
+	/**
+	 * Retrieve the Plugin Version
+	 *
+	 * Just an alias for "get_option", because ideally we don't
+	 * want to replace the option name in multiple files.
+	 *
+	 *
+	 * @return string
+	 */
+	public static function get_plugin_version()
+	{
+		return get_option('doofinder_for_wc_plugin_version', '1.5.29');
+	}
+
+
+	/**
+	 * Update the value of the Plugin Version
+	 *
+	 * Just an alias for "update_option", because ideally we don't
+	 * want to replace the option name in multiple files.
+	 *
+	 * @param string $value
+	 */
+	public static function set_plugin_version($value)
+	{
+		update_option("doofinder_for_wc_plugin_version", $value);
+	}
 }
