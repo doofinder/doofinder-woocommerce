@@ -483,8 +483,9 @@ class Data_Feed_Item {
 		// $this->log->log('Decode fields: ');
 		// $this->log->log( $this->fields );
 
-		array_walk_recursive($this->fields, function( &$item ) {
-			$item = html_entity_decode( $item, ENT_QUOTES );
+		array_walk_recursive($this->fields, function( &$value, $key ) {
+            if(!str_contains($key, 'price'))
+                $value = html_entity_decode( $value, ENT_QUOTES );
 		} );
 
 		// $this->log->log('Decoded fields: ');
