@@ -128,6 +128,9 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 == Changelog ==
 
 = 1.5.33 =
+Changed method for another more compatible with older php versions
+
+= 1.5.32 =
 Solved bug that made price to be converted into string
 
 = 1.5.31 =
