@@ -1,7 +1,7 @@
 === Doofinder for WooCommerce ===
 Contributors: doofinder
 Tags: search, autocomplete, woocommerce
-Version: 1.5.32
+Version: 1.5.33
 Requires at least: 5.0
 Tested up to: 6.0
 Requires PHP: 5.6
@@ -127,7 +127,7 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 
 == Changelog ==
 
-= 1.5.32 =
+= 1.5.33 =
 Solved bug that made price to be converted into string
 
 = 1.5.31 =
