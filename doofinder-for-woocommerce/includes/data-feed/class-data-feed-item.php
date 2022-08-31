@@ -484,8 +484,9 @@ class Data_Feed_Item {
 		// $this->log->log( $this->fields );
 
 		array_walk_recursive($this->fields, function( &$value, $key ) {
-            if(!str_contains($key, 'price'))
+            if(strpos($key, 'price') === false) {
                 $value = html_entity_decode( $value, ENT_QUOTES );
+            }
 		} );
 
 		// $this->log->log('Decoded fields: ');
@@ -523,13 +524,15 @@ class Data_Feed_Item {
 		$terms = get_the_terms( $id, 'product_cat' );
 		$this->log->log('Data Feed Item - Get Categories: ');
 		$this->log->log( $terms );
-
+        
 		if( !empty( $terms ) && is_array( $terms )) {
-			foreach ( $terms as $term ) {
-				$paths[] = $this->get_category_path( $term );
+            foreach ( $terms as $term ) {
+                $paths[] = $this->get_category_path( $term );
 			}
 			$this->clean_paths( $paths );
-
+            
+            $this->log->log('Returning paths: ');
+            $this->log->log($paths);
 			return $paths;
 		}
 
