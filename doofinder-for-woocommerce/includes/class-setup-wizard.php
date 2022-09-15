@@ -126,7 +126,7 @@ class Setup_Wizard
 	 *
 	 * @var int
 	 */
-	private static $no_steps = 4;
+	private static $no_steps = 5;
 
 	/**
 	 * Instance of the class handling the multilanguage.
@@ -1147,16 +1147,7 @@ class Setup_Wizard
 	 */
 	private function process_step_5()
 	{
-
-		$is_processing = isset($_POST['process-step']) && $_POST['process-step'] === '5';
-
-		if (!$is_processing) {
-			return;
-		}
-
-		$this->log->log('Processing Wizard Step 5');
-
-		// Move to the next step. Step that exceedes number of steps to deactivate the wizard.
+		// Move to the next step. Step that exceeds number of steps to deactivate the wizard.
 		self::next_step(self::$no_steps + 1);
 	}
 
