@@ -50,7 +50,7 @@
           window.location = response.product_url;
           return;
         } else {
-          if (wc_add_to_cart_params != undefined) {
+          if (typeof(wc_add_to_cart_params) != 'undefined') {
             //Woocommerce cart is included, trigger add to cart event
             $(document.body).trigger("added_to_cart", [
               response.fragments,
