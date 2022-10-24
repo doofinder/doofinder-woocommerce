@@ -16,7 +16,6 @@ use Doofinder\Management\Errors\NotFound;
 use Doofinder\Management\Errors\BadRequest;
 use Doofinder\Management\Errors\DoofinderError;
 
-use function WPML\FP\tryCatch;
 
 defined( 'ABSPATH' ) or die();
 
