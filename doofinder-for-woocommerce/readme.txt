@@ -128,7 +128,7 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 == Changelog ==
 
 = 1.5.37 =
-Fixed some bugs with temporary indices
+Restore to v1.5.35
 
 = 1.5.36 =
 Fixed a bug with multilanguage indexation
