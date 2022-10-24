@@ -357,7 +357,7 @@ class Doofinder_Api implements Api_Wrapper {
 
 			if ( ! $indexing_data->has( 'temp_index', $items_type ) ) {
 				try {
-					$this->create_temporary_index($items_type);
+					$this->create_index($items_type);
 				} catch (\Exception $ex) {
 					if($ex->getMessage() === Api_Status::$unknown_error){
 						return Api_Status::$unknown_error;
@@ -412,11 +412,11 @@ class Doofinder_Api implements Api_Wrapper {
 		$this->log->log('End Send Batch' . "\n");
 	}
 
-	public function create_temporary_index($items_type){
+	public function create_index($items_type){
 		$this->log->log('Send batch - createTemporaryIndex' . "\n");
 		// Try to create the temp index.
 		try {
-			$this->_create_temporary_index($items_type);
+			$this->create_temporary_index($items_type);
 		} catch ( NotFound $exception ) {
 			// If real index does not exists creating temp index will fail,
 			// So we need to create real index first
@@ -424,7 +424,7 @@ class Doofinder_Api implements Api_Wrapper {
 
 			// Finally try to create temp index
 			try {
-				$this->_create_temporary_index($items_type);
+				$this->create_temporary_index($items_type);
 			} catch ( \Exception $exception ) {
 				// For some reason Index could not be created.
 				$this->log->log('Send batch - Temp Index NOT Created' . "\n");
@@ -449,7 +449,7 @@ class Doofinder_Api implements Api_Wrapper {
 		}
 	}
 
-	public function _create_temporary_index($items_type){
+	public function create_temporary_index($items_type){
 		$indexing_data = Indexing_Data::instance();
 
 		$this->log->log('Send batch - Try to create Temp Index' . "\n");
