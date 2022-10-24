@@ -16,6 +16,7 @@ use Doofinder\Management\Errors\NotFound;
 use Doofinder\Management\Errors\BadRequest;
 use Doofinder\Management\Errors\DoofinderError;
 
+
 defined( 'ABSPATH' ) or die();
 
 class Doofinder_Api implements Api_Wrapper {
