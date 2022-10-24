@@ -16,6 +16,7 @@ use Doofinder\Management\Errors\NotFound;
 use Doofinder\Management\Errors\BadRequest;
 use Doofinder\Management\Errors\DoofinderError;
 
+
 defined( 'ABSPATH' ) or die();
 
 class Doofinder_Api implements Api_Wrapper {
@@ -339,6 +340,11 @@ class Doofinder_Api implements Api_Wrapper {
 		// Doofinder API will throw an exception in case of invalid token
 		// or something like that.
 
+		// Check if we need to add the type in our own status.
+		// This should reduce the number of requests made to the
+		// Doofinder API.
+		$indexing_data = Indexing_Data::instance();
+
 		try {
 			if ( ! $this->search_engine ) {
 				$this->log->log( 'Send batch: Invalid search engine.' );
@@ -346,129 +352,23 @@ class Doofinder_Api implements Api_Wrapper {
 				return $this->search_engine_api_status;
 			}
 
-			// Check if we need to add the type in our own status.
-			// This should reduce the number of requests made to the
-			// Doofinder API.
-			$indexing_data = Indexing_Data::instance();
-
 			$this->log->log( 'Send Batch  - Temp Index Status' );
 			$this->log->log( $indexing_data->get('temp_index') );
 
 			if ( ! $indexing_data->has( 'temp_index', $items_type ) ) {
-
-				//$this->log->log('Send batch - createTemporaryIndex (:224)' . "\n");
-
-
-				// Create the type.
 				try {
-
-					$this->log->log('Send batch - Try to create Temp Index' . "\n");
-
-					if (!$this->disable_api) {
-						$this->log->log('=== API CALL === ');
-						$this->client->createTemporaryIndex( $this->hash,  $items_type );
-						$this->api_calls++;
-					}
-
-					$this->log->log('Send batch - Temp Index Created' . "\n");
-
-					//$this->log->log('Send batch - Set Temp Index Inner State ' . "\n");
-					// Mark it in our status.
-					$indexing_data->set( 'temp_index', $items_type );
-
-
-				} catch ( NotFound $exception ) {
-
-					// If real index does not exists creating temp index will fail,
-					// So we need to create real index first
-
-					$this->log->log('Send batch - Exception - Real Index Not Found' . "\n");
-
-					try {
-
-						$this->log->log('Send batch - Try to create Real Index' . "\n");
-
-						if (!$this->disable_api) {
-							$this->log->log('=== API CALL === ');
-							// Prepare index data
-							$body = [
-								'name' => $items_type,
-								'preset' => 'product'
-							];
-							$this->client->createIndex( $this->hash, json_encode($body) );
-							$this->api_calls++;
-						}
-
-						$this->log->log('Send batch - Real Index Created' . "\n");
-
-					} catch ( \Exception $exception ) {
-						// For some reason Index could not be created.
-						$this->log->log('Send batch - Real Index NOT Created' . "\n");
-						$this->log->log( get_class($exception));
-						$this->log->log( $exception->getMessage() );
-
-						if ( $exception instanceof DoofinderError ) {
-							$this->log->log( $exception->getBody() );
-						}
+					$this->create_index($items_type);
+				} catch (\Exception $ex) {
+					if($ex->getMessage() === Api_Status::$unknown_error){
 						return Api_Status::$unknown_error;
 					}
-
-					// Finally try to create temp index
-					try {
-
-						$this->log->log('Send batch - Try to create Temp Index' . "\n");
-
-						if (!$this->disable_api) {
-							$this->log->log('=== API CALL === ');
-							$this->client->createTemporaryIndex( $this->hash,  $items_type );
-							$this->api_calls++;
-						}
-
-						$this->log->log('Send batch - Temp Index Created' . "\n");
-
-						//$this->log->log('Send batch - Set Temp Index Inner State ' . "\n");
-						// Mark it in our status.
-						$indexing_data->set( 'temp_index', $items_type );
-
-					} catch ( \Exception $exception ) {
-
-							// For some reason Index could not be created.
-							$this->log->log('Send batch - Temp Index NOT Created' . "\n");
-							$this->log->log( get_class($exception));
-							$this->log->log( $exception->getMessage() );
-
-							if ( $exception instanceof DoofinderError ) {
-								$this->log->log( $exception->getBody() );
-							}
-							return Api_Status::$unknown_error;
-					}
-
-
-
-				} catch ( \Exception $exception ) {
-					// Temp Index could not be created it probably exists already. Move on.
-					$this->log->log('Send batch - Temp Index probably exists already' . "\n");
-					$this->log->log( get_class($exception));
-					$this->log->log( $exception->getMessage() );
-
-					if ( $exception instanceof DoofinderError ) {
-						$this->log->log( $exception->getBody() );
-					}
-
 				}
 			}
 
 			$this->log->log( 'Send Batch  - Before Create Bulk Temp Index Status' );
-
+			
 			$temp_index = $indexing_data->get('temp_index');
-
 			$this->log->log( $temp_index );
-
-			// Send the items to Doofinder.
-			//$this->log->log('Send batch - createTempBulk (:233)' . "\n");
-
-			//$this->log->log($this->hash);
-			//$this->log->log($items_type);
 			$this->log->log(json_encode($items));
 
 			if (!$this->disable_api) {
@@ -482,12 +382,15 @@ class Doofinder_Api implements Api_Wrapper {
 			}
 
 			$this->log->log( 'Send batch - Batch Sent' );
-
 			$this->log->log( 'Send batch - API CALLS ------  : ' . $this->api_calls  );
-
 
 			return Api_Status::$success;
 
+		} catch ( NotFound $exception ) {
+			//The API returned that the temporary index wasn't found, we'll reset temp_index and call send_batch again
+			$this->log->log( 'Temp index not found, reset temp_index and retry' . "\n" );
+			$indexing_data->set( 'temp_index', [], true );
+			return $this->send_batch( $items_type, $items, $language );
 		} catch ( \Exception $exception ) {
 			$this->log->log( 'Send Batch - Exception 1' . "\n" );
 			$this->log->log( get_class($exception));
@@ -507,6 +410,87 @@ class Doofinder_Api implements Api_Wrapper {
 		}
 
 		$this->log->log('End Send Batch' . "\n");
+	}
+
+	public function create_index($items_type){
+		$this->log->log('Send batch - createTemporaryIndex' . "\n");
+		// Try to create the temp index.
+		try {
+			$this->create_temporary_index($items_type);
+		} catch ( NotFound $exception ) {
+			// If real index does not exists creating temp index will fail,
+			// So we need to create real index first
+			$this->create_real_index($items_type);
+
+			// Finally try to create temp index
+			try {
+				$this->create_temporary_index($items_type);
+			} catch ( \Exception $exception ) {
+				// For some reason Index could not be created.
+				$this->log->log('Send batch - Temp Index NOT Created' . "\n");
+				$this->log->log( get_class($exception));
+				$this->log->log( $exception->getMessage() );
+
+				if ( $exception instanceof DoofinderError ) {
+					$this->log->log( $exception->getBody() );
+				}
+				throw new \Exception(Api_Status::$unknown_error);
+				
+			}
+		} catch ( \Exception $exception ) {
+			// Temp Index could not be created it probably exists already. Move on.
+			$this->log->log('Send batch - Temp Index probably exists already' . "\n");
+			$this->log->log( get_class($exception));
+			$this->log->log( $exception->getMessage() );
+
+			if ( $exception instanceof DoofinderError ) {
+				$this->log->log( $exception->getBody() );
+			}
+		}
+	}
+
+	public function create_temporary_index($items_type){
+		$indexing_data = Indexing_Data::instance();
+
+		$this->log->log('Send batch - Try to create Temp Index' . "\n");
+		if (!$this->disable_api) {
+			$this->log->log('=== API CALL === ');
+			$this->client->createTemporaryIndex( $this->hash,  $items_type );
+			$this->api_calls++;
+		}
+		$this->log->log('Send batch - Temp Index Created' . "\n");
+
+		// Mark it in our status.
+		$indexing_data->set( 'temp_index', $items_type );
+	}
+
+	public function create_real_index($items_type){
+		$this->log->log('Send batch - Exception - Real Index Not Found' . "\n");
+
+		try {
+			$this->log->log('Send batch - Try to create Real Index' . "\n");
+			if (!$this->disable_api) {
+				$this->log->log('=== API CALL === ');
+				// Prepare index data
+				$body = [
+					'name' => $items_type,
+					'preset' => 'product'
+				];
+				$this->client->createIndex( $this->hash, json_encode($body) );
+				$this->api_calls++;
+			}
+			$this->log->log('Send batch - Real Index Created' . "\n");
+		} catch ( \Exception $exception ) {
+			// For some reason Index could not be created.
+			$this->log->log('Send batch - Real Index NOT Created' . "\n");
+			$this->log->log( get_class($exception));
+			$this->log->log( $exception->getMessage() );
+
+			if ( $exception instanceof DoofinderError ) {
+				$this->log->log( $exception->getBody() );
+			}			
+			throw new \Exception(Api_Status::$unknown_error);				
+		}
 	}
 
 	/**
