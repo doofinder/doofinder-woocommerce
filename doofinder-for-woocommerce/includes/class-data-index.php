@@ -641,7 +641,7 @@ class Data_Index
 			if (!$skip_replace_index) {
 				// We are done with this batch, replace temp index
 				$this->log->log('Check Next ' . $item . '  - Call replace Index');
-				if ($this->api) {
+				if ($this->api || $get_new_api) {
 					$this->call_replace_index($get_new_api);
 				}
 			}
