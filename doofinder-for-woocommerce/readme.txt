@@ -127,7 +127,7 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 
 == Changelog ==
 
-= 1.5.37 =
+= 1.5.38 =
 Fixed a bug with multilanguage indexation
 
 = 1.5.37 =
