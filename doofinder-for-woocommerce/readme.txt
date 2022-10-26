@@ -3,7 +3,7 @@ Contributors: doofinder
 Tags: search, autocomplete, woocommerce
 Version: 1.5.38
 Requires at least: 5.0
-Tested up to: 6.0
+Tested up to: 6.1
 Requires PHP: 5.6
 Stable tag: trunk
 License: GPLv2 or later
