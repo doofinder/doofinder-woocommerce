@@ -569,7 +569,13 @@ class ManagementClient {
     }
 
     /**
-     * Partially updates an item in the index.
+     * Updates an item in the index.
+     * 
+     * We call itemCreate instead of itemUpdate because itemUpdate uses PATCH 
+     * method what causes an issue when the special_price is being removed.
+     * The sale_price property never gets removed.
+     * 
+     * Using POST instead, removes this issue, as it completely updates the item.
      *
      * @param  string $hashid Unique id of a search engine. (required)
      * @param  string $item_id Unique identifier of an item inside an index. (required)
@@ -579,8 +585,8 @@ class ManagementClient {
      * @return \DoofinderManagement\Model\Item
      */
     public function updateItem($hashid, $item_id, $name, $body) {
-        try {
-            return $this->ItemsClient->itemUpdate($body, $hashid, $name, $item_id);
+        try {            
+            return $this->ItemsClient->itemCreate($body, $hashid, $name, $item_id);
         } catch (ApiException $e) {
             $statusCode = $e->getCode();
             $contentResponse = $e->getResponseBody();
