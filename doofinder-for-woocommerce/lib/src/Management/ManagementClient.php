@@ -585,7 +585,7 @@ class ManagementClient {
      * @return \DoofinderManagement\Model\Item
      */
     public function updateItem($hashid, $item_id, $name, $body) {
-        try {            
+        try {
             return $this->ItemsClient->itemCreate($body, $hashid, $name, $item_id);
         } catch (ApiException $e) {
             $statusCode = $e->getCode();
