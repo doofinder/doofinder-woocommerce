@@ -149,7 +149,6 @@ if (
                         Setup_Wizard::migrate();
                     }
 
-                    Thumbnail::prepare_thumbnail_size();
                     Post::add_additional_settings();
                     Post::register_webhooks();
 
