@@ -49,6 +49,7 @@ class WPML implements I18n_Handler
 				'active' => $active_language['active'] ?? '',
 				'default' => $is_default,
 				'prefix' => ($is_default ? '' : ($active_language['code'] ?? '')),
+				'locale' => $active_language['default_locale'] ?? ''
 			);
 
 			$this->languages[$active_language['code']] = $language;
