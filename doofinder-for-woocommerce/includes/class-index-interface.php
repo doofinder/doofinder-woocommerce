@@ -234,7 +234,7 @@ class Index_Interface {
 			$api_keys_array = [];
 
 			foreach($language->get_languages() as $lang) {
-				$code = $lang['code'];
+				$code = $lang['locale'];
 				$code = $code === $language->get_base_language() ? '' : $code;
 				$hash = Settings::get_search_engine_hash($code);
 				$hash = !$hash ? 'no-hash' : $hash;

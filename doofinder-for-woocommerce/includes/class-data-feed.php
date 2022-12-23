@@ -162,6 +162,8 @@ class Data_Feed {
 	 */
 	private function load_products($product_ids = null, $language = null) {
 		global $woocommerce;
+
+		$language = Helpers::get_language_from_locale($language);
 		
 		$this->log->log('Load products');
 

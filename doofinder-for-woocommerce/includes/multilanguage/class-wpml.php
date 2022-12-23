@@ -2,6 +2,7 @@
 
 namespace Doofinder\WC\Multilanguage;
 
+use Doofinder\WC\Helpers\Helpers;
 use Doofinder\WC\Log;
 use Doofinder\WC\Settings\Settings;
 
@@ -73,7 +74,21 @@ class WPML implements I18n_Handler
 	{
 		global $sitepress;
 
-		return $sitepress->get_default_language();
+		$lang_code = $sitepress->get_default_language();		
+		return $this->languages[$lang_code]['locale'];
+	}
+
+
+	public function get_base_locale()
+	{
+		global $sitepress;
+
+		$lang_code = $sitepress->get_default_language();		
+		return $this->languages[$lang_code]['locale'];
+	}
+
+	public function get_locale_by_lang_code($lang_code){
+		return $this->languages[$lang_code]['locale'];
 	}
 
 	/**
@@ -91,6 +106,9 @@ class WPML implements I18n_Handler
 			if ($lang === 'all') {
 				return '';
 			}
+
+			//get locale code
+			$lang = $this->get_locale_by_lang_code($lang);
 
 			return $lang;
 		}
@@ -186,7 +204,8 @@ class WPML implements I18n_Handler
 		// For example 'en' => 'English'.
 		$formatted_languages = array();
 		foreach ($languages as $key => $value) {
-			$formatted_languages[$key] = $value['translated_name'];
+			$language_code = $value['default_locale'];
+			$formatted_languages[$language_code] = $value['translated_name'];
 		}
 
 		return $formatted_languages;
@@ -215,6 +234,7 @@ class WPML implements I18n_Handler
 		global $wpdb;
 		global $sitepress;
 
+		$language_code = Helpers::get_language_from_locale($language_code);
 		$split_variable_lang = $sitepress ? 'all' : '';
 
 		// Set post types to query depending on split_variable option
@@ -282,6 +302,9 @@ class WPML implements I18n_Handler
 		if ($language_code === $base_language) {
 			return $base;
 		}
+
+		//Replace hyphens with underscores in language code		
+		$language_code = Helpers::format_locale_to_underscore($language_code);
 
 		return "{$base}_{$language_code}";
 	}
