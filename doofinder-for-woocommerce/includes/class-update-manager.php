@@ -180,4 +180,42 @@ class Update_Manager
 
 		return true;
 	}
+
+	/**
+	 * Update: 1.5.41
+	 * Update the plugin options with new language codes (en_US) instead of (en)
+	 */
+	public static function update_010541()
+	{
+		$options_to_update = [
+			"woocommerce_doofinder_internal_search_hashid_",
+			"woocommerce_doofinder_internal_search_enable_",
+			"woocommerce_doofinder_layer_enabled_",
+			"woocommerce_doofinder_layer_code_",
+			"woocommerce_doofinder_last_modified_index_",
+		];
+		$multilanguage = Multilanguage::instance();
+		$languages = $multilanguage->get_languages();
+		$sites = get_sites();
+
+		foreach ($sites as $key => $site) {
+			// Switch to another blog			
+			switch_to_blog($site->blog_id);
+			foreach ($languages as $lang_code => $language) {
+				foreach ($options_to_update as $key => $option) {
+					$key_to_update = $option . $lang_code;
+					$current_value = get_option($key_to_update, "_NOT_FOUND_");
+					if ($current_value  != "_NOT_FOUND_") {
+						$new_option_key = $option . $language['locale'];
+						update_option($new_option_key, $current_value);
+					}
+				}
+			}
+			// Restore previous blog
+			// https://developer.wordpress.org/reference/functions/restore_current_blog/#more-information
+			restore_current_blog();
+		}
+
+		return true;
+	}
 }
