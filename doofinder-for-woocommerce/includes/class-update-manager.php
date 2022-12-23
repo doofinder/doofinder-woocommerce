@@ -194,19 +194,23 @@ class Update_Manager
 			"woocommerce_doofinder_layer_code_",
 			"woocommerce_doofinder_last_modified_index_",
 		];
-		$multilanguage = Multilanguage::instance();
-		$languages = $multilanguage->get_languages();
 		$sites = get_sites();
 
 		foreach ($sites as $key => $site) {
 			// Switch to another blog			
 			switch_to_blog($site->blog_id);
+			// If WPML is not installed ignore the update for this site
+			if (!function_exists('icl_get_languages')) {
+				continue;
+			}
+
+			$languages = Helpers::getSiteLanguages($site->blog_id);
 			foreach ($languages as $lang_code => $language) {
 				foreach ($options_to_update as $key => $option) {
 					$key_to_update = $option . $lang_code;
 					$current_value = get_option($key_to_update, "_NOT_FOUND_");
 					if ($current_value  != "_NOT_FOUND_") {
-						$new_option_key = $option . $language['locale'];
+						$new_option_key = $option . $language['default_locale'];
 						update_option($new_option_key, $current_value);
 					}
 				}
