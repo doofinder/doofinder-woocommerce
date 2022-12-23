@@ -103,36 +103,4 @@ class Helpers
     {
         return str_replace("_", "-", $locale_code);
     }
-
-    /**
-     * Unfortunately while updating we can't obtain the languages for each site 
-     * with our own methods, so we have to make a query to get the available 
-     * languages for each site.
-     *
-     * @param int $blog_id
-     * @return array Available languages for the given blog_id
-     */
-    public static function getSiteLanguages($blog_id)
-    {
-        $blog_languages = array();
-        global $wpdb;
-        $blog_id = $blog_id == 1 ? '' :  $blog_id;
-
-        $query_blog_id = $blog_id == '' ? '' :  $blog_id . "_";
-
-        $QUERY  = $wpdb->prepare('SELECT code,  default_locale FROM ' . $wpdb->base_prefix . $query_blog_id . 'icl_languages WHERE active =  %d', 1) . PHP_EOL;
-        $result = $wpdb->get_results($QUERY);
-
-        $blog_languages = [];
-        if (!empty($result)) {
-            foreach ($result as $key2 => $langObj) {
-                $blog_languages[$langObj->code] = [
-                    'code' => $langObj->code,
-                    'default_locale' => $langObj->default_locale,
-                ];
-            }
-        }
-
-        return $blog_languages;
-    }
 }

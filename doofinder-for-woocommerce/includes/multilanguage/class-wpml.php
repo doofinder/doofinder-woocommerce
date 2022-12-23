@@ -304,7 +304,7 @@ class WPML implements I18n_Handler
 		}
 
 		//Replace hyphens with underscores in language code		
-		$language_code = Helpers::format_locale_to_underscore($language_code);
+		$language_code = Helpers::get_language_from_locale($language_code);
 
 		return "{$base}_{$language_code}";
 	}
