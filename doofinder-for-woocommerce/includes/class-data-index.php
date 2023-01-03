@@ -447,8 +447,8 @@ class Data_Index
 		$this->languages = [''];
 		if (is_array($languages)) {
 			$this->languages = [];
-			foreach ($languages as $key => $value) {
-				$this->languages[] = $value['locale'];
+			foreach ($languages as $language) {
+				$this->languages[] = $language['locale'];
 			}
 		}
 
