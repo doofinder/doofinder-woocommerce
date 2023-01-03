@@ -15,6 +15,7 @@ use Doofinder\Management\Errors\NotAllowed;
 use Doofinder\Management\Errors\NotFound;
 use Doofinder\Management\Errors\BadRequest;
 use Doofinder\Management\Errors\DoofinderError;
+use Doofinder\WC\Helpers\Helpers;
 
 defined( 'ABSPATH' ) or die();
 
@@ -108,7 +109,8 @@ class Doofinder_Api implements Api_Wrapper {
 
 		$this->api_key = Settings::get_api_key();
 		$this->api_host = Settings::get_api_host();
-		$this->hash = Settings::get_search_engine_hash($language);
+		$language_key = Helpers::get_language_from_locale($language);
+		$this->hash = Settings::get_search_engine_hash($language_key);
 
 
 		if ( ! $this->api_key || ! $this->hash || !$this->api_host ) {
