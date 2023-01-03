@@ -1198,7 +1198,7 @@ class Setup_Wizard
 			$name_suffix    = '';
 
 			if ($language_code !== $this->language->get_base_language()) {
-				$options_suffix = $language_code;
+				$options_suffix = Helpers::get_language_from_locale($language_code);				
 				$name_suffix    = "-$language_code";
 			}
 
@@ -1633,9 +1633,10 @@ class Setup_Wizard
 		$currency = get_woocommerce_currency();
 		foreach ($search_engines as $language => $search_engine) {
 			$currency_key = strtoupper($currency);
-			//format language to en_US instead of en-US format			
-			$language_key = Helpers::format_locale_to_underscore($language);
-			$is_primary_language = strtolower($this->language->get_base_language()) === strtolower($language_key);
+			//format language to en_US instead of en-US format		
+			$language = Helpers::format_locale_to_underscore($language);
+			$language_key = Helpers::get_language_from_locale($language);
+			$is_primary_language = strtolower($this->language->get_base_language()) === strtolower($language);
 			if (!property_exists($search_engine, $currency)) {
 				$currency_key = strtolower($currency);
 			}
@@ -1670,7 +1671,7 @@ class Setup_Wizard
 			$options_suffix = '';
 
 			if ($language_code !== $this->language->get_base_language()) {
-				$options_suffix = $language_code;
+				$options_suffix = Helpers::get_language_from_locale($language_code);
 			}
 
 			//Enable internal search
