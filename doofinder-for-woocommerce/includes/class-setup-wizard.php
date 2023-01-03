@@ -1635,7 +1635,7 @@ class Setup_Wizard
 			$currency_key = strtoupper($currency);
 			//format language to en_US instead of en-US format			
 			$language_key = Helpers::format_locale_to_underscore($language);
-			$is_primary_language = strtolower($this->language->get_base_language()) == strtolower($language_key);
+			$is_primary_language = strtolower($this->language->get_base_language()) === strtolower($language_key);
 			if (!property_exists($search_engine, $currency)) {
 				$currency_key = strtolower($currency);
 			}
