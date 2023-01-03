@@ -444,10 +444,12 @@ class Data_Index
 
 		$languages = $this->language->get_languages();
 
+		$this->languages = [''];
 		if (is_array($languages)) {
-			$this->languages = array_keys($languages);
-		} else {
-			$this->languages = [''];
+			$this->languages = [];
+			foreach ($languages as $language) {
+				$this->languages[] = $language['locale'];
+			}
 		}
 
 		// if we start indexing, then language is not set, so we get first language from list
@@ -794,6 +796,8 @@ class Data_Index
 			$this->log->log('Calculate Progress - current lang: "' . $lang . '"');
 		}
 
+		$lang = Helpers::get_language_from_locale($lang);
+
 		$query = "";
 
 		if (!$lang || !$sitepress) {
@@ -923,7 +927,7 @@ class Data_Index
 				$query .= "LEFT JOIN {$wpdb->prefix}icl_translations
 				ON $wpdb->posts.ID = {$wpdb->prefix}icl_translations.element_id
 				WHERE $wpdb->posts.post_type IN ($indexed_post_types_list)
-				AND {$wpdb->prefix}icl_translations.language_code='{$this->indexing_data->get('lang')}'
+				AND {$wpdb->prefix}icl_translations.language_code='{$lang}'
 				";
 			} else {
 				$query .= "
@@ -970,7 +974,7 @@ class Data_Index
 					LEFT JOIN {$wpdb->prefix}icl_translations
 					ON $wpdb->posts.ID = {$wpdb->prefix}icl_translations.element_id
 					WHERE " . $post_type_query . "
-					AND {$wpdb->prefix}icl_translations.language_code='{$this->indexing_data->get('lang')}'
+					AND {$wpdb->prefix}icl_translations.language_code='{$lang}'
 				";
 			} else {
 				$query .= "

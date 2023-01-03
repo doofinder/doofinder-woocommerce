@@ -49,10 +49,11 @@ class Store_Api
     public function create_store($api_keys)
     {
         if (is_array($api_keys)) {
-            $primary_language = explode("_", get_locale())[0];
+            $primary_language = get_locale();
             if ($this->language->is_active()) {
                 $primary_language = $this->language->get_base_language();
             }
+            $primary_language = $this->format_language_code($primary_language);
 
             $domain = str_ireplace('www.', '', parse_url(get_bloginfo('url'), PHP_URL_HOST));
 
@@ -67,7 +68,9 @@ class Store_Api
 
             foreach ($api_keys as $item) {
                 if ($item['hash'] === 'no-hash') {
-                    $code = $item['lang']['code'] ?? $primary_language;
+                    //Prioritize the locale code
+                    $code = $item['lang']['locale'] ?? $item['lang']['code'] ?? $primary_language;
+                    $code = $this->format_language_code($code);
                     // Prepare search engine body
                     $this->log->log('Wizard Step 2 - Prepare Search Enginge body : ');
                     $store_data["search_engines"][] = [
@@ -117,4 +120,9 @@ class Store_Api
             throw new Exception("Error #{$response->getStatusCode()} creating store structure. $body", $response->getStatusCode());
         }
     }
+
+    public function format_language_code($code)
+	{
+		return str_replace('_', '-', $code);
+	}
 }

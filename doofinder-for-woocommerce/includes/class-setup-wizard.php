@@ -1633,8 +1633,9 @@ class Setup_Wizard
 		$currency = get_woocommerce_currency();
 		foreach ($search_engines as $language => $search_engine) {
 			$currency_key = strtoupper($currency);
-			$language_key = $language;
-			$is_primary_language = strtolower($this->language->get_base_language()) == strtolower($language);
+			//format language to en_US instead of en-US format			
+			$language_key = Helpers::format_locale_to_underscore($language);
+			$is_primary_language = strtolower($this->language->get_base_language()) === strtolower($language_key);
 			if (!property_exists($search_engine, $currency)) {
 				$currency_key = strtolower($currency);
 			}
@@ -1678,6 +1679,8 @@ class Setup_Wizard
 			// Enable JS Layer			
 			Settings::enable_js_layer($options_suffix);
 
+			//Convert language to hyphen format used by live layer (en-US)
+			$language_code = Helpers::format_locale_to_hyphen($language_code);
 			$lang_config = "language: '$language_code',\n    currency: '$currency',\n    installationId:";
 			$aux_script  = !empty($language_code) ? str_replace("installationId:", $lang_config, $script) : $script;
 
