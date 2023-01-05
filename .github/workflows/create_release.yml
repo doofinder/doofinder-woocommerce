@@ -1,19 +1,19 @@
-name: Deploy to WordPress.org
+name: Deploy to Wordpress and create new release
 on:
   workflow_dispatch: {}
 jobs:
   tag:
-    name: New release
+    name: Create new release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Build
         run: |
           npm install --include=dev
           npm run build
-      - name: Create deployment
-        id: create-deploy
+      - name: Get version
+        id: get-version
         run: |
           version=`gawk 'match($0, /Version: (.*)/, ary) {print ary[1]}' doofinder-for-woocommerce/readme.txt`
           changelog_line=`grep -n "= ${version} =" doofinder-for-woocommerce/readme.txt | cut -f1 -d:`
@@ -24,8 +24,9 @@ jobs:
       - name: Print version notes
         id: print-notes
         run: |
-          echo "Version Notes ${{ steps.create-deploy.outputs.version_notes }}"
-      #      - name: WordPress Plugin Deploy
+          echo "Version:        ${{ steps.get-version.outputs.version }}"
+          echo "Version Notes:  ${{ steps.get-version.outputs.version_notes }}"
+      #      - name: Deploy to Wordpress.org SVN Repository
       #        id: deploy
       #        uses: 10up/action-wordpress-plugin-deploy@stable
       #        env:
@@ -37,6 +38,6 @@ jobs:
       - name: Upload release asset
         uses: softprops/action-gh-release@v1
         with:
-          body: ${{ steps.create-deploy.outputs.version_notes }}
+          body: ${{ steps.get-version.outputs.version_notes }}
           files: doofinder-for-woocommerce.zip
-          tag_name: "v${{ steps.create-deploy.outputs.version }}"
+          tag_name: "v${{ steps.get-version.outputs.version }}"
