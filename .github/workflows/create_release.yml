@@ -40,4 +40,4 @@ jobs:
         with:
           body: ${{ steps.get-version.outputs.version_notes }}
           files: doofinder-for-woocommerce.zip
-          tag_name: "v${{ steps.get-version.outputs.version }}"
+          draft: true
