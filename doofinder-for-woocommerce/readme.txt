@@ -1,7 +1,7 @@
 === Doofinder for WooCommerce ===
 Contributors: doofinder
 Tags: search, autocomplete, woocommerce
-Version: 1.5.42
+Version: 1.5.43
 Requires at least: 5.0
 Tested up to: 6.1
 Requires PHP: 5.6
@@ -126,6 +126,9 @@ You can click *Delete* to remove the additional attributes from the feed.
 Just send your questions to <mailto:support@doofinder.com> and we will try to answer as fast as possible with a working solution for you.
 
 == Changelog ==
+
+= 1.5.43 =
+Added release automation
 
 = 1.5.42 =
 Fixed some issues with language codes
