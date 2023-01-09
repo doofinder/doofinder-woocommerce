@@ -1,0 +1,36 @@
+name: Deploy to Wordpress and create new release
+on:
+  workflow_dispatch: {}
+jobs:
+  tag:
+    name: Create new release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Build
+        run: |
+          npm install --include=dev
+          npm run build
+      - name: Get release notes
+        id: get-release-notes
+        run: |
+          version=`gawk 'match($0, /Version: (.*)/, ary) {print ary[1]}' doofinder-for-woocommerce/readme.txt`
+          changelog_line=`grep -n "= ${version} =" doofinder-for-woocommerce/readme.txt | cut -f1 -d:`
+          ((changelog_line++))
+          release_notes=`awk "NR==$changelog_line" doofinder-for-woocommerce/readme.txt`
+          echo "release_notes=$release_notes" >> $GITHUB_OUTPUT
+      - name: Deploy to Wordpress.org SVN Repository
+        id: deploy
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: doofinder-for-woocommerce
+          BUILD_DIR: doofinder-for-woocommerce
+          ASSETS_DIR: assets
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v1
+        with:
+          body: ${{ steps.get-release-notes.outputs.release_notes }}
+          files: doofinder-for-woocommerce.zip
