@@ -8,11 +8,12 @@ use Doofinder\WC\Settings\Settings;
 use Doofinder\WC\Helpers\Helpers;
 use stdClass;
 
-defined( 'ABSPATH' ) or die;
+defined('ABSPATH') or die;
 
 
 
-class Data_Feed {
+class Data_Feed
+{
 
 	/**
 	 * Language code of the language to display feed for.
@@ -94,12 +95,13 @@ class Data_Feed {
 	 *
 	 * @since 1.0.0
 	 */
-	public static function register() {
+	public static function register()
+	{
 		$class = __CLASS__;
-		add_feed( 'doofinder', function () use ( $class ) {
+		add_feed('doofinder', function () use ($class) {
 			$feed = new $class();
 			$feed->generate();
-		} );
+		});
 	}
 
 	/* Initialization *************************************************************/
@@ -111,19 +113,20 @@ class Data_Feed {
 	 *
 	 * @param string $language Language of the feed to show.
 	 */
-	public function __construct($xml = true, $product_ids = null, $language = null) {
-		
+	public function __construct($xml = true, $product_ids = null, $language = null)
+	{
+
 		$multilanguage  = Multilanguage::instance();
 
-		$this->log = new Log( 'api.txt' );
+		$this->log = new Log('api.txt');
 
-		if ( $language ) {
+		if ($language) {
 			$this->language = $language;
 		} else {
 			$this->language = $multilanguage->get_language_code();
 		}
 
-		if ( $xml ) {
+		if ($xml) {
 			// Create XML document to fill out.
 			$this->feed = new Feed_XML();
 		} else {
@@ -133,26 +136,23 @@ class Data_Feed {
 		// Load settings.
 		$this->settings = array(
 			// Doofinder settings
-			'export_prices'  => Settings::get( 'feed', 'export_prices' ),
-			'export_tags'    => Settings::get( 'feed', 'export_tags' ),
-			'image_size'     => Settings::get( 'feed', 'image_size' ),
-			'split_variable' => Settings::get( 'feed', 'split_variable' ),
-			'protected'      => Settings::get( 'feed', 'password_protected' ),
-			'password'       => Settings::get( 'feed', 'password' ),
+			'export_prices'  => Settings::get('feed', 'export_prices'),
+			'export_tags'    => Settings::get('feed', 'export_tags'),
+			'image_size'     => Settings::get('feed', 'image_size'),
+			'split_variable' => Settings::get('feed', 'split_variable'),
+			'protected'      => Settings::get('feed', 'password_protected'),
+			'password'       => Settings::get('feed', 'password'),
 
 			// WooCommerce settings
-			'include_taxes'  => ( 'incl' === get_option( 'woocommerce_tax_display_shop' ) ),
+			'include_taxes'  => ('incl' === get_option('woocommerce_tax_display_shop')),
 		);
 
 		// Load required data from DB.
-		foreach ( get_terms( 'product_cat' ) as $term ) {
-			$this->terms_cache[ $term->term_id ] = $term;
+		foreach (get_terms('product_cat') as $term) {
+			$this->terms_cache[$term->term_id] = $term;
 		}
 
 		$this->load_products($product_ids, $language);
-		$this->load_product_variations();
-
-	
 	}
 
 	/**
@@ -160,14 +160,15 @@ class Data_Feed {
 	 *
 	 * @since 1.0.0
 	 */
-	private function load_products($product_ids = null, $language = null) {
+	private function load_products($product_ids = null, $language = null)
+	{
 		global $woocommerce;
 
 		$language = Helpers::get_language_from_locale($language);
-		
+
 		$this->log->log('Load products');
 
-		if ( $language ) {
+		if ($language) {
 			global $sitepress;
 			$current_lang = $sitepress->get_current_language();
 			$sitepress->switch_lang($language);
@@ -179,7 +180,7 @@ class Data_Feed {
 
 			'ignore_sticky_posts' => 1,
 
-			'posts_per_page' => - 1,
+			'posts_per_page' => -1,
 
 			'orderby' => 'ID',
 			'order'   => 'ASC',
@@ -189,8 +190,8 @@ class Data_Feed {
 			'update_post_term_cache' => false,
 		);
 
-		if ('yes' === Settings::get( 'feed', 'split_variable' )) {
-			$args['post_type'] = ['product','product_variation'];
+		if ('yes' === Settings::get('feed', 'split_variable')) {
+			$args['post_type'] = ['product', 'product_variation'];
 		}
 
 		if (is_array($product_ids) && !empty($product_ids)) {
@@ -205,12 +206,12 @@ class Data_Feed {
 		// Since version 3.0.0 catalog visibility became a taxonomy.
 		// Whenever the product is hidden from search the term "exclude-from-search"
 		// is added.
-		if ( version_compare( $woocommerce->version, '3.0.0', '>=' ) ) {
+		if (version_compare($woocommerce->version, '3.0.0', '>=')) {
 			$args['tax_query'] = array(
 				array(
 					'taxonomy' => 'product_visibility',
 					'field'    => 'name',
-					'terms'    => array( 'exclude-from-search' ),
+					'terms'    => array('exclude-from-search'),
 					'operator' => 'NOT IN',
 				),
 			);
@@ -227,7 +228,7 @@ class Data_Feed {
 				),
 				array(
 					'key'     => '_visibility',
-					'value'   => array( 'search', 'visible' ),
+					'value'   => array('search', 'visible'),
 					'compare' => 'IN',
 				),
 				array(
@@ -240,70 +241,39 @@ class Data_Feed {
 		// GET parameters
 		// 'limit' and 'offset' parameters create pagination.
 		$limit = 0;
-		if ( isset( $_GET['limit'] ) && ! empty( $_GET['limit'] ) ) {
+		if (isset($_GET['limit']) && !empty($_GET['limit'])) {
 			$limit                  = (int) $_GET['limit'];
 			$args['posts_per_page'] = $_GET['limit'];
 		}
 
 		$offset = 0;
-		if ( isset( $_GET['offset'] ) && ! empty( $_GET['offset'] ) ) {
+		if (isset($_GET['offset']) && !empty($_GET['offset'])) {
 			$offset         = (int) $_GET['offset'];
 			$args['offset'] = $_GET['offset'];
 		}
 
-		$query          = new \WP_Query( $args );
-		
+		$query          = new \WP_Query($args);
+
 		//$this->log->log('Load products - Query: '); 
 		//$this->log->log($query); 
 
 		$this->products = $query->posts;
 
-		$this->log->log('Load products - Count: ' . count($this->products)); 
+		$this->log->log('Load products - Count: ' . count($this->products));
 
-		$this->log->log( 'Current Memory Usage: ' . Helpers::get_memory_usage());
+		$this->log->log('Current Memory Usage: ' . Helpers::get_memory_usage());
 
 		// Check if this is the beginning or end of the feed
-		if ( 0 === $offset ) {
+		if (0 === $offset) {
 			$this->is_first = true;
 		}
 
-		if ( ! isset( $_GET['limit'] ) || $offset + $limit >= $query->found_posts ) {
+		if (!isset($_GET['limit']) || $offset + $limit >= $query->found_posts) {
 			$this->is_last = true;
 		}
 
-		if ( $language ) {
+		if ($language) {
 			$sitepress->switch_lang($current_lang);
-		}
-	}
-
-	/**
-	 * Load all variations from DB.
-	 *
-	 * @since 1.0.0
-	 */
-	private function load_product_variations() {
-
-		if ( 'yes' !== $this->settings['split_variable'] ) {
-			return;
-		}
-
-		$variations = get_posts( array(
-			'post_type'      => 'product_variation',
-			'posts_per_page' => - 1,
-
-			// Only load variations for the loaded products.
-			// If there are no products (e.g. offset value is too high, and we are past all
-			// products) passing a negative value will ensure non variations will be loaded.
-			// If we passed an empty array WordPress would load *all* variations.
-			'post_parent__in' => empty( $this->products ) ? [-1] : array_map( function ( \WP_Post $post ) {
-				return $post->ID;
-			}, $this->products )
-		) );
-
-		// Index by ID in order to avoid iterating the entire array when we need to retrieve a variation
-		$this->product_variations = array();
-		foreach ( $variations as $variation ) {
-			$this->product_variations[ $variation->ID ] = $variation;
 		}
 	}
 
@@ -314,16 +284,17 @@ class Data_Feed {
 	 *
 	 * @since 1.0.0
 	 */
-	public function generate() {
+	public function generate()
+	{
 		Doofinder_For_WooCommerce::maybe_suppress_notices();
-		header( 'Content-Type: text/plain' );
+		header('Content-Type: text/plain');
 		//header( 'Content-Type: text/html' );
 
 		if (
 			'yes' !== $this->settings['protected'] ||
-			( isset( $_GET['secret'] ) && $this->settings['password'] === $_GET['secret'] )
+			(isset($_GET['secret']) && $this->settings['password'] === $_GET['secret'])
 		) {
-			
+
 			$this->add_store_information();
 			$this->add_products();
 			$this->render();
@@ -338,13 +309,13 @@ class Data_Feed {
 	 *
 	 * @since 1.0.0
 	 */
-	public function get_items() {
-		
+	public function get_items()
+	{
+
 		$this->add_store_information();
 		$this->add_products();
 
 		return $this->feed->items ?? [];
-
 	}
 
 	/**
@@ -352,10 +323,11 @@ class Data_Feed {
 	 *
 	 * @since 1.0.0
 	 */
-	private function add_store_information() {
-		$this->feed->header['title']       = get_bloginfo( 'name' );
-		$this->feed->header['link']        = Multilanguage::get_home_url( $this->language );
-		$this->feed->header['description'] = sanitize_text_field( get_bloginfo( 'description' ) );
+	private function add_store_information()
+	{
+		$this->feed->header['title']       = get_bloginfo('name');
+		$this->feed->header['link']        = Multilanguage::get_home_url($this->language);
+		$this->feed->header['description'] = sanitize_text_field(get_bloginfo('description'));
 	}
 
 	/**
@@ -363,9 +335,10 @@ class Data_Feed {
 	 *
 	 * @since 1.0.0
 	 */
-	private function add_products() {
-		
-		foreach ( $this->products as $post ) {
+	private function add_products()
+	{
+
+		foreach ($this->products as $post) {
 			$df_post = new Post($post);
 			if (!$df_post->is_indexable()) {
 				continue;
@@ -377,8 +350,8 @@ class Data_Feed {
 				$this->paths_cache,
 				$this->terms_cache
 			);
-			
-			$this->add_item_to_feed( $item->get_fields() );
+			$fields = $item->get_fields();
+			$this->add_item_to_feed($fields);
 		}
 	}
 
@@ -387,7 +360,8 @@ class Data_Feed {
 	 *
 	 * @param array $fields Fields of the item to add.
 	 */
-	private function add_item_to_feed( $fields ) {
+	private function add_item_to_feed($fields)
+	{
 		$this->feed->items[] = $fields;
 	}
 
@@ -396,11 +370,12 @@ class Data_Feed {
 	 *
 	 * @since 1.0.0
 	 */
-	private function render() {
-		if ( empty( $this->products ) ) {
+	private function render()
+	{
+		if (empty($this->products)) {
 			echo '';
 		} else {
-			$this->feed->render( $this->is_first, $this->is_last );
+			$this->feed->render($this->is_first, $this->is_last);
 			echo $this->feed->get();
 		}
 	}
