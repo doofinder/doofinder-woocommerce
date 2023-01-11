@@ -234,6 +234,7 @@ class Data_Feed_Item
 	 */
 	private function add_variation_attributes()
 	{
+		//if ( $this->parent || ! $this->product->is_type( 'variable' ) ) {
 		if (!$this->product->is_type('variation')) {
 			return;
 		}
@@ -496,8 +497,8 @@ class Data_Feed_Item
 
 	/**
 	 * Check if all variations for a given attribute have stock.
-	 * For example, if the size 'Small' is out of stock, we will remove it from
-	 * the size attribute
+	 * For example, if the attribute Size with value 'Small' is out of stock, we
+	 * will remove it from the Small value from the size attribute.
 	 * 
 	 * @since 1.5.44
 	 * @return void
@@ -509,8 +510,45 @@ class Data_Feed_Item
 		}
 
 		$variations = $this->product->get_available_variations();
-		$stock_by_attribute = [];
+		$stock_by_attribute = $this->get_stock_by_attribute($variations);
 
+		foreach ($stock_by_attribute as $attribute => $values) {
+			$keys_without_stock = array_keys(array_filter($values, fn ($value) => $value === false));
+			if (empty($keys_without_stock)) {
+				continue;
+			}
+			//WooCommerce attributes start with pa_
+			$attribute = str_replace("pa_", "", $attribute);
+			//We need to replace double slashes by another character in order to avoid errors when exploding by single slashes
+			$new_attributes = explode("/", str_replace("//", "@SLASH@", $this->fields[$attribute]));
+			$new_attributes = array_map(fn ($value) => str_replace('@SLASH@', '/', $value), $new_attributes);
+			foreach ($keys_without_stock as $value) {
+				$pos = array_search($value, $new_attributes);
+				if ($pos !== false) {
+					unset($new_attributes[$pos]);
+				}
+			}
+			if (!empty($new_attributes)) {
+				//Replace single slashes with a custom marker
+				$new_attributes = array_map(fn ($value) => str_replace('/', '@SLASH@', $value), $new_attributes);
+				//Implode by slashes and replace the custom marker with double slashes
+				$this->fields[$attribute] = str_replace('@SLASH@', '//', implode('/', $new_attributes));
+			} else {
+				//This attribute has no values, remove it
+				unset($this->fields[$attribute]);
+			}
+		}
+	}
+
+	/**
+	 *	Given a list of variations returns the stock status by attribute value.
+	 *
+	 * @param array $variations
+	 * @return array The list of attributes and stock status by value.
+	 */
+	private function get_stock_by_attribute($variations)
+	{
+		$stock_by_attribute = [];
 		foreach ($variations as $variation) {
 			$variation_obj = new \WC_Product_variation($variation['variation_id']);
 			$attributes = $variation_obj->get_attributes();
@@ -532,17 +570,7 @@ class Data_Feed_Item
 				}
 			}
 		}
-
-		foreach ($stock_by_attribute as $attribute => $values) {
-			foreach ($values as $value => $stock) {
-				if ($stock) {
-					continue;
-				}
-				$attribute = str_replace("pa_", "", $attribute);
-				$new_attributes = trim(str_replace($value, "", $this->fields[$attribute]), "/");
-				$this->fields[$attribute] = $new_attributes;
-			}
-		}
+		return $stock_by_attribute;
 	}
 
 	/**
