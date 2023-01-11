@@ -6,9 +6,12 @@ use Doofinder\WC\Settings\Attributes;
 use Doofinder\WC\Settings\Settings;
 use Doofinder\WC\Log;
 
-defined( 'ABSPATH' ) or die;
+use function WPML\FP\tryCatch;
 
-class Data_Feed_Item {
+defined('ABSPATH') or die;
+
+class Data_Feed_Item
+{
 
 	/**
 	 * WP_Post representing the product (or product variation) being added.
@@ -90,12 +93,13 @@ class Data_Feed_Item {
 	 * @param array    $paths_cache Cache of already traversed category paths.
 	 * @param array    $terms_cache All product categories loaded from DB.
 	 */
-	public function __construct( $post, $parent = null, $settings, &$paths_cache, &$terms_cache ) {
+	public function __construct($post, $parent = null, $settings, &$paths_cache, &$terms_cache)
+	{
 
-		$this->log = new Log( 'api.txt' );
+		$this->log = new Log('api.txt');
 
 		$this->post = $post;
-		$this->product = WC()->product_factory->get_product( $post->ID );
+		$this->product = WC()->product_factory->get_product($post->ID);
 		$this->parent = $parent;
 		$this->settings = $settings;
 		$this->attributes = Attributes::instance();
@@ -116,6 +120,7 @@ class Data_Feed_Item {
 		$this->add_categories();
 		$this->add_tags();
 		$this->add_additional_attributes();
+		$this->remove_out_of_stock_attributes();
 		$this->remove_empty_fields();
 		$this->decode_fields();
 	}
@@ -126,7 +131,8 @@ class Data_Feed_Item {
 	 * @since 1.0.0
 	 * @return array Fields to add to feed.
 	 */
-	public function get_fields() {
+	public function get_fields()
+	{
 		return $this->fields;
 	}
 
@@ -138,7 +144,8 @@ class Data_Feed_Item {
 	 *
 	 * @since 1.0.0
 	 */
-	private function add_basic_fields() {
+	private function add_basic_fields()
+	{
 		$this->fields['id'] = $this->post->ID;
 	}
 
@@ -147,11 +154,12 @@ class Data_Feed_Item {
 	 *
 	 * @since 1.0.0
 	 */
-	private function add_link() {
-		if ( $this->attributes->have( 'link' ) ) {
-			$this->fields['link'] = $this->attributes->get( 'link', $this->post );
+	private function add_link()
+	{
+		if ($this->attributes->have('link')) {
+			$this->fields['link'] = $this->attributes->get('link', $this->post);
 		} else {
-			$this->fields['link'] = get_permalink( $this->post );
+			$this->fields['link'] = get_permalink($this->post);
 		}
 	}
 
@@ -162,24 +170,25 @@ class Data_Feed_Item {
 	 *
 	 * @since 1.0.0
 	 */
-	private function add_title() {
+	private function add_title()
+	{
 		$suffix = '';
-		if ( $this->parent && $this->product ) {
+		if ($this->parent && $this->product) {
 			$attributes = $this->product->get_variation_attributes();
-			$suffix = ' (' . implode( ', ', $attributes ) . ')';
+			$suffix = ' (' . implode(', ', $attributes) . ')';
 		}
 
 		$post = $this->post;
-		if ( $this->parent ) {
+		if ($this->parent) {
 			$post = $this->parent;
 		}
 
 		$title = $post->post_title;
-		if ( $this->attributes->have( 'title' ) ) {
-			$title = $this->attributes->get( 'title', $post );
+		if ($this->attributes->have('title')) {
+			$title = $this->attributes->get('title', $post);
 		}
 
-		$this->add_field( 'title', $title . $suffix );
+		$this->add_field('title', $title . $suffix);
 	}
 
 	/**
@@ -188,16 +197,17 @@ class Data_Feed_Item {
 	 *
 	 * @since 1.0.0
 	 */
-	private function add_description() {
+	private function add_description()
+	{
 		$post = $this->post;
-		if ( $this->parent ) {
+		if ($this->parent) {
 			$post = $this->parent;
 		}
 
-		if ( $this->attributes->have( 'description' ) ) {
-			$this->add_field( 'description', $this->attributes->get( 'description', $post ) );
+		if ($this->attributes->have('description')) {
+			$this->add_field('description', $this->attributes->get('description', $post));
 		} else {
-			$this->add_field( 'description', $post->post_content );
+			$this->add_field('description', $post->post_content);
 		}
 	}
 
@@ -207,8 +217,9 @@ class Data_Feed_Item {
 	 *
 	 * @since 1.0.0
 	 */
-	private function add_group_id() {
-		if ( ! $this->parent ) {
+	private function add_group_id()
+	{
+		if (!$this->parent) {
 			return;
 		}
 
@@ -221,18 +232,19 @@ class Data_Feed_Item {
 	 *
 	 * @since 1.0.0
 	 */
-	private function add_variation_attributes() {
-		if ( $this->parent || ! $this->product->is_type( 'variable' ) ) {
+	private function add_variation_attributes()
+	{
+		if (!$this->product->is_type('variation')) {
 			return;
 		}
 
-		$attributes = $this->product->get_variation_attributes();
-		foreach ( array_keys( $attributes ) as $attribute ) {
-			$values = array_map( 'trim', preg_split( '/\,/', $this->product->get_attribute( $attribute ) ) );
+		$attributes = $this->product->get_attributes();
+		foreach (array_keys($attributes) as $attribute) {
+			$values = array_map('trim', preg_split('/\,/', $this->product->get_attribute($attribute)));
 
-			foreach ( $values as $key => $val ) {
-				$val = str_replace('/', '//', $val );
-				$values[ $key ] = str_replace( ' | ', '/', $val );
+			foreach ($values as $key => $val) {
+				$val = str_replace('/', '//', $val);
+				$values[$key] = str_replace(' | ', '/', $val);
 			}
 
 			// Custom attributes added at the product level can have
@@ -240,15 +252,15 @@ class Data_Feed_Item {
 			// and therefore need to be slugified.
 
 			// Woo adds 'pa_' to attributes added in "Attributes" men.
-			$slug = str_replace( 'pa_', '', $attribute );
+			$slug = str_replace('pa_', '', $attribute);
 
 			// Make lowercase, remove all non-url characters.
-			$slug = sanitize_title( $slug );
+			$slug = sanitize_title($slug);
 
 			// "sanitize_title" separates words using "-"; use "_" instead.
-			$slug = preg_replace( '/-/', '_', $slug );
+			$slug = preg_replace('/-/', '_', $slug);
 
-			$this->fields[ $slug ] = implode( '/', $values );
+			$this->fields[$slug] = implode('/', $values);
 		}
 	}
 
@@ -257,7 +269,8 @@ class Data_Feed_Item {
 	 *
 	 * @since 1.0.0
 	 */
-	private function add_availability() {
+	private function add_availability()
+	{
 
 		$type = $this->product->get_type();
 
@@ -276,7 +289,8 @@ class Data_Feed_Item {
 	 *
 	 * @since 1.0.0
 	 */
-	private function add_type() {
+	private function add_type()
+	{
 
 		$this->fields['type'] = $this->product->get_type();
 	}
@@ -286,8 +300,9 @@ class Data_Feed_Item {
 	 *
 	 * @since 1.0.0
 	 */
-	private function add_sku() {
-		if ( $mpn = $this->product->get_sku() ) {
+	private function add_sku()
+	{
+		if ($mpn = $this->product->get_sku()) {
 			$this->fields['mpn'] = $mpn;
 		}
 	}
@@ -298,7 +313,8 @@ class Data_Feed_Item {
 	 *
 	 * @since 1.0.0
 	 */
-	private function add_thumbnail() {
+	private function add_thumbnail()
+	{
 		$size = 'thumbnail';
 		$image_id = $this->product->get_image_id();
 
@@ -310,16 +326,16 @@ class Data_Feed_Item {
 			'large',
 		);
 
-		if ( $this->settings['image_size'] && (has_image_size( $this->settings['image_size'] ) || in_array($this->settings['image_size'], $default_sizes) )) {
+		if ($this->settings['image_size'] && (has_image_size($this->settings['image_size']) || in_array($this->settings['image_size'], $default_sizes))) {
 			$size = $this->settings['image_size'];
 		}
 
-		if ( $image_id ) {
-			if ( $image_url = wp_get_attachment_image_src( $image_id, $size ) ) {
+		if ($image_id) {
+			if ($image_url = wp_get_attachment_image_src($image_id, $size)) {
 				$this->fields['image_link'] = $image_url[0];
 			}
 		} else {
-			$this->fields['image_link'] = wc_placeholder_img_src( $size );		
+			$this->fields['image_link'] = wc_placeholder_img_src($size);
 		}
 	}
 
@@ -329,21 +345,22 @@ class Data_Feed_Item {
 	 *
 	 * @since 1.0.0
 	 */
-	private function add_prices() {
-		if ( 'no' === $this->settings['export_prices'] ) {
+	private function add_prices()
+	{
+		if ('no' === $this->settings['export_prices']) {
 			return;
 		}
 
-		$prices = $this->get_prices( $this->product );
+		$prices = $this->get_prices($this->product);
 
-		if ( $prices['regular'] ) {
+		if ($prices['regular']) {
 			$this->fields['price'] = (float) $prices['regular'];
 		}
 
-		if ( isset( $prices['sale'] ) && $prices['sale'] ) {
+		if (isset($prices['sale']) && $prices['sale']) {
 			// If there's no regular price display sale price as regular.
 			$field_name = $prices['regular'] ? 'sale_price' : 'price';
-			$this->fields[ $field_name ] = (float) $prices['sale'];
+			$this->fields[$field_name] = (float) $prices['sale'];
 		}
 	}
 
@@ -356,26 +373,27 @@ class Data_Feed_Item {
 	 *
 	 * @since 1.5.11
 	 */
-	private function add_group_leader() {
-		if ( 'no' === $this->settings['split_variable'] ) {
+	private function add_group_leader()
+	{
+		if ('no' === $this->settings['split_variable']) {
 			return;
 		}
 
 		$id = $this->post->ID;
-		$product = wc_get_product( $id );
-		$variation = wc_get_product( $product->get_parent_id() );
+		$product = wc_get_product($id);
+		$variation = wc_get_product($product->get_parent_id());
 
 
-		if ( $variation ) {
-			$this->fields[ 'df_group_leader' ] = 'false';
-			$this->fields[ 'group_id' ] = (string) $variation->get_id();
+		if ($variation) {
+			$this->fields['df_group_leader'] = 'false';
+			$this->fields['group_id'] = (string) $variation->get_id();
 		} else {
-			if ( $product->is_type( 'variable' ) ) {
-				$this->fields[ 'df_group_leader' ] = 'true';
-				$this->fields[ 'group_id' ] = (string) $id;
+			if ($product->is_type('variable')) {
+				$this->fields['df_group_leader'] = 'true';
+				$this->fields['group_id'] = (string) $id;
 			} else {
-				$this->fields[ 'df_group_leader' ] = 'false';
-				$this->fields[ 'group_id' ] = false;
+				$this->fields['df_group_leader'] = 'false';
+				$this->fields['group_id'] = false;
 			}
 		}
 	}
@@ -388,11 +406,12 @@ class Data_Feed_Item {
 	 *
 	 * @since 1.0.0
 	 */
-	private function add_categories() {
-		if ( $this->parent ) {
-			$this->fields['categories'] = $this->get_categories( $this->parent->ID );
+	private function add_categories()
+	{
+		if ($this->parent) {
+			$this->fields['categories'] = $this->get_categories($this->parent->ID);
 		} else {
-			$this->fields['categories'] = $this->get_categories( $this->post->ID );
+			$this->fields['categories'] = $this->get_categories($this->post->ID);
 		}
 	}
 
@@ -403,27 +422,28 @@ class Data_Feed_Item {
 	 *
 	 * @since 1.2.0
 	 */
-	private function add_tags() {
-		if ( 'yes' !== $this->settings['export_tags'] ) {
+	private function add_tags()
+	{
+		if ('yes' !== $this->settings['export_tags']) {
 			return;
 		}
 
 		$id = $this->post->ID;
-		if ( $this->parent ) {
+		if ($this->parent) {
 			$id = $this->parent->ID;
 		}
 
-		$tags = wp_get_post_terms( $id, 'product_tag' );
-		if ( ! $tags ) {
+		$tags = wp_get_post_terms($id, 'product_tag');
+		if (!$tags) {
 			return;
 		}
 
-		$tags = array_map( function ( $tag ) {
+		$tags = array_map(function ($tag) {
 			return $tag->name;
-		}, $tags );
+		}, $tags);
 
 
-		$this->fields['tags'] = implode( '/', $tags );
+		$this->fields['tags'] = implode('/', $tags);
 	}
 
 	/* Additional fields **********************************************************/
@@ -431,18 +451,18 @@ class Data_Feed_Item {
 	/**
 	 * Add additional attributes chosen by the user in config to the feed.
 	 */
-	private function add_additional_attributes() {
-		$attributes = Settings::get( 'feed_attributes', 'additional_attributes' );
-		if ( empty( $attributes ) || ! is_array( $attributes ) ) {
+	private function add_additional_attributes()
+	{
+		$attributes = Settings::get('feed_attributes', 'additional_attributes');
+		if (empty($attributes) || !is_array($attributes)) {
 			return;
 		}
 
-		$attributes = array_map( 'wp_parse_args', $attributes );
+		$attributes = array_map('wp_parse_args', $attributes);
 
-		foreach ( $attributes as $attribute ) {
-
-			if( isset($attribute['field']) && isset($attribute['attribute'])) {
-				$this->fields[ $attribute['field'] ] = $this->attributes->get_attribute_value(
+		foreach ($attributes as $attribute) {
+			if (isset($attribute['field']) && isset($attribute['attribute'])) {
+				$this->fields[$attribute['field']] = $this->attributes->get_attribute_value(
 					$attribute['attribute'],
 					$this->post,
 					$attribute
@@ -450,14 +470,13 @@ class Data_Feed_Item {
 
 				// Inherit attributes from parent.
 				if ($this->parent) {
-					$this->fields[ $attribute['field'] ] = $this->attributes->get_attribute_value(
+					$parent_attributes = $this->attributes->get_attribute_value(
 						$attribute['attribute'],
 						$this->parent,
 						$attribute
 					);
 				}
 			}
-
 		}
 	}
 
@@ -466,10 +485,62 @@ class Data_Feed_Item {
 	 *
 	 * @since 1.2.2
 	 */
-	private function remove_empty_fields() {
-		foreach ( $this->fields as $key => $field ) {
-			if ( empty( $this->fields[ $key ] ) ) {
-				unset( $this->fields[ $key ] );
+	private function remove_empty_fields()
+	{
+		foreach ($this->fields as $key => $field) {
+			if (empty($this->fields[$key])) {
+				unset($this->fields[$key]);
+			}
+		}
+	}
+
+	/**
+	 * Check if all variations for a given attribute have stock.
+	 * For example, if the size 'Small' is out of stock, we will remove it from
+	 * the size attribute
+	 * 
+	 * @since 1.5.44
+	 * @return void
+	 */
+	public function remove_out_of_stock_attributes()
+	{
+		if ($this->product->get_type() != 'variable') {
+			return;
+		}
+
+		$variations = $this->product->get_available_variations();
+		$stock_by_attribute = [];
+
+		foreach ($variations as $variation) {
+			$variation_obj = new \WC_Product_variation($variation['variation_id']);
+			$attributes = $variation_obj->get_attributes();
+			foreach ($attributes as $attribute => $value) {
+				if (isset($stock_by_attribute[$attribute][$value]) && $stock_by_attribute[$attribute][$value]) {
+					continue;
+				}
+
+				if (!isset($stock_by_attribute[$attribute])) {
+					$stock_by_attribute[$attribute] = [];
+				}
+
+				if (!isset($stock_by_attribute[$attribute][$value])) {
+					$stock_by_attribute[$attribute][$value] = false;
+				}
+
+				if ($variation["is_in_stock"]) {
+					$stock_by_attribute[$attribute][$value] = true;
+				}
+			}
+		}
+
+		foreach ($stock_by_attribute as $attribute => $values) {
+			foreach ($values as $value => $stock) {
+				if ($stock) {
+					continue;
+				}
+				$attribute = str_replace("pa_", "", $attribute);
+				$new_attributes = trim(str_replace($value, "", $this->fields[$attribute]), "/");
+				$this->fields[$attribute] = $new_attributes;
 			}
 		}
 	}
@@ -479,15 +550,16 @@ class Data_Feed_Item {
 	 *
 	 * @since 1.5.15
 	 */
-	private function decode_fields() {
+	private function decode_fields()
+	{
 		// $this->log->log('Decode fields: ');
 		// $this->log->log( $this->fields );
 
-		array_walk_recursive($this->fields, function( &$value, $key ) {
-            if(strpos($key, 'price') === false) {
-                $value = html_entity_decode( $value, ENT_QUOTES );
-            }
-		} );
+		array_walk_recursive($this->fields, function (&$value, $key) {
+			if (strpos($key, 'price') === false) {
+				$value = html_entity_decode($value, ENT_QUOTES);
+			}
+		});
 
 		// $this->log->log('Decoded fields: ');
 		// $this->log->log($this->fields);
@@ -503,11 +575,12 @@ class Data_Feed_Item {
 	 * @param string $name  Field name to add.
 	 * @param string $value Field value to add.
 	 */
-	private function add_field( $name, $value ) {
-		$value = preg_replace( '/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $value );
-		$value = wp_strip_all_tags( $value );
+	private function add_field($name, $value)
+	{
+		$value = preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $value);
+		$value = wp_strip_all_tags($value);
 
-		$this->fields[ $name ] = $value;
+		$this->fields[$name] = $value;
 	}
 
 	/**
@@ -519,23 +592,23 @@ class Data_Feed_Item {
 	 *
 	 * @return string All category paths.
 	 */
-	private function get_categories( $id ) {
+	private function get_categories($id)
+	{
 		$paths = array();
-		$terms = get_the_terms( $id, 'product_cat' );
+		$terms = get_the_terms($id, 'product_cat');
 		$this->log->log('Data Feed Item - Get Categories: ');
-		$this->log->log( $terms );
-        
-		if( !empty( $terms ) && is_array( $terms )) {
-            foreach ( $terms as $term ) {
-                $paths[] = $this->get_category_path( $term );
+		$this->log->log($terms);
+
+		if (!empty($terms) && is_array($terms)) {
+			foreach ($terms as $term) {
+				$paths[] = $this->get_category_path($term);
 			}
-			$this->clean_paths( $paths );
-            
-            $this->log->log('Returning paths: ');
-            $this->log->log($paths);
+			$this->clean_paths($paths);
+
+			$this->log->log('Returning paths: ');
+			$this->log->log($paths);
 			return $paths;
 		}
-
 	}
 
 	/**
@@ -544,13 +617,14 @@ class Data_Feed_Item {
 	 *
 	 * @param array $paths Paths to clean up.
 	 */
-	private function clean_paths( &$paths ) {
-		sort( $paths );
-		for ( $x = 0, $i = 1, $j = count( $paths ); $i < $j; $x = $i ++ ) {
+	private function clean_paths(&$paths)
+	{
+		sort($paths);
+		for ($x = 0, $i = 1, $j = count($paths); $i < $j; $x = $i++) {
 
-			if ( isset( $paths[ $i ] ) && isset( $paths[ $x ] ) ) {
-				if ( strpos( $paths[ $i ], $paths[ $x ] ) === 0 ) {
-					unset( $paths[ $x ] );
+			if (isset($paths[$i]) && isset($paths[$x])) {
+				if (strpos($paths[$i], $paths[$x]) === 0) {
+					unset($paths[$x]);
 				}
 			}
 
@@ -567,20 +641,21 @@ class Data_Feed_Item {
 	 *
 	 * @return array|mixed|string
 	 */
-	private function get_category_path( $term ) {
+	private function get_category_path($term)
+	{
 
-		if ( is_int($term) ) {
+		if (is_int($term)) {
 
-			if ( $term > 0 ) {
-				$term = get_term_by('id',$term,'product_cat');
+			if ($term > 0) {
+				$term = get_term_by('id', $term, 'product_cat');
 			} else {
 				return '';
 			}
 		}
 
 		// Don't traverse again if we already have the path cached.
-		if ( isset( $this->paths_cache[ $term->term_id ] ) ) {
-			return $this->paths_cache[ $term->term_id ];
+		if (isset($this->paths_cache[$term->term_id])) {
+			return $this->paths_cache[$term->term_id];
 		}
 
 		$term_id = isset($term->term_id) ? $term->term_id : 0;
@@ -592,14 +667,14 @@ class Data_Feed_Item {
 		 * Terms are already loaded to the cache, so there's no need to load them from DB again.
 		 */
 		if (isset($term->parent)) {
-			while ( $term->parent ) {
-				$term = $this->terms_cache[ $term->parent ];
+			while ($term->parent) {
+				$term = $this->terms_cache[$term->parent];
 				$path[] = $term->name;
 			}
 
 			// Build a path, and cache it for future use.
-			$path = implode( ' > ', array_reverse( $path ) );
-			$this->paths_cache[ $term_id ] = $path;
+			$path = implode(' > ', array_reverse($path));
+			$this->paths_cache[$term_id] = $path;
 		} else {
 			$path = '';
 		}
@@ -616,27 +691,28 @@ class Data_Feed_Item {
 	 *
 	 * @return array Regular and sale price.
 	 */
-	private function get_prices( $product ) {
+	private function get_prices($product)
+	{
 		// Calculate prices for variable products
-		if ( $product->is_type( 'variable' ) ) {
-			return $this->get_variable_prices( $product );
+		if ($product->is_type('variable')) {
+			return $this->get_variable_prices($product);
 		}
 
 		// Calculate prices for non-variable products
-		$prices = array( 'regular' => $product->get_regular_price() );
-		if ( $product->is_on_sale() ) {
+		$prices = array('regular' => $product->get_regular_price());
+		if ($product->is_on_sale()) {
 			$prices['sale'] = $product->get_sale_price();
 		}
 
-		if ( $this->settings['include_taxes'] ) {
+		if ($this->settings['include_taxes']) {
 			// Methods for retrieving prices with taxes on \WC_Product have been
 			// deprecated in Woo 3.0.0, but we want to make sure we don't crash
 			// and retrieve the prices correctly if older version of WooCommerce
 			// is installed.
-			if ( function_exists( 'wc_get_price_including_tax' ) ) {
-				$prices = $this->get_simple_prices_with_taxes( $product, $prices );
+			if (function_exists('wc_get_price_including_tax')) {
+				$prices = $this->get_simple_prices_with_taxes($product, $prices);
 			} else {
-				$prices = $this->get_simple_prices_with_taxes_legacy( $product, $prices );
+				$prices = $this->get_simple_prices_with_taxes_legacy($product, $prices);
 			}
 		}
 
@@ -653,17 +729,18 @@ class Data_Feed_Item {
 	 *
 	 * @return array
 	 */
-	private function get_simple_prices_with_taxes( $product, $prices ) {
-		$prices['regular'] = wc_get_price_including_tax( $product, array(
+	private function get_simple_prices_with_taxes($product, $prices)
+	{
+		$prices['regular'] = wc_get_price_including_tax($product, array(
 			'qty'   => 1,
 			'price' => $prices['regular'],
-		) );
+		));
 
-		if ( isset( $prices['sale'] ) ) {
-			$prices['sale'] = wc_get_price_including_tax( $product, array(
+		if (isset($prices['sale'])) {
+			$prices['sale'] = wc_get_price_including_tax($product, array(
 				'qty'   => 1,
 				'price' => $prices['sale'],
-			) );
+			));
 		}
 
 		return $prices;
@@ -684,11 +761,12 @@ class Data_Feed_Item {
 	 *
 	 * @return array
 	 */
-	private function get_simple_prices_with_taxes_legacy( $product, $prices ) {
-		$prices['regular'] = $product->get_price_including_tax( 1, $prices['regular'] );
+	private function get_simple_prices_with_taxes_legacy($product, $prices)
+	{
+		$prices['regular'] = $product->get_price_including_tax(1, $prices['regular']);
 
-		if ( isset( $prices['sale'] ) ) {
-			$prices['sale'] = $product->get_price_including_tax( 1, $prices['sale'] );
+		if (isset($prices['sale'])) {
+			$prices['sale'] = $product->get_price_including_tax(1, $prices['sale']);
 		}
 
 		return $prices;
@@ -703,18 +781,19 @@ class Data_Feed_Item {
 	 *
 	 * @return array
 	 */
-	private function get_variable_prices( $product ) {
+	private function get_variable_prices($product)
+	{
 		$include_taxes = (bool) $this->settings['include_taxes'];
 
-		$regular_price = $product->get_variation_regular_price( 'min', $include_taxes );
+		$regular_price = $product->get_variation_regular_price('min', $include_taxes);
 		$sale_price = false;
 
-		if ( $product->is_on_sale() ) {
-			$sale_price = $product->get_variation_sale_price( 'min', $include_taxes );
+		if ($product->is_on_sale()) {
+			$sale_price = $product->get_variation_sale_price('min', $include_taxes);
 		}
 
-		$prices = array( 'regular' => $regular_price );
-		if ( $sale_price ) {
+		$prices = array('regular' => $regular_price);
+		if ($sale_price) {
 			$prices['sale'] = $sale_price;
 		}
 
