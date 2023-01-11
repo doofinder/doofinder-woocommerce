@@ -6,8 +6,6 @@ use Doofinder\WC\Settings\Attributes;
 use Doofinder\WC\Settings\Settings;
 use Doofinder\WC\Log;
 
-use function WPML\FP\tryCatch;
-
 defined('ABSPATH') or die;
 
 class Data_Feed_Item
