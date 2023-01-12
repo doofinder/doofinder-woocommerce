@@ -2,7 +2,8 @@
 
 namespace Doofinder\WC\Settings;
 
-class Attributes {
+class Attributes
+{
 
 	/**
 	 * Singleton of this class.
@@ -44,8 +45,9 @@ class Attributes {
 	 * @since 1.0.0
 	 * @return Attributes
 	 */
-	public static function instance() {
-		if ( is_null( self::$_instance ) ) {
+	public static function instance()
+	{
+		if (is_null(self::$_instance)) {
 			self::$_instance = new self();
 		}
 
@@ -57,7 +59,8 @@ class Attributes {
 	 *
 	 * @since 1.0.0
 	 */
-	public function __construct() {
+	public function __construct()
+	{
 		$this->attributes = include 'attributes.php';
 	}
 
@@ -68,10 +71,11 @@ class Attributes {
 	 *
 	 * @return bool True if the user configured and saved the attribute, false otherwise.
 	 */
-	public function have( $name ) {
-		$option = Settings::get( 'feed_attributes', $name );
+	public function have($name)
+	{
+		$option = Settings::get('feed_attributes', $name);
 
-		return ! empty( $option );
+		return !empty($option);
 	}
 
 	/**
@@ -82,13 +86,14 @@ class Attributes {
 	 *
 	 * @return mixed Attribute value.
 	 */
-	public function get( $name, $product ) {
-		$attribute = Settings::get( 'feed_attributes', $name );
-		if ( ! isset( $this->attributes[ $attribute ] ) ) {
+	public function get($name, $product)
+	{
+		$attribute = Settings::get('feed_attributes', $name);
+		if (!isset($this->attributes[$attribute])) {
 			return '';
 		}
 
-		return $this->get_attribute_value( $attribute, $product );
+		return $this->get_attribute_value($attribute, $product);
 	}
 
 	/**
@@ -100,35 +105,36 @@ class Attributes {
 	 *
 	 * @return mixed Attribute value.
 	 */
-	public function get_attribute_value( $attribute_name, $product, $parameters = [] ) {
-		$attribute = $this->attributes[ $attribute_name ];
+	public function get_attribute_value($attribute_name, $product, $parameters = [])
+	{
+		$attribute = $this->attributes[$attribute_name];
 		$value     = '';
-		switch ( $attribute['type'] ) {
+		switch ($attribute['type']) {
 			case 'predefined':
-				$value = $this->get_attribute_predefined( $attribute['source'], $product );
+				$value = $this->get_attribute_predefined($attribute['source'], $product);
 				break;
 
 			case 'meta':
-				$value = $this->get_attribute_meta( $attribute['source'], $product );
+				$value = $this->get_attribute_meta($attribute['source'], $product);
 				break;
 
 			case 'wc_attribute':
-				$value = $this->get_attribute_wc( $attribute['source'], $product );
+				$value = $this->get_attribute_wc($attribute['source'], $product);
 				break;
 
 			case 'custom_meta':
-				$value = $this->get_attribute_custom_meta( $parameters, $product );
+				$value = $this->get_attribute_custom_meta($parameters, $product);
 				break;
 		}
 
 		// Check if we should export units
-		if ( 'yes' === Settings::get( 'feed', 'export_units' ) && ! empty( $value ) ) {
-			if ( in_array( $attribute_name, $this->dimensions ) ) {
-				return $value . Settings::get_wc_option( 'woocommerce_dimension_unit' );
+		if ('yes' === Settings::get('feed', 'export_units') && !empty($value)) {
+			if (in_array($attribute_name, $this->dimensions)) {
+				return $value . Settings::get_wc_option('woocommerce_dimension_unit');
 			}
 
-			if ( in_array( $attribute_name, $this->weight ) ) {
-				return $value . Settings::get_wc_option( 'woocommerce_weight_unit' );
+			if (in_array($attribute_name, $this->weight)) {
+				return $value . Settings::get_wc_option('woocommerce_weight_unit');
 			}
 		}
 
@@ -143,20 +149,21 @@ class Attributes {
 	 *
 	 * @return mixed The attribute value.
 	 */
-	private function get_attribute_predefined( $source, $product ) {
-		switch ( $source ) {
+	private function get_attribute_predefined($source, $product)
+	{
+		switch ($source) {
 			case 'permalink':
-				return get_permalink( $product );
+				return get_permalink($product);
 			case 'post_excerpt':
 				// Woo gives Product Variations weird excerpt by default
 				// (just the list of attributes). There's no UI to change it,
 				// but variations have a "description" field.
 				// So we'll take excerpt for regular products, and this
 				// description for variations.
-				if ( $product->post_parent ) {
-					return get_post_meta( $product->ID , '_variation_description', true );
+				if ($product->post_parent) {
+					return get_post_meta($product->ID, '_variation_description', true);
 				} else {
-					return get_the_excerpt( $product );
+					return get_the_excerpt($product);
 				}
 			default:
 				return $product->$source;
@@ -171,8 +178,9 @@ class Attributes {
 	 *
 	 * @return mixed The attribute value.
 	 */
-	private function get_attribute_meta( $source, $product ) {
-		return get_post_meta( $product->ID, $source, true );
+	private function get_attribute_meta($source, $product)
+	{
+		return get_post_meta($product->ID, $source, true);
 	}
 
 	/**
@@ -184,21 +192,31 @@ class Attributes {
 	 * @return mixed The attribute value.
 	 * @since 1.2.2
 	 */
-	private function get_attribute_wc( $source, $product ) {
+	private function get_attribute_wc($source, $product)
+	{
 		$product_factory = new \WC_Product_Factory();
-		$product_object  = $product_factory->get_product( $product->ID );
+		$product_object  = $product_factory->get_product($product->ID);
+		$attribute = "";
 
-		$attribute = $product_object->get_attribute( $source );
+		if($product_object->get_type() === 'variable'){
+			$attributes = $product_object->get_variation_attributes();			
+		}else{
+			$attributes = $product_object->get_attributes();			
+		}
 
-		// `/` is used to separate values, so it cannot be a part of value.
-		// @see https://www.doofinder.com/support/the-data-feed/facets
-		$attribute = str_replace( '/', '//', $attribute );
-
-		// If there are multiple attribute values, WooCommerce separates
-		// them by `,`, it's hardcoded, and there is no hook for it.
+		$attribute = $attributes['pa_' . $source];
+		
+		if (empty($attribute)) {
+			return "";
+		}
 		// Doofinder requires attributes to be separated by `/`.
 		// @see https://www.doofinder.com/support/the-data-feed/facets
-		return implode( '/', explode( ', ', $attribute ) );
+		if (is_array($attribute)) {
+			$attribute = array_map(fn ($value): string => str_replace('/', '//', $value), $attribute);
+			return implode('/', $attribute);
+		} else {
+			return str_replace('/', '//', $attribute);
+		}
 	}
 
 	/**
@@ -210,11 +228,12 @@ class Attributes {
 	 *
 	 * @return string
 	 */
-	private function get_attribute_custom_meta( $parameters, $product ) {
-		if ( ! $parameters || ! isset( $parameters['value'] ) ) {
+	private function get_attribute_custom_meta($parameters, $product)
+	{
+		if (!$parameters || !isset($parameters['value'])) {
 			return '';
 		}
 
-		return get_post_meta( $product->ID, $parameters['value'], true );
+		return get_post_meta($product->ID, $parameters['value'], true);
 	}
 }
