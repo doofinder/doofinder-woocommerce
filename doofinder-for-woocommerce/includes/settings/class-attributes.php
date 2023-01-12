@@ -199,12 +199,12 @@ class Attributes
 		$attribute = "";
 
 		if($product_object->get_type() === 'variable'){
-			$attributes = $product_object->get_variation_attributes();
-			$attribute = $attributes['pa_' . $source];
+			$attributes = $product_object->get_variation_attributes();			
 		}else{
-			$attributes = $product_object->get_attributes();
-			$attribute = $attributes[$source];
-		}		
+			$attributes = $product_object->get_attributes();			
+		}
+
+		$attribute = $attributes['pa_' . $source];
 		
 		if (empty($attribute)) {
 			return "";
