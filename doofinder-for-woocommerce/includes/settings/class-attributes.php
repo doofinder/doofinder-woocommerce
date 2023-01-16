@@ -197,15 +197,16 @@ class Attributes
 		$product_factory = new \WC_Product_Factory();
 		$product_object  = $product_factory->get_product($product->ID);
 		$attribute = "";
+		$attribute_name = 'pa_' . $source;
 
-		if($product_object->get_type() === 'variable'){
-			$attributes = $product_object->get_variation_attributes();			
-		}else{
-			$attributes = $product_object->get_attributes();			
+		if ($product_object->get_type() === 'variable') {
+			$attributes = $product_object->get_variation_attributes();
+			$attribute = $attributes[$attribute_name];
+		} else {
+			$attributes = $product_object->get_attributes();
+			$attribute = $product_object->get_attribute( $attribute_name);
 		}
 
-		$attribute = $attributes['pa_' . $source];
-		
 		if (empty($attribute)) {
 			return "";
 		}
