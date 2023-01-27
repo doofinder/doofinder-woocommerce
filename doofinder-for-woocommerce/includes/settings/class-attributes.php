@@ -204,7 +204,7 @@ class Attributes
 			$attribute = $attributes[$attribute_name];
 		} else {
 			$attributes = $product_object->get_attributes();
-			$attribute = $product_object->get_attribute( $attribute_name);
+			$attribute = $product_object->get_attribute($attribute_name);
 		}
 
 		if (empty($attribute)) {
@@ -213,7 +213,9 @@ class Attributes
 		// Doofinder requires attributes to be separated by `/`.
 		// @see https://www.doofinder.com/support/the-data-feed/facets
 		if (is_array($attribute)) {
-			$attribute = array_map(fn ($value): string => str_replace('/', '//', $value), $attribute);
+			$attribute = array_map(function ($value) {
+				return str_replace('/', '//', $value);
+			}, $attribute);
 			return implode('/', $attribute);
 		} else {
 			return str_replace('/', '//', $attribute);
