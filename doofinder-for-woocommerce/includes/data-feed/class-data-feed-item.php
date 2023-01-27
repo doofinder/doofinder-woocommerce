@@ -511,7 +511,9 @@ class Data_Feed_Item
 		$stock_by_attribute = $this->get_stock_by_attribute($variations);
 
 		foreach ($stock_by_attribute as $attribute => $values) {
-			$keys_without_stock = array_keys(array_filter($values, fn ($value) => $value === false));
+			$keys_without_stock = array_keys(array_filter($values, function ($value) {
+				return $value === false;
+			}));
 			if (empty($keys_without_stock)) {
 				continue;
 			}
@@ -519,7 +521,9 @@ class Data_Feed_Item
 			$attribute = str_replace("pa_", "", $attribute);
 			//We need to replace double slashes by another character in order to avoid errors when exploding by single slashes
 			$new_attributes = explode("/", str_replace("//", "@SLASH@", $this->fields[$attribute]));
-			$new_attributes = array_map(fn ($value) => str_replace('@SLASH@', '/', $value), $new_attributes);
+			$new_attributes = array_map(function ($value) {
+				return str_replace('@SLASH@', '/', $value);
+			}, $new_attributes);
 			foreach ($keys_without_stock as $value) {
 				$pos = array_search($value, $new_attributes);
 				if ($pos !== false) {
@@ -528,7 +532,9 @@ class Data_Feed_Item
 			}
 			if (!empty($new_attributes)) {
 				//Replace single slashes with a custom marker
-				$new_attributes = array_map(fn ($value) => str_replace('/', '@SLASH@', $value), $new_attributes);
+				$new_attributes = array_map(function ($value) {
+					return str_replace('/', '@SLASH@', $value);
+				}, $new_attributes);
 				//Implode by slashes and replace the custom marker with double slashes
 				$this->fields[$attribute] = str_replace('@SLASH@', '//', implode('/', $new_attributes));
 			} else {
