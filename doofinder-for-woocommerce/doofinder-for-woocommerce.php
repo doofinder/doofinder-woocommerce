@@ -4,7 +4,7 @@
  * Plugin Name: Doofinder for WooCommerce
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 1.5.46
+ * Version: 1.5.47
  * Author: doofinder
  * Description: Integrate Doofinder Search in your WooCommerce shop.
  *
@@ -18,6 +18,7 @@
 
 namespace Doofinder\WC;
 
+use Automattic\WooCommerce\Utilities\FeaturesUtil;
 use Doofinder\WP\doofinder;
 use Doofinder\WC\Settings\Settings;
 
@@ -57,7 +58,7 @@ if (
              *
              * @var string
              */
-            public static $version = '1.5.46';
+            public static $version = '1.5.47';
 
             /**
              * The only instance of Doofinder_For_WooCommerce
@@ -133,6 +134,7 @@ if (
                     call_user_func(array($class, 'register_urls'));
                 });
 
+                add_action('before_woocommerce_init', array($class, 'declare_wc_compatibility'));
                 add_action('plugins_loaded', array($class, 'plugin_update'));
 
                 // Initialize Admin Panel functionality on admin side, and front functionality on front side
@@ -326,6 +328,17 @@ if (
                 //Reset migration status
                 Setup_Wizard::remove_migration_notice();
                 update_option(Setup_Wizard::$wizard_migration_option, '');
+            }
+
+            /**
+             * Declare compatibility with WC features.
+             *
+             * @return void
+             */
+            public static function declare_wc_compatibility() {
+                if ( class_exists( FeaturesUtil::class ) ) {
+                    FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+                }
             }
 
             /**
