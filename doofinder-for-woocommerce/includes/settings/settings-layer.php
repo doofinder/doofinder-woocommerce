@@ -69,13 +69,6 @@ if (
 	$multilanguage->is_active() && $multilanguage->get_language_code() ||
 	! $multilanguage->is_active()
 ) {
-	$enable_question = __( 'Enable Internal Search', 'woocommerce-doofinder' );
-
-	// If we have internationalization - ask a question for specific language.
-	if ( $multilanguage->is_active() ) {
-		$lang            = $multilanguage->get_current_language();
-		$enable_question = sprintf( __( 'Enable Internal Search for %s', 'woocommerce-doofinder' ), $lang['name'] );
-	}
 
 	$search_engine = array(
 		array(
@@ -112,14 +105,6 @@ if (
 			'css'     => 'margin-top: 5px; width: 100%; height: 350px; font-family: Consolas,Monaco,monospace; background: rgb(255 255 255 / 100%);',
 			'type'    => 'textarea',
 			'default' => ''
-		),
-
-		array(
-			'title'   => $enable_question,
-			'desc'    => '',
-			'id'      => Settings::option_id( 'internal_search', 'enable', $lang_affix ),
-			'type'    => 'checkbox',
-			'default' => 'no',
 		),
 
 		array(
