@@ -2,8 +2,8 @@ version: '2'
 
 networks:
   front:
-    external:
-      name: front
+    external: true
+    name: front
 
 services:
   db:
@@ -11,13 +11,14 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: wordpress
 
   wp:
     depends_on:
       - db
     build: .
     volumes:
-      - ./doofinder-for-woocommerce:/usr/src/doofinder-for-woocommerce
+      - ./doofinder-for-woocommerce:/var/www/html/wp-content/plugins/doofinder-for-woocommerce
     restart: unless-stopped
     networks:
       default:
@@ -27,6 +28,8 @@ services:
     environment:
       WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_PASSWORD: root
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_NAME: wordpress
       DOCKER_SERVICE_PORT: ${DOCKER_SERVICE_PORT}
     ports:
       - "${DOCKER_SERVICE_PORT}:80"
