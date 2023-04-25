@@ -1,10 +1,5 @@
 version: '2'
 
-networks:
-  front:
-    external: true
-    name: front
-
 services:
   db:
     image: mysql:5.7
@@ -20,11 +15,6 @@ services:
     volumes:
       - ./doofinder-for-woocommerce:/var/www/html/wp-content/plugins/doofinder-for-woocommerce
     restart: unless-stopped
-    networks:
-      default:
-      front:
-        aliases:
-          - woocommerce
     environment:
       WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_PASSWORD: root
