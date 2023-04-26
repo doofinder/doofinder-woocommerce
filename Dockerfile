@@ -9,6 +9,13 @@ RUN apt-get update -qq && \
   less \
   nano
 
+RUN mkdir -p /var/www/html/wp-content/plugins
+RUN mkdir -p /var/www/html/wp-content/uploads
+RUN mkdir -p /var/www/html/wp-content/upgrade
+RUN chown -R www-data:www-data /var/www
+RUN find /var/www/ -type d -exec chmod 0755 {} \;
+RUN find /var/www/ -type f -exec chmod 644 {} \;
+
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
   chmod +x wp-cli.phar && \
   mv wp-cli.phar /usr/local/bin/wpcli

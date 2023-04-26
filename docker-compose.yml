@@ -1,32 +1,25 @@
 version: '2'
 
-networks:
-  front:
-    external:
-      name: front
-
 services:
   db:
     image: mysql:5.7
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: wordpress
 
   wp:
     depends_on:
       - db
     build: .
     volumes:
-      - ./doofinder-for-woocommerce:/usr/src/doofinder-for-woocommerce
+      - ./html:/var/www/html
     restart: unless-stopped
-    networks:
-      default:
-      front:
-        aliases:
-          - woocommerce
     environment:
       WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_PASSWORD: root
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_NAME: wordpress
       DOCKER_SERVICE_PORT: ${DOCKER_SERVICE_PORT}
     ports:
       - "${DOCKER_SERVICE_PORT}:80"
