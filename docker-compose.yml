@@ -13,7 +13,7 @@ services:
       - db
     build: .
     volumes:
-      - ./doofinder-for-woocommerce:/var/www/html/wp-content/plugins/doofinder-for-woocommerce
+      - ./html:/var/www/html
     restart: unless-stopped
     environment:
       WORDPRESS_DB_HOST: db:3306
