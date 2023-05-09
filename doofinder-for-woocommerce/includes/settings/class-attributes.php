@@ -198,10 +198,12 @@ class Attributes
 		$product_object  = $product_factory->get_product($product->ID);
 		$attribute = "";
 		$attribute_name = 'pa_' . $source;
-
 		if ($product_object->get_type() === 'variable') {
 			$attributes = $product_object->get_variation_attributes();
-			$attribute = $attributes[$attribute_name];
+			if(isset($attributes[$attribute_name])) {
+				$attribute = $attributes[$attribute_name];
+			}
+			
 		} else {
 			$attributes = $product_object->get_attributes();
 			$attribute = $product_object->get_attribute($attribute_name);
@@ -213,12 +215,22 @@ class Attributes
 		// Doofinder requires attributes to be separated by `/`.
 		// @see https://www.doofinder.com/support/the-data-feed/facets
 		if (is_array($attribute)) {
-			$attribute = array_map(function ($value) {
-				return str_replace('/', '//', $value);
+			$attribute = array_map(function ($value) use($attribute_name) {
+				return str_replace('/', '//', $this->get_wc_attribute_name($attribute_name, $value));
 			}, $attribute);
-			return implode('/', $attribute);
+			return  implode('/', $attribute);
 		} else {
+			$attribute = $this->get_wc_attribute_name($attribute_name, $attribute);
 			return str_replace('/', '//', $attribute);
+		}
+	}
+
+	private function get_wc_attribute_name($attribute_name, $attribute_value_slug) {
+		$attribute_term = get_term_by('slug', $attribute_value_slug, $attribute_name);
+		if (is_a($attribute_term , 'WP_Term')) {
+			return $attribute_term->name;
+		} else {
+				return $attribute_value_slug;
 		}
 	}
 
