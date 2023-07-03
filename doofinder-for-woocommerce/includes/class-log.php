@@ -1,6 +1,6 @@
 <?php
 
-namespace Doofinder\WC;
+namespace Doofinder\WP;
 
 class Log {
 
@@ -37,11 +37,11 @@ class Log {
 	 */
 	public function log( $value ) {
 		// Check if logs directory exits. Create it if it doesn't.
-		if ( ! is_dir( Doofinder_For_WooCommerce::plugin_path() . 'logs' ) ) {
-			mkdir( Doofinder_For_WooCommerce::plugin_path() . 'logs' );
+		if ( ! is_dir( Doofinder_For_WordPress::plugin_path() . 'logs' ) ) {
+			mkdir( Doofinder_For_WordPress::plugin_path() . 'logs' );
 		}
 
-		$log_file = Doofinder_For_WooCommerce::plugin_path() . 'logs/' . $this->file_name;
+		$log_file = Doofinder_For_WordPress::plugin_path() . 'logs/' . $this->file_name;
 
 		// We don't want the log file to grow to large, so clear it
 		// if it takes up more than 1 mb of disk space.

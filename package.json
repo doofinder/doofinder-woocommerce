@@ -1,7 +1,7 @@
 {
-  "name": "doofinder-woocommerce",
-  "version": "1.5.49",
-  "description": "Integrate Doofinder in your WooCommerce site with (almost) no effort.",
+  "name": "doofinder-wordpress",
+  "version": "0.5.4",
+  "description": "Integrate Doofinder in your WordPress site with (almost) no effort.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,27 +9,26 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/doofinder/doofinder-woocommerce.git"
+    "url": "git+https://github.com/doofinder/doofinder-wordpress.git"
   },
   "keywords": [
-    "woocommerce",
-    "search",
-    "woocommerce-plugin",
     "wordpress",
-    "wordpress-plugin"
+    "wordpress-plugin",
+    "search",
+    "doofinder"
   ],
   "author": "Doofinder",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/doofinder/doofinder-woocommerce/issues"
+    "url": "https://github.com/doofinder/doofinder-wordpress/issues"
   },
-  "homepage": "https://github.com/doofinder/doofinder-woocommerce#readme",
+  "homepage": "https://github.com/doofinder/doofinder-wordpress",
   "devDependencies": {
-    "grunt": "^1.0.1",
-    "grunt-contrib-clean": "^1.0.0",
-    "grunt-contrib-compress": "^1.4.1",
-    "grunt-contrib-copy": "^1.0.0",
-    "grunt-version": "^1.1.1",
-    "load-grunt-tasks": "^3.5.2"
+    "grunt": "~1.0.1",
+    "grunt-contrib-clean": "~1.0.0",
+    "grunt-contrib-compress": "~1.4.1",
+    "grunt-contrib-copy": "~1.0.0",
+    "grunt-version": "~1.1.1",
+    "load-grunt-tasks": "~4.0.0"
   }
 }

@@ -1,10 +1,10 @@
 <?php
 
-namespace Doofinder\WC\Multilanguage;
+namespace Doofinder\WP\Multilanguage;
 
-use Doofinder\WC\Helpers\Helpers;
-use Doofinder\WC\Log;
-use Doofinder\WC\Settings\Settings;
+use Doofinder\WP\Helpers\Helpers;
+use Doofinder\WP\Log;
+use Doofinder\WP\Settings\Settings;
 
 class WPML implements I18n_Handler
 {
@@ -74,8 +74,8 @@ class WPML implements I18n_Handler
 	{
 		global $sitepress;
 
-		$lang_code = $sitepress->get_default_language();		
-		return $this->languages[$lang_code]['locale'];
+		$lang_code = $sitepress->get_default_language();
+		return $this->languages[$lang_code]['code'];
 	}
 
 
@@ -83,7 +83,7 @@ class WPML implements I18n_Handler
 	{
 		global $sitepress;
 
-		$lang_code = $sitepress->get_default_language();		
+		$lang_code = $sitepress->get_default_language();
 		return $this->languages[$lang_code]['locale'];
 	}
 
@@ -106,10 +106,6 @@ class WPML implements I18n_Handler
 			if ($lang === 'all') {
 				return '';
 			}
-
-			//get locale code
-			$lang = $this->get_locale_by_lang_code($lang);
-
 			return $lang;
 		}
 
@@ -134,7 +130,12 @@ class WPML implements I18n_Handler
 				return '';
 			}
 
-			return $this->languages[$lang];
+
+            if($lang === $this->get_base_language()){
+                return '';
+            }
+
+			return $lang;
 		}
 
 		return false;
@@ -159,134 +160,42 @@ class WPML implements I18n_Handler
 	 * @since 1.0.0
 	 * @inheritdoc
 	 */
-	public function get_feed_link($name, $language = '')
-	{
-		if (empty($language)) {
-			return get_feed_link($name);
-		}
-
-		global $sitepress;
-
-		$sitepress->switch_lang($language);
-		$link = get_feed_link($name);
-		$sitepress->switch_lang(ICL_LANGUAGE_CODE);
-
-		return $link;
-	}
-
-	/**
-	 * @since 1.0.0
-	 * @inheritdoc
-	 */
 	public function get_languages()
 	{
 		return $this->languages;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	public function get_formatted_languages()
-	{
-		if (!function_exists('icl_get_languages')) {
-			return array();
-		}
+    /**
+     * @inheritdoc
+     */
+    public function get_formatted_languages()
+    {
+        if (!function_exists('icl_get_languages')) {
+            return array();
+        }
 
-		// "wpml_active_languages" filters the list of the
-		// languages enabled (active) for a site.
-		$languages = apply_filters('wpml_active_languages', null, 'orderby=code&order=desc');
+        // "wpml_active_languages" filters the list of the
+        // languages enabled (active) for a site.
+        $languages = apply_filters('wpml_active_languages', null, 'orderby=code&order=desc');
 
-		if (empty($languages)) {
-			return array();
-		}
+        if (empty($languages)) {
+            return array();
+        }
 
-		// Create associative array with lang code / lang name pairs.
-		// For example 'en' => 'English'.
-		$formatted_languages = array();
-		foreach ($languages as $key => $value) {
-			$language_code = $value['default_locale'];
-			$formatted_languages[$language_code] = $value['translated_name'];
-		}
+        // Create associative array with lang code / lang name pairs.
+        // For example 'en' => 'English'.
+        $formatted_languages = array();
+        foreach ($languages as $key => $value) {
+            $language_code = $value['default_locale'];
+            $translated_name = isset($value['translated_name']) ? $value['translated_name'] : '';
+            if(empty($translated_name)){
+                $translated_name = isset($value['display_name']) ? $value['display_name'] : '';
+            }
+            $formatted_languages[$language_code] = $translated_name;
+        }
 
-		return $formatted_languages;
-	}
-
-	/**
-	 * @since 1.0.0
-	 * @inheritdoc
-	 */
-	public function get_posts($args, $language)
-	{
-		global $sitepress;
-
-		$sitepress->switch_lang($language);
-		$posts = get_posts($args);
-		$sitepress->switch_lang($this->get_current_language());
-
-		return $posts;
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function get_posts_ids($language_code, $post_type, $ids_greater_than, $number_of_posts)
-	{
-		global $wpdb;
-		global $sitepress;
-
-		$language_code = Helpers::get_language_from_locale($language_code);
-		$split_variable_lang = $sitepress ? 'all' : '';
-
-		// Set post types to query depending on split_variable option
-		if ('yes' === Settings::get('feed', 'split_variable', $split_variable_lang) && $post_type === 'product') {
-
-			$query = "
-				SELECT DISTINCT posts.ID
-				FROM {$wpdb->prefix}icl_translations as translations
-				LEFT JOIN {$wpdb->prefix}posts as posts
-					ON ( translations.element_id = posts.ID )
-				LEFT JOIN {$wpdb->prefix}posts as postparents
-                	ON posts.post_parent = postparents.ID
-				WHERE translations.language_code = '$language_code'
-				AND ( translations.element_type = 'post_{$post_type}' OR translations.element_type = 'post_{$post_type}_variation' )
-				AND posts.id > $ids_greater_than
-				AND posts.post_status = 'publish'
-				AND (postparents.post_status IS NULL OR postparents.post_status = 'publish')
-				ORDER BY posts.id
-				LIMIT $number_of_posts
-			";
-		} else {
-
-			$query = "
-				SELECT {$wpdb->prefix}icl_translations.element_id
-				FROM {$wpdb->prefix}icl_translations
-				JOIN {$wpdb->prefix}posts
-				ON {$wpdb->prefix}icl_translations.element_id = {$wpdb->prefix}posts.ID
-				WHERE {$wpdb->prefix}icl_translations.language_code = '$language_code'
-				AND {$wpdb->prefix}icl_translations.element_type = 'post_{$post_type}'
-				AND {$wpdb->prefix}icl_translations.element_id > $ids_greater_than
-				AND {$wpdb->prefix}posts.post_status = 'publish'
-				ORDER BY {$wpdb->prefix}icl_translations.element_id
-				LIMIT $number_of_posts
-			";
-		}
-
-		$this->log->log('Get Posts IDs - Query:');
-		$this->log->log($query);
-
-		$ids = $wpdb->get_results($query, ARRAY_N);
-
-		//$this->log->log( 'Get Posts IDs - Result:' );
-		//$this->log->log( $ids );
-
-		if (!$ids) {
-			return array();
-		}
-
-		return array_map(function ($item) {
-			return $item[0];
-		}, $ids);
-	}
+        return $formatted_languages;
+    }
 
 	/**
 	 * @inheritdoc
@@ -303,7 +212,7 @@ class WPML implements I18n_Handler
 			return $base;
 		}
 
-		//Replace hyphens with underscores in language code		
+		//Replace hyphens with underscores in language code
 		$language_code = Helpers::get_language_from_locale($language_code);
 
 		return "{$base}_{$language_code}";

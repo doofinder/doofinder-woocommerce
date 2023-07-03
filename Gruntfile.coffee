@@ -6,9 +6,9 @@ module.exports = (grunt) ->
       build: ['build/trunk/*', 'build/assets/*']
 
     copy:
-      build:
+      source:
         expand: true
-        cwd: "doofinder-for-woocommerce"
+        cwd: "doofinder"
         src: ["**/*", "!**/*.scss"]
         dest: "build/trunk"
       assets:
@@ -19,22 +19,22 @@ module.exports = (grunt) ->
 
     version:
       code:
-        src: ["doofinder-for-woocommerce/doofinder-for-woocommerce.php"]
+        src: ["doofinder/doofinder.php"]
       text:
         options:
           prefix: 'Version: '
         src: [
-          "doofinder-for-woocommerce/doofinder-for-woocommerce.php",
-          "doofinder-for-woocommerce/readme.txt"
+          "doofinder/doofinder.php",
+          "doofinder/readme.txt"
         ]
 
     compress:
-      build:
+      source:
         options:
-          archive: "doofinder-for-woocommerce.zip"
+          archive: "doofinder.zip"
         files: [{
           expand: true
-          src: ["doofinder-for-woocommerce/**/*"]
+          src: ["doofinder/**/*"]
           dest: "/"
         }]
 

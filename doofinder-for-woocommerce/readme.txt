@@ -127,6 +127,9 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 
 == Changelog ==
 
+= 2.0.0 =
+Introducing the latest version that combines the features of both Doofinder and Doofinder for WooCommerce plugins. We have simplified the setup Wizard and Settings for easier configuration. Additionally, we have implemented the "Update on save" feature along with various other enhancements for an improved user experience.
+
 = 1.5.49 =
 Fix custom attributes indexation
 

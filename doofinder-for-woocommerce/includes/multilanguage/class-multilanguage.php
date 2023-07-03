@@ -1,6 +1,6 @@
 <?php
 
-namespace Doofinder\WC\Multilanguage;
+namespace Doofinder\WP\Multilanguage;
 
 class Multilanguage {
 

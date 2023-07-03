@@ -1,9 +1,8 @@
 <?php
 
-namespace Doofinder\WC;
+namespace Doofinder\WP;
 
-use Doofinder\GuzzleHttp\Promise\Is;
-use Doofinder\WC\Settings\Settings;
+#use Doofinder\WP\Settings;
 
 class Add_To_Cart
 {
@@ -18,7 +17,6 @@ class Add_To_Cart
     /**
      * Returns the only instance of Add_To_Cart.
      *
-     * @since 1.5.23
      * @return Add_To_Cart
      */
     public static function instance()
@@ -33,7 +31,6 @@ class Add_To_Cart
     /**
      * Add_To_Cart constructor.
      *
-     * @since 1.5.23
      */
     public function __construct()
     {
@@ -124,10 +121,10 @@ class Add_To_Cart
     public function enqueue_script()
     {
         add_action('wp_enqueue_scripts', function () {
-            if ('yes' === Settings::get('layer', 'enabled')) {
+            if (Settings::is_js_layer_enabled()) {
                 wp_enqueue_script(
                     'doofinder-add-to-cart',
-                    Doofinder_For_WooCommerce::plugin_url() . 'assets/js/df-add-to-cart.js',
+                    Doofinder_For_WordPress::plugin_url() . 'assets/js/df-add-to-cart.js',
                     ['jquery'],
                     false,
                     true

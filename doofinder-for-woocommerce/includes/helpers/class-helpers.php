@@ -1,21 +1,11 @@
 <?php
 
-namespace Doofinder\WC\Helpers;
+namespace Doofinder\WP\Helpers;
 
-use Doofinder\WC\Settings\Settings;
+use Doofinder\WP\Settings;
 
 class Helpers
 {
-
-    /**
-     * Returns `true` if we are currently in debug mode, `false` otherwise.
-     *
-     * @return bool
-     */
-    public static function is_debug_mode()
-    {
-        return Settings::get_enable_debug_mode();
-    }
 
     /**
      * Check if string contains https:// if not then add it
@@ -80,7 +70,7 @@ class Helpers
 
 
     /**
-     * This function converts a locale code (language and country code) from 
+     * This function converts a locale code (language and country code) from
      * 'en-US' to 'en_US' format.
      *
      * @param string $locale_code
@@ -93,7 +83,7 @@ class Helpers
 
 
     /**
-     * This function converts a locale code (language and country code) from 
+     * This function converts a locale code (language and country code) from
      * 'en_US' to 'en-US' format used by Live Layer.
      *
      * @param string $locale_code

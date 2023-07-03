@@ -1,6 +1,6 @@
 <?php
 
-namespace Doofinder\WC;
+namespace Doofinder\WP;
 
 class Thumbnail {
 

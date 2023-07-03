@@ -17,13 +17,11 @@ if ! $(wp core is-installed); then
   wp core install --url=localhost:${DOCKER_SERVICE_PORT} --title=WooCommerce --admin_user=admin --admin_password=admin123 --admin_email=foo@bar.com --skip-email
 
   wp plugin install wordpress-importer --activate
-  wp plugin install woocommerce --activate
-  wp import wp-content/plugins/woocommerce/dummy-data/dummy-data.xml --authors=create
+  wp plugin install polylang --activate
 
   chown -R www-data:www-data /var/www/html
 
-  ln -s /usr/src/doofinder-for-woocommerce /var/www/html/wp-content/plugins
-  wp plugin activate doofinder-for-woocommerce
+  ln -s /usr/src/doofinder /var/www/html/wp-content/plugins
 fi
 
 # Pass through arguments to exec
