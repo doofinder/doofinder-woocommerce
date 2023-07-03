@@ -131,7 +131,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
 
                 //Check if the plugin exists
                 $old_plugin_notice_name = 'doofinder-for-wp-old-version-detected';
-                 if (file_exists(WP_PLUGIN_DIR . '/doofinder-for-woocommerce/doofinder-for-woocommerce.php')) {
+                 if (file_exists(WP_PLUGIN_DIR . '/doofinder/doofinder.php')) {
                     Admin_Notices::add_notice($old_plugin_notice_name, __('Deprecated version of Doofinder plugin detected', 'wordpress-doofinder'), __('The Doofinder plugin has been merged into the new version of Doofinder for WooCommerce and is no longer needed. Therefore, we have deactivated it. We recommend uninstalling it to avoid future issues.', 'wordpress-doofinder'), 'warning');
                 } else {
                     Admin_Notices::remove_notice($old_plugin_notice_name);
@@ -238,7 +238,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
          */
         public static function plugin_enabled()
         {
-            $df_wc_plugin = 'doofinder-for-woocommerce/doofinder-for-woocommerce.php';
+            $df_wc_plugin = 'doofinder/doofinder.php';
             if (is_plugin_active($df_wc_plugin))
                 deactivate_plugins($df_wc_plugin);
 
