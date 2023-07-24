@@ -176,7 +176,7 @@ trait Accessors
         update_option(self::option_name_for_language(
             'doofinder_for_wp_enable_js_layer',
             $language
-        ), true);
+        ), 1);
     }
 
     /**
@@ -192,7 +192,7 @@ trait Accessors
         update_option(self::option_name_for_language(
             'doofinder_for_wp_enable_js_layer',
             $language
-        ), false);
+        ), 0);
     }
 
     /**

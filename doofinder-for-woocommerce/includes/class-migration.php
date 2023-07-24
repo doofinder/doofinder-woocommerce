@@ -27,12 +27,8 @@ class Migration
 
         self::initialize_migration();
         if (self::do_woocommerce_migration()) {
-            self::$log->log('Migrate from woocommerce success');
-        }else{
-            self::$log->log('Nothing to migrate from woocommerce');
+            self::finish_migration();
         }
-
-        self::finish_migration();
 
         //check if app credentials are set
         if (!Store_Api::has_application_credentials() && Settings::is_configuration_complete()) {

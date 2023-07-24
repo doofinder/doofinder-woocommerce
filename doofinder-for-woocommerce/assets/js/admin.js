@@ -12,6 +12,8 @@ jQuery(function () {
             success: function (response) {
                 if (response.status === "processed") {
                     $(".indexation-status").toggleClass("processing processed");
+                    //Enable Layer switch
+                    $("input[name='doofinder_for_wp_enable_js_layer']").attr("checked", true)
                     clearInterval(indexingCheckInterval);
                 }
             },
@@ -23,6 +25,7 @@ jQuery(function () {
     }
 
     let UpdateOnSaveHandler = function () {
+        force_update_btn.attr('disabled', true);
         $.ajax({
             type: "post",
             dataType: "json",
@@ -42,8 +45,9 @@ jQuery(function () {
                     .fadeIn();
 
                 setTimeout(function () {
-                    $(".update-result-wrapper").fadeOut()
+                    $(".update-result-wrapper").fadeOut();
                     $(".update-result-wrapper").empty();
+                    force_update_btn.attr('disabled', false);
                 }, 5000);
             },
         });
@@ -52,27 +56,20 @@ jQuery(function () {
     let force_update_btn = $("#force-update-on-save");
     force_update_btn.on("click", UpdateOnSaveHandler);
 
-    /*
-    TODO: Implement notice dismiss ajax action
-
-    $(".notice.is-dismissable .notice-dismissible").on(
+    $("body").on(
         "click",
+        ".notice.doofinder.is-dismissible .notice-dismiss",
         function () {
-            let notice_id = $(this).attr("id");
-            console.log("calling dismiss notice");
+            let notice_id = $(this).parents('.notice.doofinder').attr("id");
             $.ajax({
                 type: "post",
                 dataType: "json",
                 url: ajaxurl,
                 data: {
-                    action: "doofinder_dismiss_notice",
-                    notice_id: notice_id
-                },
-                success: function (response) {
-                    console.log("Notice dismissed")
-                },
+                    action: "doofinder_notice_dismiss",
+                    notice_id: notice_id,
+                }
             });
         }
     );
-    */
 });

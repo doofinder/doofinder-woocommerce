@@ -164,11 +164,11 @@ class Update_Manager
 	*/
 
     /**
-     * Update: 1.0.0
+     * Update: 2.0.0
      * Normalize store and indices and create application credentials for
      * accessing the rest API.
      */
-    public static function update_010000()
+    public static function update_020000()
     {
         //Update api host to point to admin.doofinder.com instead of api.doofinder.com
         $multilanguage = Multilanguage::instance();

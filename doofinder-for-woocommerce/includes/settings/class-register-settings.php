@@ -78,7 +78,7 @@ trait Register_Settings
             function () {
 ?>
             <p class="description"><?php _e(
-                                        'The following options allow to identify you and your search engine in Doofinder servers. Make sure you provide a Management API Key and not a Search API Key.',
+                                        'The following options allow to identify you and your search engine in Doofinder servers.',
                                         'doofinder_for_wp'
                                     ); ?></p>
 <?php
@@ -91,7 +91,7 @@ trait Register_Settings
             $this->language->get_option_name('doofinder_for_wp_enable_js_layer');
         add_settings_field(
             $enable_js_layer_option_name,
-            __('Enable Doofinder Search Bar', 'doofinder_for_wp'),
+            __('Enable Doofinder Layer', 'doofinder_for_wp'),
             function () use ($enable_js_layer_option_name) {
                 $this->render_html_enable_js_layer($enable_js_layer_option_name);
             },
@@ -105,7 +105,7 @@ trait Register_Settings
         $api_key_option_name = 'doofinder_for_wp_api_key';
         add_settings_field(
             $api_key_option_name,
-            __('User Key', 'doofinder_for_wp'),
+            __('Api Key', 'doofinder_for_wp'),
             function () use ($api_key_option_name) {
                 $this->render_html_api_key($api_key_option_name);
             },
@@ -124,7 +124,10 @@ trait Register_Settings
                 $this->render_html_api_host($api_host_option_name);
             },
             self::$top_level_menu,
-            $field_id
+            $field_id,
+            [
+                'class' => 'hidden'
+            ]
         );
 
         register_setting(self::$top_level_menu, $api_host_option_name, array($this, 'validate_api_host'));
@@ -160,6 +163,22 @@ trait Register_Settings
         );
 
         register_setting(self::$top_level_menu, $update_on_save_option_name, array($this, 'validate_update_on_save'));
+
+
+        // JS Layer
+		$js_layer_option_name =
+        $this->language->get_option_name( 'doofinder_for_wp_js_layer' );
+        add_settings_field(
+            $js_layer_option_name,
+            __( 'JS Layer Script', 'doofinder_for_wp' ),
+            function () use ( $js_layer_option_name ) {
+                $this->render_html_js_layer( $js_layer_option_name );
+            },
+            self::$top_level_menu,
+            $field_id
+        );
+
+        register_setting( self::$top_level_menu, $js_layer_option_name );
     }
 
     /**
@@ -171,7 +190,7 @@ trait Register_Settings
     {
         add_action('admin_menu', function () {
             add_menu_page(
-                'Doofinder For WordPress',
+                'Doofinder WP & WooCommerce Search',
                 'Doofinder',
                 'manage_options',
                 self::$top_level_menu,

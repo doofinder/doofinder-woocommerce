@@ -2,6 +2,8 @@
 
 namespace Doofinder\WP;
 
+use Doofinder\WP\Multilanguage\Multilanguage;
+
 class JS_Layer
 {
 
@@ -61,7 +63,9 @@ class JS_Layer
     private function insert_js_layer_from_options()
     {
 
-        $layer = Settings::get_js_layer();
+        $multilanguage = Multilanguage::instance();
+        $lang = $multilanguage->get_current_language();
+        $layer = Settings::get_js_layer($lang);
 
         if (defined('WP_ENVIRONMENT_TYPE') && WP_ENVIRONMENT_TYPE === 'local' && defined('DF_SEARCH_HOST') && defined('DF_LAYER_HOST')) {
             $local_constants = "<script>

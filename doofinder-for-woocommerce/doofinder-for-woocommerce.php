@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Plugin Name: Doofinder for WooCommerce
+ * Plugin Name: Doofinder WP & WooCommerce Search
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  * Version: 2.0.0
- * Author: doofinder
+ * Author: Doofinder
  * Description: Integrate Doofinder Search in your WordPress site or WooCommerce shop.
  *
  * @package WordPress
@@ -136,6 +136,22 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 } else {
                     Admin_Notices::remove_notice($old_plugin_notice_name);
                 }
+
+                /**
+                 * Add image_link to product_categories
+                 */
+                add_action('rest_post_dispatch', function ($result,  $server,  $request) {
+                    if ($request->get_route() === "/wp/v2/product_cat") {
+                        $terms = $result->data;
+                        foreach ($terms as $key => $term) {
+                            // get the thumbnail id using the queried category term_id
+                            $thumbnail_id = get_term_meta($term['id'], 'thumbnail_id', true);
+                            $term['image_link'] = empty($thumbnail_id) ? "" : wp_get_attachment_url($thumbnail_id);
+                            $result->data[$key] = $term;
+                        }
+                    }
+                    return $result;
+                }, 10, 3);
             });
 
             add_action('plugins_loaded', array($class, 'plugin_update'));
@@ -331,6 +347,9 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 register_rest_route('doofinder/v1', '/index-status', array(
                     'methods' => 'POST',
                     'callback' => function (\WP_REST_Request $request) {
+                        $log = new Log('index-status.log');
+                        $log->log("Received indexing status request with payload:\n" . print_r($request, true));
+                        $valid_message = "Sources were processed successfully.";
                         if ($request->get_param('token') != Settings::get_api_key()) {
                             return new WP_REST_Response(
                                 [
@@ -340,11 +359,29 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                                 401
                             );
                         }
+
+                        $error_message = $request->get_param('message');
+                        if (!empty($error_message) && $error_message != $valid_message) {
+                            Setup_Wizard::dismiss_indexing_notice();
+                            Admin_Notices::add_notice("indexing-status-failed", __("The indexation failed", "wordpress-doofinder"), $error_message, 'error', null, '', true);
+
+                            return new WP_REST_Response(
+                                [
+                                    'status' => 200,
+                                    'indexing_status' => 'failed',
+                                    'response' => $request->get_param('message')
+                                ]
+                            );
+                        }
+
+
                         $multilanguage = Multilanguage::instance();
                         $lang = ($multilanguage->get_current_language() === $multilanguage->get_base_language()) ? "" : $multilanguage->get_current_language();
                         //Hide the indexing notice
                         Setup_Wizard::dismiss_indexing_notice();
                         Settings::set_indexing_status('processed', $lang);
+                        // Enable JS Layer for the indexed language
+                        Settings::enable_js_layer($lang);
 
                         return new WP_REST_Response(
                             [
@@ -384,15 +421,21 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 ]);
                 exit;
             });
+
+            //Force Update on save
+            add_action('wp_ajax_doofinder_notice_dismiss', function () {
+                $notice_id = $_POST['notice_id'];
+                Admin_Notices::remove_notice($notice_id);
+                wp_send_json([
+                    'success' => true
+                ]);
+                exit;
+            });
         }
 
         public static function add_schedules()
         {
             return [
-                'wp_doofinder_each_1_minute' => [
-                    'display' => __('Each minute', 'doofinder_for_wp'),
-                    'interval' => 60
-                ],
                 'wp_doofinder_each_15_minutes' => [
                     'display' => sprintf(__('Each %s minutes', 'doofinder_for_wp'), 15),
                     'interval' => 60 * 15

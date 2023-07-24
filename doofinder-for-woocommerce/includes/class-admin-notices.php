@@ -56,6 +56,14 @@ class Admin_Notices
             unset($current_notices[$id]);
             update_option('doofinder_for_wp_notices', $current_notices);
         }
+
+        /*
+        TODO: Refactor this and remove from this function
+        */
+
+        if($id === "df-indexing-notice"){
+            update_option(Setup_Wizard::$wizard_show_indexing_notice_option, 0);
+        }
     }
 
 
@@ -69,8 +77,8 @@ class Admin_Notices
 
         $classes = "wordpress-message df-notice migration-complete " . $notice['classes']
 ?>
-        <div class="notice notice-<?php echo $notice['type'] ?> <?php echo ($notice['dismissible']) ? "is-dismissible" : ""; ?>">
-            <div id=" <?php echo $notice_id; ?>" class="<?php echo $classes; ?>">
+        <div id="<?php echo $notice_id; ?>" class="notice doofinder notice-<?php echo $notice['type'] ?> <?php echo ($notice['dismissible']) ? "is-dismissible" : ""; ?>">
+            <div class="<?php echo $classes; ?>">
                 <div class="df-notice-row">
                     <div class="df-notice-col logo">
                         <figure class="logo" style="width:5rem;height:auto;float:left;margin:.5em 0;margin-right:0.75rem;">
