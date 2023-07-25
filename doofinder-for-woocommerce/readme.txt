@@ -83,9 +83,7 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 == Changelog ==
 
 = 2.0.0 =
-- Merged Doofinder and Doofinder for Woocommerce into a single plugin
-- Make use of the rest API to improve the way we access the data you want to index.
-- Added Setup Wizard and settings improvements.
+Merged Doofinder and Doofinder for Woocommerce into a single plugin
 
 = 1.5.49 =
 Fix custom attributes indexation
