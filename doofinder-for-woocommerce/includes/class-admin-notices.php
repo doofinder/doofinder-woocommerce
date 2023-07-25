@@ -56,14 +56,6 @@ class Admin_Notices
             unset($current_notices[$id]);
             update_option('doofinder_for_wp_notices', $current_notices);
         }
-
-        /*
-        TODO: Refactor this and remove from this function
-        */
-
-        if($id === "df-indexing-notice"){
-            update_option(Setup_Wizard::$wizard_show_indexing_notice_option, 0);
-        }
     }
 
 
