@@ -1,5 +1,5 @@
 <?php
-namespace Doofinder\WC\Helpers;
+namespace Doofinder\WP\Helpers;
 
 class Template_Engine {
 
@@ -123,7 +123,7 @@ class Template_Engine {
 	public static function get_template( $part, $data = array(), $folder = '' ) {
 
 		if ( !$folder ) {
-			$folder = \Doofinder\WC\Doofinder_For_WooCommerce::plugin_path() . 'views';
+			$folder = \Doofinder\WP\Doofinder_For_WordPress::plugin_path() . 'views';
 		}
 
 		$engine = self::create( $folder );
@@ -175,7 +175,7 @@ class Template_Engine {
 			}
 		} else {
 			$filename = strpos($attachment, $ext) !== false ? $attachment : $attachment . $ext;
-			$file = \Doofinder\WC\Doofinder_For_WooCommerce::plugin_path() . $path . $filename;
+			$file = \Doofinder\WP\Doofinder_For_WordPress::plugin_path() . $path . $filename;
 
 			if ( ! file_exists( $file ) ) {
 				return '';

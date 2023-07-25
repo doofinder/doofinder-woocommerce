@@ -1,24 +1,10 @@
 <?php
 
-namespace Doofinder\WC;
-
-use Doofinder\WC\Api\Api_Factory;
-use Doofinder\WC\Data_Feed;
-use Doofinder\WC\Settings\Settings;
-use Doofinder\WC\Multilanguage\Multilanguage;
-use Doofinder\WC\Log;
-
+namespace Doofinder\WP;
 
 defined( 'ABSPATH' ) or die();
 
 class Post {
-
-	/**
-	 * Instance of a class used to log to a file.
-	 *
-	 * @var Log
-	 */
-	public static $log;
 
 	/**
 	 * A list of option names/indexes for the additional options of the plugin.
@@ -29,8 +15,8 @@ class Post {
 	 */
 	public static $options = array(
 		'visibility' => array(
-			'form_name' => 'doofinder-for-wc-indexing-visibility',
-			'meta_name' => '_doofinder_for_wc_indexing_visibility',
+			'form_name' => 'doofinder-for-wp-indexing-visibility',
+			'meta_name' => '_doofinder_for_wp_indexing_visibility',
 		),
 
 		'yoast_visibility' => array(
@@ -49,13 +35,6 @@ class Post {
 		'index',
 		'noindex',
 	);
-
-	/**
-	 * Instance of class handling multilanguage environments.
-	 *
-	 * @var Language_Plugin
-	 */
-	private static $language;
 
 	/**
 	 * WP_Post this class represents.
@@ -95,23 +74,19 @@ class Post {
 	 */
 	private $yoast_visibility;
 
-	public $post_update_time;
-
 	/**
 	 * Add metaboxes with additional settings to all indexable
 	 * post types.
 	 */
 	public static function add_additional_settings() {
 		add_action( 'add_meta_boxes', function () {
-			$post_types = Post_Types::instance();
-
 			add_meta_box(
-				'doofinder-for-wc-visibility-settings',
-				__( 'Doofinder - Indexing', 'doofinder_for_wc' ),
+				'doofinder-for-wp-visibility-settings',
+				__( 'Doofinder - Indexing', 'doofinder_for_wp' ),
 				function () {
 					self::render_html_indexing_visibility();
 				},
-				$post_types->get_indexable(),
+				get_post_types( array( 'public' => true ) ),
 				'side'
 			);
 		} );
@@ -120,60 +95,6 @@ class Post {
 			self::handle_additional_settings_save( $post_id );
 		} );
 	}
-
-	/**
-	 * Register webhooks for saving, and removing the post.
-	 */
-	public static function register_webhooks() {
-		add_action( 'wp_insert_post', function ( $post_id, \WP_Post $post, $updated ) {
-			self::check_indexable( $post, $updated );
-		}, 99, 3 );
-	}
-
-	/**
-	 * Register api webhooks for creating, modyfing, and removing the post
-	 * via REST API requests. In the case of modification of
-	 * products by REST API requests, the index should be updated
-	 * to avoid displaying outdated or non-existent products.
-	 */
-	public static function register_rest_api_webhooks() {
-		self::$log = new Log( 'api.txt' );
-
-		add_action( 'woocommerce_rest_delete_product_object', function ( $post, $request )  {
-			$post = get_post( $request->data['id'] );
-
-			self::$log->log( 'API request - delete action.' );
-			self::check_indexable( $post, true );
-		}, 99, 2 );
-
-		add_action( 'woocommerce_rest_insert_product_object', function ( $post, $request )  {
-			$post = get_post( $post->get_id() );
-
-			self::$log->log( 'API request - insert action.' );
-			self::check_indexable( $post, true );
-		}, 99, 2 );
-	}
-
-	/**
-     * Only allowed post types should be indexable.
-     *
-     * @param \WP_Post $post
-     * @param bool $updated
-     */
-    private static function check_indexable($post, $updated)
-    {
-        $post_types = Post_Types::instance();
-
-        /**
-         * If the post is not indexable OR update on save is disabled we don't
-         * want to send request to the API so we skip the update_post process
-         */
-        if (! in_array($post->post_type, $post_types->get_indexable())
-            || !Settings::is_update_on_save_enabled()) {
-            return;
-        }
-        self::webhook_update_post($post, $updated);
-    }
 
 	/**
 	 * Render the contents of the metabox containing the visibility settings.
@@ -231,79 +152,6 @@ class Post {
 	}
 
 	/**
-	 * Send the post to Doofinder API when saving.
-	 *
-	 * Remove post from index if the post settings suggest
-	 * that the post should not be indexed.
-	 *
-	 * @param \WP_Post $post
-	 * @param bool $updated
-	 */
-	private static function webhook_update_post( $post, $updated ) {
-
-		// Get update time. Pass this to api methods below so the index update time is
-		// equal to db update time.
-		$update_time = time();
-
-		// Update last modified date for posts in db
-		Settings::set_last_modified_db('', $update_time);
-
-		// IF Doofinder search and Doofinder JS layer is disabled we don't want to send
-		// request to the API so we exit early
-		if ( !Settings::is_internal_search_enabled() && !Settings::is_js_layer_enabled()  ) {
-
-			return;
-		}
-
-		$doofinder_post = new Post( $post );
-
-		// When we create a new post in Wordpress, it is automatically saved
-		// with post status 'auto-draft', so to prevent unnecessary API calls
-		// check if post has status 'auto-draft' and exit early if true
-		if ( $doofinder_post->post->post_status === 'auto-draft' ) {
-			return;
-		}
-
-
-		$api            = Api_Factory::get();
-		$lang 			= Multilanguage::instance();
-		$active_lang 	= $lang->get_active_language();
-
-
-		// If post is of type 'product' we want to collect post data via
-		// Data_Feed class and get_items() method insead of Post class and
-		// format_for_api() method.
-
-		if ($doofinder_post->post->post_type === 'product') {
-			$data_feed = new Data_Feed( false, [$doofinder_post->post->ID], $active_lang);
-			$post_data = $data_feed->get_items()[0] ?? null;
-		} else {
-			$post_data = $doofinder_post->format_for_api();
-		}
-
-		// If posts settings suggest that it can be indexed
-		// we update its data in the API.
-		if ( $doofinder_post->is_indexable() ) {
-			$api->update_item(
-				$doofinder_post->post->post_type,
-				$doofinder_post->post->ID,
-				$post_data,
-				$update_time
-			);
-
-			return;
-		}
-
-		// Post cannot be indexed (it's not published, moved to trash, etc),
-		// we remove it from the index.
-		$api->remove_item(
-			$doofinder_post->post->post_type,
-			$doofinder_post->post->ID,
-			$update_time
-		);
-	}
-
-	/**
 	 * Post constructor.
 	 *
 	 * @param \WP_Post|int $post
@@ -322,10 +170,6 @@ class Post {
 		}
 
 		$this->post = get_post( $post );
-
-		$this->language = Multilanguage::instance();
-
-
 	}
 
 	/**
@@ -337,6 +181,10 @@ class Post {
 	 * @return bool
 	 */
 	public function is_indexable() {
+		if (  $this->post->post_status === 'trash' ) {
+			return false;
+		}
+
 		// Posts visibility settings are stored in meta, so we need to
 		// fetch it from the database if we don't have it yet.
 		if ( ! $this->meta ) {
@@ -392,8 +240,8 @@ class Post {
 		// Base data, that all posts must have.
 		// All other data will be added if present.
 		$data = array(
-			'id'        => $this->post->ID,
-			'title'     => $this->post->post_title,
+			'id'        => (string) $this->post->ID,
+			'title'     => $this->sanitize_html_entities($this->post->post_title),
 			'link'      => get_the_permalink( $this->post ),
 			'post_date' => $this->get_post_date()
 		);
@@ -401,14 +249,14 @@ class Post {
 		// Post content.
 		$content = $this->get_content();
 		if ( $content ) {
-			$data['content'] = $content;
+			$data['content'] = $this->sanitize_html_entities($content);
 		}
 
 		// Post description.
 		// Excerpt serves as a description.
 		$description = $this->get_excerpt();
 		if ( $description ) {
-			$data['description'] = $description;
+			$data['description'] = $this->sanitize_html_entities($description);
 		}
 
 		// Post thumbnail.
@@ -423,25 +271,22 @@ class Post {
 			$data = array_merge( $data, $meta );
 		}
 
-		// Add categories.
-		if ( Settings::get_index_categories() ) {
-			$data['categories'] = $this->get_categories();
-		}
+		$data['categories'] = $this->get_categories();
 
-		// Add tags.
-		if ( Settings::get_index_tags() ) {
-			$data['tags'] = $this->get_tags();
-		}
-
-		// Add additional attributes.
-		if ( Settings::get_additional_attributes() ) {
-			$data = array_merge(
-				$data,
-				$this->get_additional_attributes()
-			);
-		}
+		$data['tags'] = $this->get_tags();
 
 		return $data;
+	}
+
+	/**
+	 * Replaces the html entity of a text with their corresponding character
+	 *
+	 * @param {string} text
+	 *
+	 * @return string
+	 */
+	private function sanitize_html_entities($text){
+		return html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 	}
 
 	/**
@@ -451,8 +296,14 @@ class Post {
 	 * @return string[]
 	 */
 	private function get_categories() {
-		$all_categories       = get_categories();
-		$post_categories      = wp_get_post_categories( $this->post->ID, array( 'fields' => 'all' ) );
+		$all_categories = get_categories();
+		$post_categories = wp_get_post_categories($this->post->ID, array('fields' => 'all'));
+
+		if(taxonomy_exists("portfolio_category")){
+			$all_categories = array_merge($all_categories, get_terms('portfolio_category'));
+			$post_categories = array_merge($post_categories, wp_get_object_terms($this->post->ID, 'portfolio_category', array('fields' => 'all')));
+		}
+
 		$formatted_categories = array();
 
 		// We have categories as a regular array. Remap to associative
@@ -647,50 +498,6 @@ class Post {
 		}
 
 		$this->meta = $filtered_meta;
-	}
-
-	/**
-     * Generate array of values generated from additional attributes settings.
-     * These are configured by the user, so won't be exactly the same
-     * in every installation.
-     *
-	 * @return array
-	 */
-	private function get_additional_attributes() {
-		$additional_attributes = Settings::get_additional_attributes();
-		$output                = array();
-
-		foreach ( $additional_attributes as $attribute ) {
-			$value = null;
-
-			switch ( $attribute['attribute'] ) {
-				case 'post_title':
-					$value = $this->post->post_title;
-					break;
-
-				case 'post_content':
-					$value = $this->get_content();
-					break;
-
-				case 'excerpt':
-					$value = $this->get_excerpt();
-					break;
-
-				case 'permalink':
-					$value = get_the_permalink( $this->post );
-					break;
-
-				case 'thumbnail':
-					$value = $this->get_thumbnail();
-					break;
-			}
-
-			if ( $value ) {
-				$output[ $attribute['field'] ] = $value;
-			}
-		}
-
-		return $output;
 	}
 
 	/**

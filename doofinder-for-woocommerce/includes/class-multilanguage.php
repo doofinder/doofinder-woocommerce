@@ -1,9 +1,9 @@
 <?php
 
-namespace Doofinder\WC;
+namespace Doofinder\WP;
 
-use Doofinder\WC\Multilanguage\I18n_Handler;
-use Doofinder\WC\Multilanguage\WPML;
+use Doofinder\WP\Multilanguage\I18n_Handler;
+use Doofinder\WP\Multilanguage\WPML;
 
 class Multilanguage {
 
@@ -123,11 +123,11 @@ class Multilanguage {
 			$GLOBALS['hide_save_button']  = true;
 		}
 
-		$notice_html = 
-			'<div class="notice notice-error"><p>' 
-			. __( 'You have a multi-language site. Please choose a language first to configure Doofinder.', 'woocommerce-doofinder' ) 
+		$notice_html =
+			'<div class="notice notice-error"><p>'
+			. __( 'You have a multi-language site. Please choose a language first to configure Doofinder.', 'woocommerce-doofinder' )
 			. '</p></div>';
-		
+
 		return $notice_html;
 	}
 
