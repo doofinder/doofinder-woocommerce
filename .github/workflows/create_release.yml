@@ -11,6 +11,7 @@ jobs:
       - name: Build
         run: |
           npm install --include=dev
+          npm install --dev coffeescript
           npm run build
       - name: Get release notes
         id: get-release-notes
@@ -19,7 +20,7 @@ jobs:
           changelog_line=`grep -n "= ${version} =" doofinder-for-woocommerce/readme.txt | cut -f1 -d:`
           ((changelog_line++))
           release_notes=`awk "NR==$changelog_line" doofinder-for-woocommerce/readme.txt`
-          echo "release_notes=$release_notes" >> $GITHUB_OUTPUT
+          echo "release_notes=$release_notes" >> "$GITHUB_OUTPUT"
       - name: Deploy to Wordpress.org SVN Repository
         id: deploy
         uses: 10up/action-wordpress-plugin-deploy@stable
