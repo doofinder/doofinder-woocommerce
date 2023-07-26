@@ -719,7 +719,7 @@ class Setup_Wizard
                         <div class="df-notice-col extra align-center">
                             <figure class="logo" style="width:5rem;height:auto;float:left;margin:.5em 0;margin-right:0.75rem;">
                                 <div class="success-icon-wrapper">
-                                    <img src="/wp-content/plugins/doofinder/assets/img/green_checkmark.png">
+                                    <img src="/wp-content/plugins/doofinder-for-woocommerce/assets/img/green_checkmark.png">
                                 </div>
                             </figure>
                         </div>
