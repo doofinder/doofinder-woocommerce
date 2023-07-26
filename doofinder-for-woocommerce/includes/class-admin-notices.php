@@ -74,7 +74,7 @@ class Admin_Notices
                 <div class="df-notice-row">
                     <div class="df-notice-col logo">
                         <figure class="logo" style="width:5rem;height:auto;float:left;margin:.5em 0;margin-right:0.75rem;">
-                            <img src="<?php echo Doofinder_For_WordPress::plugin_url() . 'assets/svg/imagotipo1.svg'; ?>" />
+                            <img src="<?php echo Doofinder_For_WordPress::plugin_url(); ?>assets/svg/imagotipo1.svg" />
                         </figure>
                     </div>
                     <div class="df-notice-col content">
