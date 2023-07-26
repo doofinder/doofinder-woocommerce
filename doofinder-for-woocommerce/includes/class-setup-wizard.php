@@ -632,7 +632,7 @@ class Setup_Wizard
                 <div class="df-notice-row">
                     <div class="df-notice-col logo">
                         <figure class="logo" style="width:5rem;height:auto;float:left;margin:.5em 0;margin-right:0.75rem;">
-                            <img src="<?php echo Doofinder_For_WordPress::plugin_url() . 'assets/svg/imagotipo1.svg'; ?>" />
+                            <img src="<?php echo Doofinder_For_WordPress::plugin_url(); ?>assets/svg/imagotipo1.svg" />
                         </figure>
                     </div>
                     <div class="df-notice-col content">
@@ -674,7 +674,7 @@ class Setup_Wizard
                     <div class="df-notice-row flex-end">
                         <div class="df-notice-col logo">
                             <figure class="logo" style="width:5rem;height:auto;float:left;margin:.5em 0;margin-right:0.75rem;">
-                                <img src="<?php echo Doofinder_For_WordPress::plugin_url() . 'assets/svg/imagotipo1.svg'; ?>" />
+                                <img src="<?php echo Doofinder_For_WordPress::plugin_url(); ?>assets/svg/imagotipo1.svg" />
                             </figure>
                         </div>
                         <div class="df-notice-col content">
@@ -709,7 +709,7 @@ class Setup_Wizard
                     <div class="df-notice-row flex-end">
                         <div class="df-notice-col logo">
                             <figure class="logo" style="width:5rem;height:auto;float:left;margin:.5em 0;margin-right:0.75rem;">
-                                <img src="<?php echo Doofinder_For_WordPress::plugin_url() . 'assets/svg/imagotipo1.svg'; ?>" />
+                                <img src="<?php echo Doofinder_For_WordPress::plugin_url(); ?>assets/svg/imagotipo1.svg" />
                             </figure>
                         </div>
                         <div class="df-notice-col content">
@@ -719,7 +719,7 @@ class Setup_Wizard
                         <div class="df-notice-col extra align-center">
                             <figure class="logo" style="width:5rem;height:auto;float:left;margin:.5em 0;margin-right:0.75rem;">
                                 <div class="success-icon-wrapper">
-                                    <img src="/wp-content/plugins/doofinder/assets/img/green_checkmark.png">
+                                    <img src="<?php echo Doofinder_For_WordPress::plugin_url(); ?>assets/img/green_checkmark.png" />
                                 </div>
                             </figure>
                         </div>
@@ -749,7 +749,7 @@ class Setup_Wizard
                 <div class="df-notice-row">
                     <div class="df-notice-col logo">
                         <figure class="logo" style="width:5rem;height:auto;float:left;margin:.5em 0;margin-right:0.75rem;">
-                            <img src="<?php echo Doofinder_For_WordPress::plugin_url() . 'assets/svg/imagotipo1.svg'; ?>" />
+                            <img src="<?php echo Doofinder_For_WordPress::plugin_url(); ?>assets/svg/imagotipo1.svg" />
                         </figure>
                     </div>
                     <div class="df-notice-col content">

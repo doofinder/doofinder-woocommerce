@@ -26,15 +26,14 @@ class Migration
         self::$log->log('Migrate - Start');
 
         self::initialize_migration();
-        if (self::do_woocommerce_migration()) {
-            self::finish_migration();
-        }
+        $migration_result = self::do_woocommerce_migration();
 
         //check if app credentials are set
         if (!Store_Api::has_application_credentials() && Settings::is_configuration_complete()) {
             $store_api = new Store_Api();
             $store_api->normalize_store_and_indices();
         }
+        self::finish_migration($migration_result);
     }
 
     /**
@@ -168,16 +167,17 @@ class Migration
      *
      * @return void
      */
-    private static function finish_migration()
+    private static function finish_migration($migration_result)
     {
-        // Add notice about successfull migration
-        self::$log->log('Migrate - Add custom notice');
-        update_option(Setup_Wizard::$wizard_migration_notice_name, 1);
-
         // Migration completed
         self::$log->log('Migrate - Migration Completed');
         update_option(Setup_Wizard::$wizard_migration_option, 'completed');
 
-        self::add_notices();
+        if ($migration_result) {
+            // Add notice about successfull migration
+            self::$log->log('Migrate - Add custom notice');
+            update_option(Setup_Wizard::$wizard_migration_notice_name, 1);
+            self::add_notices();
+        }
     }
 }
