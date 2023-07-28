@@ -199,11 +199,12 @@ class Update_Manager
     }
 
     /**
-     * Update: 2.0.2
+     * Update: 2.0.3
      * Remove the indexing failed notice to solve any existing problem
      */
-    public static function update_020002()
+    public static function update_020003()
     {
         Admin_Notices::remove_notice("indexing-status-failed");
+        return true;
     }
 }
