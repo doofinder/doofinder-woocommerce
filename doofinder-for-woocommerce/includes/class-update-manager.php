@@ -173,7 +173,7 @@ class Update_Manager
         //Update api host to point to admin.doofinder.com instead of api.doofinder.com
         $multilanguage = Multilanguage::instance();
         $languages = $multilanguage->get_languages();
-        if(empty($languages)){
+        if (empty($languages)) {
             $languages = ['' => []];
         }
 
@@ -196,5 +196,14 @@ class Update_Manager
             $store_api->normalize_store_and_indices();
         }
         return true;
+    }
+
+    /**
+     * Update: 2.0.2
+     * Remove the indexing failed notice to solve any existing problem
+     */
+    public static function update_020002()
+    {
+        Admin_Notices::remove_notice("indexing-status-failed");
     }
 }

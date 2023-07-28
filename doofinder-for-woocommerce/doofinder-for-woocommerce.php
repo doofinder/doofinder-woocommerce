@@ -4,7 +4,7 @@
  * Plugin Name: Doofinder WP & WooCommerce Search
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 2.0.1
+ * Version: 2.0.2
  * Author: Doofinder
  * Description: Integrate Doofinder Search in your WordPress site or WooCommerce shop.
  *
@@ -34,7 +34,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
          *
          * @var string
          */
-        public static $version = '2.0.1';
+        public static $version = '2.0.2';
 
         /**
          * The only instance of Doofinder_For_WordPress
@@ -362,8 +362,11 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
 
                         $error_message = $request->get_param('message');
                         if (!empty($error_message) && $error_message != $valid_message) {
+                            $notice_title = __("An error has occurred while indexing your catalog", "wordpress-doofinder");
+                            $notice_content = __("To obtain further details, you can check the indexing results by accessing the \"Indices\" section in your Doofinder admin panel. If the problem persists, please contact our support team at <a href=\"mailto:support@doofinder.com\">support@doofinder.com</a>", "wordpress-doofinder");                            
+                            //Dismiss the indexing notice as it has already finished
                             Setup_Wizard::dismiss_indexing_notice();
-                            Admin_Notices::add_notice("indexing-status-failed", __("The indexation failed", "wordpress-doofinder"), $error_message, 'error', null, '', true);
+                            Admin_Notices::add_notice("indexing-status-failed", $notice_title, $notice_content, 'error', null, '', true);
 
                             return new WP_REST_Response(
                                 [
