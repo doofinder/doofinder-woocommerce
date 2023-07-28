@@ -107,7 +107,8 @@ class Update_Manager
      */
     private static function add_admin_notice($version, $message = "")
     {
-        $title = sprintf(__('An error occurred while updating the Doofinder Database to the %s version.', 'doofinder_for_wp'), $version);
+        $formatted_version = self::format_normalized_plugin_version($version);
+        $title = sprintf(__('An error occurred while updating the Doofinder Database to the %s version.', 'doofinder_for_wp'), $formatted_version);
         $message .= "<p>" . sprintf(__('For more details please contact us at our %s support center%s.', 'doofinder_for_wp'), '<a target="_blank" href="https://support.doofinder.com/pages/contact-us.html">', '</a>') . '</p>';
         Admin_Notices::add_notice('update-' . $version, $title, $message, 'error', null, '', true);
     }
@@ -118,38 +119,6 @@ class Update_Manager
     private static function remove_admin_notice($version)
     {
         Admin_Notices::remove_notice('update-' . $version);
-    }
-
-    /**
-     * Notice html content to show on error
-     */
-    private static function get_update_error_notice($version, $message = "")
-    {
-
-        $message_intro = sprintf(__('An error occurred while updating the Doofinder Database to the %s version.', 'woocommerce-doofinder'), $version);
-        $message_help = sprintf(__('For more details please contact us at our %s support center%s.', 'woocommerce-doofinder'), '<a target="_blank" href="https://support.doofinder.com/pages/contact-us.html">', '</a>');
-        ob_start();
-?>
-        <div id="message" class="woocommerce-message doofinder-notice-update-manager">
-            <figure class="logo" style="width:5rem;height:auto;float:left;margin:.5em 0;margin-right:0.75rem;">
-                <img src="<?php echo Doofinder_For_WordPress::plugin_url() . '/assets/svg/imagotipo1.svg'; ?>" />
-            </figure>
-            <p class="submit">
-                <strong>
-                    <?php echo $message_intro; ?>
-                </strong>
-                <?php echo $message_help; ?>
-
-            </p>
-            <?php if (!empty($message)) : ?>
-                <p class="error-details">
-                    <?php echo $message ?>
-                </p>
-            <?php endif; ?>
-
-        </div>
-<?php
-        return ob_get_clean();
     }
 
     private static function log($message)
@@ -195,6 +164,14 @@ class Update_Manager
             $store_api = new Store_Api();
             $store_api->normalize_store_and_indices();
         }
+        return true;
+    }
+    /**
+     * Update: 2.0.2     
+     */
+    public static function update_020002()
+    {
+        //Leave empty and return true to remove the update error
         return true;
     }
 
