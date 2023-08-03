@@ -126,6 +126,9 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 add_filter( 'woocommerce_product_get_regular_price', array( __CLASS__, 'filter_woocommerce_prices_with_taxes' ), 99, 2 );
                 add_filter( 'woocommerce_product_get_sale_price', array( __CLASS__, 'filter_woocommerce_prices_with_taxes' ), 99, 2 );
                 add_filter( 'woocommerce_product_get_price', array( __CLASS__, 'filter_woocommerce_prices_with_taxes' ), 99, 2 );
+                add_filter( 'woocommerce_product_variation_get_regular_price', array( __CLASS__, 'filter_woocommerce_prices_with_taxes' ), 99, 2 );
+                add_filter( 'woocommerce_product_variation_get_sale_price', array( __CLASS__, 'filter_woocommerce_prices_with_taxes' ), 99, 2 );
+                add_filter( 'woocommerce_product_variation_get_price', array( __CLASS__, 'filter_woocommerce_prices_with_taxes' ), 99, 2 );
             } );
 
             add_action('init', function () use ($class) {
