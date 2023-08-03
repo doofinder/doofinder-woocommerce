@@ -122,15 +122,6 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 JS_Layer::instance();
             }
 
-            add_action( 'rest_api_init', function() {
-                add_filter( 'woocommerce_product_get_regular_price', array( __CLASS__, 'filter_woocommerce_prices_with_taxes' ), 99, 2 );
-                add_filter( 'woocommerce_product_get_sale_price', array( __CLASS__, 'filter_woocommerce_prices_with_taxes' ), 99, 2 );
-                add_filter( 'woocommerce_product_get_price', array( __CLASS__, 'filter_woocommerce_prices_with_taxes' ), 99, 2 );
-                add_filter( 'woocommerce_product_variation_get_regular_price', array( __CLASS__, 'filter_woocommerce_prices_with_taxes' ), 99, 2 );
-                add_filter( 'woocommerce_product_variation_get_sale_price', array( __CLASS__, 'filter_woocommerce_prices_with_taxes' ), 99, 2 );
-                add_filter( 'woocommerce_product_variation_get_price', array( __CLASS__, 'filter_woocommerce_prices_with_taxes' ), 99, 2 );
-            } );
-
             add_action('init', function () use ($class) {
                 // Register all custom URLs
                 call_user_func(array($class, 'register_urls'));
@@ -400,6 +391,12 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
         {
             add_action('rest_api_init', function () {
                 Config::register();
+                add_filter( 'woocommerce_product_get_regular_price', array( __CLASS__, 'filter_woocommerce_prices_with_taxes' ), 99, 2 );
+                add_filter( 'woocommerce_product_get_sale_price', array( __CLASS__, 'filter_woocommerce_prices_with_taxes' ), 99, 2 );
+                add_filter( 'woocommerce_product_get_price', array( __CLASS__, 'filter_woocommerce_prices_with_taxes' ), 99, 2 );
+                add_filter( 'woocommerce_product_variation_get_regular_price', array( __CLASS__, 'filter_woocommerce_prices_with_taxes' ), 99, 2 );
+                add_filter( 'woocommerce_product_variation_get_sale_price', array( __CLASS__, 'filter_woocommerce_prices_with_taxes' ), 99, 2 );
+                add_filter( 'woocommerce_product_variation_get_price', array( __CLASS__, 'filter_woocommerce_prices_with_taxes' ), 99, 2 );
                 register_rest_route('doofinder/v1', '/index-status', array(
                     'methods' => 'POST',
                     'callback' => function (\WP_REST_Request $request) {
