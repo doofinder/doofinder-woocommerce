@@ -4,7 +4,7 @@
  * Plugin Name: Doofinder WP & WooCommerce Search
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 2.0.4
+ * Version: 2.0.5
  * Author: Doofinder
  * Description: Integrate Doofinder Search in your WordPress site or WooCommerce shop.
  *
@@ -16,6 +16,7 @@ namespace Doofinder\WP;
 use WP_REST_Response;
 use Doofinder\WP\Multilanguage\Multilanguage;
 use Doofinder\WP\Admin_Notices;
+use Doofinder\WP\Tax_Prices_Handler;
 
 defined('ABSPATH') or die;
 
@@ -34,7 +35,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
          *
          * @var string
          */
-        public static $version = '2.0.4';
+        public static $version = '2.0.5';
 
         /**
          * The only instance of Doofinder_For_WordPress
@@ -344,6 +345,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
         {
             add_action('rest_api_init', function () {
                 Config::register();
+                Tax_Prices_Handler::apply_correct_taxes_for_product_prices_in_rest_api();
                 register_rest_route('doofinder/v1', '/index-status', array(
                     'methods' => 'POST',
                     'callback' => function (\WP_REST_Request $request) {
