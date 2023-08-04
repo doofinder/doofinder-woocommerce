@@ -1,7 +1,7 @@
 === Doofinder WP & WooCommerce Search ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.0.4
+Version: 2.0.5
 Requires at least: 4.1
 Tested up to: 6.1
 Requires PHP: 5.6
@@ -81,6 +81,9 @@ General Settings
 Just send your questions to <mailto:support@doofinder.com> and we will try to answer as fast as possible with a working solution for you.
 
 == Changelog ==
+
+= 2.0.5 =
+Bugfix: Prices reflect the correct taxes now
 
 = 2.0.4 =
 Minor bugfix
