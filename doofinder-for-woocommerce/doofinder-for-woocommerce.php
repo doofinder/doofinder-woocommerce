@@ -168,6 +168,11 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 return $price;
             }
 
+            // Just in case the sale price has not been defined, we're going to use the price instead
+            if ( empty( $price ) ) {
+                return $product->price;
+            }
+
             $raw_real_price = self::get_raw_real_price( $price, $product );
             // Idea extracted directly from the original WC function wc_price()
             $args = array();
