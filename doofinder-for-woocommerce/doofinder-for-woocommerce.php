@@ -99,7 +99,6 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
             Update_On_Save::init();
             // Init admin functionalities
             if (is_admin()) {
-                Thumbnail::prepare_thumbnail_size();
                 Post::add_additional_settings();
                 Settings::instance();
                 if (Setup_Wizard::should_activate()) {
