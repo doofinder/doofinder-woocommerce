@@ -14,7 +14,7 @@ class Reset_Credentials_Index
      *
      * @var Store_Helpers
      */
-    private $store_helper;
+    private $store_helpers;
 
     /**
      * Instance of class handling multilanguage environments.
@@ -51,12 +51,12 @@ class Reset_Credentials_Index
         $this->current_language     = $this->language->get_current_language();
         $this->api                  = new Reset_Credentials_Api($this->current_language);
         $this->log                  = new Log('reset_credentials.txt');
-        $this->store_helper         = new Store_Helpers();
+        $this->store_helpers         = new Store_Helpers();
     }
 
     public function reset_credentials()
     {
-        $payload = $this->store_helper->get_store_options();
+        $payload = $this->store_helpers->get_store_options();
         $this->api->resetCredentials($payload);
     }
 }

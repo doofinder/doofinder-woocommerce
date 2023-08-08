@@ -13,9 +13,7 @@ class Reset_Credentials
 
         add_action('wp_ajax_doofinder_reset_credentials', function () {
             do_action("doofinder_reset_credentials");
-            wp_send_json([
-                'success' => true
-            ]);
+            wp_send_json_success();
             exit;
         });
     }
