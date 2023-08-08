@@ -82,6 +82,12 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 
 == Changelog ==
 
+= 2.0.8 =
+Added button to reset credentials if you are Administrator
+
+= 2.0.7 =
+Added parent image to variant products without image in rest response
+
 = 2.0.6 =
 Added image_link to products rest response
 
