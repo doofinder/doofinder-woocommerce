@@ -74,7 +74,7 @@ jQuery(function () {
     );
 
     let ResetCredentialsHandler = function () {
-        force_update_btn.attr('disabled', true);
+        reset_credentials_btn.attr('disabled', true);
         $.ajax({
             type: "post",
             dataType: "json",
@@ -96,7 +96,7 @@ jQuery(function () {
                 setTimeout(function () {
                     $(".update-result-wrapper").fadeOut();
                     $(".update-result-wrapper").empty();
-                    force_update_btn.attr('disabled', false);
+                    reset_credentials_btn.attr('disabled', false);
                 }, 5000);
             },
         });

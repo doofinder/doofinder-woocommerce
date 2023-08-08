@@ -61,7 +61,7 @@ class Store_Api
 
         $this->api_key = Settings::get_api_key();
         $this->api_host = Settings::get_api_host();
-        $this->store_helpers = new Store_Helpers;
+        $this->store_helpers = new Store_Helpers();
 
         $this->log->log('-------------  API HOST ------------- ');
         $this->log->log($this->api_host);
