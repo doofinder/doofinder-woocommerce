@@ -41,7 +41,7 @@ class Reset_Credentials
         ob_start();
 
     ?>
-        <p class="doofinder-button-reset-credentials" style="width:100px;float:right;position:relative;top:-68px;">
+        <p class="doofinder-button-reset-credentials" style="left: 10px;float:right;position:relative;top:-68px;">
             <a id="doofinder-reset-credentials" href="#" class="button-secondary"><?php _e('Reset Credentials', 'wordpress-doofinder'); ?></a>
         </p>
     <?php
