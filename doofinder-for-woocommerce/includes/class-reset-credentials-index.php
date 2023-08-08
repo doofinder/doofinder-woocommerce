@@ -51,7 +51,7 @@ class Reset_Credentials_Index
         $this->current_language     = $this->language->get_current_language();
         $this->api                  = new Reset_Credentials_Api($this->current_language);
         $this->log                  = new Log('reset_credentials.txt');
-        $this->store_helper         = new Store_Helpers;
+        $this->store_helper         = new Store_Helpers();
     }
 
     public function reset_credentials()
