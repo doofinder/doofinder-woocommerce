@@ -20,14 +20,6 @@ class Store_Api
     /**
      * Instance of a class used to log to a file.
      *
-     * @var Store_Helpers
-     */
-    private $store_helpers;
-
-
-    /**
-     * Instance of a class used to log to a file.
-     *
      * @var Log
      */
     private $log;
@@ -61,7 +53,6 @@ class Store_Api
 
         $this->api_key = Settings::get_api_key();
         $this->api_host = Settings::get_api_host();
-        $this->store_helpers = new Store_Helpers();
 
         $this->log->log('-------------  API HOST ------------- ');
         $this->log->log($this->api_host);
@@ -213,7 +204,7 @@ class Store_Api
             "search_engines" => [],
             "sector" => Settings::get_sector(),
             "callback_urls" => $this->get_callback_urls($api_keys, $primary_language),
-            "options" => $this->store_helpers->get_store_options(),
+            "options" => Store_Helpers::get_store_options(),
             "search_engines" => $this->build_search_engines($api_keys, $primary_language)
         ];
         return $store_payload;

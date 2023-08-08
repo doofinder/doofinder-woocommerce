@@ -9,13 +9,6 @@ use Doofinder\WP\Multilanguage\Multilanguage;
 class Reset_Credentials_Index
 {
     /**
-     * Instance of a class used to log to a file.
-     *
-     * @var Store_Helpers
-     */
-    private $store_helpers;
-
-    /**
      * Instance of class handling multilanguage environments.
      *
      * @var Language_Plugin
@@ -41,12 +34,11 @@ class Reset_Credentials_Index
         $this->language             = Multilanguage::instance();
         $this->current_language     = $this->language->get_current_language();
         $this->api                  = new Reset_Credentials_Api($this->current_language);
-        $this->store_helpers        = new Store_Helpers();
     }
 
     public function reset_credentials()
     {
-        $payload = $this->store_helpers->get_store_options();
+        $payload = Store_Helpers::get_store_options();
         $this->api->resetCredentials($payload);
     }
 }

@@ -13,9 +13,9 @@ class Store_Helpers
      *
      * @return void
      */
-    public function get_store_options()
+    public static function get_store_options()
     {
-        $password_data = $this->create_application_credentials();
+        $password_data = Store_Helpers::create_application_credentials();
         if (!is_null($password_data)) {
             return [
                 "url" => get_bloginfo('url'),
@@ -36,7 +36,7 @@ class Store_Helpers
      *
      * @return array Array containing api_user and api_pass
      */
-    private function create_application_credentials()
+    private static function create_application_credentials()
     {
         $user_id = get_current_user_id();
         $user = get_user_by('id',  $user_id);
