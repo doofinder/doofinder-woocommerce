@@ -19,8 +19,6 @@ class Update_On_Save
         add_action('wp_ajax_doofinder_force_update_on_save', function () {
             do_action("doofinder_update_on_save");
             wp_send_json_success();
-            exit;
-            
         });
     }
 
