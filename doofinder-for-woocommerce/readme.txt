@@ -1,7 +1,7 @@
 === Doofinder WP & WooCommerce Search ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.0.6
+Version: 2.0.7
 Requires at least: 4.1
 Tested up to: 6.2.2
 Requires PHP: 5.6
