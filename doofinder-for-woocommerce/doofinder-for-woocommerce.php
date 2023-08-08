@@ -4,7 +4,7 @@
  * Plugin Name: Doofinder WP & WooCommerce Search
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 2.0.5
+ * Version: 2.0.6
  * Author: Doofinder
  * Description: Integrate Doofinder Search in your WordPress site or WooCommerce shop.
  *
@@ -35,7 +35,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
          *
          * @var string
          */
-        public static $version = '2.0.5';
+        public static $version = '2.0.6';
 
         /**
          * The only instance of Doofinder_For_WordPress
@@ -99,7 +99,6 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
             Update_On_Save::init();
             // Init admin functionalities
             if (is_admin()) {
-                Thumbnail::prepare_thumbnail_size();
                 Post::add_additional_settings();
                 Settings::instance();
                 if (Setup_Wizard::should_activate()) {
@@ -138,21 +137,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                     Admin_Notices::remove_notice($old_plugin_notice_name);
                 }
 
-                /**
-                 * Add image_link to product_categories
-                 */
-                add_action('rest_post_dispatch', function ($result,  $server,  $request) {
-                    if ($request->get_route() === "/wp/v2/product_cat") {
-                        $terms = $result->data;
-                        foreach ($terms as $key => $term) {
-                            // get the thumbnail id using the queried category term_id
-                            $thumbnail_id = get_term_meta($term['id'], 'thumbnail_id', true);
-                            $term['image_link'] = empty($thumbnail_id) ? "" : wp_get_attachment_url($thumbnail_id);
-                            $result->data[$key] = $term;
-                        }
-                    }
-                    return $result;
-                }, 10, 3);
+                REST_API_Handler::initialize();
             });
 
             add_action('plugins_loaded', array($class, 'plugin_update'));
@@ -365,7 +350,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                         $error_message = $request->get_param('message');
                         if (!empty($error_message) && $error_message != $valid_message) {
                             $notice_title = __("An error has occurred while indexing your catalog", "wordpress-doofinder");
-                            $notice_content = __("To obtain further details, you can check the indexing results by accessing the \"Indices\" section in your Doofinder admin panel. If the problem persists, please contact our support team at <a href=\"mailto:support@doofinder.com\">support@doofinder.com</a>", "wordpress-doofinder");                            
+                            $notice_content = __("To obtain further details, you can check the indexing results by accessing the \"Indices\" section in your Doofinder admin panel. If the problem persists, please contact our support team at <a href=\"mailto:support@doofinder.com\">support@doofinder.com</a>", "wordpress-doofinder");
                             //Dismiss the indexing notice as it has already finished
                             Setup_Wizard::dismiss_indexing_notice();
                             Admin_Notices::add_notice("indexing-status-failed", $notice_title, $notice_content, 'error', null, '', true);

@@ -9,7 +9,7 @@ class Thumbnail {
 	 *
 	 * @var string
 	 */
-	private static $size = 'thumbnail';
+	private static $size = 'medium';
 
 	/**
 	 * Post we'll be generating thumbnail for.
@@ -18,27 +18,12 @@ class Thumbnail {
 	 */
 	private $post;
 
-	/**
-	 * Prepare the thumbnail size to be used when submitting
-	 * the images to the Doofinder API.
-	 *
-	 * Default WP thumbnail size (150x150) if it's available,
-	 * but if it's not we'll register our own.
-	 */
-	public static function prepare_thumbnail_size() {
-		add_action( 'after_setup_theme', function () {
-			// We'll use default WordPress thumbnail size if it exists.
-			if ( has_image_size( self::$size ) ) {
-				return;
-			}
-
-			// Default WP size does not exists. We'll create our own.
-			add_image_size( 'thumbnail', 150, 150, true );
-		} );
-	}
-
 	public function __construct( \WP_Post $post ) {
 		$this->post = $post;
+	}
+
+	public static function get_size(){
+		return static::$size;
 	}
 
 	/**
