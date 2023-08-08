@@ -13,12 +13,12 @@ class REST_API_Handler
      *
      * @return void
      */
-    public static function initialize(): void
+    public static function initialize()
     {
-        add_action('rest_post_dispatch', array(__CLASS__, 'add_taxonomy_image_link'), 99, 3);
-
-        if (is_plugin_active('woocommerce/woocommerce.php'))
+        if (is_plugin_active('woocommerce/woocommerce.php')) {
             add_action('rest_post_dispatch', array(__CLASS__, 'add_woocommerce_product_images'), 99, 3);
+            add_action('rest_post_dispatch', array(__CLASS__, 'add_taxonomy_image_link'), 99, 3);
+        }
     }
 
     /**
@@ -61,7 +61,7 @@ class REST_API_Handler
                 $post = get_post($product['id']);
                 $thumbnail = new Thumbnail($post);
                 $image_link = $thumbnail->get();
-                $result->data[$key]['df_image_link'] = empty($image_link) ? wc_placeholder_img_src(Thumbnail::get_size()) : $image_link;                
+                $result->data[$key]['df_image_link'] = empty($image_link) ? wc_placeholder_img_src(Thumbnail::get_size()) : $image_link;
             }
         }
         return $result;
