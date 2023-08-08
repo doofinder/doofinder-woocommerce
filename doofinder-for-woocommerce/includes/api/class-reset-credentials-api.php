@@ -76,7 +76,7 @@ class Reset_Credentials_Api
      * @param array $body The array containing the payload to be sent.
      * @return array The request decoded response
      */
-    private function sendRequest($body)
+    private function sendRequest($url, $body)
     {
         $data = [
             'headers' => [
@@ -90,12 +90,13 @@ class Reset_Credentials_Api
         ];
 
         $response = wp_remote_request($url, $data);
-        if (!is_wp_error($response)) {
+        $resp_code = wp_remote_retrieve_response_code($response);
+        if (!is_wp_error($response) && $resp_code >= 200 && $resp_code < 400 ) {
             $response_body = wp_remote_retrieve_body($response);
             $decoded_response = json_decode($response_body, true);
             $this->log->log("The request has been made correctly: $decoded_response");
         } else {
-            $error_message = $response->get_error_message();
+            $error_message = wp_remote_retrieve_response_message($response);
             $this->log->log("Error in the request: $error_message");
         }
     }
