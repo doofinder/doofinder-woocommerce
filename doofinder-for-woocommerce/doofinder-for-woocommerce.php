@@ -97,6 +97,8 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
 
             //Initialize update on save
             Update_On_Save::init();
+            //Initialize reset credentials
+            Reset_Credentials::init();
             // Init admin functionalities
             if (is_admin()) {
                 Post::add_additional_settings();
@@ -416,6 +418,14 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
             add_action('wp_ajax_doofinder_notice_dismiss', function () {
                 $notice_id = $_POST['notice_id'];
                 Admin_Notices::remove_notice($notice_id);
+                wp_send_json([
+                    'success' => true
+                ]);
+                exit;
+            });
+
+            add_action('wp_ajax_doofinder_reset_credentials', function () {
+                do_action("doofinder_reset_credentials");
                 wp_send_json([
                     'success' => true
                 ]);
