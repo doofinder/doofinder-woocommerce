@@ -58,13 +58,14 @@ class REST_API_Handler
         ) {
             $products = $result->data;
             foreach ($products as $key => $product) {
-                if (!is_array($product))
+                if (!is_array($product)){
                     continue;
+                }
                 $post = get_post($product['id']);
                 $thumbnail = new Thumbnail($post);
                 $image_link = $thumbnail->get();
-                
-                //If the product is a variation and doesn't have image, take it form its parent
+
+                //If the product is a variation and doesn't have image, take it from its parent
                 if (empty($image_link) && $post->post_type === 'product_variation') {
                     $thumbnail = new Thumbnail(get_post($post->post_parent));
                     $image_link = $thumbnail->get();
