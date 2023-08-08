@@ -48,7 +48,7 @@ class Reset_Credentials_Api
 
     public function __construct($language)
     {
-        $this->log                  = new Log('update-on-save-api.log');
+        $this->log                  = new Log('reset-credential-api.log');
         $this->api_key              = Settings::get_api_key();
         $this->api_host             = Settings::get_api_host();
         $this->hash                 = Settings::get_search_engine_hash($language);
