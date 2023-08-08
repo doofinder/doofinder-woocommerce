@@ -405,16 +405,8 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 ]);
                 exit;
             });
-            //Force Update on save
-            add_action('wp_ajax_doofinder_force_update_on_save', function () {
-                do_action("doofinder_update_on_save");
-                wp_send_json([
-                    'success' => true
-                ]);
-                exit;
-            });
 
-            //Force Update on save
+            //Notice dismiss
             add_action('wp_ajax_doofinder_notice_dismiss', function () {
                 $notice_id = $_POST['notice_id'];
                 Admin_Notices::remove_notice($notice_id);
@@ -424,13 +416,6 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 exit;
             });
 
-            add_action('wp_ajax_doofinder_reset_credentials', function () {
-                do_action("doofinder_reset_credentials");
-                wp_send_json([
-                    'success' => true
-                ]);
-                exit;
-            });
         }
 
         public static function add_schedules()

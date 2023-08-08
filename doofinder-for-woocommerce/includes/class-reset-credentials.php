@@ -10,6 +10,14 @@ class Reset_Credentials
     {
         $class = __CLASS__;
         add_action('doofinder_reset_credentials', array($class, 'launch_reset_credentials'), 10, 0);
+
+        add_action('wp_ajax_doofinder_reset_credentials', function () {
+            do_action("doofinder_reset_credentials");
+            wp_send_json([
+                'success' => true
+            ]);
+            exit;
+        });
     }
 
     public static function launch_reset_credentials()

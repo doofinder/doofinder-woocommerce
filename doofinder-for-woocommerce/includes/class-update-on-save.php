@@ -14,6 +14,15 @@ class Update_On_Save
     {
         $class = __CLASS__;
         add_action('doofinder_update_on_save', array($class, 'launch_update_on_save_task'), 10, 0);
+
+        //Force Update on save
+        add_action('wp_ajax_doofinder_force_update_on_save', function () {
+            do_action("doofinder_update_on_save");
+            wp_send_json([
+                'success' => true
+            ]);
+            exit;
+        });
     }
 
     public static function launch_update_on_save_task()
