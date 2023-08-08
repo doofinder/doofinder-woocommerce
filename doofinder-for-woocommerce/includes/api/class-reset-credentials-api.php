@@ -76,7 +76,7 @@ class Reset_Credentials_Api
      * @param array $body The array containing the payload to be sent.
      * @return array The request decoded response
      */
-    private function sendRequest($body)
+    private function sendRequest($url, $body)
     {
         $data = [
             'headers' => [
