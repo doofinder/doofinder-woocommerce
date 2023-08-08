@@ -58,9 +58,18 @@ class REST_API_Handler
         ) {
             $products = $result->data;
             foreach ($products as $key => $product) {
+                if (!is_array($product)){
+                    continue;
+                }
                 $post = get_post($product['id']);
                 $thumbnail = new Thumbnail($post);
                 $image_link = $thumbnail->get();
+
+                //If the product is a variation and doesn't have image, take it from its parent
+                if (empty($image_link) && $post->post_type === 'product_variation') {
+                    $thumbnail = new Thumbnail(get_post($post->post_parent));
+                    $image_link = $thumbnail->get();
+                }
                 $result->data[$key]['df_image_link'] = empty($image_link) ? wc_placeholder_img_src(Thumbnail::get_size()) : $image_link;
             }
         }
