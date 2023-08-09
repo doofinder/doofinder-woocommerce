@@ -126,8 +126,8 @@ class REST_API_Handler
 
         foreach ($prices as $price_name) {
             $get_price_fn = 'get_' . $price_name;
-            $price = $wc_product->$get_price_fn();
-            $product['df_' . $price_name] = self::get_raw_real_price($price, $wc_product);
+            $price = $wc_product->$get_price_fn();            
+            $product['df_' . $price_name] = $price_name === "sale_price" && $price === "" ? "" : self::get_raw_real_price($price, $wc_product);
         }
         return $product;
     }
