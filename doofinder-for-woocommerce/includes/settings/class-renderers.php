@@ -6,6 +6,7 @@ use Doofinder\WP\Multilanguage\Language_Plugin;
 use Doofinder\WP\Multilanguage\No_Language_Plugin;
 use Doofinder\WP\Setup_Wizard;
 use Doofinder\WP\Settings;
+use Doofinder\WP\Reset_Credentials;
 
 defined('ABSPATH') or die();
 
@@ -121,7 +122,15 @@ trait Renderers
 
                 ?>
             </form>
-            <?php echo Setup_Wizard::get_configure_via_setup_wizard_button_html(); ?>
+
+            <?php 
+            if (in_array('administrator',  wp_get_current_user()->roles)) {
+                echo Reset_Credentials::get_configure_via_reset_credentials_button_html();
+            }
+            
+            echo Setup_Wizard::get_configure_via_setup_wizard_button_html(); 
+           
+           ?>
         </div>
 
     <?php

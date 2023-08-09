@@ -4,7 +4,7 @@
  * Plugin Name: Doofinder WP & WooCommerce Search
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 2.0.7
+ * Version: 2.0.8
  * Author: Doofinder
  * Description: Integrate Doofinder Search in your WordPress site or WooCommerce shop.
  *
@@ -35,7 +35,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
          *
          * @var string
          */
-        public static $version = '2.0.7';
+        public static $version = '2.0.8';
 
         /**
          * The only instance of Doofinder_For_WordPress
@@ -97,6 +97,8 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
 
             //Initialize update on save
             Update_On_Save::init();
+            //Initialize reset credentials
+            Reset_Credentials::init();
             // Init admin functionalities
             if (is_admin()) {
                 Post::add_additional_settings();
@@ -403,16 +405,8 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 ]);
                 exit;
             });
-            //Force Update on save
-            add_action('wp_ajax_doofinder_force_update_on_save', function () {
-                do_action("doofinder_update_on_save");
-                wp_send_json([
-                    'success' => true
-                ]);
-                exit;
-            });
 
-            //Force Update on save
+            //Notice dismiss
             add_action('wp_ajax_doofinder_notice_dismiss', function () {
                 $notice_id = $_POST['notice_id'];
                 Admin_Notices::remove_notice($notice_id);
@@ -421,6 +415,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 ]);
                 exit;
             });
+
         }
 
         public static function add_schedules()

@@ -72,4 +72,36 @@ jQuery(function () {
             });
         }
     );
+
+    let ResetCredentialsHandler = function () {
+        reset_credentials_btn.attr('disabled', true);
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            url: ajaxurl,
+            data: {
+                action: "doofinder_reset_credentials",
+            },
+            success: function (response) {
+                message = "Error updating your data, please try again layer";
+                if (response.success) {
+                    message = "Your data is being updated...";
+                }
+                $(".update-result-wrapper")
+                    .hide()
+                    .empty()
+                    .append(message)
+                    .fadeIn();
+
+                setTimeout(function () {
+                    $(".update-result-wrapper").fadeOut();
+                    $(".update-result-wrapper").empty();
+                    reset_credentials_btn.attr('disabled', false);
+                }, 5000);
+            },
+        });
+    };
+
+    let reset_credentials_btn = $("#doofinder-reset-credentials");
+    reset_credentials_btn.on("click", ResetCredentialsHandler);
 });
