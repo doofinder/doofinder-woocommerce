@@ -119,12 +119,12 @@ class REST_API_Handler
         $product_id = $product['id'];
         $wc_product = wc_get_product($product_id);
         $prices = [
-            "regular_price" => "",
-            "sale_price" => "",
-            "price" => ""
+            "regular_price",
+            "sale_price",
+            "price"
         ];
 
-        foreach ($prices as $price_name => $value) {
+        foreach ($prices as $price_name) {
             $get_price_fn = 'get_' . $price_name;
             $price = $wc_product->$get_price_fn();
             $product['df_' . $price_name] = self::get_raw_real_price($price, $wc_product);
