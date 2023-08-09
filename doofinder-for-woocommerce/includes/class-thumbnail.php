@@ -95,6 +95,10 @@ class Thumbnail {
 	 * Regenerate thumbnails for the current post.
 	 */
 	private function regenerate_thumbnail() {
+		if (!function_exists('wp_generate_attachment_metadata')) {
+			include(ABSPATH . 'wp-admin/includes/image.php');
+		}
+		
 		$attachment_id = get_post_thumbnail_id( $this->post );
 
 		wp_update_attachment_metadata(
