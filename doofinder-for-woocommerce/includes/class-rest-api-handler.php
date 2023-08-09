@@ -58,21 +58,77 @@ class REST_API_Handler
         ) {
             $products = $result->data;
             foreach ($products as $key => $product) {
-                if (!is_array($product)){
+                if (!is_array($product)) {
                     continue;
                 }
-                $post = get_post($product['id']);
-                $thumbnail = new Thumbnail($post);
-                $image_link = $thumbnail->get();
-
-                //If the product is a variation and doesn't have image, take it from its parent
-                if (empty($image_link) && $post->post_type === 'product_variation') {
-                    $thumbnail = new Thumbnail(get_post($post->post_parent));
-                    $image_link = $thumbnail->get();
-                }
-                $result->data[$key]['df_image_link'] = empty($image_link) ? wc_placeholder_img_src(Thumbnail::get_size()) : $image_link;
+                $product = self::add_df_prices($product);
+                $product = self::add_df_image_link($product);
+                $result->data[$key] = $product;
             }
         }
         return $result;
+    }
+
+    private static function get_raw_real_price($price, $product)
+    {
+        $woocommerce_tax_display_shop = get_option('woocommerce_tax_display_shop', 'incl');
+        return 'incl' === $woocommerce_tax_display_shop ?
+            wc_get_price_including_tax(
+                $product,
+                array(
+                    'price' => $price,
+                )
+            ) :
+            wc_get_price_excluding_tax(
+                $product,
+                array(
+                    'price' => $price,
+                )
+            );
+    }
+
+    /**
+     * Function that adds the image link for 
+     *
+     * @param array $product The product or variant we are modifying
+     * @return array $product The product with the new df_image_link
+     */
+    private static function add_df_image_link($product)
+    {
+        $product_id = $product['id'];
+        $post = get_post($product_id);
+        $thumbnail = new Thumbnail($post);
+        $image_link = $thumbnail->get();
+        if (empty($image_link) && $post->post_type === 'product_variation') {
+            $thumbnail = new Thumbnail(get_post($post->post_parent));
+            $image_link = $thumbnail->get();
+        }
+        //If neither the variant and the product have an image, return the woocommerce placeholder image
+        $product['df_image_link'] = empty($image_link) ? wc_placeholder_img_src(Thumbnail::get_size()) : $image_link;
+        return $product;
+    }
+
+    /**
+     * Add the raw prices with taxes applied if needed
+     *
+     * @param array $product The product or variant we are modifying
+     * @return array $product The product with the raw price keys
+     */
+    private static function add_df_prices($product)
+    {
+        $product_id = $product['id'];
+        $wc_product = wc_get_product($product_id);
+        $prices = [
+            "regular_price" => "",
+            "sale_price" => "",
+            "price" => ""
+        ];
+
+        foreach ($prices as $price_name => $value) {
+            $get_price_fn = 'get_' . $price_name;
+            $price = $wc_product->$get_price_fn();
+            $product['df_' . $price_name] = self::get_raw_real_price($price, $wc_product);
+        }
+        return $product;
     }
 }
