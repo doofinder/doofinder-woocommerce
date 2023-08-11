@@ -172,7 +172,7 @@ class REST_API_Handler
      */
     private static function add_base_url_if_needed($image_link)
     {
-        if (strpos($image_link, "/") === 0) {
+        if (0 === strpos($image_link, "/")) {
             $image_link = get_site_url() . $image_link;
         }
         return $image_link;
