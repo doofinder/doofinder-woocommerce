@@ -8,6 +8,7 @@ use \WP_REST_Request;
 
 class REST_API_Handler
 {
+    private static $logger;
     /**
      * Add the actions and filters needed to modify REST requests
      *
@@ -15,6 +16,7 @@ class REST_API_Handler
      */
     public static function initialize()
     {
+        self::$logger = new Log("rest-api-handler.log");
         if (is_plugin_active('woocommerce/woocommerce.php')) {
             add_action('rest_post_dispatch', array(__CLASS__, 'add_woocommerce_product_images'), 99, 3);
             add_action('rest_post_dispatch', array(__CLASS__, 'add_taxonomy_image_link'), 99, 3);
@@ -31,6 +33,10 @@ class REST_API_Handler
      */
     public static function add_taxonomy_image_link($result,  $server,  $request)
     {
+        //Check if the request comes from our environment
+        if (is_null($request->get_header('Doofinder-Origin'))) {
+            return $result;
+        }
         if ($request->get_route() === "/wp/v2/product_cat") {
             $terms = $result->data;
             foreach ($terms as $key => $term) {
@@ -52,13 +58,27 @@ class REST_API_Handler
      */
     public static function add_woocommerce_product_images($result,  $server,  $request)
     {
+        //Check if the request comes from our environment
+        if (is_null($request->get_header('Doofinder-Origin'))) {
+            return $result;
+        }
+
         if (
             $request->get_route() === "/wc/v3/products" || //for products
-            preg_match_all('/\/wc\/v3\/products\/\d+\/variations/', $request->get_route()) //for product variations
+            preg_match_all('/\/wc\/v3\/products\/\d+\/variations\/?$/', $request->get_route()) //for product variations
         ) {
             $products = $result->data;
             foreach ($products as $key => $product) {
-                if (!is_array($product)) {
+                if (!is_array($product) || !isset($product['id'])) {
+                    $req_params = $request->get_params();
+                    $url = $request->get_route();
+                    self::$logger->log("INVALID PRODUCT:");
+                    self::$logger->log(print_r($product, true));
+                    self::$logger->log("====== REQUEST INFO ======");
+                    self::$logger->log("URL: $url");
+                    self::$logger->log("REQ PARAMS:");
+                    self::$logger->log(print_r($req_params, true));
+                    self::$logger->log("====== END REQUEST INFO ======");
                     continue;
                 }
                 $product = self::add_df_prices($product);
@@ -118,6 +138,14 @@ class REST_API_Handler
     {
         $product_id = $product['id'];
         $wc_product = wc_get_product($product_id);
+        if (!is_a($wc_product, 'WC_Product')) {
+            //not a valid product, return without modification
+            self::$logger->log("INVALID PRODUCT:");
+            self::$logger->log(print_r($product, true));
+            self::$logger->log("WC_PRODUCT:");
+            self::$logger->log(print_r($wc_product, true));
+            return $product;
+        }
         $prices = [
             "regular_price",
             "sale_price",
@@ -126,7 +154,7 @@ class REST_API_Handler
 
         foreach ($prices as $price_name) {
             $get_price_fn = 'get_' . $price_name;
-            $price = $wc_product->$get_price_fn();            
+            $price = $wc_product->$get_price_fn();
             $product['df_' . $price_name] = $price_name === "sale_price" && $price === "" ? "" : self::get_raw_real_price($price, $wc_product);
         }
         return $product;
