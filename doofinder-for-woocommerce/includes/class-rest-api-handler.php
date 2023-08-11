@@ -123,8 +123,12 @@ class REST_API_Handler
             $thumbnail = new Thumbnail(get_post($post->post_parent));
             $image_link = $thumbnail->get();
         }
+
         //If neither the variant and the product have an image, return the woocommerce placeholder image
-        $product['df_image_link'] = empty($image_link) ? wc_placeholder_img_src(Thumbnail::get_size()) : $image_link;
+        $image_link = empty($image_link) ? wc_placeholder_img_src(Thumbnail::get_size()) : $image_link;
+        $image_link = self::add_base_url_if_needed($image_link);
+
+        $product['df_image_link'] = $image_link;
         return $product;
     }
 
@@ -158,5 +162,19 @@ class REST_API_Handler
             $product['df_' . $price_name] = $price_name === "sale_price" && $price === "" ? "" : self::get_raw_real_price($price, $wc_product);
         }
         return $product;
+    }
+
+    /**
+     * Check that image link is absolute, if not, add the site url
+     *
+     * @param string $image_link
+     * @return string $image_link
+     */
+    private static function add_base_url_if_needed($image_link)
+    {
+        if (strpos($image_link, "/") === 0) {
+            $image_link = get_site_url() . $image_link;
+        }
+        return $image_link;
     }
 }
