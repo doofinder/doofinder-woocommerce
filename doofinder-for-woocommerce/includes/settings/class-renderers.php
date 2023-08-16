@@ -6,7 +6,9 @@ use Doofinder\WP\Multilanguage\Language_Plugin;
 use Doofinder\WP\Multilanguage\No_Language_Plugin;
 use Doofinder\WP\Setup_Wizard;
 use Doofinder\WP\Settings;
+use Doofinder\WP\Settings\Settings as SettingsHelper;
 use Doofinder\WP\Reset_Credentials;
+use Doofinder\WP\Multilanguage;
 
 defined('ABSPATH') or die();
 
@@ -123,14 +125,14 @@ trait Renderers
                 ?>
             </form>
 
-            <?php 
+            <?php
             if (in_array('administrator',  wp_get_current_user()->roles)) {
                 echo Reset_Credentials::get_configure_via_reset_credentials_button_html();
             }
-            
-            echo Setup_Wizard::get_configure_via_setup_wizard_button_html(); 
-           
-           ?>
+
+            echo Setup_Wizard::get_configure_via_setup_wizard_button_html();
+
+            ?>
         </div>
 
     <?php
@@ -354,6 +356,104 @@ trait Renderers
                                                                                 }
 
                                                                                 ?></textarea>
+
+    <?php
+    }
+
+
+    /**
+     * Render the inputs for Additional Attributes. This is a table
+     * of inputs and selects where the user can choose any additional
+     * fields to add to the exported data.
+     *
+     * @param string $option_name
+     */
+    private function render_html_additional_attributes($option_name)
+    {
+        $saved_attributes = get_option($option_name);
+
+
+        $fields = include 'attributes.php';
+
+        // Transform fields config into array accepted by Select fields
+        $options = array();
+
+        foreach ($fields as $name => $settings) {
+            $options[$name] = $settings['title'];
+        }
+        $index = 0;
+
+    ?>
+
+        <table class="doofinder-for-wp-attributes">
+            <thead>
+                <tr>
+                    <th><?php _e('Attribute', 'doofinder_for_wp'); ?></th>
+                    <th><?php _e('Field', 'doofinder_for_wp'); ?></th>
+                    <th><?php _e('Delete', 'doofinder_for_wp'); ?></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <?php
+
+                if (!empty($saved_attributes)) {
+                    foreach ($saved_attributes as $index => $attribute) {
+                        $this->render_html_single_additional_attribute(
+                            $option_name,
+                            $index,
+                            $attribute
+                        );
+                    }
+                }
+
+                $this->render_html_single_additional_attribute(
+                    $option_name,
+                    'new'
+                );
+
+                ?>
+            </tbody>
+        </table>
+
+    <?php
+    }
+
+    /**
+     * Renders a single row representing additional attribute.
+     * A helper for "render_html_additional_attributes".
+     *
+     * @see Renderers::render_html_additional_attributes
+     *
+     * @param string $option_name
+     * @param string|int $index
+     * @param ?array $attribute
+     */
+    private function render_html_single_additional_attribute($option_name, $index, $attribute = null)
+    {
+        $attributes = include 'attributes.php';
+
+    ?>
+
+        <tr>
+            <td>
+                <select <?php echo ($index === "new") ? "class=\"df-attribute-select\"" : ""; ?> name="<?php echo $option_name; ?>[<?php echo $index; ?>][attribute]">
+                    <?php foreach ($attributes as $id => $attr) : ?>
+                        <option value="<?php echo $id; ?>" <?php if ($attribute && $attribute['attribute'] === $id) : ?> selected="selected" <?php endif; ?> <?php if (isset($attr['field_name']) && !empty($attr['field_name'])) : ?> data-field-name="<?php echo $attr['field_name']; ?>" <?php endif; ?>>
+                            <?php echo $attr['title']; ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </td>
+
+            <td>
+                <input <?php echo ($index === "new") ? "class=\"df-field-text\"" : ""; ?>type="text" name="<?php echo $option_name; ?>[<?php echo $index; ?>][field]" <?php if ($attribute) : ?> value="<?php echo $attribute['field']; ?>" <?php endif; ?> />
+            </td>
+
+            <td>
+                <input type="checkbox" name="<?php echo $option_name; ?>[<?php echo $index; ?>][delete]" />
+            </td>
+        </tr>
 
 <?php
     }

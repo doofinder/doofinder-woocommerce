@@ -104,4 +104,10 @@ jQuery(function () {
 
     let reset_credentials_btn = $("#doofinder-reset-credentials");
     reset_credentials_btn.on("click", ResetCredentialsHandler);
+
+    $(".df-attribute-select").on("change", function(){
+        let default_attribute_name = $(this).find("option:selected")
+        
+        console.log(default_attribute_name);
+    });
 });

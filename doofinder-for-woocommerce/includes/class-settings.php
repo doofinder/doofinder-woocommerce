@@ -82,6 +82,10 @@ class Settings
 			'authentication' => array(
 				'label'     => __('General Settings', 'doofinder_for_wp'),
 				'fields_cb' => 'add_general_settings'
+			),
+			'data' => array(
+				'label'     => __('Data', 'doofinder_for_wp'),
+				'fields_cb' => 'add_data_settings'
 			)
 		);
 		$this->add_plugin_settings();
