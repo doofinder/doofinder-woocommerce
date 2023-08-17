@@ -1,37 +1,15 @@
 <?php
 
 // Predefined attributes that will always be present in the dropdown.
+/*
+* WordPress fields
+*/
 $attributes = array(
-    /*
-	 * WordPress fields
-	 */
-
-    'post_title' => array(
-        'title'  => __('Attribute: Post Title', 'doofinder_for_wp'),
-        'type'   => 'predefined',
-        'source' => 'post_title',
-        'field_name' => 'title'
-    ),
-
-    'post_content' => array(
-        'title'  => __('Attribute: Description', 'doofinder_for_wp'),
-        'type'   => 'predefined',
-        'source' => 'post_content',
-        'field_name' => 'content'
-    ),
-
     'post_excerpt' => array(
         'title'  => __('Attribute: Short Description', 'doofinder_for_wp'),
         'type'   => 'predefined',
         'source' => 'post_excerpt',
         'field_name' => 'excerpt'
-    ),
-
-    'permalink' => array(
-        'title'  => __('Attribute: Post Link', 'doofinder_for_wp'),
-        'type'   => 'predefined',
-        'source' => 'permalink',
-        'field_name' => 'link'
     )
 );
 
@@ -102,7 +80,7 @@ if (true) {
     // (the taxonomy registered by WC, in Products > Attributes)
     $wc_attributes = wc_get_attribute_taxonomies();
     foreach ($wc_attributes as $wc_attribute) {
-        $attributes['pa_' . $wc_attribute->attribute_name] = array(
+        $attributes['wc_' . $wc_attribute->attribute_id] = array(
             'title'  => __('Custom Attribute:', 'doofinder_for_wp') . ' ' . $wc_attribute->attribute_label,
             'type'   => 'wc_attribute',
             'source' => $wc_attribute->attribute_name,

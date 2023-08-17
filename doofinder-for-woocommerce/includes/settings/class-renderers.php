@@ -126,11 +126,12 @@ trait Renderers
             </form>
 
             <?php
-            if (in_array('administrator',  wp_get_current_user()->roles)) {
-                echo Reset_Credentials::get_configure_via_reset_credentials_button_html();
+            if (!isset($_GET['tab']) || $_GET['tab'] === 'authentication') {
+                if (in_array('administrator',  wp_get_current_user()->roles)) {
+                    echo Reset_Credentials::get_configure_via_reset_credentials_button_html();
+                }
+                echo Setup_Wizard::get_configure_via_setup_wizard_button_html();
             }
-
-            echo Setup_Wizard::get_configure_via_setup_wizard_button_html();
 
             ?>
         </div>
@@ -368,23 +369,10 @@ trait Renderers
      *
      * @param string $option_name
      */
-    private function render_html_additional_attributes($option_name)
+    private function render_html_additional_attributes()
     {
-        $saved_attributes = get_option($option_name);
-
-
-        $fields = include 'attributes.php';
-
-        // Transform fields config into array accepted by Select fields
-        $options = array();
-
-        foreach ($fields as $name => $settings) {
-            $options[$name] = $settings['title'];
-        }
-        $index = 0;
-
+        $saved_attributes = get_option(Settings::$custom_attributes_option);
     ?>
-
         <table class="doofinder-for-wp-attributes">
             <thead>
                 <tr>
@@ -393,14 +381,12 @@ trait Renderers
                     <th><?php _e('Delete', 'doofinder_for_wp'); ?></th>
                 </tr>
             </thead>
-
             <tbody>
                 <?php
-
                 if (!empty($saved_attributes)) {
                     foreach ($saved_attributes as $index => $attribute) {
                         $this->render_html_single_additional_attribute(
-                            $option_name,
+                            Settings::$custom_attributes_option,
                             $index,
                             $attribute
                         );
@@ -408,14 +394,12 @@ trait Renderers
                 }
 
                 $this->render_html_single_additional_attribute(
-                    $option_name,
+                    Settings::$custom_attributes_option,
                     'new'
                 );
-
                 ?>
             </tbody>
         </table>
-
     <?php
     }
 
@@ -432,12 +416,11 @@ trait Renderers
     private function render_html_single_additional_attribute($option_name, $index, $attribute = null)
     {
         $attributes = include 'attributes.php';
-
     ?>
-
         <tr>
             <td>
-                <select <?php echo ($index === "new") ? "class=\"df-attribute-select\"" : ""; ?> name="<?php echo $option_name; ?>[<?php echo $index; ?>][attribute]">
+                <select class="df-attribute-select" name="<?php echo $option_name; ?>[<?php echo $index; ?>][attribute]">
+                    <option disabled <?php echo ($index === "new") ? "selected" : ""; ?>>- <?php _e('Select an attribute', 'doofinder_for_wp'); ?> -</option>
                     <?php foreach ($attributes as $id => $attr) : ?>
                         <option value="<?php echo $id; ?>" <?php if ($attribute && $attribute['attribute'] === $id) : ?> selected="selected" <?php endif; ?> <?php if (isset($attr['field_name']) && !empty($attr['field_name'])) : ?> data-field-name="<?php echo $attr['field_name']; ?>" <?php endif; ?>>
                             <?php echo $attr['title']; ?>
@@ -447,11 +430,15 @@ trait Renderers
             </td>
 
             <td>
-                <input <?php echo ($index === "new") ? "class=\"df-field-text\"" : ""; ?>type="text" name="<?php echo $option_name; ?>[<?php echo $index; ?>][field]" <?php if ($attribute) : ?> value="<?php echo $attribute['field']; ?>" <?php endif; ?> />
+                <input class="df-field-text" type="text" name="<?php echo $option_name; ?>[<?php echo $index; ?>][field]" <?php if ($attribute) : ?> value="<?php echo $attribute['field']; ?>" <?php endif; ?> />
             </td>
 
             <td>
-                <input type="checkbox" name="<?php echo $option_name; ?>[<?php echo $index; ?>][delete]" />
+                <?php if ($index === "new") : ?>
+                    <input type="submit" name="submit" id="submit-new-attribute" class="button button-secondary" value="Add">
+                <?php else : ?>
+                    <input type="checkbox" name="<?php echo $option_name; ?>[<?php echo $index; ?>][delete]" />
+                <?php endif; ?>
             </td>
         </tr>
 

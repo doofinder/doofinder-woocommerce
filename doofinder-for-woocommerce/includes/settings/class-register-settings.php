@@ -181,13 +181,13 @@ trait Register_Settings
         register_setting(self::$top_level_menu, $js_layer_option_name);
     }
 
-    private function add_data_settings()
+    private function add_product_data_settings()
     {
         $field_id = 'doofinder-for-wp-data';
 
         add_settings_section(
             $field_id,
-            __('Data Settings', 'doofinder_for_wp'),
+            __('Product Data Settings', 'doofinder_for_wp'),
             function () {
         ?>
             <p class="description"><?php _e(
@@ -200,12 +200,12 @@ trait Register_Settings
         );
 
         // Custom Attributes
-        $additional_attributes_option_name = $this->language->get_option_name('doofinder_for_wp_custom_attributes');
+        $additional_attributes_option_name = \Doofinder\WP\Settings::$custom_attributes_option;
         add_settings_field(
             $additional_attributes_option_name,
             __('Custom Attributes', 'doofinder_for_wp'),
-            function () use ($additional_attributes_option_name) {
-                $this->render_html_additional_attributes($additional_attributes_option_name);
+            function (){
+                $this->render_html_additional_attributes();
             },
             self::$top_level_menu,
             $field_id
