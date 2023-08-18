@@ -101,13 +101,36 @@ jQuery(function () {
   reset_credentials_btn.on("click", ResetCredentialsHandler);
 
   /**
-   * This event listener is used to automatically populate the field name when 
+   * This event listener is used to automatically populate the field name when
    * the user selects an option.
    */
   $(".df-attribute-select").on("change", function () {
-    let default_attribute_name = $(this)
-      .find("option:selected")
-      .data("field-name");
-    $(this).parent().next().find(".df-field-text").val(default_attribute_name);
+    let selected_option = $(this).find("option:selected");
+
+    let default_attribute_name = selected_option.data("field-name");
+    let attribute_type = selected_option.data("type");
+    $(this).parent().next().find(".df-field-type").val(attribute_type);
+
+    if (attribute_type === "metafield") {
+      $(this).replaceWith(
+        '<input class="df-attribute-text" placeholder="Enter the metafield name" type="text" name="doofinder_for_wp_custom_attributes[new][attribute]" value="" />'
+      );
+    } else {
+      $(this)
+        .parent()
+        .next()
+        .find(".df-field-text")
+        .val(default_attribute_name);
+    }
+  });
+
+  $(".df-delete-attribute-btn").on("click", function (ev) {
+    ev.preventDefault();
+    $(this).closest("tr").remove();
+  });
+
+  $(".df-add-attribute-btn").on("click", function (ev) {
+    ev.preventDefault();
+    $("#submit").click();
   });
 });

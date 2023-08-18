@@ -378,7 +378,7 @@ trait Renderers
                 <tr>
                     <th><?php _e('Attribute', 'doofinder_for_wp'); ?></th>
                     <th><?php _e('Field', 'doofinder_for_wp'); ?></th>
-                    <th><?php _e('Delete', 'doofinder_for_wp'); ?></th>
+                    <th><?php _e('Action', 'doofinder_for_wp'); ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -419,25 +419,31 @@ trait Renderers
     ?>
         <tr>
             <td>
-                <select class="df-attribute-select" name="<?php echo $option_name; ?>[<?php echo $index; ?>][attribute]">
-                    <option disabled <?php echo ($index === "new") ? "selected" : ""; ?>>- <?php _e('Select an attribute', 'doofinder_for_wp'); ?> -</option>
-                    <?php foreach ($attributes as $id => $attr) : ?>
-                        <option value="<?php echo $id; ?>" <?php if ($attribute && $attribute['attribute'] === $id) : ?> selected="selected" <?php endif; ?> <?php if (isset($attr['field_name']) && !empty($attr['field_name'])) : ?> data-field-name="<?php echo $attr['field_name']; ?>" <?php endif; ?>>
-                            <?php echo $attr['title']; ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+
+                <?php if ($attribute['type'] === 'metafield' && $index != "new") : ?>
+                    <input class="df-attribute-text" type="text" name="<?php echo $option_name; ?>[<?php echo $index; ?>][attribute]" <?php if ($attribute) : ?> value="<?php echo $attribute['attribute']; ?>" <?php endif; ?> />
+                <?php else : ?>
+                    <select class="df-attribute-select" name="<?php echo $option_name; ?>[<?php echo $index; ?>][attribute]">
+                        <option disabled <?php echo ($index === "new") ? "selected" : ""; ?>>- <?php _e('Select an attribute', 'doofinder_for_wp'); ?> -</option>
+                        <?php foreach ($attributes as $id => $attr) : ?>
+                            <option value="<?php echo $id; ?>" <?php if ($attribute && $attribute['attribute'] === $id) : ?> selected="selected" <?php endif; ?> <?php if (isset($attr['field_name']) && !empty($attr['field_name'])) : ?> data-field-name="<?php echo $attr['field_name']; ?>" <?php endif; ?> data-type="<?php echo $attr['type']; ?>">
+                                <?php echo $attr['title']; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                <?php endif; ?>
             </td>
 
             <td>
                 <input class="df-field-text" type="text" name="<?php echo $option_name; ?>[<?php echo $index; ?>][field]" <?php if ($attribute) : ?> value="<?php echo $attribute['field']; ?>" <?php endif; ?> />
+                <input class="df-field-type" type="hidden" name="<?php echo $option_name; ?>[<?php echo $index; ?>][type]" <?php if ($attribute) : ?> value="<?php echo $attribute['type']; ?>" <?php endif; ?> />
             </td>
 
             <td>
                 <?php if ($index === "new") : ?>
-                    <input type="submit" name="submit" id="submit-new-attribute" class="button button-secondary" value="Add">
+                    <a href="#" class="df-add-attribute-btn df-action-btn"><span class="dashicons dashicons-insert"></span></a>
                 <?php else : ?>
-                    <input type="checkbox" name="<?php echo $option_name; ?>[<?php echo $index; ?>][delete]" />
+                    <a href="#" class="df-delete-attribute-btn df-action-btn"><span class="dashicons dashicons-trash"></span></a>
                 <?php endif; ?>
             </td>
         </tr>

@@ -7,70 +7,70 @@
 $attributes = array(
     'post_excerpt' => array(
         'title'  => __('Attribute: Short Description', 'doofinder_for_wp'),
-        'type'   => 'predefined',
+        'type'   => 'base_attribute',
         'source' => 'post_excerpt',
         'field_name' => 'excerpt'
     )
 );
 
-if (true) {
+if (is_plugin_active('woocommerce/woocommerce.php')) {
     /*
 	 * WooCommerce fields
 	 */
     $wc_default_attributes = array(
         'downloadable' => array(
             'title'  => __('Attribute: Downloadable', 'doofinder_for_wp'),
-            'type'   => 'meta',
-            'source' => '_downloadable',
+            'type'   => 'base_attribute',
+            'source' => 'downloadable',
             'field_name' => 'downloadable'
         ),
 
         'virtual' => array(
             'title'  => __('Attribute: Virtual', 'doofinder_for_wp'),
-            'type'   => 'meta',
-            'source' => '_virtual',
+            'type'   => 'base_attribute',
+            'source' => 'virtual',
             'field_name' => 'virtual'
         ),
 
         'purchase_note' => array(
             'title'  => __('Attribute: Purchase Note', 'doofinder_for_wp'),
-            'type'   => 'meta',
-            'source' => '_purchase_note',
+            'type'   => 'base_attribute',
+            'source' => 'purchase_note',
             'field_name' => 'purchase_note'
         ),
 
         'featured' => array(
             'title'  => __('Attribute: Featured', 'doofinder_for_wp'),
-            'type'   => 'meta',
-            'source' => '_featured',
+            'type'   => 'base_attribute',
+            'source' => 'featured',
             'field_name' => 'featured'
         ),
 
         'weight' => array(
             'title'  => __('Attribute: Weight', 'doofinder_for_wp'),
-            'type'   => 'meta',
+            'type'   => 'base_attribute',
             'source' => '_weight',
             'field_name' => 'weight'
         ),
 
-        'length' => array(
+        'dimensions:length' => array(
             'title'  => __('Attribute: Length', 'doofinder_for_wp'),
-            'type'   => 'meta',
-            'source' => '_length',
+            'type'   => 'base_attribute',
+            'source' => 'length',
             'field_name' => 'length'
         ),
 
-        'width' => array(
+        'dimensions:width' => array(
             'title'  => __('Attribute: Width', 'doofinder_for_wp'),
-            'type'   => 'meta',
-            'source' => '_width',
+            'type'   => 'base_attribute',
+            'source' => 'width',
             'field_name' => 'width'
         ),
 
-        'height' => array(
+        'dimensions:height' => array(
             'title'  => __('Attribute: Height', 'doofinder_for_wp'),
-            'type'   => 'meta',
-            'source' => '_height',
+            'type'   => 'base_attribute',
+            'source' => 'height',
             'field_name' => 'height'
         ),
     );
@@ -91,9 +91,9 @@ if (true) {
 
 // Custom attribute.
 // Allowing user to provide a custom meta field name.
-$attributes['custom'] = array(
+$attributes['metafield'] = array(
     'title' => __('Custom (Post Meta)', 'doofinder_for_wp'),
-    'type' => 'custom_meta'
+    'type' => 'metafield'
 );
 
 

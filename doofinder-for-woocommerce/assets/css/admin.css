@@ -378,3 +378,24 @@ Toggle
     margin: 15px;
     font-weight: bold;
 }
+
+/* */
+.df-action-btn {
+    text-decoration: none;
+    min-width: 40px;
+    text-align: center;
+    display: inline-block;
+    color: dimgrey;
+    border: 1px solid dimgrey;
+    border-radius: 3px;
+    padding: 3px 0px;
+}
+
+.df-action-btn.df-delete-attribute-btn:hover {
+    color: #e83f3f;
+    border-color: #e83f3f;
+}
+.df-action-btn.df-add-attribute-btn:hover {
+    color: #199613;
+    border-color: #199613;
+}
