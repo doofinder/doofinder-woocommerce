@@ -153,11 +153,6 @@ jQuery(function () {
         if(!CustomAttributesHandler.valid){
           ev.preventDefault();
         }
-        /*
-        invalid = $(this).find(".invalid");
-        if (invalid.length) {
-          ev.preventDefault();
-        }*/
       });
     },
     clear_errors: function (elem) {
