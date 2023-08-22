@@ -146,11 +146,15 @@ jQuery(function () {
        * Validate the field
        */
       $(".df-field-text").on("change", function () {
-        CustomAttributesHandler.validate_custom_fields(this)
+        CustomAttributesHandler.validate_custom_fields(this);
       });
 
+      /**
+       * Check if the form is valid
+       */
+
       $("#df-settings-form").on("submit", function (ev) {
-        if(!CustomAttributesHandler.valid){
+        if (!CustomAttributesHandler.valid) {
           ev.preventDefault();
         }
       });
@@ -168,13 +172,16 @@ jQuery(function () {
       $(elem).addClass("invalid");
       CustomAttributesHandler.valid = false;
     },
-    validate_custom_fields: function(elem){
+    validate_custom_fields: function (elem) {
       CustomAttributesHandler.valid = true;
       let field_name = $(elem).val();
+      let field_id = $(elem).attr("id");
+      //Get the existing fields excluding the new one
       let existing_fields = $(".df-field-text")
-        .not("#df-field-text-new")
         .map(function (index, elem) {
-          return $(elem).val();
+          if (field_id != $(elem).attr("id")) {
+            return $(elem).val();
+          }
         })
         .toArray();
 
@@ -185,7 +192,9 @@ jQuery(function () {
             field_name
           );
         CustomAttributesHandler.add_error(elem, message);
-      } else if (existing_fields.includes(field_name)) {
+      }
+
+      if (existing_fields.includes(field_name)) {
         let message = "The " + field_name + " field is duplicated";
         CustomAttributesHandler.add_error(elem, message);
       }
@@ -197,7 +206,7 @@ jQuery(function () {
       } else {
         $("#df-settings-form input[type=submit]").attr("disabled", true);
       }
-    }
+    },
   };
 
   CustomAttributesHandler.init();
