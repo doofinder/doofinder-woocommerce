@@ -5,6 +5,7 @@ namespace Doofinder\WP\Settings;
 use Doofinder\WP\Multilanguage\Language_Plugin;
 use Doofinder\WP\Setup_Wizard;
 use Doofinder\WP\Log;
+use Doofinder\WP\Settings;
 
 defined('ABSPATH') or die();
 
@@ -204,7 +205,7 @@ trait Register_Settings
         add_settings_field(
             $additional_attributes_option_name,
             __('Custom Attributes', 'doofinder_for_wp'),
-            function (){
+            function () {
                 $this->render_html_additional_attributes();
             },
             self::$top_level_menu,
@@ -365,6 +366,17 @@ trait Register_Settings
 
             if (isset($attribute['delete']) && $attribute['delete']) {
                 continue;
+            }
+
+            if (in_array($attribute['field'], Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES)) {
+                $field_name = $attribute['field'];
+                $attribute['field'] = 'custom_' . $field_name;
+                add_settings_error(
+                    'doofinder_for_wp_messages',
+                    'doofinder_for_wp_message_update_on_save',
+                    __(sprintf("The '%s' field name is reserved, we have changed it to '%s' automatically, but you can change it if you want",  $field_name,  $attribute['field'] ), 'doofinder_for_wp')
+                );
+                return false;
             }
 
             $output[] = $attribute;

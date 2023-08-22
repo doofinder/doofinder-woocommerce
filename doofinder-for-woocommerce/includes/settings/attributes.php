@@ -4,6 +4,9 @@
 /*
 * WordPress fields
 */
+
+use Doofinder\WP\Settings;
+
 $attributes = array(
     'post_excerpt' => array(
         'title'  => __('Attribute: Short Description', 'doofinder_for_wp'),
@@ -80,11 +83,13 @@ if (is_plugin_active('woocommerce/woocommerce.php')) {
     // (the taxonomy registered by WC, in Products > Attributes)
     $wc_attributes = wc_get_attribute_taxonomies();
     foreach ($wc_attributes as $wc_attribute) {
+        $field_name = $wc_attribute->attribute_name;
+        $field_name = in_array($field_name, Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES) ? 'custom_' . $field_name : $field_name;
         $attributes['wc_' . $wc_attribute->attribute_id] = array(
             'title'  => __('Custom Attribute:', 'doofinder_for_wp') . ' ' . $wc_attribute->attribute_label,
             'type'   => 'wc_attribute',
             'source' => $wc_attribute->attribute_name,
-            'field_name' => $wc_attribute->attribute_name
+            'field_name' => $field_name
         );
     }
 }

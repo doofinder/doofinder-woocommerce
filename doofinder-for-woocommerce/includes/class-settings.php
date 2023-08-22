@@ -31,6 +31,34 @@ class Settings
 	 */
 	public static $top_level_menu = 'doofinder_for_wp';
 
+	public const RESERVED_CUSTOM_ATTRIBUTES_NAMES = [
+		"availability",
+		"average_rating",
+		"best_price",
+		"catalog_visibility",
+		"categories",
+		"description",
+		"df_variants_information",
+		"df_group_leader",
+		"group_id",
+		"id",
+		"image_link",
+		"link",
+		"parent_id",
+		"price",
+		"rating_count",
+		"regular_price",
+		"sale_price",
+		"short_description",
+		"sku",
+		"slug",
+		"stock_quantity",
+		"tags",
+		"title",
+		"type",
+		"variants"
+	];
+
 	/**
 	 * Array of tab settings, indexed by the id of the tag (the GET variable
 	 * representing given tab). Values contain:

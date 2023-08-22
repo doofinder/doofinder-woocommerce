@@ -1,179 +1,179 @@
 .doofinder-for-wp-warning {
-    color: #ff9900;
+  color: #ff9900;
 }
 
 .doofinder-for-wp-progress-bar {
-    height: 25px;
+  height: 25px;
 
-    margin: 20px 0;
+  margin: 20px 0;
 
-    background-color: white;
-    background-image: linear-gradient(top, #f5f5f5, #f9f9f9);
-    background-repeat: repeat-x;
+  background-color: white;
+  background-image: linear-gradient(top, #f5f5f5, #f9f9f9);
+  background-repeat: repeat-x;
 
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
-    border-radius: 0;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  border-radius: 0;
 
-    overflow: hidden;
+  overflow: hidden;
 }
 
 .doofinder-for-wp-progress-bar .doofinder-for-wp-bar {
-    box-sizing: border-box;
+  box-sizing: border-box;
 
-    width: 0;
-    height: 100%;
+  width: 0;
+  height: 100%;
 
-    background-color: #0e90d2;
-    background-image: linear-gradient(top, #149bdf, #0480be);
-    background-repeat: repeat-x;
-    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+  background-color: #0e90d2;
+  background-image: linear-gradient(top, #149bdf, #0480be);
+  background-repeat: repeat-x;
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
 
-    transition: width 0.15s ease;
+  transition: width 0.15s ease;
 }
 
 .doofinder-for-wp-progress-bar-status {
-    color: #607d8b;
+  color: #607d8b;
 }
 
 .doofinder-for-wp-progress-bar-status p {
-    display: none;
+  display: none;
 }
 
 .doofinder-for-wp-progress-bar-status p.active {
-    display: block;
+  display: block;
 }
 
 .doofinder-for-wp-additional-messages {
-    display: none;
+  display: none;
 
-    margin-bottom: 25px;
+  margin-bottom: 25px;
 
-    color: #607d8b;
+  color: #607d8b;
 }
 
 .doofinder-for-wp-additional-messages.active {
-    display: block;
+  display: block;
 }
 
 .doofinder-for-wp-indexing-error {
-    display: none;
+  display: none;
 
-    color: #cc0000;
+  color: #cc0000;
 }
 
 .doofinder-for-wp-indexing-error.active {
-    display: block;
+  display: block;
 }
 
 .doofinder-for-wp-spinner {
-    float: none;
+  float: none;
 }
 
 .form-table td {
-    position: relative;
+  position: relative;
 }
 
 .doofinder-tooltip {
-    display: inline-block;
+  display: inline-block;
 
-    height: 16px;
-    width: 16px;
+  height: 16px;
+  width: 16px;
 
-    vertical-align: middle;
-    position: absolute;
-    left: -17px;
-    top: 21px;
+  vertical-align: middle;
+  position: absolute;
+  left: -17px;
+  top: 21px;
 
-    font-size: 15px;
-    line-height: 1;
-    color: #666;
+  font-size: 15px;
+  line-height: 1;
+  color: #666;
 
-    cursor: help;
+  cursor: help;
 }
 
 .doofinder-tooltip::after {
-    content: "\f223";
+  content: "\f223";
 
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 
-    position: absolute;
-    top: 0;
-    left: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
 
-    font-family: Dashicons;
-    text-align: center;
-    line-height: 1;
+  font-family: Dashicons;
+  text-align: center;
+  line-height: 1;
 
-    speak: none;
-    cursor: help;
+  speak: none;
+  cursor: help;
 }
 
 .doofinder-tooltip > span {
-    max-width: 200px;
-    min-width: 151px;
-    padding: 7px 11px;
+  max-width: 200px;
+  min-width: 151px;
+  padding: 7px 11px;
 
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(calc(-50% + 0.5px));
-    z-index: 2;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(calc(-50% + 0.5px));
+  z-index: 2;
 
-    text-align: center;
-    font-size: 10px;
-    line-height: 18px;
-    color: #fff;
+  text-align: center;
+  font-size: 10px;
+  line-height: 18px;
+  color: #fff;
 
-    background: #333;
-    border-radius: 3px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  background: #333;
+  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 
-    cursor: default;
-    pointer-events: none;
-    opacity: 0;
+  cursor: default;
+  pointer-events: none;
+  opacity: 0;
 
-    transition: opacity 0.3s;
+  transition: opacity 0.3s;
 }
 
 .doofinder-tooltip > span::after {
-    content: "";
+  content: "";
 
-    height: 0;
-    width: 0;
+  height: 0;
+  width: 0;
 
-    position: absolute;
-    top: -12px;
-    left: 50%;
-    transform: translateX(calc(-50% - 0.5px));
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(calc(-50% - 0.5px));
 
-    border: 6px solid transparent;
-    border-bottom-color: #333;
+  border: 6px solid transparent;
+  border-bottom-color: #333;
 }
 
 .doofinder-tooltip:hover > span {
-    opacity: 1;
+  opacity: 1;
 }
 
 p.description {
-    font-style: normal;
+  font-style: normal;
 }
 
 .custom-list li::before {
-    content: "- ";
+  content: "- ";
 }
 
 /* Custom attributes */
 
 .doofinder-for-wp-attributes th,
 .doofinder-for-wp-attributes td {
-    padding: 0 10px 0 0;
+  padding: 0 10px 0 0;
 }
 
 .doofinder-for-wp-attributes [type="text"],
 .doofinder-for-wp-attributes select {
-    display: block;
-    width: 100%;
+  display: block;
+  width: 100%;
 }
 
 /*
@@ -181,221 +181,228 @@ Indexation Status Notice
 */
 
 .lds-spinner {
-    color: official;
-    display: inline-block;
-    position: relative;
-    width: 80px;
-    height: 80px;
+  color: official;
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
 }
 
 .lds-spinner div {
-    transform-origin: 40px 40px;
-    animation: lds-spinner 1.2s linear infinite;
+  transform-origin: 40px 40px;
+  animation: lds-spinner 1.2s linear infinite;
 }
 
 .lds-spinner div:after {
-    content: " ";
-    display: block;
-    position: absolute;
-    top: 3px;
-    left: 37px;
-    width: 6px;
-    height: 18px;
-    border-radius: 20%;
-    background: #000;
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 3px;
+  left: 37px;
+  width: 6px;
+  height: 18px;
+  border-radius: 20%;
+  background: #000;
 }
 
 .lds-spinner div:nth-child(1) {
-    transform: rotate(0deg);
-    animation-delay: -1.1s;
+  transform: rotate(0deg);
+  animation-delay: -1.1s;
 }
 
 .lds-spinner div:nth-child(2) {
-    transform: rotate(30deg);
-    animation-delay: -1s;
+  transform: rotate(30deg);
+  animation-delay: -1s;
 }
 
 .lds-spinner div:nth-child(3) {
-    transform: rotate(60deg);
-    animation-delay: -0.9s;
+  transform: rotate(60deg);
+  animation-delay: -0.9s;
 }
 
 .lds-spinner div:nth-child(4) {
-    transform: rotate(90deg);
-    animation-delay: -0.8s;
+  transform: rotate(90deg);
+  animation-delay: -0.8s;
 }
 
 .lds-spinner div:nth-child(5) {
-    transform: rotate(120deg);
-    animation-delay: -0.7s;
+  transform: rotate(120deg);
+  animation-delay: -0.7s;
 }
 
 .lds-spinner div:nth-child(6) {
-    transform: rotate(150deg);
-    animation-delay: -0.6s;
+  transform: rotate(150deg);
+  animation-delay: -0.6s;
 }
 
 .lds-spinner div:nth-child(7) {
-    transform: rotate(180deg);
-    animation-delay: -0.5s;
+  transform: rotate(180deg);
+  animation-delay: -0.5s;
 }
 
 .lds-spinner div:nth-child(8) {
-    transform: rotate(210deg);
-    animation-delay: -0.4s;
+  transform: rotate(210deg);
+  animation-delay: -0.4s;
 }
 
 .lds-spinner div:nth-child(9) {
-    transform: rotate(240deg);
-    animation-delay: -0.3s;
+  transform: rotate(240deg);
+  animation-delay: -0.3s;
 }
 
 .lds-spinner div:nth-child(10) {
-    transform: rotate(270deg);
-    animation-delay: -0.2s;
+  transform: rotate(270deg);
+  animation-delay: -0.2s;
 }
 
 .lds-spinner div:nth-child(11) {
-    transform: rotate(300deg);
-    animation-delay: -0.1s;
+  transform: rotate(300deg);
+  animation-delay: -0.1s;
 }
 
 .lds-spinner div:nth-child(12) {
-    transform: rotate(330deg);
-    animation-delay: 0s;
+  transform: rotate(330deg);
+  animation-delay: 0s;
 }
 
 @keyframes lds-spinner {
-    0% {
-        opacity: 1;
-    }
+  0% {
+    opacity: 1;
+  }
 
-    100% {
-        opacity: 0;
-    }
+  100% {
+    opacity: 0;
+  }
 }
 
 .indexation-status.processing .status-processed {
-    display: none;
+  display: none;
 }
 
 .indexation-status.processed .status-processed {
-    display: block;
+  display: block;
 }
 
 .indexation-status.processed .status-processing {
-    display: none;
+  display: none;
 }
 
 .success-icon-wrapper img {
-    width: 50px;
+  width: 50px;
 }
 
 /*
 Toggle
 */
 .df-toggle-switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 24px;
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
 }
 .df-toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
+  opacity: 0;
+  width: 0;
+  height: 0;
 }
 .df-toggle-switch .toggle-slider {
-    position: absolute;
-    cursor: pointer;
-    border-radius: 50px;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: 0.4s;
-    transition: 0.4s;
+  position: absolute;
+  cursor: pointer;
+  border-radius: 50px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
 }
 .df-toggle-switch .toggle-slider:before {
-    border-radius: 50px;
-    position: absolute;
-    content: "";
-    height: 16px;
-    width: 16px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    -webkit-transition: 0.4s;
-    transition: 0.4s;
+  border-radius: 50px;
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
 }
 .df-toggle-switch input:checked + .toggle-slider {
-    background-color: #33268c;
+  background-color: #33268c;
 }
 .df-toggle-switch input:checked + .toggle-slider:before {
-    transform: translateX(26px);
+  transform: translateX(26px);
 }
 
 /* Notice styles */
 .df-notice .submit a {
-    margin: 5px !important;
+  margin: 5px !important;
 }
 
 .df-notice-row {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .df-notice-row.flex-end {
-    display: flex-end;
+  display: flex-end;
 }
 
 .df-notice-col.logo {
-    width: 100px;
+  width: 100px;
 }
 
 .df-notice-col.content {
-    flex-grow: 1;
+  flex-grow: 1;
 }
 
 .df-notice-col.extra {
-    display: flex;
-    justify-content: flex-end;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .df-notice-col.align-center {
-    align-self: center;
+  align-self: center;
 }
-
 
 /* Update on save buton */
 
-.update-on-save-btn .dashicons{
-    padding-top: 3px;
+.update-on-save-btn .dashicons {
+  padding-top: 3px;
 }
 
-.update-result-wrapper{
-    margin: 15px;
-    font-weight: bold;
+.update-result-wrapper {
+  margin: 15px;
+  font-weight: bold;
 }
 
 /* */
 .df-action-btn {
-    text-decoration: none;
-    min-width: 40px;
-    text-align: center;
-    display: inline-block;
-    color: dimgrey;
-    border: 1px solid dimgrey;
-    border-radius: 3px;
-    padding: 3px 0px;
+  text-decoration: none;
+  min-width: 40px;
+  text-align: center;
+  display: inline-block;
+  color: dimgrey;
+  border: 1px solid dimgrey;
+  border-radius: 3px;
+  padding: 3px 0px;
 }
 
 .df-action-btn.df-delete-attribute-btn:hover {
-    color: #e83f3f;
-    border-color: #e83f3f;
+  color: #e83f3f;
+  border-color: #e83f3f;
 }
 .df-action-btn.df-add-attribute-btn:hover {
-    color: #199613;
-    border-color: #199613;
+  color: #199613;
+  border-color: #199613;
+}
+
+#df-settings-form .errors {
+  color: #d63638;
+}
+
+#df-settings-form .invalid {
+  border-color: #d63638;
 }

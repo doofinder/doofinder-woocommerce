@@ -117,7 +117,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 if (Setup_Wizard::should_migrate()) {
                     Migration::migrate();
                 }
-               // Migration::migrate();
+                // Migration::migrate();
             }
 
             // Init frontend functionalities
@@ -321,7 +321,9 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
             add_action('admin_enqueue_scripts', function () {
                 wp_enqueue_script('doofinder-admin-js', plugins_url('assets/js/admin.js', __FILE__));
                 wp_localize_script('doofinder-admin-js', 'Doofinder', [
-                    'show_indexing_notice' => Setup_Wizard::should_show_indexing_notice() ? 'true' : 'false'
+                    'show_indexing_notice' => Setup_Wizard::should_show_indexing_notice() ? 'true' : 'false',
+                    'RESERVED_CUSTOM_ATTRIBUTES_NAMES' => Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES,
+                    'reserved_custom_attributes_error_message' => __("The '%field_name%' field name is reserved, please use a different field name, e.g.: 'custom_%field_name%'", "wordpress-doofinder")                    
                 ]);
 
                 // CSS
@@ -415,7 +417,6 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 ]);
                 exit;
             });
-
         }
 
         public static function add_schedules()

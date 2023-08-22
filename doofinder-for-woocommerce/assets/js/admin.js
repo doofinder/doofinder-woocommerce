@@ -100,37 +100,110 @@ jQuery(function () {
   let reset_credentials_btn = $("#doofinder-reset-credentials");
   reset_credentials_btn.on("click", ResetCredentialsHandler);
 
-  /**
-   * This event listener is used to automatically populate the field name when
-   * the user selects an option.
-   */
-  $(".df-attribute-select").on("change", function () {
-    let selected_option = $(this).find("option:selected");
+  let CustomAttributesHandler = {
+    init: function () {
+      /**
+       * This event listener is used to automatically populate the field name when
+       * the user selects an option.
+       */
+      $(".df-attribute-select").on("change", function () {
+        let selected_option = $(this).find("option:selected");
+        let default_attribute_name = selected_option.data("field-name");
+        let attribute_type = selected_option.data("type");
+        $(this).parent().next().find(".df-field-type").val(attribute_type);
 
-    let default_attribute_name = selected_option.data("field-name");
-    let attribute_type = selected_option.data("type");
-    $(this).parent().next().find(".df-field-type").val(attribute_type);
+        if (attribute_type === "metafield") {
+          $(this).replaceWith(
+            '<input class="df-attribute-text" placeholder="Enter the metafield name" type="text" name="doofinder_for_wp_custom_attributes[new][attribute]" value="" />'
+          );
+        } else {
+          $(this)
+            .parent()
+            .next()
+            .find(".df-field-text")
+            .val(default_attribute_name)
+            .trigger("change");
+        }
+      });
 
-    if (attribute_type === "metafield") {
-      $(this).replaceWith(
-        '<input class="df-attribute-text" placeholder="Enter the metafield name" type="text" name="doofinder_for_wp_custom_attributes[new][attribute]" value="" />'
-      );
-    } else {
-      $(this)
-        .parent()
-        .next()
-        .find(".df-field-text")
-        .val(default_attribute_name);
+      /**
+       * Removes a field
+       */
+      $(".df-delete-attribute-btn").on("click", function (ev) {
+        ev.preventDefault();
+        $(this).closest("tr").remove();
+      });
+
+      /**
+       * Submits the form to add the new field
+       */
+      $(".df-add-attribute-btn").on("click", function (ev) {
+        ev.preventDefault();
+        $("#submit").click();
+      });
+
+      /**
+       * Validate the field
+       */
+      $(".df-field-text").on("change", function () {
+        CustomAttributesHandler.validate_custom_fields(this)
+      });
+
+      $("#df-settings-form").on("submit", function (ev) {
+        if(!CustomAttributesHandler.valid){
+          ev.preventDefault();
+        }
+        /*
+        invalid = $(this).find(".invalid");
+        if (invalid.length) {
+          ev.preventDefault();
+        }*/
+      });
+    },
+    clear_errors: function (elem) {
+      $(elem).closest("tr").find(".errors").empty();
+    },
+    add_error: function (elem, message) {
+      CustomAttributesHandler.clear_errors(elem);
+
+      $(elem)
+        .closest("tr")
+        .find(".errors")
+        .append(`<p class='error'>${message}</p>`);
+      $(elem).addClass("invalid");
+      CustomAttributesHandler.valid = false;
+    },
+    validate_custom_fields: function(elem){
+      CustomAttributesHandler.valid = true;
+      let field_name = $(elem).val();
+      let existing_fields = $(".df-field-text")
+        .not("#df-field-text-new")
+        .map(function (index, elem) {
+          return $(elem).val();
+        })
+        .toArray();
+
+      if (Doofinder.RESERVED_CUSTOM_ATTRIBUTES_NAMES.includes(field_name)) {
+        let message =
+          Doofinder.reserved_custom_attributes_error_message.replace(
+            /%field_name%/g,
+            field_name
+          );
+        CustomAttributesHandler.add_error(elem, message);
+      } else if (existing_fields.includes(field_name)) {
+        let message = "The " + field_name + " field is duplicated";
+        CustomAttributesHandler.add_error(elem, message);
+      }
+
+      if (CustomAttributesHandler.valid) {
+        $(elem).removeClass("invalid");
+        $(elem).closest("tr").find(".errors").empty();
+        $("#df-settings-form input[type=submit]").attr("disabled", false);
+      } else {
+        $("#df-settings-form input[type=submit]").attr("disabled", true);
+      }
     }
-  });
+  };
 
-  $(".df-delete-attribute-btn").on("click", function (ev) {
-    ev.preventDefault();
-    $(this).closest("tr").remove();
-  });
-
-  $(".df-add-attribute-btn").on("click", function (ev) {
-    ev.preventDefault();
-    $("#submit").click();
-  });
+  CustomAttributesHandler.init();
 });
