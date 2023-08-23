@@ -22,6 +22,12 @@ class Migration
         'length'
     ];
 
+    private static $deprecated_attributes = [
+        'post_title',
+        'post_content',
+        'permalink'
+    ];
+
     /**
      * Try migrating old settings
      */
@@ -228,7 +234,11 @@ class Migration
                 //Product attribute, find the wc_attribute_id
                 $attribute['attribute'] = static::transform_product_attribute($attribute['attribute']);
                 $attribute['type'] = 'wc_attribute';
-            } else if ($attribute['attribute'] === 'custom') {
+                $transformed_attributes[$key] = $attribute;
+                continue;
+            }
+
+            if ($attribute['attribute'] === 'custom') {
                 //Custom Meta attribute, set the attribute from value
                 if (!isset($attribute['value'])) {
                     //no value defined, ignore attribute
@@ -237,14 +247,28 @@ class Migration
                 $attribute['type'] = 'metafield';
                 $attribute['attribute'] = $attribute['value'];
                 unset($attribute['value']);
+                $transformed_attributes[$key] = $attribute;
+                continue;
             }
 
             //Add the dimensions: for dimension attributes
             if (in_array($attribute['attribute'], static::$dimension_attributes)) {
                 $attribute['attribute'] = 'dimensions:' . $attribute['attribute'];
+                $transformed_attributes[$key] = $attribute;
+                continue;
             }
 
-            $transformed_attributes[$key] = $attribute;
+            //Add the dimensions: for dimension attributes
+            if (in_array($attribute['attribute'], static::$dimension_attributes)) {
+                $attribute['attribute'] = 'dimensions:' . $attribute['attribute'];
+                $transformed_attributes[$key] = $attribute;
+                continue;
+            }
+
+            //Remove the attributes that we are not using anymore as they are being indexed by default
+            if (in_array($attribute['attribute'], static::$deprecated_attributes)) {
+                continue;
+            }
         }
         return $transformed_attributes;
     }
