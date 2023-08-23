@@ -324,11 +324,15 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                     'show_indexing_notice' => Setup_Wizard::should_show_indexing_notice() ? 'true' : 'false',
                     'RESERVED_CUSTOM_ATTRIBUTES_NAMES' => Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES,
                     'reserved_custom_attributes_error_message' => __("The '%field_name%' field name is reserved, please use a different field name, e.g.: 'custom_%field_name%'", "wordpress-doofinder"),
-                    'duplicated_custom_attributes_error_message' => __("The '%field_name%' field name is already in use, please use a different field name", "wordpress-doofinder")                    
+                    'duplicated_custom_attributes_error_message' => __("The '%field_name%' field name is already in use, please use a different field name", "wordpress-doofinder")
                 ]);
 
                 // CSS
                 wp_enqueue_style('doofinder-admin-css', Doofinder_For_WordPress::plugin_url() . '/assets/css/admin.css');
+                //Add the Select2 CSS file
+                wp_enqueue_style('select2-css', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', array(), '4.1.0-rc.0');
+                //Add the Select2 JavaScript file
+                wp_enqueue_script('select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', 'jquery', '4.1.0-rc.0');
             });
         }
 
