@@ -9,7 +9,7 @@ use Doofinder\WP\Settings;
 
 $attributes = array(
     'post_excerpt' => array(
-        'title'  => __('Attribute: Short Description', 'doofinder_for_wp'),
+        'title'  => __('Short Description', 'doofinder_for_wp'),
         'type'   => 'base_attribute',
         'source' => 'post_excerpt',
         'field_name' => 'excerpt'
@@ -21,57 +21,22 @@ if (is_plugin_active('woocommerce/woocommerce.php')) {
 	 * WooCommerce fields
 	 */
     $wc_default_attributes = array(
-        'downloadable' => array(
-            'title'  => __('Attribute: Downloadable', 'doofinder_for_wp'),
-            'type'   => 'base_attribute',
-            'source' => 'downloadable',
-            'field_name' => 'downloadable'
-        ),
-
-        'virtual' => array(
-            'title'  => __('Attribute: Virtual', 'doofinder_for_wp'),
-            'type'   => 'base_attribute',
-            'source' => 'virtual',
-            'field_name' => 'virtual'
-        ),
-
-        'purchase_note' => array(
-            'title'  => __('Attribute: Purchase Note', 'doofinder_for_wp'),
-            'type'   => 'base_attribute',
-            'source' => 'purchase_note',
-            'field_name' => 'purchase_note'
-        ),
-
-        'featured' => array(
-            'title'  => __('Attribute: Featured', 'doofinder_for_wp'),
-            'type'   => 'base_attribute',
-            'source' => 'featured',
-            'field_name' => 'featured'
-        ),
-
-        'weight' => array(
-            'title'  => __('Attribute: Weight', 'doofinder_for_wp'),
-            'type'   => 'base_attribute',
-            'source' => '_weight',
-            'field_name' => 'weight'
-        ),
-
         'dimensions:length' => array(
-            'title'  => __('Attribute: Length', 'doofinder_for_wp'),
+            'title'  => __('Length', 'doofinder_for_wp'),
             'type'   => 'base_attribute',
             'source' => 'length',
             'field_name' => 'length'
         ),
 
         'dimensions:width' => array(
-            'title'  => __('Attribute: Width', 'doofinder_for_wp'),
+            'title'  => __('Width', 'doofinder_for_wp'),
             'type'   => 'base_attribute',
             'source' => 'width',
             'field_name' => 'width'
         ),
 
         'dimensions:height' => array(
-            'title'  => __('Attribute: Height', 'doofinder_for_wp'),
+            'title'  => __('Height', 'doofinder_for_wp'),
             'type'   => 'base_attribute',
             'source' => 'height',
             'field_name' => 'height'
@@ -86,10 +51,23 @@ if (is_plugin_active('woocommerce/woocommerce.php')) {
         $field_name = $wc_attribute->attribute_name;
         $field_name = in_array($field_name, Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES) ? 'custom_' . $field_name : $field_name;
         $attributes['wc_' . $wc_attribute->attribute_id] = array(
-            'title'  => __('Custom Attribute:', 'doofinder_for_wp') . ' ' . $wc_attribute->attribute_label,
+            'title'  => $wc_attribute->attribute_label,
             'type'   => 'wc_attribute',
             'source' => $wc_attribute->attribute_name,
             'field_name' => $field_name
+        );
+    }
+}
+
+$rest_attributes = Settings::get_product_rest_attributes();
+if (!empty($rest_attributes)) {
+    foreach ($rest_attributes as $attribute_key) {
+        $attribute_name = ucfirst(trim(str_replace("_", " ", $attribute_key)));
+        $attributes[$attribute_key]  =  array(
+            'title'  => $attribute_name,
+            'type'   => 'base_attribute',
+            'source' => $attribute_key,
+            'field_name' => $attribute_key
         );
     }
 }
@@ -101,6 +79,12 @@ $attributes['metafield'] = array(
     'type' => 'metafield'
 );
 
-
+//Sort alphabetically
+uasort($attributes, function ($a, $b) {
+    if ($a['title'] == $b['title']) {
+        return 0;
+    }
+    return ($a['title'] < $b['title']) ? -1 : 1;
+});
 
 return $attributes;

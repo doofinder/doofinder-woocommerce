@@ -102,6 +102,8 @@ jQuery(function () {
 
   let CustomAttributesHandler = {
     init: function () {
+      //Initialize select2   
+      $(".df-select-2").select2();
       /**
        * This event listener is used to automatically populate the field name when
        * the user selects an option.
@@ -113,8 +115,8 @@ jQuery(function () {
         $(this).parent().next().find(".df-field-type").val(attribute_type);
 
         if (attribute_type === "metafield") {
-          $(this).replaceWith(
-            '<input class="df-attribute-text" placeholder="Enter the metafield name" type="text" name="doofinder_for_wp_custom_attributes[new][attribute]" value="" />'
+          $(this).select2('destroy').replaceWith(
+            '<input class="df-attribute-text" placeholder="Enter the metafield key" type="text" name="doofinder_for_wp_custom_attributes[new][attribute]" value="" />'
           );
         } else {
           $(this)
@@ -216,5 +218,8 @@ jQuery(function () {
     },
   };
 
-  CustomAttributesHandler.init();
+  if ($(".doofinder-for-wp-attributes").length > 0) {
+    //initialize CustomAttributesHandler
+    CustomAttributesHandler.init();
+  }
 });

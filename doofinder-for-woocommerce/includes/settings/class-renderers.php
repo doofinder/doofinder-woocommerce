@@ -416,7 +416,8 @@ trait Renderers
      */
     private function render_html_single_additional_attribute($option_name, $index, $attribute = null)
     {
-        $attributes = include 'attributes.php';
+        $option_groups = Settings::get_additional_attributes_options();
+
     ?>
         <tr>
             <td>
@@ -424,19 +425,24 @@ trait Renderers
                 <?php if ($attribute['type'] === 'metafield' && $index != "new") : ?>
                     <input class="df-attribute-text" type="text" name="<?php echo $option_name; ?>[<?php echo $index; ?>][attribute]" <?php if ($attribute) : ?> value="<?php echo $attribute['attribute']; ?>" <?php endif; ?> />
                 <?php else : ?>
-                    <select class="df-attribute-select" name="<?php echo $option_name; ?>[<?php echo $index; ?>][attribute]" required>
+                    <select class="df-attribute-select df-select-2" name="<?php echo $option_name; ?>[<?php echo $index; ?>][attribute]" required>
                         <option disabled <?php echo ($index === "new") ? "selected" : ""; ?>>- <?php _e('Select an attribute', 'doofinder_for_wp'); ?> -</option>
-                        <?php foreach ($attributes as $id => $attr) : ?>
-                            <option value="<?php echo $id; ?>" <?php if ($attribute && $attribute['attribute'] === $id) : ?> selected="selected" <?php endif; ?> <?php if (isset($attr['field_name']) && !empty($attr['field_name'])) : ?> data-field-name="<?php echo $attr['field_name']; ?>" <?php endif; ?> data-type="<?php echo $attr['type']; ?>">
-                                <?php echo $attr['title']; ?>
-                            </option>
+                        <?php foreach ($option_groups as $group_id => $group) : ?>
+                            <optgroup label="<?php echo $group['title']; ?>">
+                                <?php foreach ($group['options'] as $id => $attr) : ?>
+                                    <option value="<?php echo $id; ?>" <?php if ($attribute && $attribute['attribute'] === $id) : ?> selected="selected" <?php endif; ?> <?php if (isset($attr['field_name']) && !empty($attr['field_name'])) : ?> data-field-name="<?php echo $attr['field_name']; ?>" <?php endif; ?> data-type="<?php echo $attr['type']; ?>">
+                                        <?php echo $attr['title']; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
+
                         <?php endforeach; ?>
                     </select>
                 <?php endif; ?>
             </td>
 
             <td>
-                <input id="df-field-text-<?php echo $index;?>" class="df-field-text" type="text" name="<?php echo $option_name; ?>[<?php echo $index; ?>][field]" <?php if ($attribute) : ?> value="<?php echo $attribute['field']; ?>" <?php endif; ?> />
+                <input id="df-field-text-<?php echo $index; ?>" class="df-field-text" type="text" name="<?php echo $option_name; ?>[<?php echo $index; ?>][field]" <?php if ($attribute) : ?> value="<?php echo $attribute['field']; ?>" <?php endif; ?> />
                 <input class="df-field-type" type="hidden" name="<?php echo $option_name; ?>[<?php echo $index; ?>][type]" <?php if ($attribute) : ?> value="<?php echo $attribute['type']; ?>" <?php endif; ?> />
             </td>
 

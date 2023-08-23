@@ -11,8 +11,6 @@ use Doofinder\WP\Settings\Register_Settings;
 use Doofinder\WP\Settings\Renderers;
 use Doofinder\WP\Settings\Helpers;
 
-use function YoastSEO_Vendor\GuzzleHttp\Psr7\str;
-
 defined('ABSPATH') or die;
 
 class Settings
@@ -31,15 +29,19 @@ class Settings
 	 */
 	public static $top_level_menu = 'doofinder_for_wp';
 
+	/**
+	 * List of keys that are reserved for custom attributes fields
+	 */
 	public const RESERVED_CUSTOM_ATTRIBUTES_NAMES = [
+		"attributes",
 		"availability",
-		"average_rating",
 		"best_price",
 		"catalog_visibility",
 		"categories",
 		"description",
 		"df_variants_information",
 		"df_group_leader",
+		"dimensions",
 		"group_id",
 		"id",
 		"image_link",
@@ -52,7 +54,6 @@ class Settings
 		"short_description",
 		"sku",
 		"slug",
-		"stock_quantity",
 		"tags",
 		"title",
 		"type",
@@ -155,18 +156,73 @@ class Settings
 			}
 		}, 10, 3);
 	}
+	/**
+	 * Returns an array with select options structured by option groups
+	 *
+	 * @return array Array of option groups with options inside
+	 */
+	public static function get_additional_attributes_options()
+	{
+		static $additional_attributes_options;
+		if (!isset($additional_attributes_options)) {
+			$fields = include_once 'settings/attributes.php';
+			$option_groups = [
+				'base_attribute' => [
+					'title' => __('Basic attributes', 'doofinder_for_wp'),
+					'options' => []
+				],
+				'wc_attribute' => [
+					'title' => __('Product attributes', 'doofinder_for_wp'),
+					'options' => []
+				],
+				'metafield' => [
+					'title' => __('Metafields', 'doofinder_for_wp'),
+					'options' => []
+				]
+			];
+
+			foreach ($fields as $key => $attr) {
+				$type = $attr['type'];
+				$option_groups[$type]['options'][$key] = $attr;
+			}
+			$additional_attributes_options = $option_groups;
+		}
+		return $additional_attributes_options;
+	}
 
 	/**
-	 * Determine if the update on save is enabled.
+	 * Make a request to the WooCommerce Products endpoint to get the available 
+	 * field list.
 	 *
-	 * Just an alias for "get_option", because ideally we don't
-	 * want to replace the option name in multiple files.
-	 *
-	 * @return bool
+	 * @return array List of Product base attributes
 	 */
-	public static function is_update_on_save_enabled()
+	public static function get_product_rest_attributes()
 	{
-		$option = get_option('doofinder_for_wp_update_on_save', 'wp_doofinder_each_day');
-		return  $option != 'wp_doofinder_each_day';
+		$transient_name = "df_product_rest_attributes";
+		$rest_attributes = get_transient($transient_name);
+		if ($rest_attributes === false) {
+			try {
+				$request = new \WP_REST_Request('GET', '/wc/v3/products');
+				$result = rest_get_server()->dispatch($request);
+				$rest_attributes  = array_keys($result->data[0]);
+				$rest_attributes = static::filter_product_rest_attributes($rest_attributes);
+				set_transient($transient_name, $rest_attributes, 600);
+			} catch (\Throwable $th) {
+				$rest_attributes = [];
+			}
+		}
+
+		return $rest_attributes;
+	}
+
+	/**
+	 * Method that removes the reserved filters from rest attribute list
+	 *
+	 * @param [type] $rest_attributes
+	 * @return void
+	 */
+	private static function filter_product_rest_attributes($rest_attributes)
+	{
+		return array_diff($rest_attributes, static::RESERVED_CUSTOM_ATTRIBUTES_NAMES);
 	}
 }
