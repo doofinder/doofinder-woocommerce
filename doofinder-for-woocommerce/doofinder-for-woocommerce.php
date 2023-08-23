@@ -323,7 +323,8 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 wp_localize_script('doofinder-admin-js', 'Doofinder', [
                     'show_indexing_notice' => Setup_Wizard::should_show_indexing_notice() ? 'true' : 'false',
                     'RESERVED_CUSTOM_ATTRIBUTES_NAMES' => Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES,
-                    'reserved_custom_attributes_error_message' => __("The '%field_name%' field name is reserved, please use a different field name, e.g.: 'custom_%field_name%'", "wordpress-doofinder")                    
+                    'reserved_custom_attributes_error_message' => __("The '%field_name%' field name is reserved, please use a different field name, e.g.: 'custom_%field_name%'", "wordpress-doofinder"),
+                    'duplicated_custom_attributes_error_message' => __("The '%field_name%' field name is already in use, please use a different field name", "wordpress-doofinder")                    
                 ]);
 
                 // CSS

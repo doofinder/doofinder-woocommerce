@@ -132,6 +132,7 @@ jQuery(function () {
       $(".df-delete-attribute-btn").on("click", function (ev) {
         ev.preventDefault();
         $(this).closest("tr").remove();
+        $(".df-field-text").trigger("change");
       });
 
       /**
@@ -195,7 +196,11 @@ jQuery(function () {
       }
 
       if (existing_fields.includes(field_name)) {
-        let message = "The " + field_name + " field is duplicated";
+        let message =
+          Doofinder.duplicated_custom_attributes_error_message.replace(
+            /%field_name%/g,
+            field_name
+          );
         CustomAttributesHandler.add_error(elem, message);
       }
 
@@ -203,6 +208,8 @@ jQuery(function () {
         $(elem).removeClass("invalid");
         $(elem).closest("tr").find(".errors").empty();
         $("#df-settings-form input[type=submit]").attr("disabled", false);
+        //Check if the current change may solve any other existing invalid field
+        $(".df-field-text.invalid").trigger("change");
       } else {
         $("#df-settings-form input[type=submit]").attr("disabled", true);
       }
