@@ -46,6 +46,7 @@ class Settings
 		"id",
 		"image_link",
 		"link",
+		"name",
 		"parent_id",
 		"price",
 		"rating_count",
