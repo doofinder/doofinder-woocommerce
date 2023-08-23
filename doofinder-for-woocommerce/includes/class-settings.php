@@ -46,6 +46,7 @@ class Settings
 		"id",
 		"image_link",
 		"link",
+		"meta_data",
 		"name",
 		"parent_id",
 		"price",
@@ -201,7 +202,7 @@ class Settings
 	{
 		$transient_name = "df_product_rest_attributes";
 		$rest_attributes = get_transient($transient_name);
-		if ($rest_attributes === false) {
+		if ($rest_attributes === false || isset($_GET['force'])) {
 			try {
 				$request = new \WP_REST_Request('GET', '/wc/v3/products');
 				$result = rest_get_server()->dispatch($request);
@@ -217,13 +218,27 @@ class Settings
 	}
 
 	/**
-	 * Method that removes the reserved filters from rest attribute list
+	 * Method that removes unwanted attributes from rest attribute list
 	 *
-	 * @param [type] $rest_attributes
-	 * @return void
+	 * @param array $rest_attributes All the attributes returned by WC REST API
+	 * @return array List of valid attributes
 	 */
 	private static function filter_product_rest_attributes($rest_attributes)
 	{
+		/**
+		 * Remove WC unwanted attributes
+		 */
+		$rest_attributes = array_diff($rest_attributes, [
+			'grouped_products',	
+			'images',		
+			'meta_data',
+			'name',
+			'permalink',
+			'price',
+			'price_html',
+			'status',
+			'variations'
+		]);
 		return array_diff($rest_attributes, static::RESERVED_CUSTOM_ATTRIBUTES_NAMES);
 	}
 }
