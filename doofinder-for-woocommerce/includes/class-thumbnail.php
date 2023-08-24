@@ -39,7 +39,7 @@ class Thumbnail {
 			return null;
 		}
 
-		if ( ! $this->has_thumbnail() || true ) {
+		if ( ! $this->has_thumbnail() ) {
 			$this->regenerate_thumbnail();
 		}
 
