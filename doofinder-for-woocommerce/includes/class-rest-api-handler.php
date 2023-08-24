@@ -2,92 +2,33 @@
 
 namespace Doofinder\WP;
 
-use \WP_HTTP_Response;
-use \WP_REST_Server;
-use \WP_REST_Request;
-
 class REST_API_Handler
 {
-    private static $logger;
+    const PRODUCT_FIELDS = [
+        'df_price',
+        'df_sale_price',
+        'df_regular_price',
+        'df_image_link'
+    ];
+
     /**
-     * Add the actions and filters needed to modify REST requests
+     * Register the REST Fields we want to add
      *
      * @return void
      */
     public static function initialize()
     {
-        self::$logger = new Log("rest-api-handler.log");
         if (is_plugin_active('woocommerce/woocommerce.php')) {
-            add_action('rest_post_dispatch', array(__CLASS__, 'add_woocommerce_product_images'), 99, 3);
-            add_action('rest_post_dispatch', array(__CLASS__, 'add_taxonomy_image_link'), 99, 3);
-        }
-    }
+            //Register the product category image field
+            register_rest_field('product_cat', 'image_link', ['get_callback' => array(REST_API_Handler::class, 'get_product_cat_df_image_link')]);
 
-    /**
-     * Add image link to taxonomy rest request
-     *
-     * @param WP_HTTP_Response $result
-     * @param WP_REST_Server $server
-     * @param WP_REST_Request $request
-     * @return WP_HTTP_Response
-     */
-    public static function add_taxonomy_image_link($result,  $server,  $request)
-    {
-        //Check if the request comes from our environment
-        if (is_null($request->get_header('Doofinder-Origin'))) {
-            return $result;
-        }
-        if ($request->get_route() === "/wp/v2/product_cat") {
-            $terms = $result->data;
-            foreach ($terms as $key => $term) {
-                // get the thumbnail id using the queried category term_id
-                $thumbnail_id = get_term_meta($term['id'], 'thumbnail_id', true);
-                $result->data[$key]['image_link'] = empty($thumbnail_id) ? "" : wp_get_attachment_url($thumbnail_id);
+            //Register the product fields
+            foreach (self::PRODUCT_FIELDS as $field) {
+                register_rest_field(array('product', 'product_variation'), $field, ['get_callback' => array(REST_API_Handler::class, 'get_' . $field)]);
             }
         }
-        return $result;
     }
 
-    /**
-     * Add image links to products and variations
-     *
-     * @param WP_HTTP_Response $result
-     * @param WP_REST_Server $server
-     * @param WP_REST_Request $request
-     * @return WP_HTTP_Response
-     */
-    public static function add_woocommerce_product_images($result,  $server,  $request)
-    {
-        //Check if the request comes from our environment
-        if (is_null($request->get_header('Doofinder-Origin'))) {
-            return $result;
-        }
-
-        if (
-            $request->get_route() === "/wc/v3/products" || //for products
-            preg_match_all('/\/wc\/v3\/products\/\d+\/variations\/?$/', $request->get_route()) //for product variations
-        ) {
-            $products = $result->data;
-            foreach ($products as $key => $product) {
-                if (!is_array($product) || !isset($product['id'])) {
-                    $req_params = $request->get_params();
-                    $url = $request->get_route();
-                    self::$logger->log("INVALID PRODUCT:");
-                    self::$logger->log(print_r($product, true));
-                    self::$logger->log("====== REQUEST INFO ======");
-                    self::$logger->log("URL: $url");
-                    self::$logger->log("REQ PARAMS:");
-                    self::$logger->log(print_r($req_params, true));
-                    self::$logger->log("====== END REQUEST INFO ======");
-                    continue;
-                }
-                $product = self::add_df_prices($product);
-                $product = self::add_df_image_link($product);
-                $result->data[$key] = $product;
-            }
-        }
-        return $result;
-    }
 
     private static function get_raw_real_price($price, $product)
     {
@@ -108,12 +49,79 @@ class REST_API_Handler
     }
 
     /**
-     * Function that adds the image link for 
+     * Check that image link is absolute, if not, add the site url
      *
-     * @param array $product The product or variant we are modifying
-     * @return array $product The product with the new df_image_link
+     * @param string $image_link
+     * @return string $image_link
      */
-    private static function add_df_image_link($product)
+    private static function add_base_url_if_needed($image_link)
+    {
+        if (0 === strpos($image_link, "/")) {
+            $image_link = get_site_url() . $image_link;
+        }
+        return $image_link;
+    }
+
+    /**
+     * Returns the raw price for the given product.
+     *
+     * @param array $product The product we want to add the field
+     * @param string $price_name The price name. By default 'price'
+     * @return void
+     */
+    private static function get_raw_price($product, $price_name = 'price')
+    {
+        $product_id = $product['id'];
+        $wc_product = wc_get_product($product_id);
+        $fn_name = "get_$price_name";
+        if (is_a($wc_product, 'WC_Product') && method_exists($wc_product, $fn_name)) {
+            $price = $wc_product->$fn_name();
+            $raw_price =  $price_name === "sale_price" && $price === "" ? "" : self::get_raw_real_price($price, $wc_product);
+            return $raw_price;
+        }
+    }
+
+    /**
+     * Get the raw price
+     *
+     * @param array $product WooCommerce Product or Variable Product as array.
+     * @return float The raw price including or excluding taxes (defined in WC settings).
+     */
+    public static function get_df_price($product)
+    {
+        return  self::get_raw_price($product);
+    }
+
+    /**
+     * Get the raw sale price
+     *
+     * @param array $product WooCommerce Product or Variable Product as array.
+     * @return float The raw sale price including or excluding taxes (defined in WC settings).
+     */
+    public static function get_df_sale_price($product)
+    {
+        return  self::get_raw_price($product, 'sale_price');
+    }
+
+    /**
+     * Get the raw regular price
+     *
+     * @param array $product WooCommerce Product or Variable Product as array.
+     * @return float The raw regular price including or excluding taxes (defined in WC settings).
+     */
+    public static function get_df_regular_price($product)
+    {
+        return  self::get_raw_price($product, 'regular_price');
+    }
+
+    /**
+     * Returns the image link for a given product.
+     * If the product is a variation and doesn't have an image, return the parent image link
+     *
+     * @param array $product WooCommerce Product or Variable Product as array.
+     * @return string The image link
+     */
+    public static function get_df_image_link($product)
     {
         $product_id = $product['id'];
         $post = get_post($product_id);
@@ -127,54 +135,22 @@ class REST_API_Handler
         //If neither the variant and the product have an image, return the woocommerce placeholder image
         $image_link = empty($image_link) ? wc_placeholder_img_src(Thumbnail::get_size()) : $image_link;
         $image_link = self::add_base_url_if_needed($image_link);
-
-        $product['df_image_link'] = $image_link;
-        return $product;
+        return $image_link;
     }
 
     /**
-     * Add the raw prices with taxes applied if needed
+     * Returns the image link for a given term.     
      *
-     * @param array $product The product or variant we are modifying
-     * @return array $product The product with the raw price keys
+     * @param array $product WooCommerce Product or Variable Product as array.
+     * @return string The image link
      */
-    private static function add_df_prices($product)
+    public static function get_product_cat_df_image_link($term)
     {
-        $product_id = $product['id'];
-        $wc_product = wc_get_product($product_id);
-        if (!is_a($wc_product, 'WC_Product')) {
-            //not a valid product, return without modification
-            self::$logger->log("INVALID PRODUCT:");
-            self::$logger->log(print_r($product, true));
-            self::$logger->log("WC_PRODUCT:");
-            self::$logger->log(print_r($wc_product, true));
-            return $product;
-        }
-        $prices = [
-            "regular_price",
-            "sale_price",
-            "price"
-        ];
-
-        foreach ($prices as $price_name) {
-            $get_price_fn = 'get_' . $price_name;
-            $price = $wc_product->$get_price_fn();
-            $product['df_' . $price_name] = $price_name === "sale_price" && $price === "" ? "" : self::get_raw_real_price($price, $wc_product);
-        }
-        return $product;
-    }
-
-    /**
-     * Check that image link is absolute, if not, add the site url
-     *
-     * @param string $image_link
-     * @return string $image_link
-     */
-    private static function add_base_url_if_needed($image_link)
-    {
-        if (0 === strpos($image_link, "/")) {
-            $image_link = get_site_url() . $image_link;
-        }
+        // get the thumbnail id using the queried category term_id
+        $thumbnail_id = get_term_meta($term['id'], 'thumbnail_id', true);
+        $image_link = empty($thumbnail_id) ? "" : wp_get_attachment_url($thumbnail_id);
+        $image_link = empty($image_link) ? wc_placeholder_img_src(Thumbnail::get_size()) : $image_link;
+        $image_link = self::add_base_url_if_needed($image_link);
         return $image_link;
     }
 }
