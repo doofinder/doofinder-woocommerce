@@ -86,6 +86,7 @@ class Update_On_Save_Index
         $this->update_on_save('delete');
         //Update last exec
         update_option('doofinder_update_on_save_last_exec', date('Y-m-d H:i:s'));
+        Update_On_Save::clean_update_on_save_db();
     }
 
     /**
@@ -112,11 +113,11 @@ class Update_On_Save_Index
                 switch ($action) {
                     case 'update':
                         $this->log->log('We send the request to UPDATE items with this data:');
-                        $this->api->updateBulk($post_type, $posts_ids_to_update);
+                        $result = $this->api->updateBulk($post_type, $posts_ids_to_update);
                         break;
                     case 'delete':
                         $this->log->log('We send the request to DELETE items with this data:');
-                        $this->api->deleteBulk($post_type, $posts_ids_to_update);
+                        $result = $this->api->deleteBulk($post_type, $posts_ids_to_update);
                         break;
                 }
             } else {
