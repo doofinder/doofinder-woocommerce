@@ -20,10 +20,11 @@ class Thumbnail {
 
 	public function __construct( \WP_Post $post ) {
 		$this->post = $post;
+		self::$size = self::get_size();
 	}
 
 	public static function get_size(){
-		return static::$size;
+		return Settings::get_image_size();
 	}
 
 	/**
@@ -38,7 +39,7 @@ class Thumbnail {
 			return null;
 		}
 
-		if ( ! $this->has_thumbnail() ) {
+		if ( ! $this->has_thumbnail() || true ) {
 			$this->regenerate_thumbnail();
 		}
 

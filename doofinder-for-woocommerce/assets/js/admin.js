@@ -101,6 +101,7 @@ jQuery(function () {
   reset_credentials_btn.on("click", ResetCredentialsHandler);
 
   let CustomAttributesHandler = {
+    valid: true,
     init: function () {
       //Initialize select2   
       $(".df-select-2").select2();
