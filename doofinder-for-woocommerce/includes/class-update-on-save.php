@@ -258,4 +258,21 @@ class Update_On_Save
         $log = new Log('update_on_save.txt');
         $log->log('Deleted database');
     }
+
+    /**
+     * Cleans the update on save database table by deleting the updated entries
+     *
+     * @return void
+     */
+    public static function clean_updated_items($ids, $action)
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'doofinder_update_on_save';
+        $ids = implode(",", $ids);
+        $query = "DELETE FROM $table_name WHERE post_id IN ($ids) AND type_action = '$action'";
+        $affected_rows = $wpdb->query($query);
+
+        $log = new Log('update_on_save.txt');
+        $log->log("Update on save: " . $action . "d $affected_rows rows with IDs: $ids");
+    }
 }
