@@ -6,7 +6,9 @@ use Doofinder\WP\Multilanguage\Language_Plugin;
 use Doofinder\WP\Multilanguage\No_Language_Plugin;
 use Doofinder\WP\Setup_Wizard;
 use Doofinder\WP\Settings;
+use Doofinder\WP\Settings\Settings as SettingsHelper;
 use Doofinder\WP\Reset_Credentials;
+use Doofinder\WP\Multilanguage;
 
 defined('ABSPATH') or die();
 
@@ -112,7 +114,7 @@ trait Renderers
 
             <?php $this->render_html_tabs(); ?>
 
-            <form action="options.php" method="post">
+            <form id="df-settings-form" action="options.php" method="post">
                 <?php
 
                 settings_fields(self::$top_level_menu);
@@ -123,14 +125,15 @@ trait Renderers
                 ?>
             </form>
 
-            <?php 
-            if (in_array('administrator',  wp_get_current_user()->roles)) {
-                echo Reset_Credentials::get_configure_via_reset_credentials_button_html();
+            <?php
+            if (!isset($_GET['tab']) || $_GET['tab'] === 'authentication') {
+                if (in_array('administrator',  wp_get_current_user()->roles)) {
+                    echo Reset_Credentials::get_configure_via_reset_credentials_button_html();
+                }
+                echo Setup_Wizard::get_configure_via_setup_wizard_button_html();
             }
-            
-            echo Setup_Wizard::get_configure_via_setup_wizard_button_html(); 
-           
-           ?>
+
+            ?>
         </div>
 
     <?php
@@ -354,6 +357,106 @@ trait Renderers
                                                                                 }
 
                                                                                 ?></textarea>
+
+    <?php
+    }
+
+
+    /**
+     * Render the inputs for Additional Attributes. This is a table
+     * of inputs and selects where the user can choose any additional
+     * fields to add to the exported data.
+     *
+     * @param string $option_name
+     */
+    private function render_html_additional_attributes()
+    {
+        $saved_attributes = get_option(Settings::$custom_attributes_option);
+    ?>
+        <table class="doofinder-for-wp-attributes">
+            <thead>
+                <tr>
+                    <th><?php _e('Attribute', 'doofinder_for_wp'); ?></th>
+                    <th><?php _e('Field', 'doofinder_for_wp'); ?></th>
+                    <th colspan="10"><?php _e('Action', 'doofinder_for_wp'); ?></th>
+                    <th colspan="100%"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                if (!empty($saved_attributes)) {
+                    foreach ($saved_attributes as $index => $attribute) {
+                        $this->render_html_single_additional_attribute(
+                            Settings::$custom_attributes_option,
+                            $index,
+                            $attribute
+                        );
+                    }
+                }
+
+                $this->render_html_single_additional_attribute(
+                    Settings::$custom_attributes_option,
+                    'new'
+                );
+                ?>
+            </tbody>
+        </table>
+    <?php
+    }
+
+    /**
+     * Renders a single row representing additional attribute.
+     * A helper for "render_html_additional_attributes".
+     *
+     * @see Renderers::render_html_additional_attributes
+     *
+     * @param string $option_name
+     * @param string|int $index
+     * @param ?array $attribute
+     */
+    private function render_html_single_additional_attribute($option_name, $index, $attribute = null)
+    {
+        $option_groups = Settings::get_additional_attributes_options();
+
+    ?>
+        <tr>
+            <td>
+
+                <?php if ($attribute['type'] === 'metafield' && $index != "new") : ?>
+                    <input class="df-attribute-text" type="text" name="<?php echo $option_name; ?>[<?php echo $index; ?>][attribute]" <?php if ($attribute) : ?> value="<?php echo $attribute['attribute']; ?>" <?php endif; ?> />
+                <?php else : ?>
+                    <select class="df-attribute-select df-select-2" name="<?php echo $option_name; ?>[<?php echo $index; ?>][attribute]" required>
+                        <option disabled <?php echo ($index === "new") ? "selected" : ""; ?>>- <?php _e('Select an attribute', 'doofinder_for_wp'); ?> -</option>
+                        <?php foreach ($option_groups as $group_id => $group) : ?>
+                            <optgroup label="<?php echo $group['title']; ?>">
+                                <?php foreach ($group['options'] as $id => $attr) : ?>
+                                    <option value="<?php echo $id; ?>" <?php if ($attribute && $attribute['attribute'] === $id) : ?> selected="selected" <?php endif; ?> <?php if (isset($attr['field_name']) && !empty($attr['field_name'])) : ?> data-field-name="<?php echo $attr['field_name']; ?>" <?php endif; ?> data-type="<?php echo $attr['type']; ?>">
+                                        <?php echo $attr['title']; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
+
+                        <?php endforeach; ?>
+                    </select>
+                <?php endif; ?>
+            </td>
+
+            <td>
+                <input id="df-field-text-<?php echo $index; ?>" class="df-field-text" type="text" name="<?php echo $option_name; ?>[<?php echo $index; ?>][field]" <?php if ($attribute) : ?> value="<?php echo $attribute['field']; ?>" <?php endif; ?> />
+                <input class="df-field-type" type="hidden" name="<?php echo $option_name; ?>[<?php echo $index; ?>][type]" <?php if ($attribute) : ?> value="<?php echo $attribute['type']; ?>" <?php endif; ?> />
+            </td>
+
+            <td>
+                <?php if ($index === "new") : ?>
+                    <a href="#" class="df-add-attribute-btn df-action-btn"><span class="dashicons dashicons-insert"></span></a>
+                <?php else : ?>
+                    <a href="#" class="df-delete-attribute-btn df-action-btn"><span class="dashicons dashicons-trash"></span></a>
+                <?php endif; ?>
+            </td>
+            <td>
+                <div class="errors"></div>
+            </td>
+        </tr>
 
 <?php
     }

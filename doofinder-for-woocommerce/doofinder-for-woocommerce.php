@@ -4,7 +4,7 @@
  * Plugin Name: Doofinder WP & WooCommerce Search
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 2.0.12
+ * Version: 2.0.13
  * Author: Doofinder
  * Description: Integrate Doofinder Search in your WordPress site or WooCommerce shop.
  *
@@ -35,7 +35,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
          *
          * @var string
          */
-        public static $version = '2.0.12';
+        public static $version = '2.0.13';
 
         /**
          * The only instance of Doofinder_For_WordPress
@@ -117,6 +117,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 if (Setup_Wizard::should_migrate()) {
                     Migration::migrate();
                 }
+                // Migration::migrate();
             }
 
             // Init frontend functionalities
@@ -320,11 +321,18 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
             add_action('admin_enqueue_scripts', function () {
                 wp_enqueue_script('doofinder-admin-js', plugins_url('assets/js/admin.js', __FILE__));
                 wp_localize_script('doofinder-admin-js', 'Doofinder', [
-                    'show_indexing_notice' => Setup_Wizard::should_show_indexing_notice() ? 'true' : 'false'
+                    'show_indexing_notice' => Setup_Wizard::should_show_indexing_notice() ? 'true' : 'false',
+                    'RESERVED_CUSTOM_ATTRIBUTES_NAMES' => Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES,
+                    'reserved_custom_attributes_error_message' => __("The '%field_name%' field name is reserved, please use a different field name, e.g.: 'custom_%field_name%'", "wordpress-doofinder"),
+                    'duplicated_custom_attributes_error_message' => __("The '%field_name%' field name is already in use, please use a different field name", "wordpress-doofinder")
                 ]);
 
                 // CSS
                 wp_enqueue_style('doofinder-admin-css', Doofinder_For_WordPress::plugin_url() . '/assets/css/admin.css');
+                //Add the Select2 CSS file
+                wp_enqueue_style('select2-css', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', array(), '4.1.0-rc.0');
+                //Add the Select2 JavaScript file
+                wp_enqueue_script('select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', 'jquery', '4.1.0-rc.0');
             });
         }
 
@@ -414,7 +422,6 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 ]);
                 exit;
             });
-
         }
 
         public static function add_schedules()

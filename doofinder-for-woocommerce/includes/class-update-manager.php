@@ -184,4 +184,14 @@ class Update_Manager
         Admin_Notices::remove_notice("indexing-status-failed");
         return true;
     }
+
+    /**
+     * Update: 2.0.13
+     * Update the woocommerce product attributes
+     */
+    public static function update_020013()
+    {
+        Migration::migrate_custom_attributes();
+        return true;
+    }
 }

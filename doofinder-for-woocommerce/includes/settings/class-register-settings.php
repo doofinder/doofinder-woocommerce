@@ -5,6 +5,7 @@ namespace Doofinder\WP\Settings;
 use Doofinder\WP\Multilanguage\Language_Plugin;
 use Doofinder\WP\Setup_Wizard;
 use Doofinder\WP\Log;
+use Doofinder\WP\Settings;
 
 defined('ABSPATH') or die();
 
@@ -81,7 +82,7 @@ trait Register_Settings
                                         'The following options allow to identify you and your search engine in Doofinder servers.',
                                         'doofinder_for_wp'
                                     ); ?></p>
-<?php
+        <?php
             },
             self::$top_level_menu
         );
@@ -166,19 +167,52 @@ trait Register_Settings
 
 
         // JS Layer
-		$js_layer_option_name =
-        $this->language->get_option_name( 'doofinder_for_wp_js_layer' );
+        $js_layer_option_name =
+            $this->language->get_option_name('doofinder_for_wp_js_layer');
         add_settings_field(
             $js_layer_option_name,
-            __( 'JS Layer Script', 'doofinder_for_wp' ),
-            function () use ( $js_layer_option_name ) {
-                $this->render_html_js_layer( $js_layer_option_name );
+            __('JS Layer Script', 'doofinder_for_wp'),
+            function () use ($js_layer_option_name) {
+                $this->render_html_js_layer($js_layer_option_name);
             },
             self::$top_level_menu,
             $field_id
         );
 
-        register_setting( self::$top_level_menu, $js_layer_option_name );
+        register_setting(self::$top_level_menu, $js_layer_option_name);
+    }
+
+    private function add_product_data_settings()
+    {
+        $field_id = 'doofinder-for-wp-data';
+
+        add_settings_section(
+            $field_id,
+            __('Product Data Settings', 'doofinder_for_wp'),
+            function () {
+        ?>
+            <p class="description"><?php _e(
+                                        'The following options allow you to set up which data would you like to index',
+                                        'doofinder_for_wp'
+                                    ); ?></p>
+<?php
+            },
+            self::$top_level_menu
+        );
+
+        // Custom Attributes
+        $additional_attributes_option_name = \Doofinder\WP\Settings::$custom_attributes_option;
+        add_settings_field(
+            $additional_attributes_option_name,
+            __('Custom Attributes', 'doofinder_for_wp'),
+            function () {
+                $this->render_html_additional_attributes();
+            },
+            self::$top_level_menu,
+            $field_id
+        );
+
+        register_setting(self::$top_level_menu, $additional_attributes_option_name, array($this, 'sanitize_additional_attributes'));
     }
 
     /**
@@ -300,5 +334,54 @@ trait Register_Settings
             );
         }
         return $input;
+    }
+
+
+    /**
+     * Process additional attributes sent from the frontend
+     * and convert them to the shape we want to store in the DB.
+     *
+     * This functional basically converts indexes, so we save a nice
+     * regular numerically-indexed array, and removes all records
+     * that are either selected to be deleted, or invalid.
+     *
+     * @param array $input
+     *
+     * @return array
+     */
+    public function sanitize_additional_attributes($input)
+    {
+        $output = array();
+
+        // We want to save a regular array containing all attributes,
+        // but what we send from the frontend is an associative array
+        // (because it has "new" entry).
+        // Convert data from frontend to nicely-indexed regular array,
+        // removing all the records that we want to delete, and those
+        // with empty "field" value along the way.
+        foreach ($input as $attribute) {
+            if (!$attribute['field']) {
+                continue;
+            }
+
+            if (isset($attribute['delete']) && $attribute['delete']) {
+                continue;
+            }
+
+            if (in_array($attribute['field'], Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES)) {
+                $field_name = $attribute['field'];
+                $attribute['field'] = 'custom_' . $field_name;
+                add_settings_error(
+                    'doofinder_for_wp_messages',
+                    'doofinder_for_wp_message_update_on_save',
+                    __(sprintf("The '%s' field name is reserved, we have changed it to '%s' automatically, but you can change it if you want",  $field_name,  $attribute['field'] ), 'doofinder_for_wp')
+                );
+                return false;
+            }
+
+            $output[] = $attribute;
+        }
+
+        return $output;
     }
 }

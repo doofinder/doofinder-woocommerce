@@ -16,6 +16,18 @@ class Migration
      */
     private static $log;
 
+    private static $dimension_attributes = [
+        'width',
+        'height',
+        'length'
+    ];
+
+    private static $deprecated_attributes = [
+        'post_title',
+        'post_content',
+        'permalink'
+    ];
+
     /**
      * Try migrating old settings
      */
@@ -37,6 +49,22 @@ class Migration
     }
 
     /**
+     * Function to migrate only custom attributes specifically when updating to 
+     * the plugin version 2.0.13
+     *
+     * @return void
+     */
+    public static function migrate_custom_attributes()
+    {
+        self::$log = new Log('migration.log');
+        self::$log->log('Migrate Custom Attributes - Start');
+
+        self::initialize_migration();
+        self::migrate_option('woocommerce_doofinder_feed_attributes_additional_attributes', 'doofinder_for_wp_custom_attributes');
+        self::finish_migration(TRUE);
+    }
+
+    /**
      * Initialize the migration
      *
      * @return void
@@ -45,6 +73,7 @@ class Migration
     {
         delete_option(Setup_Wizard::$wizard_migration_notice_name);
         delete_option(Setup_Wizard::$wizard_migration_option);
+        add_filter("doofinder-for-wp-migration-transform-woocommerce_doofinder_feed_attributes_additional_attributes", [self::class, 'transform_additional_attributes'], 10, 1);
     }
 
     /**
@@ -78,6 +107,7 @@ class Migration
             $generic_options = [
                 'woocommerce_doofinder_internal_search_api_key' => 'doofinder_for_wp_api_key',
                 'woocommerce_doofinder_internal_search_api_host' => 'doofinder_for_wp_api_host',
+                'woocommerce_doofinder_feed_attributes_additional_attributes' => 'doofinder_for_wp_custom_attributes',
                 'doofinder_for_wc_sector' => 'doofinder_sector'
             ];
             $multilang_options = [
@@ -156,6 +186,8 @@ class Migration
             self::$log->log("No need to migrate the wc option from '" . $wc_option_name . "' to '" . $wp_option_name . "', the value is already set to: \n" . print_r($current_option_value, true));
         } else {
             $wc_option_value = get_option($wc_option_name);
+            $wc_option_value = apply_filters("doofinder-for-wp-migration-transform-$wc_option_name", $wc_option_value);
+
             self::$log->log("Migrate option from '" . $wc_option_name . "' to '" . $wp_option_name . "' with value: \n" . print_r($wc_option_value, true));
             update_option($wp_option_name, $wc_option_value);
         }
@@ -179,5 +211,85 @@ class Migration
             update_option(Setup_Wizard::$wizard_migration_notice_name, 1);
             self::add_notices();
         }
+    }
+
+    /**
+     * Transforms the former custom_attributes array to the new format
+     *
+     * @param array $additional_attributes
+     * @return array Transformed custom attributes array
+     */
+    public static function transform_additional_attributes($additional_attributes)
+    {
+        $transformed_attributes = [];
+        foreach ($additional_attributes as $key => $value) {
+            $attribute = [];
+            foreach (explode('&', $value) as $attr_value) {
+                $attr = explode('=', $attr_value);
+                $attribute[$attr[0]] = $attr[1];
+                $attribute['type'] =  'base_attribute';
+            }
+
+            if (strpos($attribute['attribute'], 'pa_') === 0) {
+                //Product attribute, find the wc_attribute_id
+                $attribute['attribute'] = static::transform_product_attribute($attribute['attribute']);
+                $attribute['type'] = 'wc_attribute';
+                $transformed_attributes[$key] = $attribute;
+                continue;
+            }
+
+            if ($attribute['attribute'] === 'custom') {
+                //Custom Meta attribute, set the attribute from value
+                if (!isset($attribute['value'])) {
+                    //no value defined, ignore attribute
+                    continue;
+                }
+                $attribute['type'] = 'metafield';
+                $attribute['attribute'] = $attribute['value'];
+                unset($attribute['value']);
+                $transformed_attributes[$key] = $attribute;
+                continue;
+            }
+
+            //Add the dimensions: for dimension attributes
+            if (in_array($attribute['attribute'], static::$dimension_attributes)) {
+                $attribute['attribute'] = 'dimensions:' . $attribute['attribute'];
+                $transformed_attributes[$key] = $attribute;
+                continue;
+            }
+
+            //Add the dimensions: for dimension attributes
+            if (in_array($attribute['attribute'], static::$dimension_attributes)) {
+                $attribute['attribute'] = 'dimensions:' . $attribute['attribute'];
+                $transformed_attributes[$key] = $attribute;
+                continue;
+            }
+
+            //Remove the attributes that we are not using anymore as they are being indexed by default
+            if (in_array($attribute['attribute'], static::$deprecated_attributes)) {
+                continue;
+            }
+        }
+        return $transformed_attributes;
+    }
+
+    /**
+     * Converts the former product attribute name from pa_<attribute_name> 
+     * format to wc_<attribute_id> format.
+     * Example:
+     * pa_color => wc_4
+     *
+     * @param string $attribute_name The former attribute name.
+     * @return string The transformed attribute name.
+     */
+    private static function transform_product_attribute($attribute_name)
+    {
+        $wc_attributes = wc_get_attribute_taxonomies();
+        foreach ($wc_attributes as $wc_attribute) {
+            if ($attribute_name === 'pa_' . $wc_attribute->attribute_name) {
+                return 'wc_' . $wc_attribute->attribute_id;
+            }
+        }
+        return $attribute_name;
     }
 }

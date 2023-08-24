@@ -365,4 +365,18 @@ trait Accessors
     {
         return update_option('doofinder_for_wp_plugin_version', $version);
     }
+
+    /**
+     * Determine if the update on save is enabled.
+     *
+     * Just an alias for "get_option", because ideally we don't
+     * want to replace the option name in multiple files.
+     *
+     * @return bool
+     */
+    public static function is_update_on_save_enabled()
+    {
+        $option = get_option('doofinder_for_wp_update_on_save', 'wp_doofinder_each_day');
+        return  $option != 'wp_doofinder_each_day';
+    }
 }
