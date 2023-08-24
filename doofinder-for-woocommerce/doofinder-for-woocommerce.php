@@ -4,7 +4,7 @@
  * Plugin Name: Doofinder WP & WooCommerce Search
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 2.0.13
+ * Version: 2.0.14
  * Author: Doofinder
  * Description: Integrate Doofinder Search in your WordPress site or WooCommerce shop.
  *
@@ -16,7 +16,6 @@ namespace Doofinder\WP;
 use WP_REST_Response;
 use Doofinder\WP\Multilanguage\Multilanguage;
 use Doofinder\WP\Admin_Notices;
-use Doofinder\WP\Tax_Prices_Handler;
 
 defined('ABSPATH') or die;
 
@@ -35,7 +34,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
          *
          * @var string
          */
-        public static $version = '2.0.13';
+        public static $version = '2.0.14';
 
         /**
          * The only instance of Doofinder_For_WordPress
@@ -95,37 +94,36 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
             // Load classes on demand
             self::autoload(self::plugin_path() . 'includes/');
 
-            //Initialize update on save
-            Update_On_Save::init();
-            //Initialize reset credentials
-            Reset_Credentials::init();
-            // Init admin functionalities
-            if (is_admin()) {
-                Post::add_additional_settings();
-                Settings::instance();
-                if (Setup_Wizard::should_activate()) {
-                    Setup_Wizard::activate(true);
-                }
-
-                Setup_Wizard::instance();
-                Update_On_Save::register_hooks();
-
-                self::register_ajax_action();
-                self::register_admin_scripts_and_styles();
-
-                // Try to migrate settings if possible and necessary
-                if (Setup_Wizard::should_migrate()) {
-                    Migration::migrate();
-                }
-                // Migration::migrate();
-            }
-
-            // Init frontend functionalities
-            if (!is_admin()) {
-                JS_Layer::instance();
-            }
-
             add_action('init', function () use ($class) {
+                //Initialize update on save
+                Update_On_Save::init();
+                //Initialize reset credentials
+                Reset_Credentials::init();
+                // Init admin functionalities
+                if (is_admin()) {
+                    Post::add_additional_settings();
+                    Settings::instance();
+                    if (Setup_Wizard::should_activate()) {
+                        Setup_Wizard::activate(true);
+                    }
+
+                    Setup_Wizard::instance();
+                    Update_On_Save::register_hooks();
+
+                    self::register_ajax_action();
+                    self::register_admin_scripts_and_styles();
+
+                    // Try to migrate settings if possible and necessary
+                    if (Setup_Wizard::should_migrate()) {
+                        Migration::migrate();
+                    }
+                }
+
+                // Init frontend functionalities
+                if (!is_admin()) {
+                    JS_Layer::instance();
+                }
+
                 // Register all custom URLs
                 call_user_func(array($class, 'register_urls'));
 
