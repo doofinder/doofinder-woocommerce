@@ -5,6 +5,7 @@ namespace Doofinder\WP\Settings;
 use Doofinder\WP\Helpers;
 use Doofinder\WP\Multilanguage\Multilanguage;
 use Doofinder\WP\Multilanguage\No_Language_Plugin;
+use Doofinder\WP\Settings;
 
 defined('ABSPATH') or die();
 
@@ -378,5 +379,10 @@ trait Accessors
     {
         $option = get_option('doofinder_for_wp_update_on_save', 'wp_doofinder_each_day');
         return  $option != 'wp_doofinder_each_day';
+    }
+
+    public static function get_image_size()
+    {
+        return get_option(Settings::$image_size_option, 'medium');
     }
 }

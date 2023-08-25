@@ -6,7 +6,6 @@ use Doofinder\WP\Update_On_Save_Index;
 use Doofinder\WP\Log;
 use Doofinder\WP\Post;
 use Doofinder\WP\Multilanguage\Multilanguage;
-use Doofinder\WP\Settings\Accessors;
 
 class Update_On_Save
 {
@@ -121,7 +120,6 @@ class Update_On_Save
             if (!self::is_cron_enabled() && self::allow_process_items()) {
                 $log->log('We can send the data. ');
                 $update_on_save_index->launch_doofinder_update_on_save();
-                self::clean_update_on_save_db();
             }
         }
     }
@@ -259,5 +257,22 @@ class Update_On_Save
 
         $log = new Log('update_on_save.txt');
         $log->log('Deleted database');
+    }
+
+    /**
+     * Cleans the update on save database table by deleting the updated entries
+     *
+     * @return void
+     */
+    public static function clean_updated_items($ids, $action)
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'doofinder_update_on_save';
+        $ids = implode(",", $ids);
+        $query = "DELETE FROM $table_name WHERE post_id IN ($ids) AND type_action = '$action'";
+        $affected_rows = $wpdb->query($query);
+
+        $log = new Log('update_on_save.txt');
+        $log->log("Update on save: " . $action . "d $affected_rows rows with IDs: $ids");
     }
 }

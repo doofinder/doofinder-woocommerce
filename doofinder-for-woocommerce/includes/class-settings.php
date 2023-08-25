@@ -92,6 +92,8 @@ class Settings
 
 	public static $custom_attributes_option = 'doofinder_for_wp_custom_attributes';
 
+	public static $image_size_option = 'doofinder_for_wp_image_size';
+
 	/**
 	 * Returns the only instance of Settings
 	 *
@@ -229,8 +231,8 @@ class Settings
 		 * Remove WC unwanted attributes
 		 */
 		$rest_attributes = array_diff($rest_attributes, [
-			'grouped_products',	
-			'images',		
+			'grouped_products',
+			'images',
 			'meta_data',
 			'name',
 			'permalink',

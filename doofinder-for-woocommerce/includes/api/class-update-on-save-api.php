@@ -70,24 +70,24 @@ class Update_On_Save_Api
      * @param $data
      *
      */
-    private function sendRequest($url, $ids)
+    private function sendRequest($url, $ids, $method = 'POST')
     {
         $this->log->log("Making a request to: $url");
         $data = [
             'headers' => $this->authorization_header,
-            'method'  => 'POST',
+            'method'  => $method,
             'body' => json_encode($ids),
         ];
 
         $response = wp_remote_request($url, $data);
-        if (!is_wp_error($response)) {
-            $response_body = wp_remote_retrieve_body($response);
-            $decoded_response = json_decode($response_body, true);
-            $this->log->log("The request has been made correctly: $decoded_response");
+        if (!is_wp_error($response) && $response['response']['code'] === 200) {
+            $this->log->log("The update on save request has been processed correctly");
+            return TRUE;
         } else {
             $error_message = $response->get_error_message();
             $this->log->log("Error in the request: $error_message");
         }
+        return false;
     }
 
     public function buildURL($path)
@@ -132,6 +132,6 @@ class Update_On_Save_Api
 
         $uri = $this->buildURL("plugins/wordpress/" . $this->hash . "/" . $post_type . "/product_delete");
 
-        return $this->sendRequest($uri, $ids);
+        return $this->sendRequest($uri, $ids, "DELETE");
     }
 }

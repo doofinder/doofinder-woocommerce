@@ -71,10 +71,10 @@ trait Register_Settings
      */
     private function add_general_settings()
     {
-        $field_id = 'doofinder-for-wp-general';
+        $section_id = 'doofinder-for-wp-general';
 
         add_settings_section(
-            $field_id,
+            $section_id,
             __('General Settings', 'doofinder_for_wp'),
             function () {
 ?>
@@ -97,7 +97,7 @@ trait Register_Settings
                 $this->render_html_enable_js_layer($enable_js_layer_option_name);
             },
             self::$top_level_menu,
-            $field_id
+            $section_id
         );
 
         register_setting(self::$top_level_menu, $enable_js_layer_option_name);
@@ -111,7 +111,7 @@ trait Register_Settings
                 $this->render_html_api_key($api_key_option_name);
             },
             self::$top_level_menu,
-            $field_id
+            $section_id
         );
 
         register_setting(self::$top_level_menu, $api_key_option_name, array($this, 'validate_api_key'));
@@ -125,7 +125,7 @@ trait Register_Settings
                 $this->render_html_api_host($api_host_option_name);
             },
             self::$top_level_menu,
-            $field_id,
+            $section_id,
             [
                 'class' => 'hidden'
             ]
@@ -143,7 +143,7 @@ trait Register_Settings
                 $this->render_html_search_engine_hash($search_engine_hash_option_name);
             },
             self::$top_level_menu,
-            $field_id
+            $section_id
         );
 
         register_setting(self::$top_level_menu, $search_engine_hash_option_name, array(
@@ -160,7 +160,7 @@ trait Register_Settings
                 $this->render_html_update_on_save($update_on_save_option_name);
             },
             self::$top_level_menu,
-            $field_id
+            $section_id
         );
 
         register_setting(self::$top_level_menu, $update_on_save_option_name, array($this, 'validate_update_on_save'));
@@ -176,7 +176,7 @@ trait Register_Settings
                 $this->render_html_js_layer($js_layer_option_name);
             },
             self::$top_level_menu,
-            $field_id
+            $section_id
         );
 
         register_setting(self::$top_level_menu, $js_layer_option_name);
@@ -184,10 +184,10 @@ trait Register_Settings
 
     private function add_product_data_settings()
     {
-        $field_id = 'doofinder-for-wp-data';
+        $section_id = 'doofinder-for-wp-data';
 
         add_settings_section(
-            $field_id,
+            $section_id,
             __('Product Data Settings', 'doofinder_for_wp'),
             function () {
         ?>
@@ -200,6 +200,20 @@ trait Register_Settings
             self::$top_level_menu
         );
 
+        // Image Size
+        $image_size_option_name = \Doofinder\WP\Settings::$image_size_option;
+        add_settings_field(
+            $image_size_option_name,
+            __('Image Size', 'doofinder_for_wp'),
+            function () use ($image_size_option_name) {
+                $this->render_html_image_size_field($image_size_option_name);
+            },
+            self::$top_level_menu,
+            $section_id
+        );
+
+        register_setting(self::$top_level_menu, $image_size_option_name);
+
         // Custom Attributes
         $additional_attributes_option_name = \Doofinder\WP\Settings::$custom_attributes_option;
         add_settings_field(
@@ -209,7 +223,7 @@ trait Register_Settings
                 $this->render_html_additional_attributes();
             },
             self::$top_level_menu,
-            $field_id
+            $section_id
         );
 
         register_setting(self::$top_level_menu, $additional_attributes_option_name, array($this, 'sanitize_additional_attributes'));
@@ -374,7 +388,7 @@ trait Register_Settings
                 add_settings_error(
                     'doofinder_for_wp_messages',
                     'doofinder_for_wp_message_update_on_save',
-                    __(sprintf("The '%s' field name is reserved, we have changed it to '%s' automatically, but you can change it if you want",  $field_name,  $attribute['field'] ), 'doofinder_for_wp')
+                    __(sprintf("The '%s' field name is reserved, we have changed it to '%s' automatically, but you can change it if you want",  $field_name,  $attribute['field']), 'doofinder_for_wp')
                 );
                 return false;
             }

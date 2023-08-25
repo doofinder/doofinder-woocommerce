@@ -458,6 +458,89 @@ trait Renderers
             </td>
         </tr>
 
+    <?php
+    }
+
+    private function render_html_image_size_field($option_name)
+    {
+        $current_value = Settings::get_image_size();
+        $image_sizes = $this->_get_all_image_sizes();
+        $options = [];
+        foreach ($image_sizes as $id => $image_size) {
+            $name = $id . ' - ' . $image_size['width'] . ' x ' .  $image_size['height'];
+            $name = $id === 'medium' ? $name . ' (' . __('Recommended', 'doofinder_for_wp') . ')' : $name;
+            $options[] = [
+                'value' => $id,
+                'name' => $name
+            ];
+        }
+
+        $this->_render_select_field('df-image-size',  $option_name, $options, ['df-image-size-select'], $current_value);
+    }
+
+    /**
+     * Get all the registered image sizes along with their dimensions
+     *
+     * @global array $_wp_additional_image_sizes
+     *
+     * @return array $image_sizes The image sizes
+     */
+    private function _get_all_image_sizes()
+    {
+        global $_wp_additional_image_sizes;
+
+        $default_image_sizes = get_intermediate_image_sizes();
+
+        foreach ($default_image_sizes as $size) {
+            $image_sizes[$size]['width'] = intval(get_option("{$size}_size_w"));
+            $image_sizes[$size]['height'] = intval(get_option("{$size}_size_h"));
+            $image_sizes[$size]['crop'] = get_option("{$size}_crop") ? get_option("{$size}_crop") : false;
+        }
+
+        if (isset($_wp_additional_image_sizes) && count($_wp_additional_image_sizes)) {
+            $image_sizes = array_merge($image_sizes, $_wp_additional_image_sizes);
+        }
+
+        return $image_sizes;
+    }
+
+    /**
+
+     * E.g.:
+     * 
+     * @param array $config The configuration used to render the select.
+     * @return void
+     */
+
+    /**
+     * Generates a select field with the received configuration.
+     *
+     * @param string $id The id of the select field.
+     * @param string $name The name attribute of the select field.
+     * @param array $options The available options. Each option should have the keys value and name.
+     * @param array $classes (Optional) The classes for the select field.
+     * @param string $selected (Optional) The key of the selected option.
+     * @param string $default_option (Optional) A default option name to add to your select. This option will appear as disabled
+     * @return void
+     */
+    private function _render_select_field($id, $name, $options, $classes = [], $selected = NULL, $default_option = NULL)
+    {
+        //Add default class
+        $classes[] = 'df-select';
+        $classes = implode(" ", array_unique($classes));
+    ?>
+        <select id="<?php echo $id; ?>" name="<?php echo $name; ?>" class="<?php echo $classes; ?>">
+            <?php if (!empty($default_option)) : ?>
+                <option disabled><?php echo $default_option; ?></option>
+
+            <?php endif; ?>
+            <?php foreach ($options as $option) {
+            ?>
+                <option value="<?php echo $option['value']; ?>" <?php echo $selected === $option['value'] ? "selected" : "";  ?>><?php echo $option['name']; ?></option>
+            <?php
+            }
+            ?>
+        </select>
 <?php
     }
 }
