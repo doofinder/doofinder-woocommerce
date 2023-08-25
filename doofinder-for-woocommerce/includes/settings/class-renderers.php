@@ -422,7 +422,10 @@ trait Renderers
         <tr>
             <td>
 
-                <?php if ($attribute['type'] === 'metafield' && $index != "new") : ?>
+
+                <?php
+                $type = ($attribute !== null) ? $attribute['type'] : null;
+                if ($type === 'metafield' && $index !== "new") : ?>
                     <input class="df-attribute-text" type="text" name="<?php echo $option_name; ?>[<?php echo $index; ?>][attribute]" <?php if ($attribute) : ?> value="<?php echo $attribute['attribute']; ?>" <?php endif; ?> />
                 <?php else : ?>
                     <select class="df-attribute-select df-select-2" name="<?php echo $option_name; ?>[<?php echo $index; ?>][attribute]" required>
