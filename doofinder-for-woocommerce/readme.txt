@@ -1,7 +1,7 @@
 === Doofinder WP & WooCommerce Search ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.0.16
+Version: 2.0.17
 Requires at least: 4.1
 Tested up to: 6.2.2
 Requires PHP: 5.6
@@ -81,6 +81,9 @@ General Settings
 Just send your questions to <mailto:support@doofinder.com> and we will try to answer as fast as possible with a working solution for you.
 
 == Changelog ==
+
+= 2.0.17 =
+Fix visual bug in Product Data Settings.
 
 = 2.0.16 =
 Added Image Size selector to Product Data Settingsa and fixed 'update on save' issue.
