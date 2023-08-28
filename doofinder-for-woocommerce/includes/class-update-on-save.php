@@ -138,14 +138,16 @@ class Update_On_Save
         if ($status === 'auto-draft' || $type === "revision") {
             # If it is draft or revision we don't need to do anything with it because we don't have to index it.
             $log->log('It is not necessary to save it as it is a draft. ');
-        } elseif ($doofinder_post->is_indexable()) {
+        } elseif ($doofinder_post->is_indexable() && in_array($type, ["post", "product", "page"])) {
             # If the status of the post is still indexable after the changes we do an update.
             $log->log('The item will be saved with the update action. ');
             self::add_to_update_on_save_db($post_id, $type, "update");
-        } else {
+        } elseif (in_array($type, ["post", "product", "page"])) {
             # If the status of the post is no longer indexable we have to delete it.
             $log->log('The item will be saved with the delete action. ');
             self::add_to_update_on_save_db($post_id, $type, "delete");
+        } else {
+            $log->log('It is not necessary to save it, since it is a non-indexable type.');
         }
     }
 
