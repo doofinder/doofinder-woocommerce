@@ -4,7 +4,7 @@
  * Plugin Name: Doofinder WP & WooCommerce Search
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 2.0.18
+ * Version: 2.0.19
  * Author: Doofinder
  * Description: Integrate Doofinder Search in your WordPress site or WooCommerce shop.
  *
@@ -34,7 +34,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
          *
          * @var string
          */
-        public static $version = '2.0.18';
+        public static $version = '2.0.19';
 
         /**
          * The only instance of Doofinder_For_WordPress
@@ -100,7 +100,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 //Initialize reset credentials
                 Reset_Credentials::init();
                 // Init admin functionalities
-                if (is_admin()) {
+                if (is_admin()) {                    
                     Post::add_additional_settings();
                     Settings::instance();
                     if (Setup_Wizard::should_activate()) {
@@ -369,40 +369,6 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 exit;
             });
         }
-
-        public static function add_schedules()
-        {
-            return [
-                'wp_doofinder_each_15_minutes' => [
-                    'display' => sprintf(__('Each %s minutes', 'doofinder_for_wp'), 15),
-                    'interval' => 60 * 15
-                ],
-                'wp_doofinder_each_30_minutes' => [
-                    'display' => sprintf(__('Each %s minutes', 'doofinder_for_wp'), 30),
-                    'interval' => 60 * 30
-                ],
-                'wp_doofinder_each_60_minutes' => [
-                    'display' => __('Each hour', 'doofinder_for_wp'),
-                    'interval' => HOUR_IN_SECONDS
-                ],
-                'wp_doofinder_each_2_hours' => [
-                    'display' => sprintf(__('Each %s hours', 'doofinder_for_wp'), 2),
-                    'interval' => HOUR_IN_SECONDS * 2
-                ],
-                'wp_doofinder_each_6_hours' => [
-                    'display' => sprintf(__('Each %s hours', 'doofinder_for_wp'), 6),
-                    'interval' => HOUR_IN_SECONDS * 6
-                ],
-                'wp_doofinder_each_12_hours' => [
-                    'display' => sprintf(__('Each %s hours', 'doofinder_for_wp'), 12),
-                    'interval' => HOUR_IN_SECONDS * 12
-                ],
-                'wp_doofinder_each_day' => [
-                    'display' => __('Each day', 'doofinder_for_wp'),
-                    'interval' => DAY_IN_SECONDS
-                ]
-            ];
-        }
     }
 
 endif;
@@ -412,6 +378,3 @@ register_deactivation_hook(__FILE__, array('\Doofinder\WP\Doofinder_For_WordPres
 
 add_action('plugins_loaded', array('\Doofinder\WP\Doofinder_For_WordPress', 'instance'), 0);
 add_action('upgrader_process_complete', array('\Doofinder\WP\Doofinder_For_WordPress', 'upgrader_process_complete'), 10, 2);
-
-//Define cron schedules here
-add_filter('cron_schedules', ['\Doofinder\WP\Doofinder_For_WordPress', 'add_schedules']);
