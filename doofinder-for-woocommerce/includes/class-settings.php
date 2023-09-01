@@ -280,7 +280,6 @@ class Settings
 			]
 		];
 
-		$schedules =  array_merge($schedules, $df_schedules);
-		return $schedules;
+		return array_merge($schedules, $df_schedules);		
 	}
 }
