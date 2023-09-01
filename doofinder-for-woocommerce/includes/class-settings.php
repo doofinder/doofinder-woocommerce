@@ -159,6 +159,8 @@ class Settings
 				);
 			}
 		}, 10, 3);
+
+		add_filter('cron_schedules', [self::class, 'add_schedules'], 100, 1);
 	}
 	/**
 	 * Returns an array with select options structured by option groups
@@ -242,5 +244,43 @@ class Settings
 			'variations'
 		]);
 		return array_diff($rest_attributes, static::RESERVED_CUSTOM_ATTRIBUTES_NAMES);
+	}
+
+
+	public static function add_schedules($schedules)
+	{
+		$df_schedules = [
+			'wp_doofinder_each_15_minutes' => [
+				'display' => sprintf(__('Each %s minutes', 'doofinder_for_wp'), 15),
+				'interval' => 60 * 15
+			],
+			'wp_doofinder_each_30_minutes' => [
+				'display' => sprintf(__('Each %s minutes', 'doofinder_for_wp'), 30),
+				'interval' => 60 * 30
+			],
+			'wp_doofinder_each_60_minutes' => [
+				'display' => __('Each hour', 'doofinder_for_wp'),
+				'interval' => HOUR_IN_SECONDS
+			],
+			'wp_doofinder_each_2_hours' => [
+				'display' => sprintf(__('Each %s hours', 'doofinder_for_wp'), 2),
+				'interval' => HOUR_IN_SECONDS * 2
+			],
+			'wp_doofinder_each_6_hours' => [
+				'display' => sprintf(__('Each %s hours', 'doofinder_for_wp'), 6),
+				'interval' => HOUR_IN_SECONDS * 6
+			],
+			'wp_doofinder_each_12_hours' => [
+				'display' => sprintf(__('Each %s hours', 'doofinder_for_wp'), 12),
+				'interval' => HOUR_IN_SECONDS * 12
+			],
+			'wp_doofinder_each_day' => [
+				'display' => __('Each day', 'doofinder_for_wp'),
+				'interval' => DAY_IN_SECONDS
+			]
+		];
+
+		$schedules =  array_merge($schedules, $df_schedules);
+		return $schedules;
 	}
 }
