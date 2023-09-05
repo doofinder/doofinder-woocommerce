@@ -49,7 +49,7 @@ class Thumbnail
 			return $intermediate['url'];
 		}
 
-		$this->regenerate_thumbnail();
+		$this->regenerate_thumbnail($thumbnail_id);
 		$thumbnail = wp_get_attachment_image_src($thumbnail_id, self::$size);
 		return $thumbnail[0];
 	}
@@ -57,13 +57,11 @@ class Thumbnail
 	/**
 	 * Regenerate thumbnails for the current post.
 	 */
-	private function regenerate_thumbnail()
+	private function regenerate_thumbnail($attachment_id)
 	{
 		if (!function_exists('wp_generate_attachment_metadata')) {
 			include(ABSPATH . 'wp-admin/includes/image.php');
 		}
-
-		$attachment_id = get_post_thumbnail_id($this->post);
 
 		wp_update_attachment_metadata(
 			$attachment_id,
