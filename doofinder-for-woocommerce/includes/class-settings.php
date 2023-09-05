@@ -59,7 +59,12 @@ class Settings
 		"tags",
 		"title",
 		"type",
-		"variants"
+		"variants",
+		"df_image_link",
+		"df_price",
+		"df_regular_price",
+		"df_sale_price",
+		
 	];
 
 	/**
