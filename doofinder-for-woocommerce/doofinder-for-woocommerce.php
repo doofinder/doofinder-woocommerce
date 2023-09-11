@@ -4,7 +4,7 @@
  * Plugin Name: Doofinder WP & WooCommerce Search
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 2.0.20
+ * Version: 2.0.21
  * Author: Doofinder
  * Description: Integrate Doofinder Search in your WordPress site or WooCommerce shop.
  *
@@ -34,7 +34,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
          *
          * @var string
          */
-        public static $version = '2.0.20';
+        public static $version = '2.0.21';
 
         /**
          * The only instance of Doofinder_For_WordPress
@@ -91,6 +91,10 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
         {
             $class = __CLASS__;
 
+            if( !function_exists('is_plugin_active') ) {
+                include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+            }
+
             // Load classes on demand
             self::autoload(self::plugin_path() . 'includes/');
 
@@ -100,7 +104,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 //Initialize reset credentials
                 Reset_Credentials::init();
                 // Init admin functionalities
-                if (is_admin()) {                    
+                if (is_admin()) {
                     Post::add_additional_settings();
                     Settings::instance();
                     if (Setup_Wizard::should_activate()) {

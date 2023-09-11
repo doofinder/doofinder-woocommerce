@@ -329,7 +329,8 @@ class Store_Api
     private function get_callback_urls($api_keys, $primary_language)
     {
         $callback_urls = [];
-        $currency = 'EUR';
+        $currency = is_plugin_active('woocommerce/woocommerce.php') ? get_woocommerce_currency() : "EUR";
+
         foreach ($api_keys as $item) {
             $code = $item['lang']['locale'] ?? $item['lang']['code'] ?? $primary_language;
             $lang = Helpers::get_language_from_locale($code);
