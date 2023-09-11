@@ -156,14 +156,8 @@ class Update_Manager
             }
         }
 
-        /*
-        Detect if we are updating from a former version of Doofinder to
-        normalize store and indices
-        */
-        if (Settings::is_configuration_complete() && !Store_Api::has_application_credentials()) {
-            $store_api = new Store_Api();
-            $store_api->normalize_store_and_indices();
-        }
+        Migration::migrate();
+
         return true;
     }
     /**
