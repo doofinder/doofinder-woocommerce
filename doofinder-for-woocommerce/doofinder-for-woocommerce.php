@@ -91,6 +91,10 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
         {
             $class = __CLASS__;
 
+            if( !function_exists('is_plugin_active') ) {
+                include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+            }
+
             // Load classes on demand
             self::autoload(self::plugin_path() . 'includes/');
 
@@ -100,7 +104,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 //Initialize reset credentials
                 Reset_Credentials::init();
                 // Init admin functionalities
-                if (is_admin()) {                    
+                if (is_admin()) {
                     Post::add_additional_settings();
                     Settings::instance();
                     if (Setup_Wizard::should_activate()) {
