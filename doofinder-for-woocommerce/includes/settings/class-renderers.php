@@ -2,13 +2,12 @@
 
 namespace Doofinder\WP\Settings;
 
+use Doofinder\WP\Api\Store_Api;
 use Doofinder\WP\Multilanguage\Language_Plugin;
 use Doofinder\WP\Multilanguage\No_Language_Plugin;
 use Doofinder\WP\Setup_Wizard;
 use Doofinder\WP\Settings;
-use Doofinder\WP\Settings\Settings as SettingsHelper;
 use Doofinder\WP\Reset_Credentials;
-use Doofinder\WP\Multilanguage;
 
 defined('ABSPATH') or die();
 
@@ -89,6 +88,12 @@ trait Renderers
         // only users that have access to wp settings can view this form
         if (!current_user_can('manage_options')) {
             return;
+        }
+
+        if (isset($_GET['force_normalization'])) {
+            echo "<h1>Force Normalization</h1>";
+            $store_api = new Store_Api();
+            $store_api->normalize_store_and_indices();
         }
 
         // add update messages if doesn't exist

@@ -11,6 +11,7 @@ use Doofinder\WP\Multilanguage\No_Language_Plugin;
 use Doofinder\WP\Settings;
 use Exception;
 use WP_Application_Passwords;
+use WP_Http;
 
 defined('ABSPATH') or die();
 
@@ -127,7 +128,8 @@ class Store_Api
         }
 
         $this->log->log("Sending request to normalize indices.");
-        $response = $this->sendRequest("plugins/wordpress/normalize-indices/", $payload);
+        $response = $this->sendRequest("plugins/wordpress/normalize-indices/", $payload, true);
+
         if (array_key_exists('errors', $response)) {
             $this->log->log("The store and indices normalization has failed!");
             $this->log->log(print_r($response['errors'], true));
@@ -175,7 +177,7 @@ class Store_Api
      * @param array $body The array containing the payload to be sent.
      * @return array The request decoded response
      */
-    private function sendRequest($endpoint, $body)
+    private function sendRequest($endpoint, $body, $migration = false)
     {
         $data = [
             'headers' => [
@@ -193,14 +195,8 @@ class Store_Api
         $response = wp_remote_post($url, $data);
         $response_code = wp_remote_retrieve_response_code($response);
 
-        if (is_wp_error($response)) {
-            $error_message = $response->get_error_message();
-            throw new Exception($error_message, (int)$response->get_error_code());
-        }
-
-        if ($response_code < 200 || $response_code >= 400) {
-            $error_message = wp_remote_retrieve_response_message($response);
-            throw new Exception($error_message, $response_code);
+        if (!$migration) {
+            $this->throw_exception($response, $response_code);
         }
 
         $response_body = wp_remote_retrieve_body($response);
@@ -297,7 +293,8 @@ class Store_Api
                     "type" => "wordpress",
                     "options" => [
                         "feed_type" => "product",
-                        "url" => $this->language->get_home_url($language)
+                        "url" => $this->language->get_home_url($language),
+                        "custom_attributes" => Settings::get_custom_attributes()
                     ]
                 ]
             ]
@@ -371,6 +368,26 @@ class Store_Api
         }
 
         return $callback_url;
+    }
+
+    /**
+     * This method throw_exception
+     *
+     * @param [type] $response
+     * @return void
+     */
+    private function throw_exception($response, $response_code)
+    {
+
+        if (is_wp_error($response)) {
+            $error_message = $response->get_error_message();
+            throw new Exception($error_message, (int)$response->get_error_code());
+        }
+
+        if ($response_code < WP_Http::OK || $response_code >= WP_Http::BAD_REQUEST) {
+            $error_message = wp_remote_retrieve_response_message($response);
+            throw new Exception($error_message, $response_code);
+        }
     }
 
 }

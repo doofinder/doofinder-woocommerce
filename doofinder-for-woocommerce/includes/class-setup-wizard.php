@@ -1340,39 +1340,4 @@ class Setup_Wizard
             }
         }
     }
-
-
-    /**
-     * Check if we should migrate settings
-     *
-     * @return bool
-     */
-    public static function should_migrate()
-    {
-
-        $log = new Log();
-        $migration_option = get_option(self::$wizard_migration_option);
-
-        // Migration was already done, we should abort
-        if ($migration_option === 'completed' || $migration_option === 'failed') {
-            //$log->log('Should migrate - Migration already done or not possible');
-            return false;
-        }
-
-        if (!Settings::get_api_key()) {
-            $log->log('Should migrate - Migration possible - Api Key');
-            return true;
-        }
-
-        if (!Settings::get_api_host()) {
-            $log->log('Should migrate - Migration possible - Api Host');
-            return true;
-        }
-
-        // Migration not necessary
-        $log->log('Should migrate - Migration not necessary');
-        update_option(self::$wizard_migration_option, 'completed');
-
-        return false;
-    }
 }

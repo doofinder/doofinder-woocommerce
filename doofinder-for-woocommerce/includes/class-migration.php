@@ -42,6 +42,7 @@ class Migration
 
         //check if app credentials are set
         if (!Store_Api::has_application_credentials() && Settings::is_configuration_complete()) {
+            self::$log->log('Migrate - We need to create the store and the indices.');
             $store_api = new Store_Api();
             $store_api->normalize_store_and_indices();
         }
