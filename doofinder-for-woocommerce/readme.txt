@@ -82,7 +82,7 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 
 == Changelog ==
 
-= 2.0.21 =
+= 2.0.22 =
 Fix migration update in old clients.
 
 = 2.0.21 =

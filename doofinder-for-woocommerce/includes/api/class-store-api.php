@@ -11,6 +11,7 @@ use Doofinder\WP\Multilanguage\No_Language_Plugin;
 use Doofinder\WP\Settings;
 use Exception;
 use WP_Application_Passwords;
+use WP_Http;
 
 defined('ABSPATH') or die();
 
@@ -377,12 +378,13 @@ class Store_Api
      */
     private function throw_exception($response, $response_code)
     {
+
         if (is_wp_error($response)) {
             $error_message = $response->get_error_message();
             throw new Exception($error_message, (int)$response->get_error_code());
         }
 
-        if ($response_code < 200 || $response_code >= 400) {
+        if ($response_code < WP_Http::OK || $response_code >= WP_Http::BAD_REQUEST) {
             $error_message = wp_remote_retrieve_response_message($response);
             throw new Exception($error_message, $response_code);
         }
