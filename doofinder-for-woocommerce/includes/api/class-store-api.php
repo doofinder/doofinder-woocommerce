@@ -292,7 +292,8 @@ class Store_Api
                     "type" => "wordpress",
                     "options" => [
                         "feed_type" => "product",
-                        "url" => $this->language->get_home_url($language)
+                        "url" => $this->language->get_home_url($language),
+                        "custom_attributes" => Settings::get_custom_attributes()
                     ]
                 ]
             ]
