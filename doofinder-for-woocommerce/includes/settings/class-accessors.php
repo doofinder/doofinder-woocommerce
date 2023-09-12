@@ -385,4 +385,9 @@ trait Accessors
     {
         return get_option(Settings::$image_size_option, 'medium');
     }
+
+    public static function get_custom_attributes()
+    {
+        return get_option(Settings::$custom_attributes_option, []);
+    }
 }
