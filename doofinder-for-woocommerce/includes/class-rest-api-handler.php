@@ -26,6 +26,14 @@ class REST_API_Handler
             foreach (self::PRODUCT_FIELDS as $field) {
                 register_rest_field(array('product', 'product_variation'), $field, ['get_callback' => array(REST_API_Handler::class, 'get_' . $field)]);
             }
+
+            /*
+            Return prices applying base location taxes
+            More info: https://github.com/woocommerce/woocommerce/wiki/How-Taxes-Work-in-WooCommerce#prices-including-tax---experimental-behavior
+            */
+            add_filter('woocommerce_adjust_non_base_location_prices', function ($value) {
+                return isset($_SERVER['HTTP_DOOFINDER_ORIGIN']) ? false : $value;
+            });
         }
     }
 
