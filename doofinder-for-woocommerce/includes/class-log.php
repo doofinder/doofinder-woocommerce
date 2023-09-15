@@ -9,7 +9,7 @@ class Log {
 	 *
 	 * @var string
 	 */
-	private $file_name = 'log.txt';
+	private $file_name = 'log.log';
 
 	/**
 	 * Maximum allowed size of the log file.

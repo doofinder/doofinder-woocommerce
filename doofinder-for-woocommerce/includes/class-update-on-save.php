@@ -107,7 +107,7 @@ class Update_On_Save
     public static function add_item_to_update($post_id, $post, $updated)
     {
 
-        $log = new Log('update_on_save.txt');
+        $log = new Log('update-on-save-add-item.log');
         $update_on_save_index = new Update_On_Save_Index();
 
         if (Settings::is_update_on_save_enabled()) {
@@ -134,7 +134,7 @@ class Update_On_Save
      */
     public static function add_item_to_db($doofinder_post, $post_id, $status, $type)
     {
-        $log = new Log('update_on_save.txt');
+        $log = new Log('update-on-save-add-item.log');
         if ($status === 'auto-draft' || $type === "revision") {
             # If it is draft or revision we don't need to do anything with it because we don't have to index it.
             $log->log('It is not necessary to save it as it is a draft. ');
@@ -196,7 +196,7 @@ class Update_On_Save
     public static function allow_process_items()
     {
 
-        $log = new Log('update_on_save.txt');
+        $log = new Log('update-on-save-add-item.log');
         $language = Multilanguage::instance();
         $current_language = $language->get_active_language();
         $update_on_save_schedule = Settings::get_update_on_save($current_language);
@@ -241,7 +241,7 @@ class Update_On_Save
 
         $wpdb->query("TRUNCATE TABLE $table_name");
 
-        $log = new Log('update_on_save.txt');
+        $log = new Log('update-on-save-add-item.log');
         $log->log('Cleaned database');
     }
 
@@ -257,7 +257,7 @@ class Update_On_Save
 
         $wpdb->query("DROP TABLE $table_name");
 
-        $log = new Log('update_on_save.txt');
+        $log = new Log('update-on-save-add-item.log');
         $log->log('Deleted database');
     }
 
@@ -274,7 +274,7 @@ class Update_On_Save
         $query = "DELETE FROM $table_name WHERE post_id IN ($ids) AND type_action = '$action'";
         $affected_rows = $wpdb->query($query);
 
-        $log = new Log('update_on_save.txt');
+        $log = new Log('update-on-save-add-item.log');
         $log->log("Update on save: " . $action . "d $affected_rows rows with IDs: $ids");
     }
 }

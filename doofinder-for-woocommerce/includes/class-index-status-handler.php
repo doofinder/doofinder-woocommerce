@@ -19,7 +19,7 @@ class Index_Status_Handler
      */
     public static function initialize()
     {
-        self::$logger = new Log('index-status.log');
+        self::$logger = new Log('store_create_index_status.log');
         $namespace_path = self::NAMESPACE . '/v' . self::API_VERSION;
         register_rest_route($namespace_path,  '/index-status', array(
             'methods' => 'POST',
