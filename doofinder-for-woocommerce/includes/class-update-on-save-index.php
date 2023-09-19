@@ -67,7 +67,7 @@ class Update_On_Save_Index
         $this->language             = Multilanguage::instance();
         $this->current_language     = $this->language->get_current_language();
         $this->api                    = new Update_On_Save_Api($this->current_language);
-        $this->log                     = new Log('update_on_save_api.txt');
+        $this->log                     = new Log('update-on-save-add-item.log');
     }
 
     /**
