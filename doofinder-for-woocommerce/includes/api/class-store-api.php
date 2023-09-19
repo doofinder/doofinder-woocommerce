@@ -50,7 +50,7 @@ class Store_Api
     public function __construct()
     {
         // Get global disable_api_calls flag
-        $this->log = new Log('stores-api.txt');
+        $this->log = new Log('store_create_api.log');
 
         $this->api_key = Settings::get_api_key();
         $this->api_host = Settings::get_api_host();
@@ -73,7 +73,11 @@ class Store_Api
         if (is_array($api_keys)) {
             $store_payload = $this->build_store_payload($api_keys);
             $this->log->log("store_data: ");
-            $this->log->log($store_payload);
+
+            $store_payload_log = $store_payload;
+            unset($store_payload_log["options"]);
+
+            $this->log->log($store_payload_log);
             return $this->sendRequest("plugins/create-store", $store_payload);
         }
     }
