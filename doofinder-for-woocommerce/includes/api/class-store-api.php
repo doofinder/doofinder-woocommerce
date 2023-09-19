@@ -127,8 +127,12 @@ class Store_Api
                 $lang = '';
             }
 
-            $se_hashid = Settings::get_search_engine_hash($lang);
-            $payload['search_engines'][$se_hashid] = $search_engine['datatypes'][0]['datasources'][0]['options'];
+            if (isset($api_keys[$lang])) {
+                $se_hashid = $api_keys[$lang]['hash']; 
+                $payload['search_engines'][$se_hashid] = $search_engine['datatypes'][0]['datasources'][0]['options'];
+            } else {
+                $this->log->log("No search engine retrieved for the language - " . $lang);
+            }        
         }
 
         $this->log->log("Sending request to normalize indices.");
