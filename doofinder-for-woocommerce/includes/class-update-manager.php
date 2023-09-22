@@ -188,22 +188,4 @@ class Update_Manager
         Migration::migrate_custom_attributes();
         return true;
     }
-
-    /**
-     * Update: 2.0.23
-     * Cleaning logs so that they are saved in the new format
-     */
-    public static function update_020023()
-    {
-        //Old log zip and cleaning
-        if(file_exists(Doofinder_For_WordPress::plugin_path()."logs/log.txt")){
-            $cmds = ["cd ".Doofinder_For_WordPress::plugin_path()."logs",
-                     "tar -czvf old_logs.tar.gz *",
-                     "rm *.txt *.log"];
-
-            $cmd = implode(" && ", $cmds);
-            shell_exec($cmd);
-        }
-        return true;
-    }
 }
