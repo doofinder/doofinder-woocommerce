@@ -323,7 +323,7 @@ class Store_Api
                 [
                     "type" => "wordpress",
                     "options" => [
-                        "feed_type" => "post",
+                        "feed_type" => "posts",
                         "url" =>  $this->language->get_home_url($language)
                     ]
                 ]

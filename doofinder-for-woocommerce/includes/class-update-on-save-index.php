@@ -60,7 +60,7 @@ class Update_On_Save_Index
      *
      * @var array
      */
-    private $post_types = array("product", "product_variation", "post", "page");
+    private $post_types = array("product", "product_variation", "posts", "pages");
 
     public function __construct()
     {
