@@ -317,7 +317,7 @@ class Store_Api
     private function get_post_datatype($language)
     {
         return [
-            "name" => "post",
+            "name" => "posts",
             "preset" => "generic",
             "datasources" => [
                 [
