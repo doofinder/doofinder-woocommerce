@@ -82,7 +82,7 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 
 == Changelog ==
 
-= 2.0.27 =
+= 2.0.28 =
 Fix store payload in wordpress case
 
 = 2.0.27 =
