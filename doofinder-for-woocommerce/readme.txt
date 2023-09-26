@@ -1,7 +1,7 @@
 === Doofinder WP & WooCommerce Search ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.0.27
+Version: 2.0.28
 Requires at least: 4.1
 Tested up to: 6.3.1
 Requires PHP: 5.6
@@ -81,6 +81,9 @@ General Settings
 Just send your questions to <mailto:support@doofinder.com> and we will try to answer as fast as possible with a working solution for you.
 
 == Changelog ==
+
+= 2.0.27 =
+Fix store payload in wordpress case
 
 = 2.0.27 =
 Changes required for the new functionality "Indexable customs posts types".
