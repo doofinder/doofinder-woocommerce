@@ -85,6 +85,8 @@ class REST_API_Handler
         if (is_a($wc_product, 'WC_Product') && method_exists($wc_product, $fn_name)) {
             $price = $wc_product->$fn_name();
             $raw_price =  $price_name === "sale_price" && $price === "" ? "" : self::get_raw_real_price($price, $wc_product);
+            //If price is equal to 0, return an empty string
+            $raw_price = (0 == $raw_price) ? "" : $raw_price;
             return $raw_price;
         }
     }
