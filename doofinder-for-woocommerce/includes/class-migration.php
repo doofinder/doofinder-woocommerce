@@ -63,6 +63,7 @@ class Migration
         self::initialize_migration();
         self::migrate_option('woocommerce_doofinder_feed_attributes_additional_attributes', 'doofinder_for_wp_custom_attributes');
         self::finish_migration(TRUE);
+        self::add_notices();
     }
 
     /**
@@ -72,8 +73,6 @@ class Migration
      */
     private static function initialize_migration()
     {
-        delete_option(Setup_Wizard::$wizard_migration_notice_name);
-        delete_option(Setup_Wizard::$wizard_migration_option);
         add_filter("doofinder-for-wp-migration-transform-woocommerce_doofinder_feed_attributes_additional_attributes", [self::class, 'transform_additional_attributes'], 10, 1);
     }
 
@@ -84,15 +83,15 @@ class Migration
      */
     public static function add_notices()
     {
-        add_action('admin_notices', function () {
-            $migration_completed = "completed" === get_option(Setup_Wizard::$wizard_migration_option);
-            $show_migration_completed_notice = (bool) get_option(Setup_Wizard::$wizard_migration_notice_name);
-            if ($migration_completed && $show_migration_completed_notice) {
-                //Disable the migration notice after showing it once
-                update_option(Setup_Wizard::$wizard_migration_notice_name, 0);
-                echo Setup_Wizard::get_setup_wizard_migration_notice_html();
-            }
-        });
+        $migration_completed = "completed" === get_option(Setup_Wizard::$wizard_migration_option);
+        if ($migration_completed) {
+            $notice_title = __('Migration status', 'wordpress-doofinder');
+            $notice_message = __('Doofinder settings have been migrated successfully.', 'wordpress-doofinder');
+            $notice_name = 'migration-status';
+            Admin_Notices::add_notice($notice_name, $notice_title, $notice_message, 'success');
+            //Set this notice to be shown once
+            Admin_Notices::set_show_once($notice_name);
+        }
     }
 
     /**
@@ -107,7 +106,7 @@ class Migration
             //There was a woocommerce plugin installed, try to import data to the new plugin
             $generic_options = [
                 'woocommerce_doofinder_internal_search_api_key' => 'doofinder_for_wp_api_key',
-                'woocommerce_doofinder_internal_search_api_host' => 'doofinder_for_wp_api_host',
+                'woocommerce_doofinder_api_admin_endpoint' => 'doofinder_for_wp_api_host',
                 'woocommerce_doofinder_feed_attributes_additional_attributes' => 'doofinder_for_wp_custom_attributes',
                 'doofinder_for_wc_sector' => 'doofinder_sector'
             ];
@@ -205,13 +204,6 @@ class Migration
         // Migration completed
         self::$log->log('Migrate - Migration Completed');
         update_option(Setup_Wizard::$wizard_migration_option, 'completed');
-
-        if ($migration_result) {
-            // Add notice about successfull migration
-            self::$log->log('Migrate - Add custom notice');
-            update_option(Setup_Wizard::$wizard_migration_notice_name, 1);
-            self::add_notices();
-        }
     }
 
     /**
