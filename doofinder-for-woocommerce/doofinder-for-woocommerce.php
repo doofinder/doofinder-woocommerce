@@ -275,7 +275,8 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
 
         public static function plugin_update()
         {
-            if (Settings::get_plugin_version() != self::$version) {
+            $current_db_version = Settings::get_plugin_version();
+            if ($current_db_version != self::$version) {
                 Update_Manager::check_updates(self::$version);
             }
         }
