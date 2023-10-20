@@ -150,7 +150,7 @@ class Landing
         ob_start();
     ?>
 
-        <section id="primary" style="max-width: 1600px; padding: 4vw 6vw; margin: 0 auto;" class="df-content-area content-area">
+        <section id="primary" class="df-content-area content-area">
                 <header class="woocommerce-products-header df-products-header">
                     <h1 class="woocommerce-products-header__title page-title"><?php echo $this->landing_data['data']['title']; ?></h1>
                 </header>
@@ -159,13 +159,10 @@ class Landing
                     foreach ($this->landing_data['data']['blocks'] as &$block) {
                         ?>
                         <div class="df-landing-block df-landing-block-<?php echo $landing_slug; ?>">
-
-                        
-                        <?php
-                            echo $block['above'];
-                            echo $this->render_products($block['products'], $landing_slug);
-                            echo $block['below'];
-                         ?>
+                            <div class="df-above-block"><?php echo $block['above']; ?></div>
+                            <div class="df-product-block"><?php echo $this->render_products($block['products'], $landing_slug); ?></div>
+                            <div class="df-below-block"><?php echo $block['below']; ?></div>
+                         
                          </div>
                          <?php
                     }
@@ -233,7 +230,7 @@ class Landing
     private function render_products($products_ids, $slug) {
         $ids = implode(',', $products_ids);
 
-        echo do_shortcode('[products limit="4" columns="4" paginate="true" class="df-products-' . $slug .'" ids="' . $ids . ']');
+        echo do_shortcode('[products limit="4" columns="4" paginate="false" class="df-products-' . $slug .'" ids="' . $ids . ']');
         
     }
 }

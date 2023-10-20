@@ -26,7 +26,11 @@ if (isset($landing_data['data'])) {
 ?>
 <!DOCTYPE html>
     <html <?php language_attributes(); ?>>
-        <?php get_header(); ?>
+        <head>
+            <link rel="stylesheet" href="<?php echo Doofinder_For_WordPress::plugin_url(); ?>assets/css/landing.css">
+            <?php get_header(); ?>      
+        </head>
+       
 
 
         <?php
