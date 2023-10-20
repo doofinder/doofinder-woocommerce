@@ -86,6 +86,35 @@ class Landing
             }
           } );
     }
+    /**
+     * 
+     *
+     * @param string  $meta_title
+     * @param string  $meta_description
+     * @param string  $index
+     *
+     * @return mixed
+     */
+    public static function set_meta_data($meta_title, $meta_description, $index) 
+    {                
+        // Configure the page meta title
+        add_filter('wp_title', function ($title) use ($meta_title) {
+            return $meta_title;
+        }, 10, 2);
+        
+        // Configure the meta description
+        add_filter('document_title_parts', function ($title_parts) use ($meta_description) {
+            $title_parts['description'] = $meta_description;
+            return $title_parts;
+        });
+        
+        // Configure indexing policies
+        if ($index === false) {
+            add_filter('wp_robots', function ($robots) {
+                return 'noindex,nofollow';
+            });
+        }
+    }
 
     /**
      * 
@@ -113,28 +142,35 @@ class Landing
     /**
      * Landing content html
      *
+     * @param string $landing_slug
      *
      */
-    public function get_landing_html()
+    public function get_landing_html($landing_slug)
     {
         ob_start();
     ?>
 
-        <div id="primary" class="df-content-area content-area">
+        <section id="primary" style="max-width: 1600px; padding: 4vw 6vw; margin: 0 auto;" class="df-content-area content-area">
                 <header class="woocommerce-products-header df-products-header">
                     <h1 class="woocommerce-products-header__title page-title"><?php echo $this->landing_data['data']['title']; ?></h1>
-                    <p class="df-products-description"><?php echo $this->landing_data['data']['description']; ?></p>
                 </header>
                     <?php
 
                     foreach ($this->landing_data['data']['blocks'] as &$block) {
-                         echo $block['above'];
-                         echo $this->render_products($block['products']);
-                         echo $block['below'] ;
+                        ?>
+                        <div class="df-landing-block df-landing-block-<?php echo $landing_slug; ?>">
+
+                        
+                        <?php
+                            echo $block['above'];
+                            echo $this->render_products($block['products'], $landing_slug);
+                            echo $block['below'];
+                         ?>
+                         </div>
+                         <?php
                     }
                     ?>
-
-        </div>
+        </section>
     <?php
         $html = ob_get_clean();
         return $html;
@@ -192,63 +228,12 @@ class Landing
      * Renders product listings.
      *
      * @param array $products_ids
+     * @param string $slug
      */
-    private function render_products($products_ids) {
-        if (!function_exists('wc_get_products')) return;
+    private function render_products($products_ids, $slug) {
+        $ids = implode(',', $products_ids);
 
-        // Definimos las variables de paginación y filtro
-        $paged = (get_query_var('paged')) ? absint(get_query_var('paged')) : 1;
-        $ordering = WC()->query->get_catalog_ordering_args();
-        $explode = explode(' ', $ordering['orderby']);
-        $ordering['orderby'] = array_shift($explode);
-        $ordering['orderby'] = stristr($ordering['orderby'], 'price') ? 'meta_value_num' : $ordering['orderby'];
-        $products_per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
-        
-        // Construimos la consulta usando diferentes argumentos, solo necesitaremos los Ids de los productos
-        $custom_products = wc_get_products(array(
-            'status' => 'publish',
-            'visibility' => 'visible',
-            'limit' => $products_per_page,
-            'page' => $paged,
-            'paginate' => true,
-            'return' => $products_ids,
-            'orderby' => $ordering['orderby'],
-            'order' => $ordering['order'],
-        ));
-
-        // Establecemos las propiedades globales para el bucle
-        wc_set_loop_prop('current_page', $paged);
-        wc_set_loop_prop('is_paginated', true);
-        wc_set_loop_prop('page_template', get_page_template_slug());
-        wc_set_loop_prop('per_page', $products_per_page);
-        wc_set_loop_prop('total', $custom_products->total);
-        wc_set_loop_prop('total_pages', $custom_products->max_num_pages);
-
-        // Construcción del bucle de WooCommerce teniendo en cuenta los hooks
-        if ($custom_products) {
-            do_action('woocommerce_before_shop_loop');
-            woocommerce_product_loop_start();
-
-            // Recorremos todos los Ids obtenidos
-            foreach ($custom_products->products as $item) {
-                // $product = wc_get_product($item);
-
-                // // Mostramos el producto usando la plantilla por defecto de WC
-                // wc_get_template_part('archive', 'product', '', array('product' => $product));
-
-                wc_setup_product_data($item);
-
-                // Mostramos el producto usando la plantilla por defecto de WC
-                wc_get_template_part('content', 'product');
-            }
-            wp_reset_postdata();
-            woocommerce_product_loop_end();
-            do_action('woocommerce_after_shop_loop');
-        } else {
-            do_action('woocommerce_no_products_found');
-        }
-        do_action('woocommerce_after_main_content');
-        
+        echo do_shortcode('[products limit="4" columns="4" paginate="true" class="df-products-' . $slug .'" ids="' . $ids . ']');
         
     }
 }

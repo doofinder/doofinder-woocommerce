@@ -78,31 +78,7 @@ class Landing_Api
 
             $this->log->log("to: " . $endpoint);
 
-            // return $this->sendRequest($endpoint);
-
-            $data = [
-                'title' => "Test de prueba",
-                'description' => "description de prueba",
-                'meta_title' => "Meta title de prueba",
-                'meta_description' => "Meta description de prueba",
-                'index' => true,
-                'blocks' => [ 
-                    'block1' => [
-                        'above' => '<p>Esto es above del primer block</p>',
-                        'below' => '<p>Esto es below del primer block</p>',
-                        'position' => 'esto no se muy bien lo que es, es el primero?',
-                        'query' => 'esta query es para doophoenix'
-                    ],
-                    'block2' => [
-                        'above' => '<b>Esto es above del segundo block</b>',
-                        'below' => '<b>Esto es below del segundo block</b>',
-                        'position' => 'esto no se muy bien lo que es, es el segundo?',
-                        'query' => 'esta query es para doophoenix',
-                    ]
-                ]
-            ];
-            
-            return ['data' => $data];
+            return $this->sendRequest($endpoint);
     }
 
     /**
