@@ -133,7 +133,7 @@ class Landing
         $this->landing_data = self::have_params($hashid, $slug) ? $this->landing_api->get_landing_info($hashid, $slug) : $error_not_set ;
 
         if(isset($this->landing_data['data']))
-            $this->build_blocks();
+            $this->build_blocks($hashid);
 
         return $this->landing_data;
 
@@ -160,7 +160,7 @@ class Landing
                         ?>
                         <div class="df-landing-block df-landing-block-<?php echo $landing_slug; ?>">
                             <div class="df-above-block"><?php echo $block['above']; ?></div>
-                            <div class="df-product-block"><?php echo $this->render_products($block['products'], $landing_slug); ?></div>
+                            <div class="df-product-block"><?php echo $this->render_products($block['products']); ?></div>
                             <div class="df-below-block"><?php echo $block['below']; ?></div>
                          
                          </div>
@@ -212,25 +212,34 @@ class Landing
         return !empty($hashid) && !empty($slug) ? true : false;
     }
 
-    public function build_blocks() {
+    public function build_blocks($hashid) {
         foreach ($this->landing_data['data']['blocks'] as &$block) {
-            $product_ids = $this->landing_api->get_custom_result($block['query']);
-            if (is_array($product_ids) && !empty($product_ids))
-                $block['products'] = $product_ids; 
+            $products = $this->landing_api->get_custom_result($hashid, $block['query']);
+            $products_ids = $this->get_product_ids($products['results']);
+
+            if (is_array($products_ids) && !empty($products_ids))
+                $block['products'] = $products_ids; 
             
         }
+    }
+
+    private function get_product_ids($results) {
+        $products_ids = array();
+        foreach ($results as $product) {
+            $products_ids[] =  strval($product['id']);
+        }
+        return $products_ids;
     }
 
     /**
      * Renders product listings.
      *
      * @param array $products_ids
-     * @param string $slug
+     * 
      */
-    private function render_products($products_ids, $slug) {
+    private function render_products($products_ids) {
         $ids = implode(',', $products_ids);
-
-        echo do_shortcode('[products limit="4" columns="4" paginate="false" class="df-products-' . $slug .'" ids="' . $ids . ']');
+        echo do_shortcode('[products limit="4" columns="4" paginate="false" ids="' . $ids . '"]');
         
     }
 }
