@@ -97,6 +97,8 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
             // Load classes on demand
             self::autoload(self::plugin_path() . 'includes/');
 
+            Endpoints::init();
+
             add_action('init', function () use ($class) {
                 //Initialize update on save
                 Update_On_Save::init();
@@ -335,7 +337,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
         {
             add_action('rest_api_init', function () {
                 Config::register();
-                REST_API_Handler::initialize();
+                //REST_API_Handler::initialize();
                 Index_Status_Handler::initialize();
             });
         }

@@ -128,11 +128,11 @@ class Store_Api
             }
 
             if (isset($api_keys[$lang])) {
-                $se_hashid = $api_keys[$lang]['hash']; 
+                $se_hashid = $api_keys[$lang]['hash'];
                 $payload['search_engines'][$se_hashid] = $search_engine['datatypes'][0]['datasources'][0]['options'];
             } else {
                 $this->log->log("No search engine retrieved for the language - " . $lang);
-            }        
+            }
         }
 
         $this->log->log("Sending request to normalize indices.");
@@ -155,27 +155,6 @@ class Store_Api
     public static function has_application_credentials()
     {
         return WP_Application_Passwords::application_name_exists_for_user(get_current_user_id(), 'doofinder');
-    }
-
-    public function update_custom_attributes($custom_attributes){
-        $multilanguage = Multilanguage::instance();
-        $search_engines_by_language = Setup_Wizard::are_api_keys_present(true, $multilanguage);
-
-        if (!Multilanguage::$is_multilang) {
-            $search_engines_by_language = [
-                '' => [
-                    'hash' => Settings::get_search_engine_hash()
-                ]
-            ];
-        }
-        foreach ($search_engines_by_language as $language => $search_engine) {
-            $se_hash = $search_engine["hash"];
-            if(empty($se_hash)){
-                continue;
-            }
-            $response = $this->sendRequest("plugins/wordpress/$se_hash/update-custom-attributes/", $custom_attributes);
-        }
-
     }
 
     /**
@@ -301,8 +280,7 @@ class Store_Api
                     "type" => "wordpress",
                     "options" => [
                         "feed_type" => "product",
-                        "url" => $this->language->get_home_url($language),
-                        "custom_attributes" => Settings::get_custom_attributes()
+                        "lang" => $language
                     ]
                 ]
             ]
@@ -324,7 +302,7 @@ class Store_Api
                     "type" => "wordpress",
                     "options" => [
                         "feed_type" => "posts",
-                        "url" =>  $this->language->get_home_url($language)
+                        "lang" => $language
                     ]
                 ]
             ]
