@@ -20,10 +20,10 @@ class Admin_Notices
         });
     }
 
-    public static function add_notice($notice_name, $title, $message, $type = 'info', $extra = null, $classes = '', $dismissible = false)
+    public static function add_notice($notice_id, $title, $message, $type = 'info', $extra = null, $classes = '', $dismissible = false)
     {
         $current_notices = self::get_custom_notices();
-        $current_notices[$notice_name] = [
+        $current_notices[$notice_id] = [
             'type' => $type,
             'title' => $title,
             'message' => $message,
@@ -35,25 +35,25 @@ class Admin_Notices
     }
 
 
-    public static function add_custom_notice($notice_name, $html)
+    public static function add_custom_notice($notice_id, $html)
     {
         $current_notices = self::get_custom_notices();
-        $current_notices[$notice_name] = [
+        $current_notices[$notice_id] = [
             'is_custom' => true,
             'html' => $html
         ];
         update_option('doofinder_for_wp_notices', $current_notices);
     }
 
-    public static function remove_notice($id)
+    public static function remove_notice($notice_id)
     {
-        if (!self::is_notice_active($id)) {
+        if (!self::is_notice_active($notice_id)) {
             return;
         }
 
         $current_notices = self::get_custom_notices();
-        if (array_key_exists($id, $current_notices)) {
-            unset($current_notices[$id]);
+        if (array_key_exists($notice_id, $current_notices)) {
+            unset($current_notices[$notice_id]);
             update_option('doofinder_for_wp_notices', $current_notices);
         }
     }
@@ -102,6 +102,7 @@ class Admin_Notices
             </div>
         </div>
 <?php
+        self::notice_shown($notice_id);
     }
 
     public static function render_custom_notice($notice_html)
@@ -109,9 +110,40 @@ class Admin_Notices
         echo $notice_html;
     }
 
-    public static function is_notice_active($notice_name)
+    public static function is_notice_active($notice_id)
     {
         $current_notices = self::get_custom_notices();
-        return array_key_exists($notice_name, $current_notices);
+        return array_key_exists($notice_id, $current_notices);
+    }
+
+    /**
+     * Sets the given notice as a show once notice.
+     * It will be automatically disabled after being shown.
+     *
+     * @param string $notice_id The unique notice ID
+     * @return void
+     */
+    public static function set_show_once($notice_id)
+    {
+        if (self::is_notice_active($notice_id)) {
+            $show_once_notices = get_option('doofinder_for_wp_show_once_notices', []);
+            $show_once_notices[] = $notice_id;
+            update_option('doofinder_for_wp_show_once_notices', $show_once_notices);
+        }
+    }
+
+    /**
+     * If the notice was configured as show_once, it will remove the notice
+     *
+     * @param string $notice_id The notice unique identifier.
+     * @return void
+     */
+    public static function notice_shown($notice_id)
+    {
+        $show_once_notices = get_option('doofinder_for_wp_show_once_notices', []);
+        if (in_array($notice_id, $show_once_notices)) {
+            //Remove notice as it was shown
+            self::remove_notice($notice_id);
+        }
     }
 }

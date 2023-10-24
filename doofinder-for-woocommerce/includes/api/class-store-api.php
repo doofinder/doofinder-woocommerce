@@ -138,11 +138,13 @@ class Store_Api
         $this->log->log("Sending request to normalize indices.");
         $response = $this->sendRequest("plugins/wordpress/normalize-indices/", $payload, true);
 
-        if (array_key_exists('errors', $response)) {
+        if (!is_array($response)) {
+            $this->log->log("The store and indices normalization has failed due to an invalid response: " . print_r($response, true));
+        } else if (array_key_exists('errors', $response)) {
             $this->log->log("The store and indices normalization has failed!");
             $this->log->log(print_r($response['errors'], true));
         } else {
-            $this->log->log("The store and indices normalization has finished succesfully!");
+            $this->log->log("The store and indices normalization has finished successfully!");
             $this->log->log("Response: \n" . print_r($response, true));
         }
     }
@@ -155,6 +157,27 @@ class Store_Api
     public static function has_application_credentials()
     {
         return WP_Application_Passwords::application_name_exists_for_user(get_current_user_id(), 'doofinder');
+    }
+
+    public function update_custom_attributes($custom_attributes)
+    {
+        $multilanguage = Multilanguage::instance();
+        $search_engines_by_language = Setup_Wizard::are_api_keys_present(true, $multilanguage);
+
+        if (!Multilanguage::$is_multilang) {
+            $search_engines_by_language = [
+                '' => [
+                    'hash' => Settings::get_search_engine_hash()
+                ]
+            ];
+        }
+        foreach ($search_engines_by_language as $language => $search_engine) {
+            $se_hash = $search_engine["hash"];
+            if (empty($se_hash)) {
+                continue;
+            }
+            $response = $this->sendRequest("plugins/wordpress/$se_hash/update-custom-attributes/", $custom_attributes);
+        }
     }
 
     /**
@@ -182,12 +205,19 @@ class Store_Api
         $response = wp_remote_post($url, $data);
         $response_code = wp_remote_retrieve_response_code($response);
 
+        $this->log->log("Response code: $response_code");
+        $this->log->log("Response: " . print_r($response, true));
+
         if (!$migration) {
             $this->throw_exception($response, $response_code);
         }
 
         $response_body = wp_remote_retrieve_body($response);
+        $this->log->log("Response body: " . print_r($response_body, true));
+
         $decoded_response = json_decode($response_body, true);
+        $this->log->log("Decoded response: " . print_r($decoded_response, true));
+
         return $decoded_response;
     }
 
@@ -375,5 +405,4 @@ class Store_Api
             throw new Exception($error_message, $response_code);
         }
     }
-
 }

@@ -67,13 +67,6 @@ class Setup_Wizard
     private static $wizard_request_token = 'doofinder_setup_wizard_token';
 
     /**
-     * Name of the migration notice
-     *
-     * @var string
-     */
-    public static $wizard_migration_notice_name = 'doofinder_show_the_migration_complete_notice';
-
-    /**
      * Name of the option storing settgins migration info
      *
      * @var string
@@ -723,40 +716,6 @@ class Setup_Wizard
                                 </div>
                             </figure>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    <?php
-        $html = ob_get_clean();
-        return $html;
-    }
-
-
-    /**
-     * Wizard setup notice html
-     *
-     * @param bool $settings
-     *
-     * @return string
-     */
-    public static function get_setup_wizard_migration_notice_html()
-    {
-        ob_start();
-    ?>
-        <div class="notice notice-success is-dismissible">
-            <div id="message" class="wordpress-message df-notice migration-complete">
-                <div class="df-notice-row">
-                    <div class="df-notice-col logo">
-                        <figure class="logo" style="width:5rem;height:auto;float:left;margin:.5em 0;margin-right:0.75rem;">
-                            <img src="<?php echo Doofinder_For_WordPress::plugin_url(); ?>assets/svg/imagotipo1.svg" />
-                        </figure>
-                    </div>
-                    <div class="df-notice-col content">
-                        <h3><?php _e('Migration status', 'wordpress-doofinder') ?></h3>
-                        <p>
-                            <?php _e('Doofinder settings have been migrated successfully.', 'wordpress-doofinder') ?>
-                        </p>
                     </div>
                 </div>
             </div>

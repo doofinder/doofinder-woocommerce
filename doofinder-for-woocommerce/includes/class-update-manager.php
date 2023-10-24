@@ -31,6 +31,7 @@ class Update_Manager
         $current_normalized_version = self::normalize_plugin_version(Settings::get_plugin_version());
         $plugin_normalized_version = self::normalize_plugin_version($plugin_version);
 
+        $result = NULL;
         for ($version = $current_normalized_version + 1; $version <= $plugin_normalized_version; $version++) {
             $version_number = str_pad($version, 6, '0', STR_PAD_LEFT);
             $update_function = 'update_' . $version_number;
@@ -38,7 +39,6 @@ class Update_Manager
             self::log("check if the update  $update_function exists.");
             if (method_exists(Update_Manager::class, $update_function)) {
                 self::log("Executing $update_function update...");
-                $result = NULL;
                 try {
                     $result = call_user_func(array(Update_Manager::class, $update_function));
                 } catch (\Exception $ex) {
@@ -61,6 +61,12 @@ class Update_Manager
                 Settings::set_plugin_version($formatted_version);
             }
         }
+
+        if ($result) {
+            //All updates executed successfully, update the plugin version to the latest one            
+            Settings::set_plugin_version($plugin_version);
+        }
+
         self::log("Updates ended, plugin db version is: " . Settings::get_plugin_version());
     }
 
@@ -140,20 +146,11 @@ class Update_Manager
     public static function update_020000()
     {
         //Update api host to point to admin.doofinder.com instead of api.doofinder.com
-        $multilanguage = Multilanguage::instance();
-        $languages = $multilanguage->get_languages();
-        if (empty($languages)) {
-            $languages = ['' => []];
-        }
-
-        foreach ($languages as $lang_key => $value) {
-            $lang_key = ($lang_key != $multilanguage->get_base_language()) ? $lang_key : '';
-            $api_host = Settings::get_api_host($lang_key);
-            if (!strpos($api_host, "admin.doofinder.com")) {
-                $api_host_parts = explode("-", $api_host);
-                $new_api_host = $api_host_parts[0] . '-' . 'admin.doofinder.com';
-                Settings::set_api_host($new_api_host);
-            }
+        $api_host = Settings::get_api_host();
+        if (!empty($api_host) && !strpos($api_host, "admin.doofinder.com")) {
+            $api_host_parts = explode("-", $api_host);
+            $new_api_host = $api_host_parts[0] . '-' . 'admin.doofinder.com';
+            Settings::set_api_host($new_api_host);
         }
 
         Migration::migrate();
