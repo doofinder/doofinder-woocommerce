@@ -13,8 +13,6 @@ if (!class_exists('Doofinder\WP\Landing')) {
     require_once( $parse_uri[0] . 'wp-load.php' );
 }
 
-$wp_scripts = wp_scripts();
-
 /**
  * @var Landing $landing
  */
@@ -58,6 +56,5 @@ if (isset($landing_data['data'])) {
             ?>
 
             <?php get_footer(); ?>
-            <script src="<?php echo $wp_scripts->base_url . $wp_scripts->registered['jquery-core']->src; ?>"></script>
         </body>
 </html>

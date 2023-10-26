@@ -223,10 +223,13 @@ class Landing
     public function build_blocks($hashid) {
         foreach ($this->landing_data['data']['blocks'] as &$block) {
             $products = $this->landing_api->get_custom_result($hashid, $block['query']);
-            $products_ids = $this->get_product_ids($products['results']);
-
-            if (is_array($products_ids) && !empty($products_ids))
-                $block['products'] = $products_ids; 
+            if (isset($products['results'])) {
+                $products_ids = $this->get_product_ids($products['results']);
+                if (is_array($products_ids) && !empty($products_ids))
+                    $block['products'] = $products_ids; 
+            } else {
+                $block['products'] = $products; 
+            }
             
         }
     }
@@ -246,11 +249,13 @@ class Landing
      * 
      */
     private function render_products($products_ids) {
+        if (isset($products_ids['error']))
+            return $products_ids['error'];
+
         $args = array(
             'post_type' => array('product', 'product_variation'),
             'post__in' => $products_ids,
-            'posts_per_page' => 12,
-            'columns'   => 4
+            'posts_per_page' => 12
         );
 
         $query = new \WP_Query($args);
