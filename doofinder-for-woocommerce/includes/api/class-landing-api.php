@@ -51,10 +51,29 @@ class Landing_Api
     }
 
     /**
-     * Send a POST request with the given $body to the given $endpoint.
+     * Retrieves landing page information from the API using the provided hashid and slug.
      *
-     * @param string $endpoint The endpoint url.
-     * @return array The request decoded response
+     * @param string $hashid The hashid parameter
+     * @param string $slug The slug parameter for the landing page.
+     *
+     * @return array An array containing landing page information or an error message.
+     *
+     * Example of 'data' array:
+     *   [
+     *     'title' => 'Landing Page Title',
+     *     'meta_title' => 'Meta Title',
+     *     'meta_description' => 'Meta Description',
+     *     'index' => 'index_value',
+     *     'blocks' => [
+     *       [
+     *         'above' => 'Above content for block',
+     *         'below' => 'Below content for block',
+     *         'position' => 'block_position',
+     *         'query' => 'custom_query_for_block',
+     *       ],
+     *       // Additional blocks...
+     *     ]
+     *   ]
      */
     public function get_landing_info($hashid, $slug)
     {
@@ -98,11 +117,13 @@ class Landing_Api
     }
 
     /**
-     * Send a POST request with the given $body to the given $endpoint.
+     * Retrieves custom search results from the Doofinder API based on the provided hashid and query.
      *
-     * @param string $hashid The endpoint url.
-     * @param string $query The endpoint url. 
-     * @return array The request decoded response
+     * @param string $hashid The hashid parameter for the search engine.
+     * @param string $query The custom query string for searching products.
+     *
+     * @return array An array containing custom search results or an error message.
+     *
      */
     public function get_custom_result($hashid, $query)
     {
@@ -140,18 +161,20 @@ class Landing_Api
     }
 
     /**
-     * Send a POST request with the given $body to the given $endpoint.
+     * Sends an HTTP POST request to the specified URL with the provided data and handles the response.
      *
-     * @param string $url The endpoint url.
-     * @param array $data The endpoint url.
-     * @return array The request decoded response
+     * @param string $url The URL to which the request is sent.
+     * @param array $data An array containing request parameters and headers.
+     *
+     * @return array An array containing the response data or an error message.
+     *
      */
     private function sendRequest($url, $data)
     {
         $response = wp_remote_post($url, $data);
 
         if (is_wp_error($response)) {
-            // Si se produce un error en la solicitud, devuelve información de error
+            // If an error occurs in the request, returns error information.
             $error = $response->get_error_message();
             $this->log->log("Try request: " . $error);
             return ['error' => $error];

@@ -66,56 +66,64 @@ class Landing
         $this->landing_api                  = new Landing_Api();
     }
 
-    public static function init()
-    {        
+    /**
+     * Initializes the custom functionality of Doofinder for WordPress, including setting up rewrite rules and including custom templates.
+     * 
+    */
+    public static function init() {
+        // Add a custom rewrite tag
         add_rewrite_tag( '%df-landing%', '([^/]+)' );
+
+        // Add a custom rewrite rule
         add_rewrite_rule(
-            '^df/(.+)/?$', 
-            'index.php?df-landing=$matches[1]', 
-            'top'
+            '^df/(.+)/?$', // The rewrite pattern
+            'index.php?df-landing=$matches[1]', // The corresponding query
+            'top' // Rule priority
         );
-        
+
+        // Add an action to redirect to the custom template when the rewrite rule is matched
         add_action( 'template_redirect', function() {
             global $wp_query;
-          
+
+            // Get the value of 'df-landing' from the query
             $model = $wp_query->get( 'df-landing' );
-          
+
+            // If 'df-landing' is not empty, include the custom template and exit the normal flow
             if ( ! empty( $model ) ) {
+                // Include the custom template
                 include Doofinder_For_WordPress::plugin_path() . '/views/landing.php';
                 exit;
             }
-          } );
+        } );
     }
 
-    /**
-     * 
-     *
-     * @param string  $meta_title
-     * @param string  $meta_description
-     * @param string  $index
-     *
-     * @return mixed
-     */
-    public static function set_meta_data($meta_title, $meta_description, $index) 
-    {                
 
+    /**
+     * Sets the meta data for a landing page, including meta title, meta description, and indexing policies.
+     *
+     * @param string $meta_title The meta title to be configured for the landing page.
+     * @param string $meta_description The meta description to be configured for the landing page.
+     * @param bool $index Determines the indexing policies for the landing page. If false, the page will be set to 'noindex, nofollow'.
+     */
+    public static function set_meta_data($meta_title, $meta_description, $index) {
+        // Add classes to the body element
         add_filter('body_class', function($classes) {
             $classes[] = 'archive';
             $classes[] = 'woocommerce';
             return $classes;
-          } );
+        });
 
         // Configure the page meta title
         add_filter('wp_title', function ($title) use ($meta_title) {
             return $meta_title;
         }, 10, 2);
-        
+
         // Configure the meta description
         add_filter('document_title_parts', function ($title_parts) use ($meta_description) {
             $title_parts['description'] = $meta_description;
             return $title_parts;
         });
-        
+
         // Configure indexing policies
         if ($index === false) {
             add_filter('wp_robots', function ($robots) {
@@ -125,33 +133,39 @@ class Landing
     }
 
     /**
-     * 
+     * Retrieves landing page information based on the provided hashid and slug.
      *
-     * @param string  $hashid
-     * @param string  $slug
+     * @param string $hashid The unique identifier (hashid).
+     * @param string $slug The slug of the landing page.
      *
-     * @return mixed
+     * @return array An array containing landing page information or an error message if the page is not well-constructed.
      */
-    public function get_landing_info($hashid, $slug)
-    {
-        $hashid = isset($hashid) ? Settings::get_search_engine_hash($this->current_language) : $hashid;
+    public function get_landing_info($hashid, $slug) {
+        // Determine the hashid to use based on the provided parameter or settings
+        $hashid = !empty($hashid) ? $hashid : Settings::get_search_engine_hash($this->current_language);
 
+        // Define an error message for cases where required parameters are missing
         $error_not_set = ['error' => "The page is not well constructed. The hashid or slug is missing."];
 
-        $this->landing_data = self::have_params($hashid, $slug) ? $this->landing_api->get_landing_info($hashid, $slug) : $error_not_set ;
+        // Check if the necessary parameters are available or return the error message
+        $this->landing_data = self::have_params($hashid, $slug) ? $this->landing_api->get_landing_info($hashid, $slug) : $error_not_set;
 
-        if(isset($this->landing_data['data']))
+        // If landing page data is available, build its blocks
+        if (isset($this->landing_data['data'])) {
             $this->build_blocks($hashid);
+        }
 
+        // Return the landing page information or error message
         return $this->landing_data;
-
     }
 
+
     /**
-     * Landing content html
+     * Generates the HTML content for a landing page based on the provided landing slug.
      *
-     * @param string $landing_slug
+     * @param string $landing_slug The slug of the landing page.
      *
+     * @return string The HTML content for the landing page.
      */
     public function get_landing_html($landing_slug)
     {
@@ -182,11 +196,11 @@ class Landing
     }
     
     /**
-     * Landing error html
+     * Generates HTML content for displaying an error message on the landing page.
      *
-     * @param string  $error
+     * @param string $error The error message to display.
      *
-     * @return string
+     * @return string The HTML content for the error message.
      */
     public function get_error_html($error)
     {
@@ -208,49 +222,63 @@ class Landing
     }
 
     /**
-     * 
+     * Checks if both the hashid and slug parameters are not empty.
      *
-     * @param string  $hashid
-     * @param string  $slug
+     * @param string $hashid The hashid parameter.
+     * @param string $slug The slug parameter.
      *
-     * @return bool
+     * @return bool True if both parameters are not empty, otherwise false.
      */
-    public function have_params($hashid, $slug)
+    private function have_params($hashid, $slug)
     {
         return !empty($hashid) && !empty($slug) ? true : false;
     }
 
-    public function build_blocks($hashid) {
+    /**
+     * Builds product blocks within the landing page using custom queries and retrieves product IDs or an error message.
+     *
+     * @param string $hashid The hashid parameter used for custom queries.
+     */
+    private function build_blocks($hashid) {
         foreach ($this->landing_data['data']['blocks'] as &$block) {
+            // Get custom search results based on the provided query
             $products = $this->landing_api->get_custom_result($hashid, $block['query']);
+    
             if (isset($products['results'])) {
+                // Extract product IDs from the search results
                 $products_ids = $this->get_product_ids($products['results']);
-                if (is_array($products_ids) && !empty($products_ids))
-                    $block['products'] = $products_ids; 
+    
+                if (is_array($products_ids) && !empty($products_ids)) {
+                    $block['products'] = $products_ids;
+                }
             } else {
-                $block['products'] = $products; 
+                // If no results were found, store the original products array or an error message
+                $block['products'] = isset($products['error']) ? $products : $products['results'];
             }
-            
         }
     }
-
+    /**
+     * Extracts product IDs from an array of search results.
+     *
+     * @param array $results An array of search results containing product data.
+     *
+     * @return array An array of product IDs.
+     */
     private function get_product_ids($results) {
-        $products_ids = array();
-        foreach ($results as $product) {
-            $products_ids[] =  strval($product['id']);
-        }
-        return $products_ids;
+        return array_map(function($product) {
+            return strval($product['id']);
+        }, $results);
     }
 
     /**
-     * Renders product listings.
+     * Renders a list of products based on provided product IDs or an error message.
      *
-     * @param array $products_ids
-     * 
+     * @param array $products_ids An array of product IDs or an error message.
+     *
      */
     private function render_products($products_ids) {
         if (isset($products_ids['error']))
-            return $products_ids['error'];
+            echo 'Product ids could not be obtained in our request: : ' . $products_ids['error'];
 
         $args = array(
             'post_type' => array('product', 'product_variation'),
@@ -271,7 +299,7 @@ class Landing
 
             woocommerce_product_loop_end();
         } else {
-            echo 'No se encontraron productos.';
+            echo 'No products were found for the list of ids we have obtained.';
         }
 
         wp_reset_postdata();

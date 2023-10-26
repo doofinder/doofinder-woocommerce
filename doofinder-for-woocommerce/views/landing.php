@@ -2,13 +2,11 @@
 
 namespace Doofinder\WP;
 
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
-
 use Doofinder\WP\Landing;
 
 if (!class_exists('Doofinder\WP\Landing')) {
-    // La clase Landing no está definida, carga el núcleo de WordPress.
+    // The Landing class is not defined, it loads the WordPress core.
+    // This means that it is accessed directly from the PHP file.
     $parse_uri = explode( 'wp-content', $_SERVER['SCRIPT_FILENAME'] );
     require_once( $parse_uri[0] . 'wp-load.php' );
 }
