@@ -32,7 +32,7 @@ class Settings
 	/**
 	 * List of keys that are reserved for custom attributes fields
 	 */
-	public const RESERVED_CUSTOM_ATTRIBUTES_NAMES = [
+	const RESERVED_CUSTOM_ATTRIBUTES_NAMES = [
 		"attributes",
 		"availability",
 		"best_price",
