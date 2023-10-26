@@ -85,6 +85,9 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 = 2.1 =
 New functionality added: Conversion pages.
 
+= 2.0.31 =
+Fixed a bug while processing the indices normalization response.
+
 = 2.0.30 =
 Fix issues while migrating api-host.
 
