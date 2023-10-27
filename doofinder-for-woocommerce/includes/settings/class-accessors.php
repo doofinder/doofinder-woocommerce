@@ -61,7 +61,7 @@ trait Accessors
      */
     public static function get_api_host()
     {
-        // //If we are in local environment, return the DF_API_HOST set in wp-config
+        //If we are in local environment, return the DF_API_HOST set in wp-config
         if (wp_get_environment_type() === 'local' && defined('DF_API_HOST')) {
             return DF_API_HOST;
         }
