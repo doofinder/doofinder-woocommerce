@@ -95,6 +95,7 @@ class Landing
                 exit;
             }
         } );
+        flush_rewrite_rules();
     }
 
 
@@ -181,11 +182,11 @@ class Landing
      * @return string The formatted URL with the slug included.
      */
     private function formated_url($home_url, $slug) {
-        $slug = "/df/{$slug}";
+        $slug = "df/{$slug}";
         if(strpos($home_url, '?lang=') !== false) {
             $formated_url = str_replace('?lang=', "{$slug}/?lang=", $home_url);
         } else {
-            $formated_url = "{$home_url}/{$slug}";
+            $formated_url = "{$home_url}{$slug}";
         }
         return $formated_url;
     }
@@ -196,6 +197,8 @@ class Landing
      * @param string $formated_url The URL to which the redirection will occur.
      */
     private function redirect($formated_url) {
+
+        echo $formated_url;
         header("Location: $formated_url");
         exit;
     }
