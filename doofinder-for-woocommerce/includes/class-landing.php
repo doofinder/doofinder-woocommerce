@@ -197,8 +197,6 @@ class Landing
      * @param string $formated_url The URL to which the redirection will occur.
      */
     private function redirect($formated_url) {
-
-        echo $formated_url;
         header("Location: $formated_url");
         exit;
     }
