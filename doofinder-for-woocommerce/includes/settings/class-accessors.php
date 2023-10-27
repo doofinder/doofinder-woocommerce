@@ -61,7 +61,6 @@ trait Accessors
      */
     public static function get_api_host()
     {
-        // return 'http://edu-doomanager.ngrok.doofinder.com';
         // //If we are in local environment, return the DF_API_HOST set in wp-config
         if (wp_get_environment_type() === 'local' && defined('DF_API_HOST')) {
             return DF_API_HOST;
