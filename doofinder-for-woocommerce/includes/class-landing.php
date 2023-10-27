@@ -133,6 +133,74 @@ class Landing
     }
 
     /**
+     * Create a redirect based on the desired language, slug, and hashid.
+     *
+     * @param string $slug The slug for the redirect.
+     * @param string $hashid The hashid associated with the desired language.
+     *
+     * @return void
+     */
+    public function create_redirect($slug, $hashid) {
+        $languages = $this->language->get_languages();
+        $desired_lang = $this->get_desired_language($languages, $hashid);
+        if ( !empty($desired_lang) && !empty($slug) && !empty($hashid) )  {
+            $home_url = $this->language->get_home_url($desired_lang);
+            $formated_url = $this->formated_url($home_url, $slug);
+            $this->redirect($formated_url);
+        }
+
+    }
+
+    /**
+     * Determine the desired language based on the provided hashid and a list of languages.
+     *
+     * @param array $languages An array of available languages with their properties.
+     * @param string $hashid The hashid associated with the desired language.
+     *
+     * @return string The code of the desired language, or an empty string if not found.
+     */
+    private function get_desired_language($languages, $hashid) {
+        $desired_lang = '';
+        foreach ($languages as $language) {
+            $hashid_by_lang = Settings::get_search_engine_hash($language['code']);
+            if($hashid_by_lang === $hashid) {
+                $desired_lang = $language['code'];
+                break;
+            }
+        }
+
+        return $desired_lang;
+    }
+
+    /**
+     * Format the URL by appending the slug to the home URL while considering different URL formats.
+     *
+     * @param string $home_url The home URL for the desired language.
+     * @param string $slug The slug to be appended to the URL.
+     *
+     * @return string The formatted URL with the slug included.
+     */
+    private function formated_url($home_url, $slug) {
+        $slug = "/df/{$slug}";
+        if(strpos($home_url, '?lang=') !== false) {
+            $formated_url = str_replace('?lang=', "{$slug}/?lang=", $home_url);
+        } else {
+            $formated_url = "{$home_url}/{$slug}";
+        }
+        return $formated_url;
+    }
+
+    /**
+     * Redirect to a given formatted URL.
+     *
+     * @param string $formated_url The URL to which the redirection will occur.
+     */
+    private function redirect($formated_url) {
+        header("Location: $formated_url");
+        exit;
+    }
+
+    /**
      * Retrieves landing page information based on the provided hashid and slug.
      *
      * @param string $hashid The unique identifier (hashid).

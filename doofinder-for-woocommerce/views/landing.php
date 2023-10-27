@@ -21,22 +21,8 @@ $landing_slug = get_query_var('df-landing');
 
 if ($landing_slug != false) {
     $hashid = get_query_var('hashid');;
-} else { ?>
-        <script type="text/javascript">
-            // Extract query parameters from the URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const slug = urlParams.get('slug');
-            
-            // Check if slug are present in the URL
-            if (slug) {
-                // Construct the new URL
-                const newURL = `/df/${slug}`;
-            
-                // Redirect to the new URL
-                window.location.href = newURL;
-            }
-        </script>
-        <?php
+} else {  
+    $landing->create_redirect($_GET['slug'], $_GET['hashid']); 
 }
 
 $landing_data = $landing->get_landing_info($hashid, $landing_slug);
