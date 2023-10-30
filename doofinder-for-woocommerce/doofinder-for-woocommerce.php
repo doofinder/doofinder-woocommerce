@@ -6,7 +6,7 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  * Version: 2.0.32
  * Requires at least: 5.6
- * Requires PHP: 5.6
+ * Requires PHP: 7.0
  * Author: Doofinder
  * Description: Integrate Doofinder Search in your WordPress site or WooCommerce shop.
  *

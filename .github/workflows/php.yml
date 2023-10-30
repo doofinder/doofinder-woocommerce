@@ -2,17 +2,13 @@ name: PHP tests
 on: [push, pull_request]
 jobs:
   phplint:
-    name: PHP Syntax check 5.6|7.2|7.3|8.2
+    name: PHP Syntax check 7.2|7.3|8.2
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: PHP Lint 5.6
-        uses: dbfx/github-phplint/5.6@master
-        with:
-          folder-to-exclude: "! -path \"./vendor/*\""   
       - name: PHP Lint 7.2
         uses: dbfx/github-phplint/7.2@master
         with:
