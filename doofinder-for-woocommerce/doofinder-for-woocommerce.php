@@ -245,6 +245,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 deactivate_plugins($df_wc_plugin);
 
             self::autoload(self::plugin_path() . 'includes/');
+            self::register_urls();
             flush_rewrite_rules();
 
             Update_On_Save::create_update_on_save_db();

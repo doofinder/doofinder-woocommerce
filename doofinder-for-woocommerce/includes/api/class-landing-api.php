@@ -137,19 +137,10 @@ class Landing_Api
             'timeout' => 20,
         ];
 
-        $api_host = $this->api_host;
-        // Divide la URL en partes usando el separador '-'.
-        $parts = explode('-', parse_url($api_host, PHP_URL_HOST));
+        $zone = $this->get_zone();
 
-        // Verifica si el segundo elemento es "admin".
-        if (isset($parts[1]) && $parts[1] === 'admin.doofinder.com') {
-            // La zona está en el primer elemento.
-            $zone = $parts[0];
-            $this->log->log("Zona: $zone");
-        } else {
-            $error_url = "URL no válida. {$api_host}";
-            $this->log->log($error_url);
-            return ['error' => $error_url];
+        if (isset($zone['error'])) {
+            return $zone;
         }
 
         $url = "https://{$zone}-search.doofinder.com{$endpoint}";
@@ -158,6 +149,32 @@ class Landing_Api
         $decoded_response = $this->sendRequest($url, $data);
 
         return $decoded_response;
+    }
+
+    /**
+     * Get the zone from the API host URL.
+     *
+     * This function extracts the zone from the given API host URL. The zone is part of the URL
+     * and is used to determine the specific server zone for making requests to the Doofinder API.
+     *
+     * @return string|array Returns the zone if it's found in the URL. If the zone is not found or the URL is invalid, an array with an 'error' key is returned.
+     */
+    private function get_zone() {
+        $api_host = $this->api_host;
+        // Split the URL into parts using the '-' separator.
+        $parts = explode('-', parse_url($api_host, PHP_URL_HOST));
+
+        // Check if the second element is "admin".
+        if (isset($parts[1]) && $parts[1] === 'admin.doofinder.com') {
+            // The zone is in the first element.
+            $zone = $parts[0];
+            $this->log->log("Zone: $zone");
+            return $zone;
+        } else {
+            $error_url = "Invaid zone in server. {$api_host}";
+            $this->log->log($error_url);
+            return ['error' => $error_url];
+        }
     }
 
     /**
@@ -185,7 +202,7 @@ class Landing_Api
         $decoded_response = json_decode($response_body, true);
 
         if (is_null($decoded_response)) {
-            $error_message = "There was a failure with the request. [{$response_code}] - {$response_body}. Try again later or contact support." ;
+            $error_message = "There was a failure with the request. [{$response_code}] - {$response_body}. Try again later." ;
             $this->log->log("Error in response: [{$response_code}] - {$response_body} )");
             return ['error' => $error_message];
         }

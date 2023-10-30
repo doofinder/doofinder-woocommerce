@@ -347,7 +347,7 @@ class Landing
      */
     private function render_products($products_ids) {
         if (isset($products_ids['error']))
-            echo 'Product ids could not be obtained in our request: : ' . $products_ids['error'];
+            echo 'Product ids could not be obtained in our request: ' . $products_ids['error'];
 
         $args = array(
             'post_type' => array('product', 'product_variation'),
