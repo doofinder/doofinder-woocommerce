@@ -220,9 +220,8 @@ class Landing
         $this->landing_data = self::have_params($hashid, $slug) ? $this->landing_api->get_landing_info($hashid, $slug) : $error_not_set;
 
         // If landing page data is available, build its blocks
-        if (isset($this->landing_data['data'])) {
+        if (isset($this->landing_data['data']))
             $this->build_blocks($hashid);
-        }
 
         // Return the landing page information or error message
         return $this->landing_data;
@@ -317,9 +316,9 @@ class Landing
                 // Extract product IDs from the search results
                 $products_ids = $this->get_product_ids($products['results']);
     
-                if (is_array($products_ids) && !empty($products_ids)) {
+                if (is_array($products_ids) && !empty($products_ids))
                     $block['products'] = $products_ids;
-                }
+
             } else {
                 // If no results were found, store the original products array or an error message
                 $block['products'] = isset($products['error']) ? $products : $products['results'];

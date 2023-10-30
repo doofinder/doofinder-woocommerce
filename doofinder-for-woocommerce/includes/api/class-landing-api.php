@@ -139,9 +139,8 @@ class Landing_Api
 
         $zone = $this->get_zone();
 
-        if (isset($zone['error'])) {
+        if (isset($zone['error']))
             return $zone;
-        }
 
         $url = "https://{$zone}-search.doofinder.com{$endpoint}";
         $this->log->log("Making a request to: $url");
