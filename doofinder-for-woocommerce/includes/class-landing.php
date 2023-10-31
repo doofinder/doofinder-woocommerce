@@ -57,6 +57,10 @@ class Landing
      */
     private $landing_api;
 
+    const DF_LANDING_CACHE = "df_landing_cache";
+
+    const ERROR_MSG = "[500] - Oops! We're experiencing some technical difficulties at the moment. Please check back later. We apologize for any inconvenience.";
+
     public function __construct()
     {
 
@@ -153,55 +157,6 @@ class Landing
     }
 
     /**
-     * Determine the desired language based on the provided hashid and a list of languages.
-     *
-     * @param array $languages An array of available languages with their properties.
-     * @param string $hashid The hashid associated with the desired language.
-     *
-     * @return string The code of the desired language, or an empty string if not found.
-     */
-    private function get_desired_language($languages, $hashid) {
-        $desired_lang = '';
-        foreach ($languages as $language) {
-            $hashid_by_lang = Settings::get_search_engine_hash($language['code']);
-            if($hashid_by_lang === $hashid) {
-                $desired_lang = $language['code'];
-                break;
-            }
-        }
-
-        return $desired_lang;
-    }
-
-    /**
-     * Format the URL by appending the slug to the home URL while considering different URL formats.
-     *
-     * @param string $home_url The home URL for the desired language.
-     * @param string $slug The slug to be appended to the URL.
-     *
-     * @return string The formatted URL with the slug included.
-     */
-    private function formated_url($home_url, $slug) {
-        $slug = "df/{$slug}";
-        if(strpos($home_url, '?lang=') !== false) {
-            $formated_url = str_replace('?lang=', "{$slug}/?lang=", $home_url);
-        } else {
-            $formated_url = "{$home_url}{$slug}";
-        }
-        return $formated_url;
-    }
-
-    /**
-     * Redirect to a given formatted URL.
-     *
-     * @param string $formated_url The URL to which the redirection will occur.
-     */
-    private function redirect($formated_url) {
-        header("Location: $formated_url");
-        exit;
-    }
-
-    /**
      * Retrieves landing page information based on the provided hashid and slug.
      *
      * @param string $hashid The unique identifier (hashid).
@@ -217,16 +172,21 @@ class Landing
         $error_not_set = ['error' => "The page is not well constructed. The hashid or slug is missing."];
 
         // Check if the necessary parameters are available or return the error message
-        $this->landing_data = self::have_params($hashid, $slug) ? $this->landing_api->get_landing_info($hashid, $slug) : $error_not_set;
+        $this->landing_data = self::have_params($hashid, $slug) ? $this->request_landing_info($hashid, $slug) : $error_not_set;
 
-        // If landing page data is available, build its blocks
-        if (isset($this->landing_data['data']))
-            $this->build_blocks($hashid);
+        if(isset($this->landing_data["error"]))
+            $this->log->log($this->landing_data["error"]);
 
         // Return the landing page information or error message
         return $this->landing_data;
     }
 
+    /**
+     * Clears the landing cache by deleting the transient.
+     */
+    public function clear_cache() {
+        delete_transient(self::DF_LANDING_CACHE);
+    }
 
     /**
      * Generates the HTML content for a landing page based on the provided data and landing slug.
@@ -250,9 +210,9 @@ class Landing
             <body class="woocommerce woocommerce-page woocommerce-js">
                     <?php
                     if (isset($landing_data['error'])) {
-                        echo $this->get_error_html($landing_data['error']);
+                        echo $this->get_error_html();
                     } elseif (isset($landing_data['data_not_set'])) {
-                        echo $this->get_error_html($landing_data['data_not_set']);
+                        echo $this->get_error_html();
                     } elseif (isset($landing_data['data'])) {
                         echo $this->get_data_html($landing_slug);
                     }
@@ -304,20 +264,17 @@ class Landing
     /**
      * Generates HTML content for displaying an error message on the landing page.
      *
-     * @param string $error The error message to display.
-     *
      * @return string The HTML content for the error message.
      */
-    public function get_error_html($error)
+    public function get_error_html()
     {
         ob_start();
     ?>
         <div id="primary" class="df-content-area content-area">
              <main id="main" class="site-main">
                 <div class="df-error-col content">
-                    <h3> We couldnt retrieve the API data. Please try again later. </h3>
                     <p>
-                        <?php echo $error; ?>
+                        <?php echo self::ERROR_MSG; ?>
                     </p>
                 </div>
             </div>
@@ -342,7 +299,7 @@ class Landing
             <head>
                 <?php get_header(); ?>      
             </head>
-        <body class="woocommerce woocommerce-page woocommerce-js">
+        <body class="woocommerce woocommerce-page woocommerce-js df-error-col content">
                 <p>Doofinder is disabled</p>
                 <?php get_footer(); ?>
             </body>
@@ -350,6 +307,75 @@ class Landing
     <?php
         $html = ob_get_clean();
         return $html;
+    }
+
+    /**
+     * Determine the desired language based on the provided hashid and a list of languages.
+     *
+     * @param array $languages An array of available languages with their properties.
+     * @param string $hashid The hashid associated with the desired language.
+     *
+     * @return string The code of the desired language, or an empty string if not found.
+     */
+    private function get_desired_language($languages, $hashid) {
+        $desired_lang = '';
+        foreach ($languages as $language) {
+            $hashid_by_lang = Settings::get_search_engine_hash($language['code']);
+            if($hashid_by_lang === $hashid) {
+                $desired_lang = $language['code'];
+                break;
+            }
+        }
+
+        return $desired_lang;
+    }
+
+    /**
+     * Format the URL by appending the slug to the home URL while considering different URL formats.
+     *
+     * @param string $home_url The home URL for the desired language.
+     * @param string $slug The slug to be appended to the URL.
+     *
+     * @return string The formatted URL with the slug included.
+     */
+    private function formated_url($home_url, $slug) {
+        $slug = "df/{$slug}";
+        if(strpos($home_url, '?lang=') !== false) {
+            $formated_url = str_replace('?lang=', "{$slug}/?lang=", $home_url);
+        } else {
+            $formated_url = "{$home_url}{$slug}";
+        }
+        return $formated_url;
+    }
+
+    /**
+     * Redirect to a given formatted URL.
+     *
+     * @param string $formated_url The URL to which the redirection will occur.
+     */
+    private function redirect($formated_url) {
+        header("Location: $formated_url");
+        exit;
+    }
+
+    private function request_landing_info($hashid, $slug) {
+        $cached_data = get_transient(self::DF_LANDING_CACHE);
+
+        if (false === $cached_data) {
+            $this->landing_data = $this->landing_api->get_landing_info($hashid, $slug);
+            // If landing page data is available, build its blocks
+            if (isset($this->landing_data['data'])) {
+                $this->build_blocks($hashid);
+
+                // Cache the data for 15 minutes (900 seconds).
+                 set_transient(self::DF_LANDING_CACHE, $this->landing_data, 900);
+
+            }
+            return $this->landing_data;
+        } 
+
+        // Return the landing page information or error message
+        return $cached_data;
     }
 
     /**
@@ -408,8 +434,10 @@ class Landing
      *
      */
     private function render_products($products_ids) {
-        if (isset($products_ids['error']))
-            echo 'Product ids could not be obtained in our request: ' . $products_ids['error'];
+        if (isset($products_ids['error'])) {
+            $this->log->log("Product ids could not be obtained in our request: " . $products_ids['error']);
+            echo self::ERROR_MSG;
+        }
 
         $args = array(
             'post_type' => array('product', 'product_variation'),
@@ -430,7 +458,8 @@ class Landing
 
             woocommerce_product_loop_end();
         } else {
-            echo 'No products were found for the list of ids we have obtained.';
+            $this->log->log("No products were found for the list of ids we have obtained: " . $products_ids);
+            echo self::ERROR_MSG;
         }
 
         wp_reset_postdata();

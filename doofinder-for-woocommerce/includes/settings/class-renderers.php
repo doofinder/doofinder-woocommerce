@@ -3,11 +3,12 @@
 namespace Doofinder\WP\Settings;
 
 use Doofinder\WP\Api\Store_Api;
+use Doofinder\WP\Landing;
 use Doofinder\WP\Multilanguage\Language_Plugin;
 use Doofinder\WP\Multilanguage\No_Language_Plugin;
-use Doofinder\WP\Setup_Wizard;
-use Doofinder\WP\Settings;
 use Doofinder\WP\Reset_Credentials;
+use Doofinder\WP\Settings;
+use Doofinder\WP\Setup_Wizard;
 
 defined('ABSPATH') or die();
 
@@ -94,6 +95,12 @@ trait Renderers
             echo "<h1>Force Normalization</h1>";
             $store_api = new Store_Api();
             $store_api->normalize_store_and_indices();
+        }
+
+        if (isset($_GET['clear_landing_cache'])) {
+            echo "<h1>Conversion page caché is clear</h1>";
+            $landing = new Landing();
+            $landing->clear_cache();
         }
 
         // add update messages if doesn't exist
