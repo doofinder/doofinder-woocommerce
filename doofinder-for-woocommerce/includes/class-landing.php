@@ -229,13 +229,51 @@ class Landing
 
 
     /**
-     * Generates the HTML content for a landing page based on the provided landing slug.
+     * Generates the HTML content for a landing page based on the provided data and landing slug.
+     *
+     * @param array $landing_data  An array containing landing page information or an error message if the page is not well-constructed.
+     * @param string $landing_slug The slug of the landing page.
+     *
+     * @return string The HTML content for the landing page.
+     */
+    public function get_landing_html($landing_data, $landing_slug)
+    {
+        ob_start();
+    ?>
+
+    <!DOCTYPE html>
+            <html <?php language_attributes(); ?>>
+                <head>
+                    <link rel="stylesheet" href="<?php echo Doofinder_For_WordPress::plugin_url(); ?>assets/css/landing.css">
+                    <?php get_header(); ?>      
+                </head>
+            <body class="woocommerce woocommerce-page woocommerce-js">
+                    <?php
+                    if (isset($landing_data['error'])) {
+                        echo $this->get_error_html($landing_data['error']);
+                    } elseif (isset($landing_data['data_not_set'])) {
+                        echo $this->get_error_html($landing_data['data_not_set']);
+                    } elseif (isset($landing_data['data'])) {
+                        echo $this->get_data_html($landing_slug);
+                    }
+                    ?>
+
+                    <?php get_footer(); ?>
+                </body>
+        </html>
+    <?php
+        $html = ob_get_clean();
+        return $html;
+    }
+
+    /**
+     * Generates the HTML content for a data based on the data.
      *
      * @param string $landing_slug The slug of the landing page.
      *
      * @return string The HTML content for the landing page.
      */
-    public function get_landing_html($landing_slug)
+    public function get_data_html($landing_slug)
     {
         ob_start();
     ?>
@@ -284,6 +322,31 @@ class Landing
                 </div>
             </div>
         </div>
+    <?php
+        $html = ob_get_clean();
+        return $html;
+    }
+
+    /**
+     * Generates HTML content for displaying an error message on the landing page becouse doofinder is disabled.
+     *
+     *
+     * @return string The HTML content for the error message.
+     */
+    public function get_disabled_html()
+    {
+        ob_start();
+    ?>
+    <!DOCTYPE html>
+        <html <?php language_attributes(); ?>>
+            <head>
+                <?php get_header(); ?>      
+            </head>
+        <body class="woocommerce woocommerce-page woocommerce-js">
+                <p>Doofinder is disabled</p>
+                <?php get_footer(); ?>
+            </body>
+    </html>
     <?php
         $html = ob_get_clean();
         return $html;

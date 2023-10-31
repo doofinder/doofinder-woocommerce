@@ -35,40 +35,8 @@ if (is_plugin_active('doofinder-for-woocommerce/doofinder-for-woocommerce.php'))
         $landing->set_meta_data($meta_title, $meta_description, $index);
     }
 
-    ?>
-    <!DOCTYPE html>
-        <html <?php language_attributes(); ?>>
-            <head>
-                <link rel="stylesheet" href="<?php echo Doofinder_For_WordPress::plugin_url(); ?>assets/css/landing.css">
-                <?php get_header(); ?>      
-            </head>
-        <body class="woocommerce woocommerce-page woocommerce-js">
-                <?php
-                if (isset($landing_data['error'])) {
-                    echo $landing->get_error_html($landing_data['error']);
-                } elseif (isset($landing_data['data_not_set'])) {
-                    echo $landing->get_error_html($landing_data['data_not_set']);
-                } elseif (isset($landing_data['data'])) {
-                    echo $landing->get_landing_html($landing_slug);
-                }
-                ?>
-
-                <?php get_footer(); ?>
-            </body>
-    </html>
-    <?php 
-        } else { ?>
-
-    <!DOCTYPE html>
-        <html <?php language_attributes(); ?>>
-            <head>
-                <?php get_header(); ?>      
-            </head>
-        <body class="woocommerce woocommerce-page woocommerce-js">
-                <p>Doofinder is disabled</p>
-                <?php get_footer(); ?>
-            </body>
-    </html>
-    <?php      
-        }
+    echo $landing->get_landing_html($landing_data, $landing_slug);
+} else { 
+    echo $landing->get_disabled_html();    
+}
 ?>    
