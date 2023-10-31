@@ -98,7 +98,7 @@ trait Renderers
         }
 
         if (isset($_GET['clear_landing_cache'])) {
-            echo "<h1>Conversion page caché is clear</h1>";
+            echo "<h1>Conversion page cache is clear</h1>";
             $landing = new Landing();
             $landing->clear_cache();
         }

@@ -342,6 +342,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 Config::register();
                 REST_API_Handler::initialize();
                 Index_Status_Handler::initialize();
+                Landing::register_endpoint();
             });
         }
 

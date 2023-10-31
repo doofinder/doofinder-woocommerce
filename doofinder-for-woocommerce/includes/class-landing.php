@@ -2,6 +2,8 @@
 
 namespace Doofinder\WP;
 
+use WP_REST_Response;
+use WP_REST_Request;
 use Doofinder\WP\Api\Landing_Api;
 use Doofinder\WP\Multilanguage\Language_Plugin;
 use Doofinder\WP\Multilanguage\Multilanguage;
@@ -102,6 +104,14 @@ class Landing
         flush_rewrite_rules();
     }
 
+    public static function register_endpoint() {
+        register_rest_route('doofinder/v1',  '/clear_landing_cache', array(
+            'methods' => 'POST',
+            'callback' => array(Landing::class, 'doomanager_clear_cache'),
+            'permission_callback' => '__return_true'
+        ));
+    }
+
 
     /**
      * Sets the meta data for a landing page, including meta title, meta description, and indexing policies.
@@ -185,7 +195,26 @@ class Landing
      * Clears the landing cache for specific lang  by deleting the transient.
      */
     public function clear_cache() {
-        delete_transient(self::DF_LANDING_CACHE . "_" . $this->current_language);
+        delete_transient(self::lang_cache());
+    }
+
+    /**
+     * Clears the landings cache from doomanager.
+     */
+    public static function doomanager_clear_cache(WP_REST_Request $request) {
+        $class = __CLASS__;
+        $landing = new $class();
+        $languages = $landing->language->get_languages();
+        foreach ($languages as $language) {
+            delete_transient(self::DF_LANDING_CACHE . "_" . $language['code']);
+        }
+        return new WP_REST_Response(
+            [
+                'status' => 200,
+                'response' => "All caches are clean"
+            ]
+        );
+        
     }
 
     /**
@@ -309,6 +338,10 @@ class Landing
         return $html;
     }
 
+    private function lang_cache(){
+       return self::DF_LANDING_CACHE . "_" . $this->current_language;
+    }
+
     /**
      * Determine the desired language based on the provided hashid and a list of languages.
      *
@@ -359,7 +392,7 @@ class Landing
     }
 
     private function request_landing_info($hashid, $slug) {
-        $lang_cache = self::DF_LANDING_CACHE . "_" . $this->current_language;
+        $lang_cache =  self::lang_cache();
         $cached_data = get_transient($lang_cache);
 
         if (false === $cached_data) {
