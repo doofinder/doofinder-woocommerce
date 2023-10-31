@@ -1,10 +1,10 @@
 === Doofinder WP & WooCommerce Search ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.0.31
-Requires at least: 4.1
+Version: 2.0.32
+Requires at least: 5.6
 Tested up to: 6.3.1
-Requires PHP: 5.6
+Requires PHP: 7.0
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -81,6 +81,9 @@ General Settings
 Just send your questions to <mailto:support@doofinder.com> and we will try to answer as fast as possible with a working solution for you.
 
 == Changelog ==
+
+= 2.0.32 =
+Adjusted minimum requirements to install the plugin.
 
 = 2.0.31 =
 Fixed a bug while processing the indices normalization response.
