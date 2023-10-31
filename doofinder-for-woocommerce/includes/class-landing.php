@@ -182,10 +182,10 @@ class Landing
     }
 
     /**
-     * Clears the landing cache by deleting the transient.
+     * Clears the landing cache for specific lang  by deleting the transient.
      */
     public function clear_cache() {
-        delete_transient(self::DF_LANDING_CACHE);
+        delete_transient(self::DF_LANDING_CACHE . "_" . $this->current_language);
     }
 
     /**
@@ -359,7 +359,8 @@ class Landing
     }
 
     private function request_landing_info($hashid, $slug) {
-        $cached_data = get_transient(self::DF_LANDING_CACHE);
+        $lang_cache = self::DF_LANDING_CACHE . "_" . $this->current_language;
+        $cached_data = get_transient($lang_cache);
 
         if (false === $cached_data) {
             $this->landing_data = $this->landing_api->get_landing_info($hashid, $slug);
@@ -368,7 +369,7 @@ class Landing
                 $this->build_blocks($hashid);
 
                 // Cache the data for 15 minutes (900 seconds).
-                 set_transient(self::DF_LANDING_CACHE, $this->landing_data, 900);
+                 set_transient($lang_cache, $this->landing_data, 900);
 
             }
             return $this->landing_data;
