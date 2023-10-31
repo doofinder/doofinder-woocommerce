@@ -144,7 +144,7 @@ class Landing_Api
         if (isset($zone['error']))
             return $zone;
 
-        $url = "https://{$zone}-" . self::SEARCH_API_HOST . $endpoint;
+        $url = "https://" . $zone . "-" . self::SEARCH_API_HOST . $endpoint;
         $this->log->log("Making a request to: $url");
 
         $decoded_response = $this->sendRequest($url, $data);
