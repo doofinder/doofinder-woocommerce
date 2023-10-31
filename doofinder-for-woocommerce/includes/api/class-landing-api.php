@@ -40,6 +40,8 @@ class Landing_Api
      */
     private $api_key;
 
+    const SEARCH_API_HOST = "search.doofinder.com/";
+
     public function __construct()
     {
         // Get global disable_api_calls flag
@@ -127,7 +129,7 @@ class Landing_Api
      */
     public function get_custom_result($hashid, $query)
     {
-        $endpoint = "/6/{$hashid}/_search?query={$query}";
+        $endpoint = "6/{$hashid}/_search?query={$query}";
         $data = [
             'headers' => [
                 'Authorization' => "Token {$this->api_key}",
@@ -142,7 +144,7 @@ class Landing_Api
         if (isset($zone['error']))
             return $zone;
 
-        $url = "https://{$zone}-search.doofinder.com{$endpoint}";
+        $url = "https://{$zone}-" . self::SEARCH_API_HOST . $endpoint;
         $this->log->log("Making a request to: $url");
 
         $decoded_response = $this->sendRequest($url, $data);
