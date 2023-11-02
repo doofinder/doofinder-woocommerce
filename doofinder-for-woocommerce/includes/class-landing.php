@@ -418,7 +418,7 @@ class Landing
      *
      * @return bool True if both parameters are not empty, otherwise false.
      */
-    private function have_params($hashid, $slug)
+    private static function have_params($hashid, $slug)
     {
         return !empty($hashid) && !empty($slug) ? true : false;
     }
@@ -497,7 +497,7 @@ class Landing
         wp_reset_postdata();
     }
 
-    private function translated_error() {
+    private static function translated_error() {
         _e("[500] - Oops! We're experiencing some technical difficulties at the moment. Please check back later. We apologize for any inconvenience.", 'wordpress-doofinder');
     }
 }
