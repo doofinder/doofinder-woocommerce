@@ -61,8 +61,6 @@ class Landing
 
     const DF_LANDING_CACHE = "df_landing_cache";
 
-    const ERROR_MSG = "[500] - Oops! We're experiencing some technical difficulties at the moment. Please check back later. We apologize for any inconvenience.";
-
     public function __construct()
     {
 
@@ -303,7 +301,7 @@ class Landing
              <main id="main" class="site-main">
                 <div class="df-error-col content">
                     <p>
-                        <?php echo self::ERROR_MSG; ?>
+                        <?php echo self::translated_error(); ?>
                     </p>
                 </div>
             </div>
@@ -470,7 +468,7 @@ class Landing
     private function render_products($products_ids) {
         if (isset($products_ids['error'])) {
             $this->log->log("Product ids could not be obtained in our request: " . $products_ids['error']);
-            echo self::ERROR_MSG;
+            echo self::translated_error();
         }
 
         $args = array(
@@ -493,9 +491,13 @@ class Landing
             woocommerce_product_loop_end();
         } else {
             $this->log->log("No products were found for the list of ids we have obtained: " . $products_ids);
-            echo self::ERROR_MSG;
+            echo self::translated_error();
         }
 
         wp_reset_postdata();
+    }
+
+    private function translated_error() {
+        _e("[500] - Oops! We're experiencing some technical difficulties at the moment. Please check back later. We apologize for any inconvenience.", 'wordpress-doofinder');
     }
 }
