@@ -5,7 +5,7 @@ namespace Doofinder\WP;
 use Doofinder\WP\Api\Store_Api;
 use Doofinder\WP\Settings;
 use Doofinder\WP\Log;
-
+use Doofinder\WP\Reset_Credentials_Index;
 class Migration
 {
 
@@ -50,7 +50,7 @@ class Migration
     }
 
     /**
-     * Function to migrate only custom attributes specifically when updating to 
+     * Function to migrate only custom attributes specifically when updating to
      * the plugin version 2.0.13
      *
      * @return void
@@ -266,8 +266,14 @@ class Migration
         return $transformed_attributes;
     }
 
+    public static function create_token_auth()
+    {
+        $reset_credentials_context = new Reset_Credentials_Index();
+        $reset_credentials_context->reset_credentials();
+    }
+
     /**
-     * Converts the former product attribute name from pa_<attribute_name> 
+     * Converts the former product attribute name from pa_<attribute_name>
      * format to wc_<attribute_id> format.
      * Example:
      * pa_color => wc_4

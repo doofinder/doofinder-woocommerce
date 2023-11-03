@@ -63,7 +63,7 @@ class Update_Manager
         }
 
         if ($result) {
-            //All updates executed successfully, update the plugin version to the latest one            
+            //All updates executed successfully, update the plugin version to the latest one
             Settings::set_plugin_version($plugin_version);
         }
 
@@ -183,6 +183,16 @@ class Update_Manager
     public static function update_020013()
     {
         Migration::migrate_custom_attributes();
+        return true;
+    }
+
+    /**
+     * Update: 2.0.32
+     * Update the woocommerce product attributes
+     */
+    public static function update_020100()
+    {
+        Migration::create_token_auth();
         return true;
     }
 }

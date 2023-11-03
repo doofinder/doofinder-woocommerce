@@ -41,4 +41,16 @@ class Reset_Credentials_Index
         $payload = Store_Helpers::get_store_options();
         $this->api->resetCredentials($payload);
     }
+
+    public function reset_token_auth()
+    {
+        $endpoints_token = Store_Helpers::create_endpoints_token();
+        update_option('doofinder_for_wp_token', $endpoints_token);
+
+        $payload = [
+            'df_token'    => $endpoints_token
+        ];
+
+        $this->api->resetCredentials($payload);
+    }
 }
