@@ -19,3 +19,5 @@ wp-content/plugins/hello.php
 doofinder-for-woocommerce.zip
 node_modules
 build
+
+/vendor/
