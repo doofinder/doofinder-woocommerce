@@ -33,7 +33,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
          *
          * @var string
          */
-        public static $version = '2.0.31';
+        public static $version = '2.1.0';
 
         /**
          * The only instance of Doofinder_For_WordPress
@@ -338,7 +338,6 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
         {
             add_action('rest_api_init', function () {
                 Config::register();
-                //REST_API_Handler::initialize();
                 Index_Status_Handler::initialize();
             });
         }
