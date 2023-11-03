@@ -187,7 +187,7 @@ class Update_Manager
     }
 
     /**
-     * Update: 2.0.32
+     * Update: 2.1.0
      * Update the woocommerce product attributes
      */
     public static function update_020100()
