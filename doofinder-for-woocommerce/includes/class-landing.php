@@ -370,6 +370,10 @@ class Landing
      * @return string The formatted URL with the slug included.
      */
     private function formated_url($home_url, $slug) {
+        if (substr($home_url, -1) != '/') {
+            $home_url .= '/';
+        }
+
         $slug = "df/{$slug}";
         if(strpos($home_url, '?lang=') !== false) {
             $formated_url = str_replace('?lang=', "{$slug}/?lang=", $home_url);
