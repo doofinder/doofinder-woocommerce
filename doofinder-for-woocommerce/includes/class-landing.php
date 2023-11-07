@@ -156,7 +156,7 @@ class Landing
     public function create_redirect($slug, $hashid) {
         $languages = $this->language->get_languages();
         $desired_lang = $this->get_desired_language($languages, $hashid);
-        if ( !empty($desired_lang) && !empty($slug) && !empty($hashid) )  {
+        if ( !empty($slug) && !empty($hashid) )  {
             $home_url = $this->language->get_home_url($desired_lang);
             $formated_url = $this->formated_url($home_url, $slug);
             $this->redirect($formated_url);
