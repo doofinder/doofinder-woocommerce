@@ -69,7 +69,7 @@ class Endpoint_Product
                     //unset($filtered_product_data["attributes"]);
                 }
                 // Include images if requested
-                if (in_array('images', $fields)) {
+                if (in_array('image_link', $fields)) {
                     $filtered_product_data = self::clear_images_fields($filtered_product_data);
                 }
                 $filtered_product_data = self::format_prices($filtered_product_data);
