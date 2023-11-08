@@ -438,17 +438,10 @@ class Endpoint_Product
         $custom_attributes    = array();
 
         foreach ($product_attributes as $attribute_name => $attribute_data) {
-            $attribute_slug     = str_replace("pa_", "", $attribute_name);
-            $matching_attribute = false;
+            $attribute_slug = str_replace("pa_", "", $attribute_name);
+            $found_key      = array_search($attribute_slug, array_column($doofinder_attributes, 'field'));
 
-            foreach ($doofinder_attributes as $doofinder_attribute) {
-                if ($doofinder_attribute['field'] === $attribute_slug) {
-                    $matching_attribute = true;
-                    break;
-                }
-            }
-            if($matching_attribute){
-
+            if ($found_key){
                 $attribute_options = $attribute_data['options'] ?? array($attribute_data);
 
                 foreach ($attribute_options as $option) {
@@ -465,13 +458,6 @@ class Endpoint_Product
                 }
             }
         }
-
-        foreach($custom_attributes as $key=>$custom_attribute){
-            if(is_array($custom_attribute) && count($custom_attribute) == 1){
-                $custom_attributes[$key] = $custom_attribute[0];
-            }
-        }
-
         return $custom_attributes;
     }
 
