@@ -269,7 +269,7 @@ class Migration
     public static function create_token_auth()
     {
         $reset_credentials_context = new Reset_Credentials_Index();
-        $reset_credentials_context->reset_credentials();
+        $reset_credentials_context->reset_token_auth();
     }
 
     /**
