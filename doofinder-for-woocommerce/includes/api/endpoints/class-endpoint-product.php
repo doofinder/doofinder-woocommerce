@@ -389,7 +389,7 @@ class Endpoint_Product
                 }
                 //Setting df_variants_information when variation attribute = true
                 if($product["parent_id"] == 0){
-                    $attr_variation_true = self::get_df_variants_information($product);
+                    $attr_variation_true                = self::get_df_variants_information($product);
                     $product["df_variants_information"] = $attr_variation_true;
                     $products[]                         = $product;
                 }
@@ -441,20 +441,11 @@ class Endpoint_Product
             $attribute_slug = str_replace("pa_", "", $attribute_name);
             $found_key      = array_search($attribute_slug, array_column($doofinder_attributes, 'field'));
 
-            if ($found_key){
-                $attribute_options = $attribute_data['options'] ?? array($attribute_data);
-
+            if ($found_key) {
+                $attribute_options = (array) ($attribute_data['options'] ?? $attribute_data);
                 foreach ($attribute_options as $option) {
-                    $term = get_term_by('name', $option, $attribute_name);
-                    if(empty($term)){
-                        $term = get_term_by('id', $option, $attribute_name);
-                    }
-                    if(empty($term)){
-                        $custom_attributes[$attribute_slug][] = $option;
-                    }
-                    else if ($term && !is_wp_error($term)) {
-                        $custom_attributes[$attribute_slug][] = $term->name;
-                    }
+                    $term = get_term_by('name', $option, $attribute_name) ?? get_term_by('id', $option, $attribute_name);
+                    $custom_attributes[$attribute_slug][] = empty($term) || is_wp_error($term) ? $option : $term->name;
                 }
             }
         }
