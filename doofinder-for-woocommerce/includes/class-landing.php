@@ -204,7 +204,7 @@ class Landing
         $landing = new $class();
         $languages = $landing->language->get_languages();
         foreach ($languages as $language) {
-            delete_transient(self::DF_LANDING_CACHE . "_" . $language['code']);
+            delete_transient(self::DF_LANDING_CACHE . "_" . $language['prefix']);
         }
         return new WP_REST_Response(
             [
