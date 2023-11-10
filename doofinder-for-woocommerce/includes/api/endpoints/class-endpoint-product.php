@@ -47,6 +47,7 @@ class Endpoint_Product
             'per_page' => $request->get_param('per_page') ?? self::PER_PAGE,
             'page'     => $request->get_param('page') ?? 1,
             'lang'     => $request->get_param('lang') ?? "",
+            'fields'   => $fields
         ];
 
         // Retrieve the original product data
@@ -58,7 +59,7 @@ class Endpoint_Product
         if (!empty($products)) {
 
             // Include variants if requested
-            $products = self::get_variations($products);
+            $products = self::get_variations($products, $fields);
 
             foreach ($products as $product_data) {
                 // Filter fields
@@ -135,6 +136,7 @@ class Endpoint_Product
      */
     private static function check_stock_status($data, $fields) {
         if (in_array('stock_status', $fields)) {
+            unset($data["stock_status"]);
             return self::check_availability($data);
         }
         return $data;
@@ -440,25 +442,18 @@ class Endpoint_Product
         $products = array();
 
         foreach($products_data as $product){
-
             if($product["type"] == "variable"){
 
                 $variations_data = self::request_variations($product["id"]);
 
-                //Setting parent_id in variations
                 foreach ($variations_data as &$variation) {
-                    foreach ($product as $field => $value) {
-                        if (!isset($variation[$field])) {
-                            $variation[$field]      = $value;
-                            $variation["parent_id"] = $product["id"];
-                        }
-                    }
+                    $variation = array_merge($product, $variation, ["parent_id" => $product["id"]]);
                 }
+
                 //Setting df_variants_information when variation attribute = true
-                if($product["parent_id"] == 0){
-                    $product["df_variants_information"] = self::get_df_variants_information($product);
-                    $products[]                         = $product;
-                }
+                $attr_variation_true                = self::get_df_variants_information($product);
+                $product["df_variants_information"] = $attr_variation_true;
+                $products[]                         = $product;
                 $products = array_merge($products, $variations_data);
             }
             else{
@@ -483,10 +478,11 @@ class Endpoint_Product
             $request = new WP_REST_Request('GET', '/wc/v3/products/' . $product_id . '/variations');
             $request->set_query_params(array(
                 'page'     => $page,
-                'per_page' => self::PER_PAGE,
+                'per_page' => self::PER_PAGE
             ));
             $variants_response = rest_do_request($request);
             $variations_data   = array_merge($variations_data, $variants_response->data);
+
             $page++;
 
         } while (count($variants_response->data) >= self::PER_PAGE);
@@ -533,14 +529,16 @@ class Endpoint_Product
             $attribute_slug = str_replace("pa_", "", $attribute_name);
             $found_key      = array_search($attribute_slug, array_column($doofinder_attributes, 'field'));
 
-            if ($found_key) {
+            if (is_integer($found_key)) {
                 $attribute_options = (array) ($attribute_data['options'] ?? $attribute_data);
+
                 foreach ($attribute_options as $option) {
                     $term = get_term_by('name', $option, $attribute_name) ?? get_term_by('id', $option, $attribute_name);
                     $custom_attributes[$attribute_slug][] = empty($term) || is_wp_error($term) ? $option : $term->name;
                 }
             }
         }
+
         return $custom_attributes;
     }
 

@@ -106,8 +106,9 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 Update_On_Save::init();
                 //Initialize reset credentials
                 Reset_Credentials::init();
-
+                REST_API_Handler::initialize();
                 Landing::init();
+
                 // Init admin functionalities
                 if (is_admin()) {
                     Post::add_additional_settings();
