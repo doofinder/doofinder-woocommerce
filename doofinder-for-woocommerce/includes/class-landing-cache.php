@@ -4,6 +4,7 @@ namespace Doofinder\WP;
 
 use WP_REST_Response;
 use WP_REST_Request;
+use WP_Http;
 use Doofinder\WP\Multilanguage\Multilanguage;
 use Doofinder\WP\Multilanguage\No_Language_Plugin;
 
@@ -11,6 +12,8 @@ class Landing_Cache
 {
 
     const DF_LANDING_CACHE = "df_landing_cache";
+
+    const MINUTE_IN_SECONDS = 60;
 
     /**
      * Registers the custom REST endpoint to clear the landing cache.
@@ -36,8 +39,7 @@ class Landing_Cache
      */
     public static function set_cache($lang_cache, $landing_data)
     {
-        // Cache the data for 15 minutes (900 seconds).
-        set_transient($lang_cache, $landing_data, 900);
+        set_transient($lang_cache, $landing_data, 15 * self::MINUTE_IN_SECONDS);
     }
 
     /**
@@ -128,7 +130,7 @@ class Landing_Cache
 
         return new WP_REST_Response(
             [
-                'status' => 200,
+                'status' => WP_Http::OK,
                 'response' => "All caches are clean"
             ]
         );
