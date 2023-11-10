@@ -232,6 +232,7 @@ class Landing
 
             <?php get_footer(); ?>
         </body>
+
         </html>
     <?php
         $html = ob_get_clean();
