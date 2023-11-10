@@ -100,7 +100,7 @@ trait Renderers
         if (isset($_GET['clear_landing_cache'])) {
             echo "<h1>Conversion page cache is clear</h1>";
             $landing = new Landing();
-            $landing->clear_cache_by_refix();
+            $landing->clear_cache_by_prefix();
         }
 
         // add update messages if doesn't exist

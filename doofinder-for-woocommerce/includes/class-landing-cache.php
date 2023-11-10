@@ -13,8 +13,6 @@ class Landing_Cache
 
     const DF_LANDING_CACHE = "df_landing_cache";
 
-    const MINUTE_IN_SECONDS = 60;
-
     /**
      * Registers the custom REST endpoint to clear the landing cache.
      *
@@ -39,7 +37,7 @@ class Landing_Cache
      */
     public static function set_cache($lang_cache, $landing_data)
     {
-        set_transient($lang_cache, $landing_data, 15 * self::MINUTE_IN_SECONDS);
+        set_transient($lang_cache, $landing_data, 15 * MINUTE_IN_SECONDS);
     }
 
     /**
@@ -75,7 +73,7 @@ class Landing_Cache
      *
      * @since 1.0.0
      */
-    public static function clear_cache_by_refix($lang_cache)
+    public static function clear_cache_by_prefix($lang_cache)
     {
         delete_transient($lang_cache);
     }

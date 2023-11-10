@@ -192,10 +192,10 @@ class Landing
      *
      * @since 1.0.0
      */
-    public function clear_cache_by_refix()
+    public function clear_cache_by_prefix()
     {
         $lang_cache =  self::is_no_multilang() ? Landing_Cache::lang_cache() : Landing_Cache::lang_cache($this->current_language);
-        Landing_Cache::clear_cache_by_refix($lang_cache);
+        Landing_Cache::clear_cache_by_prefix($lang_cache);
     }
 
 
