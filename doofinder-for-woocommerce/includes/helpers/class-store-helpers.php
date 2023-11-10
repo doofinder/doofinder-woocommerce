@@ -19,7 +19,7 @@ class Store_Helpers
         $endpoints_token = Store_Helpers::create_endpoints_token();
 
         update_option('doofinder_for_wp_token', $endpoints_token);
-
+        //TODO api_pass and api_user can be remove since new refactor endpoints
         if (!is_null($password_data)) {
             return [
                 "url" => get_bloginfo('url'),
