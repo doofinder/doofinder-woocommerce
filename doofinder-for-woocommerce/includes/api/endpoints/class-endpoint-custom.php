@@ -34,58 +34,162 @@ class Endpoint_Custom
      * @return WP_REST_Response Response containing modified data.
      */
     public static function custom_endpoint($request) {
-
         Endpoints::CheckSecureToken();
 
-        // Get the 'fields' parameter from the request
-        $fields_param = $request->get_param('fields');
-        $fields       = !empty($fields_param) ? explode(',', $fields_param) : array();
+        $fields = explode(',', $request->get_param('fields') ?? '');
 
-        $config_request["per_page"] = $request->get_param('per_page') ?? self::PER_PAGE;
-        $config_request["page"]     = $request->get_param('page') ?? 1;
-        $config_request["lang"]     = $request->get_param('lang') ?? "";
-        $config_request["type"]     = $request->get_param('type');
+        $config_request = [
+            'per_page' => $request->get_param('per_page') ?? self::PER_PAGE,
+            'page'     => $request->get_param('page') ?? 1,
+            'lang'     => $request->get_param('lang') ?? "",
+            'type'     => $request->get_param('type'),
+        ];
 
-        // Retrieve the original items data
-        $items          = self::get_items($config_request);
-        $modified_items = array();
+        $items = self::get_items($config_request);
+        $modified_items = [];
 
-        // Process and filter items data
-        if (!empty($items)) {
-            foreach ($items as $item_data) {
-                // Filter fields
-                $filtered_data = !empty($fields) ? array_intersect_key($item_data, array_flip($fields)) : $item_data;
+        foreach ($items as $item_data) {
+            $filtered_data = array_intersect_key($item_data, array_flip($fields));
 
-                if(isset($filtered_data["title"]["rendered"]) && in_array('title', $fields)){
-                    $filtered_data["title"] = $filtered_data["title"]["rendered"];
-                }
-                if(isset($filtered_data["content"]["rendered"]) && in_array('content', $fields)){
-                    $filtered_data["content"] = self::process_content($filtered_data["content"]["rendered"]);
-                }
-                if(isset($filtered_data["excerpt"]["rendered"]) && in_array('excerpt', $fields)){
-                    $filtered_data["description"] = self::process_content($filtered_data["excerpt"]["rendered"]);
-                    unset($filtered_data["excerpt"]);
-                }
-                unset($filtered_data["author"]);
-                if(in_array('author', $fields) && $config_request["type"] != "posts"){
-                    $filtered_data["author"] = isset($filtered_data["_embedded"]["author"][0]["name"]) ? $filtered_data["_embedded"]["author"][0]["name"] : "Default";
-                }
-                if(isset($filtered_data["_embedded"]["wp:featuredmedia"][0]["media_details"]["sizes"]["medium"]["source_url"]) && in_array('image_link', $fields)){
-                    $filtered_data["image_link"] = $filtered_data["_embedded"]["wp:featuredmedia"][0]["media_details"]["sizes"]["medium"]["source_url"];
-                }
-                if(isset($filtered_data["_embedded"]["wp:term"][0]) && in_array('post_tags', $fields)){
-                    $filtered_data["post_tags"] = self::get_terms("post_tag", $filtered_data["_embedded"]["wp:term"]);
-                }
-                if(isset($filtered_data["_embedded"]["wp:term"][0]) && in_array('categories', $fields)){
-                    $filtered_data["categories"] = self::get_terms("category", $filtered_data["_embedded"]["wp:term"]);
-                }
-                unset($filtered_data["_embedded"]);
-                $modified_items[] = $filtered_data;
-            }
+            $filtered_data = self::get_title($filtered_data, $fields);
+            $filtered_data = self::get_content($filtered_data, $fields);
+            $filtered_data = self::get_description($filtered_data, $fields);
+            $filtered_data = self::get_author($filtered_data, $fields, $config_request);
+            $filtered_data = self::get_image_link($filtered_data, $fields);
+            $filtered_data = self::get_post_tags($filtered_data, $fields);
+            $filtered_data = self::get_categories($filtered_data, $fields);
+            $filtered_data = self::clear_unused_fields($filtered_data);
+
+            $modified_items[] = $filtered_data;
         }
 
         // Return the modified items data as a response
         return new WP_REST_Response($modified_items);
+    }
+
+    /**
+     * Retrieves and processes the post tags information if requested by the fields.
+     *
+     * @param array $filtered_data The filtered data array.
+     * @param array $fields        The requested fields.
+     *
+     * @return array The filtered data array with post tags information if requested.
+     */
+    private static function get_post_tags($filtered_data, $fields) {
+        if (in_array('post_tags', $fields) && isset($filtered_data["_embedded"]["wp:term"][0])) {
+            $filtered_data["post_tags"] = self::get_terms("post_tag", $filtered_data["_embedded"]["wp:term"]);
+        }
+
+        return $filtered_data;
+    }
+
+    /**
+     * Retrieves and processes the categories information if requested by the fields.
+     *
+     * @param array $filtered_data The filtered data array.
+     * @param array $fields        The requested fields.
+     *
+     * @return array The filtered data array with categories information if requested.
+     */
+    private static function get_categories($filtered_data, $fields) {
+        if (in_array('categories', $fields) && isset($filtered_data["_embedded"]["wp:term"][0])) {
+            $filtered_data["categories"] = self::get_terms("category", $filtered_data["_embedded"]["wp:term"]);
+        }
+
+        return $filtered_data;
+    }
+
+
+    /**
+     * Retrieves and processes the title information if requested by the fields.
+     *
+     * @param array $filtered_data The filtered data array.
+     * @param array $fields        The requested fields.
+     *
+     * @return array The filtered data array with title information if requested.
+     */
+    private static function get_title($filtered_data, $fields) {
+        $filtered_data["title"] = $filtered_data["title"]["rendered"] ?? null;
+
+        return $filtered_data;
+    }
+
+    /**
+     * Retrieves and processes the content information if requested by the fields.
+     *
+     * @param array $filtered_data The filtered data array.
+     * @param array $fields        The requested fields.
+     *
+     * @return array The filtered data array with content information if requested.
+     */
+    private static function get_content($filtered_data, $fields) {
+        $filtered_data["content"] = self::process_content($filtered_data["content"]["rendered"] ?? null);
+
+        return $filtered_data;
+    }
+
+    /**
+     * Retrieves and processes the description information if requested by the fields.
+     *
+     * @param array $filtered_data The filtered data array.
+     * @param array $fields        The requested fields.
+     *
+     * @return array The filtered data array with description information if requested.
+     */
+    private static function get_description($filtered_data, $fields) {
+        $filtered_data["description"] = self::process_content($filtered_data["excerpt"]["rendered"] ?? null);
+
+        return $filtered_data;
+    }
+
+    /**
+     * Retrieves and processes the author information if requested by the fields.
+     *
+     * @param array $filtered_data Product data array.
+     * @param array $fields        The requested fields.
+     * @param array $config_request The configuration request array.
+     *
+     * @return array The filtered data array with author information if requested.
+     */
+    private static function get_author($filtered_data, $fields, $config_request) {
+        if (in_array('author', $fields) && $config_request["type"] != "posts") {
+            $filtered_data["author"] = $filtered_data["_embedded"]["author"][0]["name"] ?? "Default";
+        }
+
+        return $filtered_data;
+    }
+
+    /**
+     * Retrieves and processes the image link information if requested by the fields.
+     *
+     * @param array $filtered_data The filtered data array.
+     * @param array $fields        The requested fields.
+     *
+     * @return array The filtered data array with image link information if requested.
+     */
+    private static function get_image_link($filtered_data, $fields) {
+        $featured_media = $filtered_data["_embedded"]["wp:featuredmedia"][0]["media_details"]["sizes"]["medium"]["source_url"] ?? null;
+        $filtered_data["image_link"] = in_array('image_link', $fields) ? $featured_media : null;
+
+        return $filtered_data;
+    }
+
+
+    /**
+     * Clears unused fields from the filtered data array.
+     *
+     * This function removes specific keys from the provided array, including "excerpt," "_embedded," and "author."
+     *
+     * @param array $filtered_data The data array to be processed.
+     *
+     * @return array The processed data array with unused fields removed.
+     */
+    private static function clear_unused_fields($filtered_data){
+        unset($filtered_data["excerpt"]);
+        unset($filtered_data["_embedded"]);
+        unset($filtered_data["author"]);
+
+        return $filtered_data;
     }
 
     /**

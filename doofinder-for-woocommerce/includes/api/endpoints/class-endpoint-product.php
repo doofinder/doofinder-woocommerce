@@ -42,12 +42,15 @@ class Endpoint_Product
         // Get the 'fields' parameter from the request
         $fields_param = $request->get_param('fields');
         $fields       = !empty($fields_param) ? explode(',', $fields_param) : array();
-        $per_page     = $request->get_param('per_page') ?? self::PER_PAGE;
-        $page         = $request->get_param('page') ?? 1;
-        $lang         = $request->get_param('lang') ?? "";
+
+        $config_request = [
+            'per_page' => $request->get_param('per_page') ?? self::PER_PAGE,
+            'page'     => $request->get_param('page') ?? 1,
+            'lang'     => $request->get_param('lang') ?? "",
+        ];
 
         // Retrieve the original product data
-        $products          = self::get_products($per_page, $page, $lang, $fields);
+        $products          = self::get_products($config_request);
         $custom_attr       = Settings::get_custom_attributes();
         $modified_products = array();
 
@@ -60,35 +63,17 @@ class Endpoint_Product
             foreach ($products as $product_data) {
                 // Filter fields
                 $filtered_product_data = !empty($fields) ? array_intersect_key($product_data, array_flip($fields)) : $product_data;
-                if (in_array('categories', $fields) && isset($product_data["categories"])) {
-                    $filtered_product_data['categories'] = self::get_category_path($product_data["categories"]);
-                }
-                //If shop has custom attributes
-                if (count($custom_attr) > 0) {
-                    $filtered_product_data = array_merge($filtered_product_data, self::get_custom_attributes($product_data["id"]));
-                    //unset($filtered_product_data["attributes"]);
-                }
-                // Include images if requested
-                if (in_array('image_link', $fields)) {
-                    $filtered_product_data = self::clear_images_fields($filtered_product_data);
-                }
+
+                $filtered_product_data = self::get_categories($filtered_product_data, $fields);
+                $filtered_product_data = self::merge_custom_attributes($filtered_product_data, $custom_attr, $product_data["id"]);
+                $filtered_product_data = self::get_image_field($filtered_product_data, $fields);
                 $filtered_product_data = self::format_prices($filtered_product_data);
-
-                if (in_array('stock_status', $fields)) {
-                    $filtered_product_data = self::check_availability($filtered_product_data);
-                }
-
-                if (in_array('description', $fields)) {
-                    $filtered_product_data["description"] = self::process_content($filtered_product_data["description"]);
-                }
-                if (in_array('short_description', $fields)) {
-                    $filtered_product_data["short_description"] = self::process_content($filtered_product_data["short_description"]);
-                }
-                if (in_array('tags', $fields)) {
-                    $filtered_product_data["tags"] = self::get_tag_names($filtered_product_data["tags"]);
-                }
-
+                $filtered_product_data = self::check_stock_status($filtered_product_data, $fields);
+                $filtered_product_data = self::get_description($filtered_product_data, $fields);
+                $filtered_product_data = self::get_short_description($filtered_product_data, $fields);
+                $filtered_product_data = self::get_tags($filtered_product_data, $fields);
                 $filtered_product_data = self::clean_fields($filtered_product_data);
+
                 $modified_products[]   = $filtered_product_data;
             }
             // Cascade variants to their parent products
@@ -96,6 +81,105 @@ class Endpoint_Product
         }
         // Return the modified product data as a response
         return new WP_REST_Response($modified_products);
+    }
+
+    /**
+     * Get categories in the data.
+     *
+     * @param array $data   The data to process.
+     * @param array $fields The list of fields being processed.
+     * @return array The processed data.
+     */
+    private static function get_categories($data, $fields) {
+        if (in_array('categories', $fields) && isset($data["categories"])) {
+            $data['categories'] = self::get_category_path($data["categories"]);
+        }
+        return $data;
+    }
+
+    /**
+     * Merge custom attributes into the data.
+     *
+     * @param array $data        The data to merge into.
+     * @param array $custom_attr The custom attributes to merge.
+     * @param int   $product_id  The ID of the product.
+     * @return array The merged data.
+     */
+    private static function merge_custom_attributes($data, $custom_attr, $product_id) {
+        if (count($custom_attr) > 0) {
+            return array_merge($data, self::get_custom_attributes($product_id));
+        }
+        return $data;
+    }
+
+    /**
+     * Get the image link in the data.
+     *
+     * @param array $data   The data to process.
+     * @param array $fields The list of fields being processed.
+     * @return array The processed data.
+     */
+    private static function get_image_field($data, $fields) {
+        if (in_array('image_link', $fields)) {
+            return self::clear_images_fields($data);
+        }
+        return $data;
+    }
+
+    /**
+     * Check the stock status in the data.
+     *
+     * @param array $data   The data to check.
+     * @param array $fields The list of fields being processed.
+     * @return array The processed data.
+     */
+    private static function check_stock_status($data, $fields) {
+        if (in_array('stock_status', $fields)) {
+            return self::check_availability($data);
+        }
+        return $data;
+    }
+
+    /**
+     * Process the description field in the data.
+     *
+     * @param array $data   The data to process.
+     * @param array $fields The list of fields being processed.
+     * @return array The processed data.
+     */
+    private static function get_description($data, $fields) {
+        if (in_array('description', $fields)) {
+            $data['description'] = self::process_content($data['description']);
+        }
+        return $data;
+    }
+
+    /**
+     * Process the short description field in the data.
+     *
+     * @param array $data   The data to process.
+     * @param array $fields The list of fields being processed.
+     * @return array The processed data.
+     */
+    private static function get_short_description($data, $fields) {
+        if (in_array('short_description', $fields)) {
+            $data['short_description'] = self::process_content($data['short_description']);
+        }
+        return $data;
+    }
+
+    /**
+     * Get tags in the data.
+     *
+     * @param array $data   The data to process.
+     * @param array $fields The list of fields being processed.
+     * @return array The processed data.
+     */
+    private static function get_tags($data, $fields) {
+        if (in_array('tags', $fields)) {
+            $data['tags'] = self::get_tag_names($data['tags']);
+        }
+        return $data;
     }
 
     /**
@@ -130,20 +214,17 @@ class Endpoint_Product
     /**
      * Retrieve a list of products with pagination.
      *
-     * @param int $per_page The number of products per page.
-     * @param int $page     The current page number.
-     * @param int $lang     Language.
-     * @param int $fields   Fields API we want to order
+     * @param int $config   Config request for get products
      * @return array|null   An array of product data or null on failure.
      */
-    private static function get_products($per_page, $page, $lang, $fields){
+    private static function get_products($config){
         // Retrieve the original product data
         $request = new WP_REST_Request('GET', '/wc/v3/products');
         $request->set_query_params(array(
-            'page'     => $page,
-            'per_page' => $per_page,
-            'lang'     => $lang,
-            '_fields'  => $fields
+            'page'     => $config["page"],
+            'per_page' => $config["per_page"],
+            'lang'     => $config["lang"],
+            '_fields'  => $config["fields"]
         ));
         $original_response = rest_do_request($request);
         return $original_response->data;
@@ -362,21 +443,7 @@ class Endpoint_Product
 
             if($product["type"] == "variable"){
 
-                $page            = 1;
-                $variations_data = array();
-
-                //variations pagination
-                do{
-                    $request = new WP_REST_Request('GET', '/wc/v3/products/'.$product["id"].'/variations');
-                    $request->set_query_params(array(
-                        'page'     => $page,
-                        'per_page' => self::PER_PAGE,
-                    ));
-                    $variants_response = rest_do_request($request);
-                    $variations_data   = array_merge($variations_data, $variants_response->data);
-                    $page++;
-                }
-                while(count($variants_response->data) >= self::PER_PAGE);
+                $variations_data = self::request_variations($product["id"]);
 
                 //Setting parent_id in variations
                 foreach ($variations_data as &$variation) {
@@ -389,8 +456,7 @@ class Endpoint_Product
                 }
                 //Setting df_variants_information when variation attribute = true
                 if($product["parent_id"] == 0){
-                    $attr_variation_true                = self::get_df_variants_information($product);
-                    $product["df_variants_information"] = $attr_variation_true;
+                    $product["df_variants_information"] = self::get_df_variants_information($product);
                     $products[]                         = $product;
                 }
                 $products = array_merge($products, $variations_data);
@@ -402,6 +468,31 @@ class Endpoint_Product
         return $products;
     }
 
+    /**
+     * Request variations for a given product ID.
+     *
+     * @param int $product_id The ID of the product.
+     * @return array The variations data.
+     */
+    private static function request_variations($product_id) {
+
+        $page            = 1;
+        $variations_data = array();
+
+        do {
+            $request = new WP_REST_Request('GET', '/wc/v3/products/' . $product_id . '/variations');
+            $request->set_query_params(array(
+                'page'     => $page,
+                'per_page' => self::PER_PAGE,
+            ));
+            $variants_response = rest_do_request($request);
+            $variations_data   = array_merge($variations_data, $variants_response->data);
+            $page++;
+
+        } while (count($variants_response->data) >= self::PER_PAGE);
+
+        return $variations_data;
+    }
 
     /**
      * Generate df_variants_information node response
@@ -416,13 +507,14 @@ class Endpoint_Product
         array_walk($product_attributes, function (&$element) {
             $element = str_replace(['pa_', 'wc_'], '', $element);
         });
-        $attr_variation_true = [];
+
+        $variation_attributes = [];
         foreach($product["attributes"] as $p_attr){
             if($p_attr["variation"] && in_array(strtolower($p_attr["name"]), $product_attributes)){
-                $attr_variation_true[] = strtolower($p_attr["name"]);
+                $variation_attributes[] = strtolower($p_attr["name"]);
             }
         }
-        return $attr_variation_true;
+        return $variation_attributes;
     }
 
     /**
