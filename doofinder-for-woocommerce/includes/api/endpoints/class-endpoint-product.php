@@ -444,11 +444,7 @@ class Endpoint_Product
         foreach($products_data as $product){
             if($product["type"] == "variable"){
 
-                $variations_data = self::request_variations($product["id"]);
-
-                foreach ($variations_data as &$variation) {
-                    $variation = array_merge($product, $variation, ["parent_id" => $product["id"]]);
-                }
+                $variations_data = self::processVariations($product);
 
                 //Setting df_variants_information when variation attribute = true
                 $attr_variation_true                = self::get_df_variants_information($product);
@@ -461,6 +457,24 @@ class Endpoint_Product
             }
         }
         return $products;
+    }
+
+    /**
+     * Process variations for a variable product.
+     *
+     * This function retrieves variations for a variable product, merges them with the product data,
+     * and sets the "parent_id" field.
+     *
+     * @param array $product The product data for a variable product.
+     * @return array The processed array of variations for the variable product.
+     */
+    private static function processVariations($product) {
+        $variations_data = self::request_variations($product["id"]);
+
+        foreach ($variations_data as &$variation) {
+            $variation = array_merge($product, $variation, ["parent_id" => $product["id"]]);
+        }
+        return $variations_data;
     }
 
     /**
