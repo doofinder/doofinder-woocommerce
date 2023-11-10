@@ -149,15 +149,15 @@ class Landing
 
             if (self::is_no_multilang()) {
                 $home_url = $this->language->get_home_url('');
-                $formated_url = $this->formated_url($home_url, $slug);
-                $this->redirect($formated_url);
+                $formatted_url = $this->formatted_url($home_url, $slug);
+                $this->redirect($formatted_url);
             }
 
             $languages = $this->language->get_languages();
             $desired_lang = $this->get_desired_language($languages, $hashid);
             $home_url = $this->language->get_home_url($desired_lang);
-            $formated_url = $this->formated_url($home_url, $slug);
-            $this->redirect($formated_url);
+            $formatted_url = $this->formatted_url($home_url, $slug);
+            $this->redirect($formatted_url);
         }
     }
 
@@ -186,6 +186,18 @@ class Landing
         // Return the landing page information or error message
         return $this->landing_data;
     }
+    
+    /**
+     * Clears landing cache based on the current language or default language if no multilanguage support.
+     *
+     * @since 1.0.0
+     */
+    public function clear_cache_by_refix()
+    {
+        $lang_cache =  self::is_no_multilang() ? Landing_Cache::lang_cache() : Landing_Cache::lang_cache($this->current_language);
+        Landing_Cache::clear_cache_by_refix($lang_cache);
+    }
+
 
     /**
      * Generates the HTML content for a landing page based on the provided data and landing slug.
@@ -344,7 +356,7 @@ class Landing
      *
      * @return string The formatted URL with the slug included.
      */
-    private function formated_url($home_url, $slug)
+    private function formatted_url($home_url, $slug)
     {
         if (substr($home_url, -1) != '/') {
             $home_url .= '/';
@@ -352,21 +364,21 @@ class Landing
 
         $slug = "df/{$slug}";
         if (strpos($home_url, '?lang=') !== false) {
-            $formated_url = str_replace('?lang=', "{$slug}/?lang=", $home_url);
+            $formatted_url = str_replace('?lang=', "{$slug}/?lang=", $home_url);
         } else {
-            $formated_url = "{$home_url}{$slug}";
+            $formatted_url = "{$home_url}{$slug}";
         }
-        return $formated_url;
+        return $formatted_url;
     }
 
     /**
      * Redirect to a given formatted URL.
      *
-     * @param string $formated_url The URL to which the redirection will occur.
+     * @param string $formatted_url The URL to which the redirection will occur.
      */
-    private function redirect($formated_url)
+    private function redirect($formatted_url)
     {
-        header("Location: $formated_url");
+        header("Location: $formatted_url");
         exit;
     }
 
