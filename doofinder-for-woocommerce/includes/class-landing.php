@@ -4,10 +4,10 @@ namespace Doofinder\WP;
 
 use Doofinder\WP\Api\Landing_Api;
 use Doofinder\WP\Landing_Cache;
+use Doofinder\WP\Log;
 use Doofinder\WP\Multilanguage\Multilanguage;
 use Doofinder\WP\Multilanguage\No_Language_Plugin;
 use Doofinder\WP\Settings;
-use Doofinder\WP\Log;
 
 class Landing
 {
@@ -186,7 +186,7 @@ class Landing
         // Return the landing page information or error message
         return $this->landing_data;
     }
-    
+
     /**
      * Clears landing cache based on the current language or default language if no multilanguage support.
      *

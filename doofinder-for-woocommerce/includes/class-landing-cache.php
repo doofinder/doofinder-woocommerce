@@ -2,11 +2,11 @@
 
 namespace Doofinder\WP;
 
-use WP_REST_Response;
-use WP_REST_Request;
-use WP_Http;
 use Doofinder\WP\Multilanguage\Multilanguage;
 use Doofinder\WP\Multilanguage\No_Language_Plugin;
+use WP_Http;
+use WP_REST_Request;
+use WP_REST_Response;
 
 class Landing_Cache
 {
