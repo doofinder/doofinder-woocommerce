@@ -106,6 +106,8 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 Update_On_Save::init();
                 //Initialize reset credentials
                 Reset_Credentials::init();
+
+                Landing::init();
                 // Init admin functionalities
                 if (is_admin()) {
                     Post::add_additional_settings();
@@ -341,6 +343,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
             add_action('rest_api_init', function () {
                 Config::register();
                 Index_Status_Handler::initialize();
+                Landing_Cache::register_endpoint();
             });
         }
 

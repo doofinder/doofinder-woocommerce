@@ -87,6 +87,9 @@ New internal endpoints to obtain products, posts, pages and custom items.
 Refactor in custom attributes management.
 Secure authentication via token in headers.
 
+= 2.0.33 =
+New functionality added: Conversion pages.
+
 = 2.0.32 =
 Adjusted minimum requirements to install the plugin.
 
