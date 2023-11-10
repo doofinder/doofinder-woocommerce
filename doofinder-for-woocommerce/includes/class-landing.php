@@ -198,7 +198,6 @@ class Landing
         Landing_Cache::clear_cache_by_prefix($lang_cache);
     }
 
-
     /**
      * Generates the HTML content for a landing page based on the provided data and landing slug.
      *
@@ -233,7 +232,6 @@ class Landing
 
             <?php get_footer(); ?>
         </body>
-
         </html>
     <?php
         $html = ob_get_clean();
@@ -489,7 +487,6 @@ class Landing
 
         wp_reset_postdata();
     }
-
     private static function translated_error()
     {
         _e("[500] - Oops! We're experiencing some technical difficulties at the moment. Please check back later. We apologize for any inconvenience.", 'wordpress-doofinder');
