@@ -12,7 +12,7 @@ class Endpoint_Product_Category
 {
     const PER_PAGE = 100;
     const CONTEXT  = "doofinder/v1";
-    const ENDPOINT = "/product-cat";
+    const ENDPOINT = "/product_category";
 
     /**
      * Initialize the custom item endpoint.

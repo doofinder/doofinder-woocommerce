@@ -12,7 +12,7 @@ class Endpoint_Post_Category
 {
     const PER_PAGE = 100;
     const CONTEXT  = "doofinder/v1";
-    const ENDPOINT = "/post-cat";
+    const ENDPOINT = "/post_category";
 
     /**
      * Initialize the custom item endpoint.
