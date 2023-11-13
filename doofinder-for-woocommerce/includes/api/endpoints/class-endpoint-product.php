@@ -392,6 +392,7 @@ class Endpoint_Product
         else{
             $product["availability"] = "out of stock";
         }
+        unset($product["purchasable"]);
         return $product;
     }
 
@@ -442,12 +443,17 @@ class Endpoint_Product
         $products = array();
 
         foreach($products_data as $product){
-            if($product["type"] == "variable"){
+            $type       = $product["type"];
+            $attributes = $product["attributes"];
 
+            unset($product["type"]);
+            unset($product["attributes"]);
+
+            if($type == "variable"){
                 $variations_data = self::processVariations($product);
 
                 //Setting df_variants_information when variation attribute = true
-                $attr_variation_true                = self::get_df_variants_information($product);
+                $attr_variation_true                = self::get_df_variants_information($product, $attributes);
                 $product["df_variants_information"] = $attr_variation_true;
                 $products[]                         = $product;
                 $products = array_merge($products, $variations_data);
@@ -508,9 +514,10 @@ class Endpoint_Product
      * Generate df_variants_information node response
      *
      * @param array $product
+     * @param array $attributes
      * @return array df_variants_information
      */
-    private static function get_df_variants_information($product){
+    private static function get_df_variants_information($product, $attributes){
 
         $product_attributes = array_keys(wc_get_product($product["id"])->get_attributes());
 
@@ -519,7 +526,7 @@ class Endpoint_Product
         });
 
         $variation_attributes = [];
-        foreach($product["attributes"] as $p_attr){
+        foreach($attributes as $p_attr){
             if($p_attr["variation"] && in_array(strtolower($p_attr["name"]), $product_attributes)){
                 $variation_attributes[] = strtolower($p_attr["name"]);
             }
