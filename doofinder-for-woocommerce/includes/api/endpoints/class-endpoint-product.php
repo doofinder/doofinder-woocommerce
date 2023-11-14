@@ -372,6 +372,7 @@ class Endpoint_Product
         $product["title"] = $product["name"];
         $product["link"] = $product["permalink"];
 
+        unset($product["attributes"]);
         unset($product["name"]);
         unset($product["permalink"]);
 
@@ -446,7 +447,6 @@ class Endpoint_Product
             $attributes = $product["attributes"];
 
             unset($product["type"]);
-            unset($product["attributes"]);
 
             if($type == "variable"){
                 $variations_data = self::processVariations($product);
