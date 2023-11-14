@@ -136,7 +136,6 @@ class Endpoint_Product
      */
     private static function check_stock_status($data, $fields) {
         if (in_array('stock_status', $fields)) {
-            unset($data["stock_status"]);
             return self::check_availability($data);
         }
         return $data;
@@ -392,7 +391,7 @@ class Endpoint_Product
         else{
             $product["availability"] = "out of stock";
         }
-        unset($product["purchasable"]);
+        unset($product["stock_status"]);
         return $product;
     }
 
