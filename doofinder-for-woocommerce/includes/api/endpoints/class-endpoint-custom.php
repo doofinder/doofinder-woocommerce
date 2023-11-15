@@ -43,6 +43,7 @@ class Endpoint_Custom
             'page'     => $request->get_param('page') ?? 1,
             'lang'     => $request->get_param('lang') ?? "",
             'type'     => $request->get_param('type'),
+            'ids'      => $request->get_param('ids') ?? ""
         ];
 
         $items = self::get_items($config_request);
@@ -237,7 +238,8 @@ class Endpoint_Custom
         $request->set_query_params(array(
             'page'     => $config_request["page"],
             'per_page' => $config_request["per_page"],
-            'lang'     => $config_request["lang"]
+            'lang'     => $config_request["lang"],
+            'include'  => $config_request["ids"]
         ));
         $response = rest_do_request($request);
         $data = rest_get_server()->response_to_data($response, true);

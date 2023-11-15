@@ -47,6 +47,7 @@ class Endpoint_Product
             'per_page' => $request->get_param('per_page') ?? self::PER_PAGE,
             'page'     => $request->get_param('page') ?? 1,
             'lang'     => $request->get_param('lang') ?? "",
+            'ids'      => $request->get_param('ids') ?? "",
             'fields'   => $fields
         ];
 
@@ -225,7 +226,8 @@ class Endpoint_Product
             'page'     => $config["page"],
             'per_page' => $config["per_page"],
             'lang'     => $config["lang"],
-            '_fields'  => $config["fields"]
+            '_fields'  => $config["fields"],
+            'include'  => $config["ids"]
         ));
         $original_response = rest_do_request($request);
         return $original_response->data;
