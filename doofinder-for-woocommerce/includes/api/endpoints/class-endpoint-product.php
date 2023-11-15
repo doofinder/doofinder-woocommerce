@@ -95,7 +95,7 @@ class Endpoint_Product
      * @return array The processed data.
      */
     private static function get_categories($data, $fields) {
-        if (in_array('categories', $fields) && isset($data["categories"])) {
+        if (isset($data["categories"])) {
             $data['categories'] = self::get_category_path($data["categories"]);
         }
         return $data;
@@ -124,10 +124,7 @@ class Endpoint_Product
      * @return array The processed data.
      */
     private static function get_image_field($data, $fields) {
-        if (in_array('image_link', $fields)) {
-            return self::clear_images_fields($data);
-        }
-        return $data;
+        return self::clear_images_fields($data);
     }
 
     /**
@@ -138,10 +135,7 @@ class Endpoint_Product
      * @return array The processed data.
      */
     private static function check_stock_status($data, $fields) {
-        if (in_array('stock_status', $fields)) {
-            return self::check_availability($data);
-        }
-        return $data;
+        return self::check_availability($data);
     }
 
     /**
@@ -152,9 +146,7 @@ class Endpoint_Product
      * @return array The processed data.
      */
     private static function get_description($data, $fields) {
-        if (in_array('description', $fields)) {
-            $data['description'] = self::process_content($data['description']);
-        }
+        $data['description'] = self::process_content($data['description']);
         return $data;
     }
 
@@ -166,9 +158,7 @@ class Endpoint_Product
      * @return array The processed data.
      */
     private static function get_short_description($data, $fields) {
-        if (in_array('short_description', $fields)) {
-            $data['short_description'] = self::process_content($data['short_description']);
-        }
+        $data['short_description'] = self::process_content($data['short_description']);
         return $data;
     }
 
@@ -180,9 +170,7 @@ class Endpoint_Product
      * @return array The processed data.
      */
     private static function get_tags($data, $fields) {
-        if (in_array('tags', $fields)) {
-            $data['tags'] = self::get_tag_names($data['tags']);
-        }
+        $data['tags'] = self::get_tag_names($data['tags']);
         return $data;
     }
 
@@ -367,7 +355,7 @@ class Endpoint_Product
     }
 
     /**
-     * Field names to exchange
+     * Field names to exchange and clear unused or empty fields
      *
      * @param array $product The product array to process.
      * @return array $product without fields excluded
@@ -379,6 +367,10 @@ class Endpoint_Product
         unset($product["attributes"]);
         unset($product["name"]);
         unset($product["permalink"]);
+
+        $product = array_filter($product, function ($value) {
+            return $value !== '' && $value !== null;
+        });
 
         return $product;
     }
