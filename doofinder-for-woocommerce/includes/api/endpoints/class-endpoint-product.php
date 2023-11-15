@@ -111,7 +111,7 @@ class Endpoint_Product
      */
     private static function merge_custom_attributes($data, $custom_attr, $product_id) {
         if (count($custom_attr) > 0) {
-            return array_merge($data, self::get_custom_attributes($product_id));
+            return array_merge($data, self::get_custom_attributes($product_id, $custom_attr));
         }
         return $data;
     }
@@ -231,9 +231,11 @@ class Endpoint_Product
     */
    private static function format_prices($product)
    {
-        $product["price"]         = self::get_price($product["id"]);
-        $product["regular_price"] = self::get_regular_price($product["id"]);
-        $product["sale_price"]    = self::get_sale_price($product["id"]);
+        $wc_product = wc_get_product($product["id"]);
+
+        $product["price"]         = self::get_price($product["id"], $wc_product);
+        $product["regular_price"] = self::get_regular_price($product["id"], $wc_product);
+        $product["sale_price"]    = self::get_sale_price($product["id"], $wc_product);
 
         return $product;
     }
@@ -241,13 +243,12 @@ class Endpoint_Product
     /**
      * Returns the raw price for the given product.
      *
-     * @param array $product The product we want to add the field
+     * @param array WooCommerce Product
      * @param string $price_name The price name. By default 'price'
      * @return void
      */
-    private static function get_raw_price($id, $price_name = 'price')
+    private static function get_raw_price($wc_product, $price_name = 'price')
     {
-        $wc_product = wc_get_product($id);
         $fn_name = "get_$price_name";
         if (is_a($wc_product, 'WC_Product') && method_exists($wc_product, $fn_name)) {
             $price = $wc_product->$fn_name();
@@ -289,9 +290,9 @@ class Endpoint_Product
      * @param integer $id Product ID to get field.
      * @return float The raw price including or excluding taxes (defined in WC settings).
      */
-    private static function get_price($id)
+    private static function get_price($id, $product)
     {
-        return  self::get_raw_price($id);
+        return  self::get_raw_price($product);
     }
 
     /**
@@ -300,9 +301,9 @@ class Endpoint_Product
      * @param integer $id Product ID to get field.
      * @return float The raw sale price including or excluding taxes (defined in WC settings).
      */
-    private static function get_sale_price($id)
+    private static function get_sale_price($id, $product)
     {
-        return  self::get_raw_price($id, 'sale_price');
+        return  self::get_raw_price($product, 'sale_price');
     }
 
     /**
@@ -311,9 +312,9 @@ class Endpoint_Product
      * @param integer $id Product ID to get field.
      * @return float The raw regular price including or excluding taxes (defined in WC settings).
      */
-    private static function get_regular_price($id)
+    private static function get_regular_price($id, $product)
     {
-        return  self::get_raw_price($id, 'regular_price');
+        return  self::get_raw_price($product, 'regular_price');
     }
 
     /**
@@ -533,17 +534,17 @@ class Endpoint_Product
      * Get custom attributes for a product.
      *
      * @param int $product_id The ID of the product.
+     * @param array $custom_attr List of custom attributes.
      * @return array The custom attributes for the product.
      */
-    private static function get_custom_attributes($product_id){
+    private static function get_custom_attributes($product_id, $custom_attr){
 
-        $doofinder_attributes = Settings::get_custom_attributes();
         $product_attributes   = wc_get_product($product_id)->get_attributes();
         $custom_attributes    = array();
 
         foreach ($product_attributes as $attribute_name => $attribute_data) {
             $attribute_slug = str_replace("pa_", "", $attribute_name);
-            $found_key      = array_search($attribute_slug, array_column($doofinder_attributes, 'field'));
+            $found_key      = array_search($attribute_slug, array_column($custom_attr, 'field'));
 
             if (is_integer($found_key)) {
                 $attribute_options = (array) ($attribute_data['options'] ?? $attribute_data);
