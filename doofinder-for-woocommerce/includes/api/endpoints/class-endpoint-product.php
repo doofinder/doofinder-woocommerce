@@ -26,7 +26,7 @@ class Endpoint_Product
         add_action('rest_api_init', function () {
             register_rest_route(self::CONTEXT, self::ENDPOINT, array(
                 'methods'  => 'GET',
-                'callback' => array(Endpoint_Product::class, 'custom_product_endpoint'),
+                'callback' => array(self::class, 'custom_product_endpoint'),
             ));
         });
     }
@@ -35,23 +35,26 @@ class Endpoint_Product
      * Custom product endpoint callback.
      *
      * @param WP_REST_Request $request The REST request object.
+     * @param array $config_request Array config for internal requests.
      * @return WP_REST_Response Response containing modified data.
      */
-    public static function custom_product_endpoint($request) {
+    public static function custom_product_endpoint($request, $config_request = false) {
 
-        Endpoints::CheckSecureToken();
+        if(!$config_request){
+            Endpoints::CheckSecureToken();
 
-        // Get the 'fields' parameter from the request
-        $fields_param = $request->get_param('fields');
-        $fields       = !empty($fields_param) ? explode(',', $fields_param) : array();
+            // Get the 'fields' parameter from the request
+            $fields_param = $request->get_param('fields');
+            $fields       = !empty($fields_param) ? explode(',', $fields_param) : array();
 
-        $config_request = [
-            'per_page' => $request->get_param('per_page') ?? self::PER_PAGE,
-            'page'     => $request->get_param('page') ?? 1,
-            'lang'     => $request->get_param('lang') ?? "",
-            'ids'      => $request->get_param('ids') ?? "",
-            'fields'   => $fields
-        ];
+            $config_request = [
+                'per_page' => $request->get_param('per_page') ?? self::PER_PAGE,
+                'page'     => $request->get_param('page') ?? 1,
+                'lang'     => $request->get_param('lang') ?? "",
+                'ids'      => $request->get_param('ids') ?? "",
+                'fields'   => $fields
+            ];
+        }
 
         // Retrieve the original product data
         $products          = self::get_products($config_request);
@@ -369,9 +372,9 @@ class Endpoint_Product
         unset($product["name"]);
         unset($product["permalink"]);
 
-        $product = array_filter($product, function ($value) {
+        /*$product = array_filter($product, function ($value) {
             return $value !== '' && $value !== null;
-        });
+        });*/
 
         return $product;
     }

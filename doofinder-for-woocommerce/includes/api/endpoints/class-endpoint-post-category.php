@@ -23,7 +23,7 @@ class Endpoint_Post_Category
         add_action('rest_api_init', function () {
             register_rest_route(self::CONTEXT, self::ENDPOINT, array(
                 'methods'  => 'GET',
-                'callback' => array(Endpoint_Post_Category::class, 'post_category_endpoint')
+                'callback' => array(self::class, 'post_category_endpoint')
             ));
         });
     }

@@ -22,7 +22,7 @@ class Endpoint_Custom
         add_action('rest_api_init', function () {
             register_rest_route(self::CONTEXT, self::ENDPOINT, array(
                 'methods'  => 'GET',
-                'callback' => array(Endpoint_Custom::class, 'custom_endpoint')
+                'callback' => array(self::class, 'custom_endpoint')
             ));
         });
     }
