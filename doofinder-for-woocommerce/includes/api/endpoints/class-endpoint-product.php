@@ -355,7 +355,7 @@ class Endpoint_Product
     }
 
     /**
-     * Field names to exchange and clear unused or empty fields
+     * Field names to exchange and clean unused or empty fields
      *
      * @param array $product The product array to process.
      * @return array $product without fields excluded
