@@ -1,5 +1,7 @@
 <?php
 
+ini_set('serialize_precision','-1');
+
 use Doofinder\WP\Endpoints;
 use Doofinder\WP\Settings;
 use Doofinder\WP\Thumbnail;
