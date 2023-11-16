@@ -550,11 +550,10 @@ class Endpoint_Product
             $found_key      = array_search($attribute_slug, array_column($custom_attr, 'field'));
 
             if (is_integer($found_key)) {
-                $attribute_options = (array) ($attribute_data['options'] ?? $attribute_data);
+                $attribute_options = is_string($attribute_data) ? [$attribute_data] : $attribute_data->get_slugs();
 
                 foreach ($attribute_options as $option) {
-                    $term = get_term_by('name', $option, $attribute_name) ?? get_term_by('id', $option, $attribute_name);
-                    $custom_attributes[$attribute_slug][] = empty($term) || is_wp_error($term) ? $option : $term->name;
+                    $custom_attributes[$attribute_slug][] = $option;
                 }
             }
         }

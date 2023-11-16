@@ -343,7 +343,11 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
         {
             add_action('rest_api_init', function () {
                 Config::register();
-                REST_API_Handler::initialize();
+
+                if(empty($_SERVER["HTTP_DOOFINDER_TOKEN"])){
+                    REST_API_Handler::initialize();
+                }
+
                 Index_Status_Handler::initialize();
                 Landing_Cache::register_endpoint();
             });
