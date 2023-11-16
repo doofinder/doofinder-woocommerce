@@ -372,9 +372,9 @@ class Endpoint_Product
         unset($product["name"]);
         unset($product["permalink"]);
 
-        /*$product = array_filter($product, function ($value) {
+        $product = array_filter($product, function ($value) {
             return $value !== '' && $value !== null;
-        });*/
+        });
 
         return $product;
     }
