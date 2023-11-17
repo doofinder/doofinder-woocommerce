@@ -31,25 +31,37 @@ class Endpoint_Custom
      * Custom item endpoint callback.
      *
      * @param WP_REST_Request $request The REST request object.
+     * @param array $config_request Array config for internal requests.
      * @return WP_REST_Response Response containing modified data.
      */
-    public static function custom_endpoint($request) {
-        Endpoints::CheckSecureToken();
+    public static function custom_endpoint($request, $config_request = false) {
 
-        $fields = explode(',', $request->get_param('fields') ?? '');
+        if(!$config_request){
+            Endpoints::CheckSecureToken();
 
-        $config_request = [
-            'per_page' => $request->get_param('per_page') ?? self::PER_PAGE,
-            'page'     => $request->get_param('page') ?? 1,
-            'lang'     => $request->get_param('lang') ?? "",
-            'type'     => $request->get_param('type'),
-            'ids'      => $request->get_param('ids') ?? ""
-        ];
+            // Get the 'fields' parameter from the request
+            $fields_param = $request->get_param('fields') ?? "";
+            $fields       = !empty($fields_param) ? explode(',', $fields_param) : [];
+
+            $config_request = [
+                'per_page' => $request->get_param('per_page') ?? self::PER_PAGE,
+                'page'     => $request->get_param('page') ?? 1,
+                'lang'     => $request->get_param('lang') ?? "",
+                'ids'      => $request->get_param('ids') ?? "",
+                'type'     => $request->get_param('type'),
+                'fields'   => $fields
+            ];
+        }
+        else{
+            $fields_param = $config_request['fields'] ?? "";
+            $fields       = !empty($fields_param) ? explode(',', $fields_param) : [];
+        }
 
         $items = self::get_items($config_request);
         $modified_items = [];
 
         foreach ($items as $item_data) {
+
             $filtered_data = array_intersect_key($item_data, array_flip($fields));
 
             $filtered_data = self::get_title($filtered_data, $fields);

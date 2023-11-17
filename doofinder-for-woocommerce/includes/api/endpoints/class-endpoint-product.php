@@ -45,7 +45,7 @@ class Endpoint_Product
 
             // Get the 'fields' parameter from the request
             $fields_param = $request->get_param('fields');
-            $fields       = !empty($fields_param) ? explode(',', $fields_param) : array();
+            $fields       = !empty($fields_param) ? explode(',', $fields_param) : [];
 
             $config_request = [
                 'per_page' => $request->get_param('per_page') ?? self::PER_PAGE,
@@ -55,6 +55,11 @@ class Endpoint_Product
                 'fields'   => $fields
             ];
         }
+        else{
+            $fields_param = $config_request['fields'] ?? "";
+            $fields       = !empty($fields_param) ? explode(',', $fields_param) : [];
+        }
+
 
         // Retrieve the original product data
         $products          = self::get_products($config_request);
@@ -216,7 +221,7 @@ class Endpoint_Product
         // Retrieve the original product data
         $request = new WP_REST_Request('GET', '/wc/v3/products');
         $request->set_query_params(array(
-            'page'     => $config["page"],
+            'page'     => $config["page"] ?? self::PER_PAGE,
             'per_page' => $config["per_page"],
             'lang'     => $config["lang"],
             '_fields'  => $config["fields"],

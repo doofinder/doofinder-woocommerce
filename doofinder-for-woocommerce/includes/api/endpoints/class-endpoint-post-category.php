@@ -1,7 +1,6 @@
 <?php
 
 use Doofinder\WP\Endpoints;
-use Doofinder\WP\Thumbnail;
 
 /**
  * Class Endpoint_Post_Category
@@ -44,7 +43,7 @@ class Endpoint_Post_Category
         $config_request["fields"]   = $request->get_param('fields') ?? "";
 
         // Get the 'fields' parameter from the request
-        $fields       = !empty($config_request["fields"]) ? explode(',', $config_request["fields"]) : array();
+        $fields       = !empty($config_request["fields"]) ? explode(',', $config_request["fields"]) : [];
 
         // Retrieve the original items data
         $items = self::get_items($config_request);
