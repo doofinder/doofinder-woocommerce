@@ -13,7 +13,7 @@ class Reset_Credentials
         add_action('doofinder_reset_credentials', array($class, 'launch_reset_credentials'), 10, 0);
 
         add_action('wp_ajax_doofinder_reset_credentials', function () {
-            if (!current_user_can('manage_options') || !wp_verify_nonce($_POST['nonce'], 'ajax-nonce')) {
+            if (!current_user_can('manage_options') || !wp_verify_nonce($_POST['nonce'], 'doofinder-ajax-nonce')) {
                 status_header(WP_Http::UNAUTHORIZED);
                 die('Unauthorized request');
             }
