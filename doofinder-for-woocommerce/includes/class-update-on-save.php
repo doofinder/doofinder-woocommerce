@@ -16,6 +16,10 @@ class Update_On_Save
 
         //Force Update on save
         add_action('wp_ajax_doofinder_force_update_on_save', function () {
+            if (!wp_verify_nonce($_POST['nonce'], 'ajax-nonce')) {
+                status_header(\WP_Http::UNAUTHORIZED);
+                die('Unauthorized request');
+            }
             do_action("doofinder_update_on_save");
             wp_send_json_success();
         });

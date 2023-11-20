@@ -82,6 +82,9 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 
 == Changelog ==
 
+= 2.0.34 =
+Improved security in Ajax calls.
+
 = 2.0.33 =
 New functionality added: Conversion pages.
 
