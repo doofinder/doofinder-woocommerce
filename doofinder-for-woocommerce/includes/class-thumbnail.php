@@ -54,7 +54,7 @@ class Thumbnail
 		}
 
 		//I update the image metadata with the new formats
-		//$this->regenerate_thumbnail($thumbnail_id);
+		$this->regenerate_thumbnail($thumbnail_id);
 
 		//I return the URL of the generated image in the metadata
 		$thumbnail = wp_get_attachment_image_src($thumbnail_id, self::$size);
