@@ -91,7 +91,7 @@ class Update_On_Save_Api
         ];
 
         $response = wp_remote_request($url, $data);
-exit();
+
         if (!is_wp_error($response) && $response['response']['code'] === 200) {
             $this->log->log("The update on save request has been processed correctly");
             return TRUE;
