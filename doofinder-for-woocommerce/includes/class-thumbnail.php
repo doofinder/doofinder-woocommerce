@@ -71,7 +71,7 @@ class Thumbnail
 	 * Get size of Format thumbnail requested
 	 *
 	 * @param string $format Format image (large, medium, etc...)
-	 * @return void
+	 * @return array Size of thumbnail requested
 	 */
 	private function get_thumbnail_size($format){
 
