@@ -82,6 +82,12 @@ class Thumbnail
 		//Thumb requested size
 		$thumb_size = $this->get_thumbnail_size(self::$size);
 
+		//If I find the image I am looking for in the metadata, I return it.
+		$thumb_meta = wp_get_attachment_image_src($thumbnail_id, self::$size);
+		if($thumb_meta[0] == $thumb_size["w"] && $thumb_meta[1] == $thumb_size["h"]){
+			return $thumb_meta["0"];
+		}
+
 		//Full img size
 		$img_original = $this->get_original_size($thumbnail_id);
 
