@@ -44,27 +44,44 @@ class Thumbnail
 		}
 
 		$thumbnail_id = get_post_thumbnail_id($this->post);
-		$intermediate = image_get_intermediate_size($thumbnail_id, self::$size);
-		if (FALSE != $intermediate) {
-			return $intermediate['url'];
+		$thumbnail = image_get_intermediate_size($thumbnail_id, self::$size);
+
+		if (FALSE != $thumbnail) {
+			return $thumbnail[0];
 		}
 
-		$thumb_size = $this->get_thumbnail_size(self::$size);
-
-		//Full img size
-		$img_ori = wp_get_attachment_image_src($thumbnail_id, "full");
-		$img_original["w"]   = $img_ori[1] ?? 0;
-		$img_original["h"]   = $img_ori[2] ?? 0;
-
-		//Check if is posible generate a thumb or not
-		if($thumb_size["w"] >= $img_original["w"] || $thumb_size["h"] >= $img_original["h"]){
-			return $img_ori[0] ?? "";
+		$img_url = $this->check_size_image_url($thumbnail_id);
+		if($img_url){
+			return $img_url;
 		}
 
 		$this->regenerate_thumbnail($thumbnail_id);
 		$thumbnail = wp_get_attachment_image_src($thumbnail_id, self::$size);
 
 		return $thumbnail[0];
+	}
+
+	/**
+	 * Checks if we are going to be able to generate the thumbnail from
+	 * the original image and if it cannot then it will return the URL
+	 * of the original image.
+	 *
+	 * @param string $thumbnail_id Thumb ID por check
+	 * @return string URL of Thumb or false
+	 */
+	private function check_size_image_url($thumbnail_id){
+
+		//Thumb requested size
+		$thumb_size = $this->get_thumbnail_size(self::$size);
+
+		//Full img size
+		$img_original = $this->get_original_size($thumbnail_id);
+
+		//Check if is posible generate a thumb or not
+		if($thumb_size["w"] >= $img_original["w"] || $thumb_size["h"] >= $img_original["h"]){
+			return $img_original["url"];
+		}
+		return false;
 	}
 
 	/**
@@ -91,6 +108,24 @@ class Thumbnail
 		}
 
 		return $size;
+	}
+
+	/**
+	 * Get size from thumbnail_id
+	 *
+	 * @param string $thumbnail_id Thumbnail ID for get original size
+	 * @return array Original IMG (w,h and url)
+	 */
+	private function get_original_size($thumbnail_id){
+
+		$img = array();
+		$img_ori = wp_get_attachment_image_src($thumbnail_id, "full");
+
+		$img["url"] = $img_ori[0];
+		$img["w"]   = $img_ori[1];
+		$img["h"]   = $img_ori[2];
+
+		return $img;
 	}
 
 	/**
