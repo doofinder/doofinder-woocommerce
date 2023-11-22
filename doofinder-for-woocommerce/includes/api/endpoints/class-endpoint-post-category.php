@@ -12,6 +12,16 @@ class Endpoint_Post_Category
     const PER_PAGE = 100;
     const CONTEXT  = "doofinder/v1";
     const ENDPOINT = "/post_category";
+    const FIELDS = [
+        "description",
+        "_embedded",
+        "id",
+        "image_link",
+        "link",
+        "name",
+        "parent",
+        "slug"
+        ];
 
     /**
      * Initialize the custom item endpoint.
@@ -40,10 +50,7 @@ class Endpoint_Post_Category
         $config_request["per_page"] = $request->get_param('per_page') ?? self::PER_PAGE;
         $config_request["page"]     = $request->get_param('page') ?? 1;
         $config_request["lang"]     = $request->get_param('lang') ?? "";
-        $config_request["fields"]   = $request->get_param('fields') ?? "";
-
-        // Get the 'fields' parameter from the request
-        $fields       = !empty($config_request["fields"]) ? explode(',', $config_request["fields"]) : [];
+        $config_request["fields"]   = $request->get_param('fields') == "all" ? "" : implode(",", self::get_fields());
 
         // Retrieve the original items data
         $items = self::get_items($config_request);
@@ -75,6 +82,15 @@ class Endpoint_Post_Category
         }
 
         return $data;
+    }
+
+    /**
+     * Get the array of fields.
+     *
+     * @return array The array of fields.
+     */
+    public static function get_fields() {
+        return self::FIELDS;
     }
 }
 ?>

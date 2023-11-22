@@ -49,9 +49,48 @@ class Thumbnail
 			return $intermediate['url'];
 		}
 
+		$thumb_size = $this->get_thumbnail_size(self::$size);
+
+		//Full img size
+		$img_ori = wp_get_attachment_image_src($thumbnail_id, "full");
+		$img_original["w"]   = $img_ori[1] ?? 0;
+		$img_original["h"]   = $img_ori[2] ?? 0;
+
+		//Check if is posible generate a thumb or not
+		if($thumb_size["w"] >= $img_original["w"] || $thumb_size["h"] >= $img_original["h"]){
+			return $img_ori[0] ?? "";
+		}
+
 		$this->regenerate_thumbnail($thumbnail_id);
 		$thumbnail = wp_get_attachment_image_src($thumbnail_id, self::$size);
+
 		return $thumbnail[0];
+	}
+
+	/**
+	 * Get size of Format thumbnail requested
+	 *
+	 * @param string $format Format image (large, medium, etc...)
+	 * @return void
+	 */
+	private function get_thumbnail_size($format){
+
+		$size = array();
+
+		$w_thumb = get_option($format."_size_w");
+		$h_thumb = get_option($format."_size_h");
+
+		if(empty($w_thumb)){
+			$size = explode("x", self::$size);
+			$size["w"] = $size[0] ?? 0;
+			$size["h"] = $size[1] ?? 0;
+		}
+		else{
+			$size["w"] = $w_thumb ?? 0;
+			$size["h"] = $h_thumb ?? 0;
+		}
+
+		return $size;
 	}
 
 	/**

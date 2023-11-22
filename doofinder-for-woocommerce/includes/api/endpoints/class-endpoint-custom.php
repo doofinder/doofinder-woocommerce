@@ -12,6 +12,20 @@ class Endpoint_Custom
     const PER_PAGE = 100;
     const CONTEXT  = "doofinder/v1";
     const ENDPOINT = "/custom";
+    const FIELDS = [
+        "_embedded",
+        "author",
+        "categories",
+        "content",
+        "excerpt",
+        "id",
+        "image_link",
+        "link",
+        "post_tags",
+        "slug",
+        "title"
+      ];
+
 
     /**
      * Initialize the custom item endpoint.
@@ -40,21 +54,19 @@ class Endpoint_Custom
             Endpoints::CheckSecureToken();
 
             // Get the 'fields' parameter from the request
-            $fields_param = $request->get_param('fields') ?? "";
-            $fields       = !empty($fields_param) ? explode(',', $fields_param) : [];
+            $fields = $request->get_param('fields') == "all" ? [] : self::get_fields();
 
             $config_request = [
                 'per_page' => $request->get_param('per_page') ?? self::PER_PAGE,
                 'page'     => $request->get_param('page') ?? 1,
                 'lang'     => $request->get_param('lang') ?? "",
                 'ids'      => $request->get_param('ids') ?? "",
-                'type'     => $request->get_param('type'),
+                'type'     => $request->get_param('type') ?? "",
                 'fields'   => $fields
             ];
         }
         else{
-            $fields_param = $config_request['fields'] ?? "";
-            $fields       = !empty($fields_param) ? explode(',', $fields_param) : [];
+            $fields = !empty($config_request['fields']) ? explode(",", $config_request['fields']) : [];
         }
 
         $items = self::get_items($config_request);
@@ -62,7 +74,7 @@ class Endpoint_Custom
 
         foreach ($items as $item_data) {
 
-            $filtered_data = array_intersect_key($item_data, array_flip($fields));
+            $filtered_data = !empty($fields) ? array_intersect_key($item_data, array_flip($fields)) : $item_data;
 
             $filtered_data = self::get_title($filtered_data, $fields);
             $filtered_data = self::get_content($filtered_data, $fields);
@@ -78,6 +90,39 @@ class Endpoint_Custom
 
         // Return the modified items data as a response
         return new WP_REST_Response($modified_items);
+    }
+
+    /**
+     * Get the array of fields.
+     *
+     * @return array The array of fields.
+     */
+    public static function get_fields() {
+        return self::FIELDS;
+    }
+
+    /**
+     * Get custom data from our endpoint products
+     *
+     * @param array  $ids ID product we want to get data
+     * @param string $type Type of custom data
+     * @return array  Array of custom data
+     */
+    public static function get_data($ids, $type){
+
+        $request_params = array(
+            "ids"      => implode(",", $ids),
+            "fields"   => implode(",", self::get_fields()),
+            "type"     => $type
+        );
+
+        $items = self::custom_endpoint(false, $request_params)->data;
+
+        array_walk($items, function (&$product) {
+            unset($product['_links']);
+        });
+
+        return $items;
     }
 
     /**

@@ -16,6 +16,34 @@ class Endpoint_Product
     const PER_PAGE = 100;
     const CONTEXT  = "doofinder/v1";
     const ENDPOINT = "/product";
+    const FIELDS = [
+        "attributes",
+        "average_rating",
+        "best_price",
+        "catalog_visibility",
+        "categories",
+        "description",
+        "df_group_leader",
+        "df_variants_information",
+        "group_id",
+        "id",
+        "image_link",
+        "link",
+        "meta_data",
+        "name",
+        "parent_id",
+        "permalink",
+        "price",
+        "purchasable",
+        "regular_price",
+        "sale_price",
+        "short_description",
+        "sku",
+        "slug",
+        "stock_status",
+        "tags",
+        "type"
+      ];
 
     /**
      * Initialize the custom product endpoint.
@@ -44,8 +72,7 @@ class Endpoint_Product
             Endpoints::CheckSecureToken();
 
             // Get the 'fields' parameter from the request
-            $fields_param = $request->get_param('fields');
-            $fields       = !empty($fields_param) ? explode(',', $fields_param) : [];
+            $fields = $request->get_param('fields') == "all" ? [] : self::get_fields();
 
             $config_request = [
                 'per_page' => $request->get_param('per_page') ?? self::PER_PAGE,
@@ -77,13 +104,14 @@ class Endpoint_Product
                 $filtered_product_data = !empty($fields) ? array_intersect_key($product_data, array_flip($fields)) : $product_data;
 
                 $filtered_product_data = self::get_categories($filtered_product_data, $fields);
-                $filtered_product_data = self::merge_custom_attributes($filtered_product_data, $custom_attr, $product_data["id"]);
+                $filtered_product_data = self::merge_custom_attributes($filtered_product_data, $custom_attr);
                 $filtered_product_data = self::get_image_field($filtered_product_data, $fields);
                 $filtered_product_data = self::format_prices($filtered_product_data);
                 $filtered_product_data = self::check_stock_status($filtered_product_data, $fields);
                 $filtered_product_data = self::get_description($filtered_product_data, $fields);
                 $filtered_product_data = self::get_short_description($filtered_product_data, $fields);
                 $filtered_product_data = self::get_tags($filtered_product_data, $fields);
+                $filtered_product_data = self::get_meta_attributes($filtered_product_data, $custom_attr);
                 $filtered_product_data = self::clean_fields($filtered_product_data);
 
                 $modified_products[]   = $filtered_product_data;
@@ -93,6 +121,37 @@ class Endpoint_Product
         }
         // Return the modified product data as a response
         return new WP_REST_Response($modified_products);
+    }
+
+    /**
+     * Get the array of fields.
+     *
+     * @return array The array of fields.
+     */
+    public static function get_fields() {
+        return self::FIELDS;
+    }
+
+    /**
+     * Get products data from our endpoint products
+     *
+     * @param array  $ids ID product we want to get data
+     * @return array  Array Products
+     */
+    public static function get_data($ids){
+
+        $request_params = array(
+            "ids"      => implode(",", $ids),
+            "fields"   => implode(",", self::get_fields())
+        );
+
+        $items = self::custom_product_endpoint(false, $request_params)->data;
+
+        array_walk($items, function (&$product) {
+            unset($product['_links']);
+        });
+
+        return $items;
     }
 
     /**
@@ -114,13 +173,34 @@ class Endpoint_Product
      *
      * @param array $data        The data to merge into.
      * @param array $custom_attr The custom attributes to merge.
-     * @param int   $product_id  The ID of the product.
      * @return array The merged data.
      */
-    private static function merge_custom_attributes($data, $custom_attr, $product_id) {
+    private static function merge_custom_attributes($data, $custom_attr) {
         if (count($custom_attr) > 0) {
-            return array_merge($data, self::get_custom_attributes($product_id, $custom_attr));
+            return array_merge($data, self::get_custom_attributes($data["id"], $custom_attr));
         }
+        return $data;
+    }
+
+    /**
+     * Get custom meta field data from product
+     *
+     * @param array $data        The data to merge into.
+     * @param array $custom_attr The custom attributes to merge.
+     * @return array The merged data.
+     */
+    private static function get_meta_attributes($data, $custom_attr) {
+        foreach ($custom_attr as $attr) {
+            if ($attr["type"] == "metafield") {
+                foreach ($data["meta_data"] as $meta) {
+                    $meta_data = $meta->get_data();
+                    if ($meta_data["key"] == $attr["field"]) {
+                        $data[$attr["field"]] = $meta_data["value"] ?? "";
+                    }
+                }
+            }
+        }
+        unset($data["meta_data"]);
         return $data;
     }
 

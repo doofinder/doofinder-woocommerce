@@ -13,6 +13,16 @@ class Endpoint_Product_Category
     const PER_PAGE = 100;
     const CONTEXT  = "doofinder/v1";
     const ENDPOINT = "/product_category";
+    const FIELDS = [
+        "description",
+        "_embedded",
+        "id",
+        "image_link",
+        "link",
+        "name",
+        "parent",
+        "slug"
+        ];
 
     /**
      * Initialize the custom item endpoint.
@@ -41,10 +51,10 @@ class Endpoint_Product_Category
         $config_request["per_page"] = $request->get_param('per_page') ?? self::PER_PAGE;
         $config_request["page"]     = $request->get_param('page') ?? 1;
         $config_request["lang"]     = $request->get_param('lang') ?? "";
-        $config_request["fields"]   = $request->get_param('fields') ?? "";
+        $config_request["fields"]   = $request->get_param('fields') == "all" ? "" : implode(",", self::get_fields());
 
         // Get the 'fields' parameter from the request
-        $fields       = !empty($config_request["fields"]) ? explode(',', $config_request["fields"]) : array();
+        $fields = !empty($config_request["fields"]) ? self::get_fields() : [];
 
         // Retrieve the original items data
         $items = self::get_items($config_request);
@@ -52,7 +62,7 @@ class Endpoint_Product_Category
         if (!empty($items)) {
             foreach ($items as &$item_data) {
 
-                if(in_array('image_link', $fields)){
+                if(in_array('image_link', $fields) || empty($fields)){
                     $item_data["image_link"] = self::get_product_cat_df_image_link($item_data);
                 }
             }
@@ -60,6 +70,15 @@ class Endpoint_Product_Category
 
         // Return the modified items data as a response
         return new WP_REST_Response($items);
+    }
+
+    /**
+     * Get the array of fields.
+     *
+     * @return array The array of fields.
+     */
+    public static function get_fields() {
+        return self::FIELDS;
     }
 
     /**

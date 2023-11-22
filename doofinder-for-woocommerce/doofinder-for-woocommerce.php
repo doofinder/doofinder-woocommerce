@@ -99,13 +99,14 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
             // Load classes on demand
             self::autoload(self::plugin_path() . 'includes/');
 
-            Endpoints::init();
-
             add_action('init', function () use ($class) {
+
                 //Initialize update on save
                 Update_On_Save::init();
                 //Initialize reset credentials
                 Reset_Credentials::init();
+                //Initialize custom endpoints
+                Endpoints::init();
 
                 Landing::init();
 
