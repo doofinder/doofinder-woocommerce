@@ -82,6 +82,9 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 
 == Changelog ==
 
+= 2.1.1 =
+Update on save refactor and add fields tu custom endpoints
+
 = 2.1.0 =
 New internal endpoints to obtain products, posts, pages and custom items.
 Refactor in custom attributes management.

@@ -195,4 +195,17 @@ class Update_Manager
         Migration::create_token_auth();
         return true;
     }
+
+    /**
+     * Update: 2.1.1
+     * Update the woocommerce product attributes
+     */
+    public static function update_020101()
+    {
+        $doomanager_host = Settings::get_api_host();
+        $dooplugins_host = str_replace("admin", "plugins", $doomanager_host);
+        Settings::set_dooplugins_host($dooplugins_host);
+
+        return true;
+    }
 }
