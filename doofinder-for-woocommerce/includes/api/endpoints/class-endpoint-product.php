@@ -80,6 +80,8 @@ class Endpoint_Product
                 'page'     => $request->get_param('page') ?? 1,
                 'lang'     => $request->get_param('lang') ?? "",
                 'ids'      => $request->get_param('ids') ?? "",
+                'orderby'  => $request->get_param('orderby') ?? "id",
+                'order'    => $request->get_param('order') ?? "desc",
                 'fields'   => $fields
             ];
         }
@@ -308,7 +310,8 @@ class Endpoint_Product
             'status'   => "publish",
             '_fields'  => $config["fields"],
             'include'  => $config["ids"],
-            'orderby'  => "id"
+            'orderby'  => $config["orderby"],
+            'order'  => $config["order"]
         ));
         $original_response = rest_do_request($request);
         return $original_response->data;
