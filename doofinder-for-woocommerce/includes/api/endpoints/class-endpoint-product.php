@@ -305,7 +305,9 @@ class Endpoint_Product
             'per_page' => $config["per_page"],
             'lang'     => $config["lang"],
             '_fields'  => $config["fields"],
-            'include'  => $config["ids"]
+            'include'  => $config["ids"],
+            "orderby"  => "id",
+            "order"    => "asc"
         ));
         $original_response = rest_do_request($request);
         return $original_response->data;
@@ -456,6 +458,10 @@ class Endpoint_Product
         unset($product["attributes"]);
         unset($product["name"]);
         unset($product["permalink"]);
+
+        if(empty($product["parent_id"])){
+            unset($product["parent_id"]);
+        }
 
         $product = array_filter($product, function ($value) {
             return $value !== '' && $value !== null;

@@ -296,7 +296,9 @@ class Endpoint_Custom
             'page'     => $config_request["page"],
             'per_page' => $config_request["per_page"],
             'lang'     => $config_request["lang"],
-            'include'  => $config_request["ids"]
+            'include'  => $config_request["ids"],
+            "orderby"  => "id",
+            "order"    => "asc"
         ));
         $response = rest_do_request($request);
         $data = rest_get_server()->response_to_data($response, true);
