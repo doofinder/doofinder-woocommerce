@@ -90,7 +90,6 @@ class Endpoint_Product
             $fields       = !empty($fields_param) ? explode(',', $fields_param) : [];
         }
 
-
         // Retrieve the original product data
         $products          = self::get_products($config_request);
         $custom_attr       = Settings::get_custom_attributes();
@@ -304,14 +303,14 @@ class Endpoint_Product
         // Retrieve the original product data
         $request = new WP_REST_Request('GET', '/wc/v3/products');
         $request->set_query_params(array(
-            'page'     => $config["page"],
+            'page'     => $config["page"] ?? 1,
             'per_page' => $config["per_page"] ?? self::PER_PAGE,
-            'lang'     => $config["lang"],
+            'lang'     => $config["lang"] ?? "",
             'status'   => "publish",
             '_fields'  => $config["fields"],
             'include'  => $config["ids"],
-            'orderby'  => $config["orderby"],
-            'order'  => $config["order"]
+            'orderby'  => $config["orderby"] ?? "id",
+            'order'    => $config["order"] ?? "desc"
         ));
         $original_response = rest_do_request($request);
         return $original_response->data;
