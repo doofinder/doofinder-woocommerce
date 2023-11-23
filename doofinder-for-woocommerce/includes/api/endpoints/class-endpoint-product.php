@@ -39,6 +39,7 @@ class Endpoint_Product
         "sale_price",
         "short_description",
         "sku",
+        "status",
         "slug",
         "stock_status",
         "tags",
@@ -301,13 +302,13 @@ class Endpoint_Product
         // Retrieve the original product data
         $request = new WP_REST_Request('GET', '/wc/v3/products');
         $request->set_query_params(array(
-            'page'     => $config["page"] ?? self::PER_PAGE,
-            'per_page' => $config["per_page"],
+            'page'     => $config["page"],
+            'per_page' => $config["per_page"] ?? self::PER_PAGE,
             'lang'     => $config["lang"],
+            'status'   => "publish",
             '_fields'  => $config["fields"],
             'include'  => $config["ids"],
-            "orderby"  => "id",
-            "order"    => "asc"
+            'orderby'  => "id"
         ));
         $original_response = rest_do_request($request);
         return $original_response->data;
