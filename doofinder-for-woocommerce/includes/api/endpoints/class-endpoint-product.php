@@ -572,6 +572,7 @@ class Endpoint_Product
 
         foreach ($variations_data as &$variation) {
             $variation = array_merge($product, $variation, ["parent_id" => $product["id"]]);
+            $variation["name"] = $product["name"];
         }
         return $variations_data;
     }
@@ -688,7 +689,7 @@ class Endpoint_Product
         $category_path = $category->name;
         $parent_id     = $category->parent;
 
-        while ($parent_id !== 0) {
+        while (!empty($parent_id)) {
             $parent_category = get_term($parent_id, 'product_cat');
             if (!is_wp_error($parent_category)) {
                 $category_path = $parent_category->name . ' > ' . $category_path;

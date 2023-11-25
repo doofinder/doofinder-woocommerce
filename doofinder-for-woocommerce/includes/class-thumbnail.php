@@ -76,7 +76,7 @@ class Thumbnail
 		$thumbnail = image_get_intermediate_size($thumbnail_id, self::$size);
 
 		//If I find it, I return its URL
-		if (FALSE != $thumbnail && $thumbnail[0] != "") {
+		if (FALSE != $thumbnail && !empty($thumbnail[0])) {
 			return $thumbnail[0];
 		}
 
@@ -85,7 +85,7 @@ class Thumbnail
 
 		//If I find the image I am looking for in the metadata, I return it.
 		$thumb_meta = wp_get_attachment_image_src($thumbnail_id, self::$size);
-		if(($thumb_meta[0] >= $thumb_size["w"] || $thumb_meta[1] >= $thumb_size["h"]) && $thumb_meta["0"] != ""){
+		if(($thumb_meta[0] >= $thumb_size["w"] || $thumb_meta[1] >= $thumb_size["h"]) && !empty($thumb_meta["0"])){
 			return $thumb_meta["0"];
 		}
 
@@ -93,7 +93,7 @@ class Thumbnail
 		$img_original = $this->get_original_size($thumbnail_id);
 
 		//Check if is posible generate a thumb or not
-		if(($thumb_size["w"] >= $img_original["w"] || $thumb_size["h"] >= $img_original["h"]) && $img_original["url"] != ""){
+		if(($thumb_size["w"] >= $img_original["w"] || $thumb_size["h"] >= $img_original["h"]) && !empty($img_original["url"])){
 			return $img_original["url"];
 		}
 		return false;
