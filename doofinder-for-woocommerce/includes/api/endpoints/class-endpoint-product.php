@@ -467,7 +467,7 @@ class Endpoint_Product
         }
 
         $product = array_filter($product, function ($value) {
-            return $value !== '' && $value !== null;
+            return !empty($value);
         });
 
         return $product;
