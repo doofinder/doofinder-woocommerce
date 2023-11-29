@@ -10,7 +10,7 @@ class Index_Status_Handler
 {
     const NAMESPACE = 'doofinder';
     const API_VERSION = 1;
-    const INDEXING_TIMEOUT = 6 * HOUR_IN_SECONDS;
+    const INDEXING_TIMEOUT = 12 * HOUR_IN_SECONDS;
 
     private static $logger;
     /**
