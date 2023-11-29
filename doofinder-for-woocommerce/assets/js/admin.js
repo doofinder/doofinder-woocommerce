@@ -19,6 +19,10 @@ jQuery(function () {
           );
           clearInterval(indexingCheckInterval);
         }
+        if (response.status === "timed-out") {
+          $("#df-indexing-status").remove();
+          clearInterval(indexingCheckInterval);
+        }
       },
     });
   };
@@ -103,7 +107,7 @@ jQuery(function () {
   let CustomAttributesHandler = {
     valid: true,
     init: function () {
-      //Initialize select2   
+      //Initialize select2
       $(".df-select-2").select2();
       /**
        * This event listener is used to automatically populate the field name when
@@ -116,9 +120,11 @@ jQuery(function () {
         $(this).parent().next().find(".df-field-type").val(attribute_type);
 
         if (attribute_type === "metafield") {
-          $(this).select2('destroy').replaceWith(
-            '<input class="df-attribute-text" placeholder="Enter the metafield key" type="text" name="doofinder_for_wp_custom_attributes[new][attribute]" value="" />'
-          );
+          $(this)
+            .select2("destroy")
+            .replaceWith(
+              '<input class="df-attribute-text" placeholder="Enter the metafield key" type="text" name="doofinder_for_wp_custom_attributes[new][attribute]" value="" />'
+            );
         } else {
           $(this)
             .parent()

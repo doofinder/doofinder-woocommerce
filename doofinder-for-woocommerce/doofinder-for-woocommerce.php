@@ -92,8 +92,8 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
         {
             $class = __CLASS__;
 
-            if( !function_exists('is_plugin_active') ) {
-                include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+            if (!function_exists('is_plugin_active')) {
+                include_once(ABSPATH . 'wp-admin/includes/plugin.php');
             }
 
             // Load classes on demand
@@ -119,7 +119,6 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
 
                     self::register_ajax_action();
                     self::register_admin_scripts_and_styles();
-
                 }
 
                 // Init frontend functionalities
@@ -358,8 +357,16 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
             add_action('wp_ajax_doofinder_check_indexing_status', function () {
                 $multilanguage = Multilanguage::instance();
                 $lang = ($multilanguage->get_current_language() === $multilanguage->get_base_language()) ? "" : $multilanguage->get_current_language();
+                $status = Settings::get_indexing_status($lang);
+
+                if (Index_Status_Handler::is_indexing_status_timed_out($lang)) {
+                    Setup_Wizard::dismiss_indexing_notice();
+                    $status = 'timed-out';
+                    Settings::set_indexing_status($status, $lang);
+                }
+
                 wp_send_json([
-                    'status' => Settings::get_indexing_status($lang)
+                    'status' => $status
                 ]);
                 exit;
             });
