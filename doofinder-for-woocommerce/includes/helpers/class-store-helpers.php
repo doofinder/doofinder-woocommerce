@@ -16,11 +16,16 @@ class Store_Helpers
     public static function get_store_options()
     {
         $password_data = Store_Helpers::create_application_credentials();
+        $endpoints_token = Store_Helpers::create_endpoints_token();
+
+        update_option('doofinder_for_wp_token', $endpoints_token);
+        //TODO api_pass and api_user can be remove since new refactor endpoints
         if (!is_null($password_data)) {
             return [
                 "url" => get_bloginfo('url'),
                 'api_pass' => $password_data['api_pass'],
-                'api_user' => $password_data['api_user']
+                'api_user' => $password_data['api_user'],
+                'df_token'    => $endpoints_token,
             ];
         } else {
             throw new Exception("Error creating application credentials");
@@ -63,5 +68,16 @@ class Store_Helpers
             ];
         }
         return $password_data;
+    }
+
+    /**
+     * To create a new token that will be used to authenticate new product endpoints via headers
+     *
+     * @return string New token to authenticate woocommerce endpoints created by doofinder
+     */
+    public static function create_endpoints_token()
+    {
+        $randomString = uniqid();
+        return md5($randomString);
     }
 }

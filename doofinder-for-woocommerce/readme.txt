@@ -1,7 +1,7 @@
 === Doofinder WP & WooCommerce Search ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.0.33
+Version: 2.1.1
 Requires at least: 5.6
 Tested up to: 6.3.1
 Requires PHP: 7.0
@@ -81,6 +81,14 @@ General Settings
 Just send your questions to <mailto:support@doofinder.com> and we will try to answer as fast as possible with a working solution for you.
 
 == Changelog ==
+
+= 2.1.1 =
+Update on save refactor and add fields tu custom endpoints
+
+= 2.1.0 =
+New internal endpoints to obtain products, posts, pages and custom items.
+Refactor in custom attributes management.
+Secure authentication via token in headers.
 
 = 2.0.34 =
 Improved security in Ajax calls.
