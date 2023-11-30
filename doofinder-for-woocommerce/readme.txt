@@ -90,6 +90,9 @@ New internal endpoints to obtain products, posts, pages and custom items.
 Refactor in custom attributes management.
 Secure authentication via token in headers.
 
+= 2.0.34 =
+Improved security in Ajax calls.
+
 = 2.0.33 =
 New functionality added: Conversion pages.
 
