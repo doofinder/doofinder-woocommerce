@@ -52,7 +52,11 @@ class Thumbnail
 		if($img_url){
 			return $img_url;
 		}
+		$img_original = $this->get_original_size($thumbnail_id);
 
+		if(empty($img_original["url"])){
+			return null;
+		}
 		//I update the image metadata with the new formats
 		$this->regenerate_thumbnail($thumbnail_id);
 

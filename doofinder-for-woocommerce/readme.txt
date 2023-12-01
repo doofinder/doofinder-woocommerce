@@ -1,7 +1,7 @@
 === Doofinder WP & WooCommerce Search ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.1.2
+Version: 2.1.3
 Requires at least: 5.6
 Tested up to: 6.3.1
 Requires PHP: 7.0
@@ -81,6 +81,9 @@ General Settings
 Just send your questions to <mailto:support@doofinder.com> and we will try to answer as fast as possible with a working solution for you.
 
 == Changelog ==
+
+= 2.1.3 =
+Set product price correctly and check if product has a corrupted image
 
 = 2.1.2 =
 Added initial indexation status check timeout.
