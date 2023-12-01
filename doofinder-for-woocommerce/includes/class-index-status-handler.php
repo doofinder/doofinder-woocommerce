@@ -10,6 +10,7 @@ class Index_Status_Handler
 {
     const NAMESPACE = 'doofinder';
     const API_VERSION = 1;
+    const INDEXING_TIMEOUT = 12 * HOUR_IN_SECONDS;
 
     private static $logger;
     /**
@@ -75,5 +76,37 @@ class Index_Status_Handler
                 'response' => "Indexing status updated"
             ]
         );
+    }
+
+    /**
+     * Marks the start of the indexation process.
+     * 
+     * This function sets a transient flag to indicate that the indexation process has started.
+     * The transient has a predefined expiration time.
+     * 
+     * @param string $lang The language code for the indexation.
+     * @return void
+     */
+    public static function indexing_started($lang = "")
+    {
+        $langSuffix = empty($lang) ? "" : "_$lang";
+        set_transient("doofinder_indexing$langSuffix", true, self::INDEXING_TIMEOUT);
+    }
+
+    /**
+     * Checks if the indexation has timed out.
+     * 
+     * This function verifies if the indexation process has exceeded the set timeout.
+     * When indexation begins, a transient with the timeout as the expiration date is created.
+     * If the transient returns false, it indicates that the indexation has timed out.
+     * 
+     * @param string $lang The language code of the indexation.
+     * @return boolean True if the indexing has timed out, False if it's still within the time limit.
+     */
+    public static function is_indexing_status_timed_out($lang = "")
+    {
+        $langSuffix = empty($lang) ? "" : "_$lang";
+        $timedOut = !get_transient("doofinder_indexing$langSuffix");
+        return $timedOut;
     }
 }

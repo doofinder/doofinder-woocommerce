@@ -19,6 +19,10 @@ jQuery(function () {
           );
           clearInterval(indexingCheckInterval);
         }
+        if (response.status === "timed-out") {
+          $("#df-indexing-status").remove();
+          clearInterval(indexingCheckInterval);
+        }
       },
     });
   };
