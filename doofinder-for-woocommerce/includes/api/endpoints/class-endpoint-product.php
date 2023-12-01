@@ -326,8 +326,8 @@ class Endpoint_Product
    {
         $wc_product = wc_get_product($product["id"]);
 
-        $product["price"]         = self::get_price($product["id"], $wc_product);
         $product["regular_price"] = self::get_regular_price($product["id"], $wc_product);
+        $product["price"]         = $product["regular_price"];
         $product["sale_price"]    = self::get_sale_price($product["id"], $wc_product);
 
         return $product;
