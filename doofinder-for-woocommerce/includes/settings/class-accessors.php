@@ -3,6 +3,7 @@
 namespace Doofinder\WP\Settings;
 
 use Doofinder\WP\Helpers;
+use Doofinder\WP\Index_Status_Handler;
 use Doofinder\WP\Multilanguage\Multilanguage;
 use Doofinder\WP\Multilanguage\No_Language_Plugin;
 use Doofinder\WP\Settings;
@@ -379,6 +380,10 @@ trait Accessors
      */
     public static function set_indexing_status($value, $language = '')
     {
+        //If the new status is processing, mark the indexing start
+        if ("processing" == $value) {
+            Index_Status_Handler::indexing_started($language);
+        }
         update_option(self::option_name_for_language('doofinder_for_wp_indexing_status', $language), $value);
     }
 

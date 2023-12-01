@@ -489,7 +489,7 @@ class Setup_Wizard
      * @param string $status
      * @return void
      */
-    private static function set_indexing_status($status)
+    public static function set_indexing_status($status)
     {
         $multilanguage = Multilanguage::instance();
         $languages = $multilanguage->get_languages();
