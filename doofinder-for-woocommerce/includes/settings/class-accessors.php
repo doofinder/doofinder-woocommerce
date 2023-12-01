@@ -60,6 +60,19 @@ trait Accessors
      *
      * @return string
      */
+    public static function get_dooplugins_host()
+    {
+        return get_option('doofinder_for_wp_dooplugins_host', 'https://plugins.doofinder.com');
+    }
+
+    /**
+     * Retrieve the API Host.
+     *
+     * Just an alias for "get_option" to avoid repeating the string
+     * (option name) in multiple files.
+     *
+     * @return string
+     */
     public static function get_api_host()
     {
         //If we are in local environment, return the DF_API_HOST set in wp-config
@@ -80,6 +93,19 @@ trait Accessors
     public static function set_api_host($api_host)
     {
         update_option('doofinder_for_wp_api_host', $api_host);
+    }
+
+    /**
+     * Set the value of the Dooplugins Host.
+     *
+     * Just an alias for "update_option" to avoid repeating the string
+     * (option name) in multiple files.
+     *
+     * @param string $dp_host
+     */
+    public static function set_dooplugins_host($dp_host)
+    {
+        update_option('doofinder_for_wp_dooplugins_host', $dp_host);
     }
 
     /**

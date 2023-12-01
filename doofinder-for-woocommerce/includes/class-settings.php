@@ -64,7 +64,7 @@ class Settings
 		"df_price",
 		"df_regular_price",
 		"df_sale_price",
-		
+
 	];
 
 	/**
@@ -143,26 +143,12 @@ class Settings
 	{
 		$option = static::$custom_attributes_option;
 		add_action("update_option_{$option}", function ($old_value, $value, $option) {
-			//Make an API call to update custom attributes in our admin
-			//do_action("doofinder_update_custom_attributes");
-			try {
-				$store_api = new Store_Api();
-				$store_api->update_custom_attributes($value);
-
-				add_settings_error(
-					'doofinder_for_wp_messages',
-					'doofinder_for_wp_message',
-					__('Custom Attributes updated successfully. <br/> Please, keep in mind that you need to reindex in order for the changes to be reflected in the search layer.', 'doofinder_for_wp'),
-					'success'
-				);
-			} catch (\Throwable $th) {
-				add_settings_error(
-					'doofinder_for_wp_messages',
-					'doofinder_for_wp_message',
-					__(sprintf('An error ocurred while sending the custom attributes to the Doofinder server.<br/>If the problem persists, please contact our <a href="mailto:support@doofinder.com">support team</a>.<br/>Error message: %s', $th->getMessage()), 'doofinder_for_wp'),
-					'error'
-				);
-			}
+			add_settings_error(
+				'doofinder_for_wp_messages',
+				'doofinder_for_wp_message',
+				__('Custom Attributes updated successfully. <br/> Please, keep in mind that you need to reindex in order for the changes to be reflected in the search layer.', 'doofinder_for_wp'),
+				'success'
+			);
 		}, 10, 3);
 
 		add_filter('cron_schedules', [self::class, 'add_schedules'], 100, 1);
@@ -202,7 +188,7 @@ class Settings
 	}
 
 	/**
-	 * Make a request to the WooCommerce Products endpoint to get the available 
+	 * Make a request to the WooCommerce Products endpoint to get the available
 	 * field list.
 	 *
 	 * @return array List of Product base attributes
@@ -285,6 +271,6 @@ class Settings
 			]
 		];
 
-		return array_merge($schedules, $df_schedules);		
+		return array_merge($schedules, $df_schedules);
 	}
 }

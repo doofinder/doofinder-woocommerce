@@ -39,6 +39,7 @@ jQuery(function () {
       url: ajaxurl,
       data: {
         action: "doofinder_force_update_on_save",
+        nonce: Doofinder.nonce
       },
       success: function (response) {
         message = "Error updating your data, please try again layer";
@@ -71,6 +72,7 @@ jQuery(function () {
         data: {
           action: "doofinder_notice_dismiss",
           notice_id: notice_id,
+          nonce: Doofinder.nonce
         },
       });
     }
@@ -84,6 +86,7 @@ jQuery(function () {
       url: ajaxurl,
       data: {
         action: "doofinder_reset_credentials",
+        nonce: Doofinder.nonce
       },
       success: function (response) {
         message = "Error updating your data, please try again layer";

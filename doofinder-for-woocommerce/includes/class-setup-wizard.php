@@ -1078,8 +1078,9 @@ class Setup_Wizard
 
     private function check_api_settings($step)
     {
-        $api_key = $_REQUEST['api_token'] ?? null;
-        $api_host = $_REQUEST['admin_endpoint'] ?? null; // i.e: https://eu1-admin.doofinder.com
+        $api_key         = $_REQUEST['api_token'] ?? null;
+        $api_host        = $_REQUEST['admin_endpoint'] ?? null;    // i.e: https://eu1-admin.doofinder.com
+        $dooplugins_host = $_REQUEST['dooplugins_endpoint'] ?? null;  // i.e: https://eu1-plugins.doofinder.com
 
         if (empty($api_key)) {
             $this->add_wizard_step_error($step, 'api-key', __('API key is missing.', 'wordpress-doofinder'));
@@ -1093,6 +1094,12 @@ class Setup_Wizard
             $this->remove_wizard_step_error($step, 'api-host');
         }
 
+        if (empty($dooplugins_host)) {
+            $this->add_wizard_step_error($step, 'dooplugins-host', __('API dooplugins is missing.', 'wordpress-doofinder'));
+        } else {
+            $this->remove_wizard_step_error($step, 'dooplugins-host');
+        }
+
         if (!empty($this->errors['wizard-step-' . $step])) {
             return FALSE;
         }
@@ -1103,8 +1110,9 @@ class Setup_Wizard
         }
 
         return [
-            'api_key' => $api_key,
-            'api_host' => $api_host,
+            'api_key'         => $api_key,
+            'api_host'        => $api_host,
+            'dooplugins_host' => $dooplugins_host,
         ];
     }
 
@@ -1138,6 +1146,7 @@ class Setup_Wizard
 
         Settings::set_api_key($api_key);
         Settings::set_api_host($api_host);
+        Settings::set_dooplugins_host($dooplugins_host);
     }
 
 

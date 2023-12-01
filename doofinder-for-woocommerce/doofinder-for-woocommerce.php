@@ -4,7 +4,7 @@
  * Plugin Name: Doofinder WP & WooCommerce Search
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 2.0.34
+ * Version: 2.1.1
  * Requires at least: 5.6
  * Requires PHP: 7.0
  * Author: Doofinder
@@ -35,7 +35,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
          *
          * @var string
          */
-        public static $version = '2.0.34';
+        public static $version = '2.1.1';
 
         /**
          * The only instance of Doofinder_For_WordPress
@@ -100,12 +100,16 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
             self::autoload(self::plugin_path() . 'includes/');
 
             add_action('init', function () use ($class) {
+
                 //Initialize update on save
                 Update_On_Save::init();
                 //Initialize reset credentials
                 Reset_Credentials::init();
+                //Initialize custom endpoints
+                Endpoints::init();
 
                 Landing::init();
+
                 // Init admin functionalities
                 if (is_admin()) {
                     Post::add_additional_settings();
@@ -320,6 +324,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
             add_action('admin_enqueue_scripts', function () {
                 wp_enqueue_script('doofinder-admin-js', plugins_url('assets/js/admin.js', __FILE__));
                 wp_localize_script('doofinder-admin-js', 'Doofinder', [
+                    'nonce' => wp_create_nonce('doofinder-ajax-nonce'),
                     'show_indexing_notice' => Setup_Wizard::should_show_indexing_notice() ? 'true' : 'false',
                     'RESERVED_CUSTOM_ATTRIBUTES_NAMES' => Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES,
                     'reserved_custom_attributes_error_message' => __("The '%field_name%' field name is reserved, please use a different field name, e.g.: 'custom_%field_name%'", "wordpress-doofinder"),
@@ -339,7 +344,11 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
         {
             add_action('rest_api_init', function () {
                 Config::register();
-                REST_API_Handler::initialize();
+
+                if(empty($_SERVER["HTTP_DOOFINDER_TOKEN"])){
+                    REST_API_Handler::initialize();
+                }
+
                 Index_Status_Handler::initialize();
                 Landing_Cache::register_endpoint();
             });
@@ -373,6 +382,10 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
 
             //Notice dismiss
             add_action('wp_ajax_doofinder_notice_dismiss', function () {
+                if (!wp_verify_nonce($_POST['nonce'], 'doofinder-ajax-nonce')) {
+                    status_header(\WP_Http::UNAUTHORIZED);
+                    die('Unauthorized request');
+                }
                 $notice_id = $_POST['notice_id'];
                 Admin_Notices::remove_notice($notice_id);
                 wp_send_json([

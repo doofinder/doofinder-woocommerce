@@ -3,6 +3,7 @@
 namespace Doofinder\WP;
 
 use Doofinder\WP\Reset_Credentials_Index;
+use WP_Http;
 
 class Reset_Credentials
 {
@@ -12,6 +13,10 @@ class Reset_Credentials
         add_action('doofinder_reset_credentials', array($class, 'launch_reset_credentials'), 10, 0);
 
         add_action('wp_ajax_doofinder_reset_credentials', function () {
+            if (!current_user_can('manage_options') || !wp_verify_nonce($_POST['nonce'], 'doofinder-ajax-nonce')) {
+                status_header(WP_Http::UNAUTHORIZED);
+                die('Unauthorized request');
+            }
             do_action("doofinder_reset_credentials");
             wp_send_json_success();
         });
@@ -37,11 +42,11 @@ class Reset_Credentials
 
         ob_start();
 
-    ?>
+?>
         <p class="doofinder-button-reset-credentials" style="left: 10px;float:right;position:relative;top:-68px;">
             <a id="doofinder-reset-credentials" href="#" class="button-secondary"><?php _e('Reset Credentials', 'wordpress-doofinder'); ?></a>
         </p>
-    <?php
+<?php
 
         $html = ob_get_clean();
 
