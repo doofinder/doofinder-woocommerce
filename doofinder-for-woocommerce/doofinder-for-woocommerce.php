@@ -4,7 +4,7 @@
  * Plugin Name: Doofinder WP & WooCommerce Search
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 2.0.33
+ * Version: 2.0.34
  * Requires at least: 5.6
  * Requires PHP: 7.0
  * Author: Doofinder
@@ -35,7 +35,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
          *
          * @var string
          */
-        public static $version = '2.0.33';
+        public static $version = '2.0.34';
 
         /**
          * The only instance of Doofinder_For_WordPress
