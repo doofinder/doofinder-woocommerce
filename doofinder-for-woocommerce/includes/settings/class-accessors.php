@@ -354,7 +354,7 @@ trait Accessors
      */
     public static function set_indexing_status($value, $language = '')
     {
-        //If the new status is processing, enable the 
+        //If the new status is processing, mark the indexing start
         if ("processing" == $value) {
             Index_Status_Handler::indexing_started($language);
         }
