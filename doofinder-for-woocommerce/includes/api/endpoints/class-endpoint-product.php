@@ -185,6 +185,9 @@ class Endpoint_Product
             return isset($attr['type']) && $attr['type'] !== 'metafield';
         });
 
+        //reindex array
+        $custom_attr = array_values($custom_attr);
+
         if (count($custom_attr) > 0) {
             return array_merge($data, self::get_custom_attributes($data["id"], $custom_attr));
         }
@@ -648,7 +651,7 @@ class Endpoint_Product
         $custom_attributes  = [];
 
         foreach ($product_attributes as $attribute_name => $attribute_data) {
-	        $attribute_slug = str_replace(["pa_", "-"], ["", "_"], $attribute_name);
+	        $attribute_slug = str_replace("pa_", "", $attribute_name);
             $found_key      = array_search($attribute_slug, array_column($custom_attr, 'attribute'));
 
             //If the slug was not found, it is because the field has been renamed in the plugin's doofinder panel.
@@ -656,9 +659,9 @@ class Endpoint_Product
                 $attribute_slug = self::get_slug_from_map_attributes($custom_attr, $attribute_slug);
                 $found_key = $attribute_slug ? true : false;
             }
+
             if ($found_key !== false) {
                 $attribute_options = is_string($attribute_data) ? [$attribute_data] : $attribute_data->get_slugs();
-
                 foreach ($attribute_options as $option) {
                     $custom_attributes[$attribute_slug][] = $option;
                 }
