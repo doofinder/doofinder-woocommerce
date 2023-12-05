@@ -1,7 +1,7 @@
 === Doofinder WP & WooCommerce Search ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.1.4
+Version: 2.1.5
 Requires at least: 5.6
 Tested up to: 6.3.1
 Requires PHP: 7.0
@@ -81,6 +81,9 @@ General Settings
 Just send your questions to <mailto:support@doofinder.com> and we will try to answer as fast as possible with a working solution for you.
 
 == Changelog ==
+
+= 2.1.5 =
+Add permission_callback in API endpoints
 
 = 2.1.4 =
 Check if regular price is empty
