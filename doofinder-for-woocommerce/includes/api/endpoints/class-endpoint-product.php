@@ -179,6 +179,12 @@ class Endpoint_Product
      * @return array The merged data.
      */
     private static function merge_custom_attributes($data, $custom_attr) {
+
+        //For custom attributes we don't want metafields
+        $custom_attr = array_filter($custom_attr, function ($attr) {
+            return isset($attr['type']) && $attr['type'] !== 'metafield';
+        });
+
         if (count($custom_attr) > 0) {
             return array_merge($data, self::get_custom_attributes($data["id"], $custom_attr));
         }
@@ -638,14 +644,19 @@ class Endpoint_Product
      */
     private static function get_custom_attributes($product_id, $custom_attr){
 
-        $product_attributes   = wc_get_product($product_id)->get_attributes();
-        $custom_attributes    = array();
+        $product_attributes = wc_get_product($product_id)->get_attributes();
+        $custom_attributes  = [];
 
         foreach ($product_attributes as $attribute_name => $attribute_data) {
-            $attribute_slug = str_replace("pa_", "", $attribute_name);
-            $found_key      = array_search($attribute_slug, array_column($custom_attr, 'field'));
+	        $attribute_slug = str_replace(["pa_", "-"], ["", "_"], $attribute_name);
+            $found_key      = array_search($attribute_slug, array_column($custom_attr, 'attribute'));
 
-            if (is_integer($found_key)) {
+            //If the slug was not found, it is because the field has been renamed in the plugin's doofinder panel.
+            if($found_key === false){
+                $attribute_slug = self::get_slug_from_map_attributes($custom_attr, $attribute_slug);
+                $found_key = $attribute_slug ? true : false;
+            }
+            if ($found_key !== false) {
                 $attribute_options = is_string($attribute_data) ? [$attribute_data] : $attribute_data->get_slugs();
 
                 foreach ($attribute_options as $option) {
@@ -656,6 +667,33 @@ class Endpoint_Product
 
         return $custom_attributes;
     }
+
+
+    /**
+     * To obtain the slug mapped from the original product attribute
+     *
+     * @param Array $custom_attr Array of custom attributes
+     * @param String $attribute_slug slug we are looking for
+     * @return string Slug founded or false
+     */
+    private static function get_slug_from_map_attributes($custom_attr, $attribute_slug){
+
+        $all_attributes = wc_get_attribute_taxonomies();
+
+        foreach($all_attributes as $attribute){
+            if($attribute->attribute_name == $attribute_slug){
+                $found_key      = (Integer)$attribute->attribute_id;
+                $custom_index   = array_search("wc_".$found_key, array_column($custom_attr, 'attribute'));
+
+                if($custom_index !== false){
+                    $attribute_slug = $custom_attr[$custom_index]["field"];
+                    return $attribute_slug;
+                }
+            }
+        }
+        return false;
+    }
+
 
     /**
      * Get the category path for a product.

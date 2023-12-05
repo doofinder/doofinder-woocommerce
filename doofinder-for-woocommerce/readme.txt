@@ -1,7 +1,7 @@
 === Doofinder WP & WooCommerce Search ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.1.5
+Version: 2.1.6
 Requires at least: 5.6
 Tested up to: 6.3.1
 Requires PHP: 7.0
@@ -76,14 +76,22 @@ General Settings
 - **Update on Save:** The period of time that must elapse before the posts / products are updated after making a change.
 - **JS Layer Script:** Here you can modify the Layer Javascript Code. It is required for the Javascript Layer to work.
 
-== I have any other problem with your plugin. What can I do? ==
+== Frequently Asked Questions ==
 
+= I have problems with your plugin. What can I do? =
 Just send your questions to <mailto:support@doofinder.com> and we will try to answer as fast as possible with a working solution for you.
+
+= How can I report security bugs? =
+You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/doofinder-for-woocommerce)
 
 == Changelog ==
 
-= 2.1.5 =
+= 2.1.6 =
 Add permission_callback in API endpoints
+Fix renamed custom attributes
+
+= 2.1.5 =
+Added FAQ section.
 
 = 2.1.4 =
 Check if regular price is empty
