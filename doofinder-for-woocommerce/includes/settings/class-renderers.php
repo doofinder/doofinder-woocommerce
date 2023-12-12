@@ -188,7 +188,7 @@ trait Renderers
 
     ?>
 
-        <input type="hidden" name="doofinder_for_wp_selected_tab" value="<?php echo $selected_tab; ?>">
+        <input type="hidden" name="doofinder_for_wp_selected_tab" value="<?php echo htmlentities($selected_tab) ?>">
 
     <?php
     }
