@@ -104,7 +104,7 @@ class Endpoint_Product
         if (!empty($products)) {
 
             // Include variants if requested
-            $products = self::get_variations($products, $fields);
+            $products = self::get_variations($products);
 
             foreach ($products as $product_data) {
                 // Filter fields
@@ -340,7 +340,7 @@ class Endpoint_Product
     /**
      * Retrieve a list of products with pagination.
      *
-     * @param int $config   Config request for get products
+     * @param array $config   Config request for get products
      * @return array|null   An array of product data or null on failure.
      */
     private static function get_products($config){
