@@ -429,7 +429,7 @@ class Endpoint_Product
      */
     private static function get_price($id, $product)
     {
-        return  self::get_raw_price($product);
+        return self::get_raw_price($product);
     }
 
     /**
@@ -440,7 +440,7 @@ class Endpoint_Product
      */
     private static function get_sale_price($id, $product)
     {
-        return  self::get_raw_price($product, 'sale_price');
+        return self::get_raw_price($product, 'sale_price');
     }
 
     /**
@@ -451,7 +451,7 @@ class Endpoint_Product
      */
     private static function get_regular_price($id, $product)
     {
-        return  self::get_raw_price($product, 'regular_price');
+        return self::get_raw_price($product, 'regular_price');
     }
 
     /**
