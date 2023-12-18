@@ -200,7 +200,9 @@ class Endpoint_Product
     private static function merge_custom_attributes($data, $custom_attr) {
 
         // Filter out metafield custom attributes
-        $custom_attr = array_values(array_filter($custom_attr, fn($attr) => isset($attr['type']) && $attr['type'] !== 'metafield'));
+        $custom_attr = array_values(array_filter($custom_attr, function ($attr) {
+            return isset($attr['type']) && $attr['type'] !== 'metafield';
+        }));
 
         if (!empty($custom_attr)) {
             $data_with_attr = array_merge($data, self::get_custom_attributes($data["id"], $custom_attr));
