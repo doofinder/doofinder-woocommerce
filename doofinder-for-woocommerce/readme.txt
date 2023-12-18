@@ -88,6 +88,8 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 2.1.9 =
 Add basic attributes and plugin attributes to response
+Fix corrupts images in custom endpoint
+Improve XSS secure
 
 = 2.1.8 =
 Fix possible XSS issue
