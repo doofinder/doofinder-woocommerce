@@ -227,10 +227,18 @@ class Endpoint_Custom
      * @return array The filtered data array with image link information if requested.
      */
     private static function get_image_link($filtered_data, $fields) {
-        $featured_media = $filtered_data["_embedded"]["wp:featuredmedia"][0]["media_details"]["sizes"]["medium"]["source_url"] ?? null;
-        $filtered_data["image_link"] = in_array('image_link', $fields) ? $featured_media : null;
+        $filtered_data_array = json_decode(json_encode($filtered_data), true);
 
-        return $filtered_data;
+        if (is_array($filtered_data_array)) {
+            $featured_media = is_array($filtered_data_array["_embedded"]["wp:featuredmedia"][0]["media_details"]["sizes"]["medium"]) ? $filtered_data_array["_embedded"]["wp:featuredmedia"][0]["media_details"]["sizes"]["medium"]["source_url"] : null;
+            $filtered_data_array["image_link"] = in_array('image_link', $fields) ? $featured_media : null;
+    
+            return $filtered_data_array;
+        } 
+        
+        $filtered_data_array["image_link"] =  null;
+
+        return $filtered_data_array;
     }
 
 

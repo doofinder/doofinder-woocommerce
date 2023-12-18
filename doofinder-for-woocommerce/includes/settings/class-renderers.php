@@ -188,7 +188,7 @@ trait Renderers
 
     ?>
 
-        <input type="hidden" name="doofinder_for_wp_selected_tab" value="<?php echo htmlentities($selected_tab) ?>">
+        <input type="hidden" name="doofinder_for_wp_selected_tab" value="<?php echo htmlspecialchars($selected_tab) ?>">
 
     <?php
     }
@@ -208,7 +208,7 @@ trait Renderers
                                                     'The secret token is used to authenticate requests. Don`t need to use eu1- or us1- prefix.',
                                                     'doofinder_for_wp'
                                                 ); ?></span></span>
-        <input type="text" name="<?php echo $option_name; ?>" class="widefat" <?php if ($saved_value) : ?> value="<?php echo $saved_value; ?>" <?php endif; ?>>
+        <input type="text" name="<?php echo $option_name; ?>" class="widefat" <?php if ($saved_value) : ?> value="<?php echo htmlspecialchars($saved_value); ?>" <?php endif; ?>>
 
     <?php
     }
@@ -259,7 +259,7 @@ trait Renderers
                                                     'doofinder_for_wp'
                                                 ); ?></span></span>
 
-        <input type="text" name="<?php echo $option_name; ?>" class="widefat" <?php if ($saved_value) : ?> value="<?php echo $saved_value; ?>" <?php endif; ?>>
+        <input type="text" name="<?php echo $option_name; ?>" class="widefat" <?php if ($saved_value) : ?> value="<?php echo htmlspecialchars($saved_value); ?>" <?php endif; ?>>
 
     <?php
     }
@@ -457,7 +457,7 @@ trait Renderers
             </td>
 
             <td>
-                <input id="df-field-text-<?php echo $index; ?>" class="df-field-text" type="text" name="<?php echo $option_name; ?>[<?php echo $index; ?>][field]" <?php if ($attribute) : ?> value="<?php echo $attribute['field']; ?>" <?php endif; ?> />
+                <input id="df-field-text-<?php echo $index; ?>" class="df-field-text" type="text" name="<?php echo $option_name; ?>[<?php echo $index; ?>][field]" <?php if ($attribute) : ?> value="<?php echo htmlspecialchars($attribute['field']); ?>" <?php endif; ?> />
                 <input class="df-field-type" type="hidden" name="<?php echo $option_name; ?>[<?php echo $index; ?>][type]" <?php if ($attribute) : ?> value="<?php echo $attribute['type']; ?>" <?php endif; ?> />
             </td>
 
