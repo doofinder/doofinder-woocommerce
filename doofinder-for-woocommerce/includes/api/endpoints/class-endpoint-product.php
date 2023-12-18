@@ -70,11 +70,13 @@ class Endpoint_Product
      */
     public static function custom_product_endpoint($request, $config_request = false) {
 
+        $custom_attr         = Settings::get_custom_attributes();
+        $custom_attr_fields  = self::get_field_attributes($custom_attr);
+
         if(!$config_request){
             Endpoints::CheckSecureToken();
 
-            // Get the 'fields' parameter from the request
-            $fields = $request->get_param('fields') == "all" ? [] : self::get_fields();
+            $fields = ($request->get_param('fields') == "all") ? [] : array_merge(self::get_fields(), array_values($custom_attr_fields));
 
             $config_request = [
                 'per_page' => $request->get_param('per_page') ?? self::PER_PAGE,
@@ -86,9 +88,11 @@ class Endpoint_Product
                 'fields'   => $fields
             ];
         }
+        //Update on save
         else{
             $fields_param = $config_request['fields'] ?? "";
             $fields       = !empty($fields_param) ? explode(',', $fields_param) : [];
+            $fields       = array_merge($fields, array_values($custom_attr_fields));
         }
 
         // Retrieve the original product data
@@ -100,7 +104,7 @@ class Endpoint_Product
         if (!empty($products)) {
 
             // Include variants if requested
-            $products = self::get_variations($products, $fields);
+            $products = self::get_variations($products);
 
             foreach ($products as $product_data) {
                 // Filter fields
@@ -124,6 +128,21 @@ class Endpoint_Product
         }
         // Return the modified product data as a response
         return new WP_REST_Response($modified_products);
+    }
+
+    /**
+     * Get the array of custom attributes name fields.
+     * @param array  $custom_attrs Array of custom attributes
+     *
+     * @return array The array of fields.
+     */
+    public static function get_field_attributes($custom_attrs) {
+
+        $custom_fields = [];
+        foreach ($custom_attrs as $custom_attr) {
+            $custom_fields[$custom_attr["field"]] = $custom_attr["attribute"];
+        }
+        return $custom_fields;
     }
 
     /**
@@ -180,16 +199,31 @@ class Endpoint_Product
      */
     private static function merge_custom_attributes($data, $custom_attr) {
 
-        //For custom attributes we don't want metafields
-        $custom_attr = array_filter($custom_attr, function ($attr) {
+        // Filter out metafield custom attributes
+        $custom_attr = array_values(array_filter($custom_attr, function ($attr) {
             return isset($attr['type']) && $attr['type'] !== 'metafield';
-        });
+        }));
 
-        //reindex array
-        $custom_attr = array_values($custom_attr);
+        if (!empty($custom_attr)) {
+            $data_with_attr = array_merge($data, self::get_custom_attributes($data["id"], $custom_attr));
 
-        if (count($custom_attr) > 0) {
-            return array_merge($data, self::get_custom_attributes($data["id"], $custom_attr));
+            foreach ($custom_attr as $custom) {
+                $attributeKey = $custom["attribute"];
+                $fieldKey     = $custom["field"];
+
+                //Exchange renamed fields
+                if (isset($data_with_attr[$attributeKey])) {
+                    $data_with_attr[$fieldKey] = $data_with_attr[$attributeKey];
+                    unset($data_with_attr[$attributeKey]);
+
+                    //List of value options
+                    if (is_array($data_with_attr[$fieldKey])) {
+                        $data_with_attr[$fieldKey] = array_column($data_with_attr[$fieldKey], "name");
+                    }
+                }
+            }
+
+            return $data_with_attr;
         }
         return $data;
     }
@@ -306,7 +340,7 @@ class Endpoint_Product
     /**
      * Retrieve a list of products with pagination.
      *
-     * @param int $config   Config request for get products
+     * @param array $config   Config request for get products
      * @return array|null   An array of product data or null on failure.
      */
     private static function get_products($config){
@@ -395,7 +429,7 @@ class Endpoint_Product
      */
     private static function get_price($id, $product)
     {
-        return  self::get_raw_price($product);
+        return self::get_raw_price($product);
     }
 
     /**
@@ -406,7 +440,7 @@ class Endpoint_Product
      */
     private static function get_sale_price($id, $product)
     {
-        return  self::get_raw_price($product, 'sale_price');
+        return self::get_raw_price($product, 'sale_price');
     }
 
     /**
@@ -417,7 +451,7 @@ class Endpoint_Product
      */
     private static function get_regular_price($id, $product)
     {
-        return  self::get_raw_price($product, 'regular_price');
+        return self::get_raw_price($product, 'regular_price');
     }
 
     /**
@@ -641,13 +675,13 @@ class Endpoint_Product
     /**
      * Get custom attributes for a product.
      *
-     * @param int $product_id The ID of the product.
+     * @param integer $product_id The ID of the product.
      * @param array $custom_attr List of custom attributes.
      * @return array The custom attributes for the product.
      */
     private static function get_custom_attributes($product_id, $custom_attr){
 
-        $product_attributes = wc_get_product($product_id)->get_attributes();
+        $product_attributes = self::get_all_attributes($product_id);
         $custom_attributes  = [];
 
         foreach ($product_attributes as $attribute_name => $attribute_data) {
@@ -676,12 +710,30 @@ class Endpoint_Product
         return $custom_attributes;
     }
 
+    /**
+     * Obtain all atributtes of product (basic and custom)
+     *
+     * @param integer $product_id
+     * @return array List of attributes
+     */
+    private static function get_all_attributes($product_id){
+
+        $product_attributes = wc_get_product($product_id)->get_attributes();
+        $basic_attributtes  = get_post_meta($product_id);
+        $basic_clean        = [];
+
+        foreach($basic_attributtes as $key_attr => $basic_attr){
+            $key_attr               = $key_attr[0] == "_" ? substr($key_attr, 1) : $key_attr;
+            $basic_clean[$key_attr] = $basic_attr[0] ?? "";
+        }
+        return array_merge($product_attributes, $basic_clean);
+    }
 
     /**
      * To obtain the slug mapped from the original product attribute
      *
-     * @param Array $custom_attr Array of custom attributes
-     * @param String $attribute_slug slug we are looking for
+     * @param array $custom_attr Array of custom attributes
+     * @param string $attribute_slug slug we are looking for
      * @return string Slug founded or false
      */
     private static function get_slug_from_map_attributes($custom_attr, $attribute_slug){
