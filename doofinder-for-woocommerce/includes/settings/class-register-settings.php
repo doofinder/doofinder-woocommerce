@@ -267,14 +267,16 @@ trait Register_Settings
             );
         }
 
+        $sanitized_api_key = strip_tags($input);        
+
         /**
          * Old API keys use prefixes like eu1- and us1-,
          * in api 2.0 there aren't needed.
          */
-        if (strpos($input, '-')) {
-            return substr($input, 4);
+        if (strpos($sanitized_api_key, '-')) {
+            return substr($sanitized_api_key, 4);
         } else {
-            return $input;
+            return $sanitized_api_key;
         }
     }
 
@@ -328,7 +330,9 @@ trait Register_Settings
             );
         }
 
-        return $input;
+        $sanitized_engine_hash = strip_tags($input);       
+
+        return $sanitized_engine_hash;
     }
 
     /**
@@ -374,6 +378,7 @@ trait Register_Settings
         // removing all the records that we want to delete, and those
         // with empty "field" value along the way.
         foreach ($input as $attribute) {
+            $attribute['field'] = strip_tags($attribute['field']);
             if (!$attribute['field']) {
                 continue;
             }
