@@ -88,6 +88,7 @@ class Endpoint_Product
                 'fields'   => $fields
             ];
         }
+        //Update on save
         else{
             $fields_param = $config_request['fields'] ?? "";
             $fields       = !empty($fields_param) ? explode(',', $fields_param) : [];
