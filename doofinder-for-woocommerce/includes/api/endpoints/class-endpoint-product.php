@@ -76,8 +76,7 @@ class Endpoint_Product
         if(!$config_request){
             Endpoints::CheckSecureToken();
 
-            $fields = $request->get_param('fields') == "all" ? [] : self::get_fields();
-            $fields = array_merge($fields, array_values($custom_attr_fields));
+            $fields = ($request->get_param('fields') == "all") ? [] : array_merge(self::get_fields(), array_values($custom_attr_fields));
 
             $config_request = [
                 'per_page' => $request->get_param('per_page') ?? self::PER_PAGE,
@@ -86,7 +85,7 @@ class Endpoint_Product
                 'ids'      => $request->get_param('ids') ?? "",
                 'orderby'  => $request->get_param('orderby') ?? "id",
                 'order'    => $request->get_param('order') ?? "desc",
-                'fields'   => array_merge($fields, array_values($custom_attr_fields))
+                'fields'   => $fields
             ];
         }
         else{
