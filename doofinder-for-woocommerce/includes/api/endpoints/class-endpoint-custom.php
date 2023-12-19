@@ -71,9 +71,12 @@ class Endpoint_Custom
         }
 
         $items = self::get_items($config_request);
-        $modified_items = [];
 
         foreach ($items as $item_data) {
+
+            if(get_post_meta($item_data["id"], "_doofinder_for_wp_indexing_visibility", true) == "noindex"){
+                continue;
+            }
 
             $filtered_data = !empty($fields) ? array_intersect_key($item_data, array_flip($fields)) : $item_data;
 
@@ -90,7 +93,7 @@ class Endpoint_Custom
         }
 
         // Return the modified items data as a response
-        return new WP_REST_Response($modified_items);
+        return new WP_REST_Response($modified_items ?? []);
     }
 
     /**
@@ -232,10 +235,10 @@ class Endpoint_Custom
         if (is_array($filtered_data_array)) {
             $featured_media = is_array($filtered_data_array["_embedded"]["wp:featuredmedia"][0]["media_details"]["sizes"]["medium"]) ? $filtered_data_array["_embedded"]["wp:featuredmedia"][0]["media_details"]["sizes"]["medium"]["source_url"] : null;
             $filtered_data_array["image_link"] = in_array('image_link', $fields) ? $featured_media : null;
-    
+
             return $filtered_data_array;
-        } 
-        
+        }
+
         $filtered_data_array["image_link"] =  null;
 
         return $filtered_data_array;

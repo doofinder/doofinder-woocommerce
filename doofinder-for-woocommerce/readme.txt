@@ -1,7 +1,7 @@
 === Doofinder WP & WooCommerce Search ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.1.9
+Version: 2.1.10
 Requires at least: 5.6
 Tested up to: 6.3.1
 Requires PHP: 7.0
@@ -85,6 +85,10 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/doofinder-for-woocommerce)
 
 == Changelog ==
+
+= 2.1.10 =
+Add protocol to dooplugins endpoint
+Fix Last page error posts
 
 = 2.1.9 =
 Add basic attributes and plugin attributes to response

@@ -107,6 +107,11 @@ class Endpoint_Product
             $products = self::get_variations($products);
 
             foreach ($products as $product_data) {
+
+                if(get_post_meta($item_data["id"], "_doofinder_for_wp_indexing_visibility", true) == "noindex"){
+                    continue;
+                }
+
                 // Filter fields
                 $filtered_product_data = !empty($fields) ? array_intersect_key($product_data, array_flip($fields)) : $product_data;
 
