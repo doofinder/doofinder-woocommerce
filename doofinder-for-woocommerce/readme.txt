@@ -89,6 +89,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 = 2.1.10 =
 Add protocol to dooplugins endpoint
 Fix Last page error posts
+Fix css problems
 
 = 2.1.9 =
 Add basic attributes and plugin attributes to response
