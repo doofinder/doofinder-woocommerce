@@ -219,7 +219,11 @@ class Endpoint_Product
                 //Exchange renamed fields
                 if (isset($data_with_attr[$attributeKey])) {
                     $data_with_attr[$fieldKey] = $data_with_attr[$attributeKey];
-                    unset($data_with_attr[$attributeKey]);
+
+                    //We delete the original key only if it has been renamed to a different alias.
+                    if ($fieldKey != $attributeKey) {
+                        unset($data_with_attr[$attributeKey]);
+                    }
 
                     //List of value options
                     if (is_array($data_with_attr[$fieldKey])) {
@@ -245,7 +249,7 @@ class Endpoint_Product
             if ($attr["type"] == "metafield") {
                 foreach ($data["meta_data"] as $meta) {
                     $meta_data = $meta->get_data();
-                    if ($meta_data["key"] == $attr["field"]) {
+                    if ($meta_data["key"] == $attr["attribute"]) {
                         $data[$attr["field"]] = $meta_data["value"] ?? "";
                     }
                 }
