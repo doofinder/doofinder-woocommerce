@@ -208,4 +208,24 @@ class Update_Manager
 
         return true;
     }
+
+    /**
+     * Update: 2.1.12
+     * Remove stock_status from custom_attributes
+     */
+    public static function update_020112()
+    {
+        //Remove the stock_status custom_attribute if existing
+        $custom_attributes = Settings::get_custom_attributes();
+        foreach ($custom_attributes as $key => $attr) {
+            if ($attr['attribute'] === "stock_status") {
+                unset($custom_attributes[$key]);
+                update_option(Settings::$custom_attributes_option, $custom_attributes);
+                break;
+            }
+        }
+        //Delete the custom_attributes transient
+        delete_transient("df_product_rest_attributes");
+        return true;
+    }
 }
