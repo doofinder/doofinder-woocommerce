@@ -60,11 +60,7 @@ class Settings
 		"title",
 		"type",
 		"variants",
-		"df_image_link",
-		"df_price",
-		"df_regular_price",
-		"df_sale_price",
-
+		"stock_status"
 	];
 
 	/**
