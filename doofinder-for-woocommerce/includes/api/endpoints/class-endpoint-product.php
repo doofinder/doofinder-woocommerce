@@ -108,7 +108,7 @@ class Endpoint_Product
 
             foreach ($products as $product_data) {
 
-                if(get_post_meta($item_data["id"], "_doofinder_for_wp_indexing_visibility", true) == "noindex"){
+                if(get_post_meta($product_data["id"], "_doofinder_for_wp_indexing_visibility", true) == "noindex"){
                     continue;
                 }
 
