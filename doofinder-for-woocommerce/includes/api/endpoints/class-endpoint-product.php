@@ -620,7 +620,6 @@ class Endpoint_Product
                 $products[] = $product;
             }
         }
-
         return $products;
     }
 
