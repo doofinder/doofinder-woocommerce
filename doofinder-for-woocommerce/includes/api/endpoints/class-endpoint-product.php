@@ -24,6 +24,7 @@ class Endpoint_Product
         "categories",
         "description",
         "df_group_leader",
+        "df_indexable",
         "df_variants_information",
         "group_id",
         "id",
@@ -108,13 +109,12 @@ class Endpoint_Product
 
             foreach ($products as $product_data) {
 
-                if(get_post_meta($product_data["id"], "_doofinder_for_wp_indexing_visibility", true) == "noindex"){
-                    continue;
-                }
+                $indexable_opt = get_post_meta($product_data["id"], "_doofinder_for_wp_indexing_visibility", true);
 
                 // Filter fields
                 $filtered_product_data = !empty($fields) ? array_intersect_key($product_data, array_flip($fields)) : $product_data;
 
+                $filtered_product_data = self::set_indexable($filtered_product_data, $indexable_opt);
                 $filtered_product_data = self::get_categories($filtered_product_data, $fields);
                 $filtered_product_data = self::merge_custom_attributes($filtered_product_data, $custom_attr);
                 $filtered_product_data = self::get_image_field($filtered_product_data, $fields);
@@ -179,6 +179,18 @@ class Endpoint_Product
         });
 
         return $items;
+    }
+
+    /**
+     * Set indexable option.
+     *
+     * @param array $data   The data to process.
+     * @param string $indexable The indexable option.
+     * @return array The processed data.
+     */
+    private static function set_indexable($data, $indexable) {
+        $data['df_indexable'] = $indexable;
+        return $data;
     }
 
     /**
