@@ -62,7 +62,13 @@ trait Accessors
      */
     public static function get_dooplugins_host()
     {
-        return get_option('doofinder_for_wp_dooplugins_host', 'https://plugins.doofinder.com');
+        $doopluginsHost = get_option('doofinder_for_wp_dooplugins_host', 'https://plugins.doofinder.com');
+
+        if (strpos($doopluginsHost, 'https://') !== 0) {
+            $doopluginsHost = 'https://' . $doopluginsHost;
+        }
+    
+        return $doopluginsHost;
     }
 
     /**
