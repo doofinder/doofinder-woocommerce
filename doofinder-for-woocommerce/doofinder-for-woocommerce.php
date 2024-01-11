@@ -122,7 +122,6 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                     Update_On_Save::register_hooks();
 
                     self::register_ajax_action();
-                    self::register_admin_scripts_and_styles();
                 }
 
                 // Init frontend functionalities
@@ -319,9 +318,11 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
             }
         }
 
-        public static function register_admin_scripts_and_styles()
-        {
-            add_action('admin_enqueue_scripts', function () {
+        public static function load_only_doofinder_admin_scripts_and_styles() {
+            $current_screen = get_current_screen();
+
+            // Verify if it is the specific page by its unique identifier
+            if ($current_screen->id === 'toplevel_page_doofinder_for_wp') {
                 wp_enqueue_script('doofinder-admin-js', plugins_url('assets/js/admin.js', __FILE__));
                 wp_localize_script('doofinder-admin-js', 'Doofinder', [
                     'nonce' => wp_create_nonce('doofinder-ajax-nonce'),
@@ -333,14 +334,6 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
 
                 // CSS
                 wp_enqueue_style('doofinder-admin-css', Doofinder_For_WordPress::plugin_url() . '/assets/css/admin.css');
-            });
-        }
-
-        public static function load_only_doofinder_admin_scripts_and_styles() {
-            $current_screen = get_current_screen();
-
-            // Verify if it is the specific page by its unique identifier
-            if ($current_screen->id === 'toplevel_page_doofinder_for_wp') {
                 //Add the Select2 CSS file
                 wp_enqueue_style('select2-css', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', array(), '4.1.0-rc.0');
                 //Add the Select2 JavaScript file
