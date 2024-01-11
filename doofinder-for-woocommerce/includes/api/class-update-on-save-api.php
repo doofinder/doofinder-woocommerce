@@ -121,7 +121,7 @@ class Update_On_Save_Api
     public function updateBulk($post_type, $ids)
     {
         $this->log->log('Update items');
-        $uri = $this->buildURL("https://".$this->dp_host, "item/" . $this->hash . "/" . $post_type . "?action=update&platform=wordpress");
+        $uri = $this->buildURL($this->dp_host, "item/" . $this->hash . "/" . $post_type . "?action=update&platform=wordpress");
 
         $chunks = array_chunk($ids, 100);
         $resp = true;
@@ -191,7 +191,7 @@ class Update_On_Save_Api
     {
         $this->log->log('Delete items');
 
-        $uri = $this->buildURL("https://".$this->dp_host, "item/" . $this->hash . "/" . $post_type . "?action=delete&platform=wordpress");
+        $uri = $this->buildURL($this->dp_host, "item/" . $this->hash . "/" . $post_type . "?action=delete&platform=wordpress");
 
         return $this->sendRequest($uri, $ids);
     }

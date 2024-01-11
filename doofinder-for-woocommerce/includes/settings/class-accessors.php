@@ -62,7 +62,9 @@ trait Accessors
      */
     public static function get_dooplugins_host()
     {
-        return get_option('doofinder_for_wp_dooplugins_host', 'https://plugins.doofinder.com');
+        $doopluginsHost = get_option('doofinder_for_wp_dooplugins_host', 'https://plugins.doofinder.com');
+    
+        return self::normalize_host($doopluginsHost);
     }
 
     /**
@@ -79,7 +81,10 @@ trait Accessors
         if (wp_get_environment_type() === 'local' && defined('DF_API_HOST')) {
             return DF_API_HOST;
         }
-        return get_option('doofinder_for_wp_api_host', 'https://admin.doofinder.com');
+
+        $adminHost = get_option('doofinder_for_wp_api_host', 'https://admin.doofinder.com');
+        
+        return self::normalize_host($adminHost);
     }
 
     /**
@@ -420,5 +425,14 @@ trait Accessors
     public static function get_custom_attributes()
     {
         return get_option(Settings::$custom_attributes_option, []);
+    }
+
+    private static function normalize_host($host) 
+    {
+        if (strpos($host, 'https://') !== 0) {
+            $host = 'https://' . $host;
+        }
+
+        return $host;
     }
 }
