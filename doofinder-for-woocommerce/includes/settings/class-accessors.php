@@ -84,7 +84,7 @@ trait Accessors
 
         $adminHost = get_option('doofinder_for_wp_api_host', 'https://admin.doofinder.com');
         
-        return self::normalize_host($adminHost)
+        return self::normalize_host($adminHost);
     }
 
     /**
