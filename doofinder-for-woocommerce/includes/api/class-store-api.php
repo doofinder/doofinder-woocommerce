@@ -204,6 +204,7 @@ class Store_Api
             "name" =>  get_bloginfo('name'),
             "platform" =>  is_plugin_active('woocommerce/woocommerce.php') ? "woocommerce" : "wordpress",
             "primary_language" => $primary_language,
+            "site_url" => get_bloginfo('url'),
             "sector" => Settings::get_sector(),
             "callback_urls" => $this->get_callback_urls($api_keys, $primary_language),
             "options" => Store_Helpers::get_store_options(),
