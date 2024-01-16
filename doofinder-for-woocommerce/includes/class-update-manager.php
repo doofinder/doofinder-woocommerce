@@ -237,7 +237,7 @@ class Update_Manager
      */
     public static function update_020200()
     {
-        //Update api host to point to admin.doofinder.com instead of api.doofinder.com
+        //Update dooplugins host to point to plugins.doofinder.com from admin zone
         $dooplugins_host = Settings::get_dooplugins_host();
         if (empty($dooplugins_host) || !strpos($dooplugins_host, "plugins.doofinder.com")) {
             $api_host = Settings::get_api_host();
