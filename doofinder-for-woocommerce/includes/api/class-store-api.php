@@ -129,7 +129,9 @@ class Store_Api
 
             if (isset($api_keys[$lang])) {
                 $se_hashid = $api_keys[$lang]['hash'];
-                $payload['search_engines'][$se_hashid] = $search_engine['datatypes'][0]['datasources'][0]['options'];
+                $payload['search_engines'][$se_hashid] = [ 
+                    "feed_type" => is_plugin_active('woocommerce/woocommerce.php') ? "product" : "posts", 
+                    "lang" => $lang];
             } else {
                 $this->log->log("No search engine retrieved for the language - " . $lang);
             }
@@ -206,7 +208,6 @@ class Store_Api
             "primary_language" => $primary_language,
             "site_url" => get_bloginfo('url'),
             "sector" => Settings::get_sector(),
-            "callback_urls" => $this->get_callback_urls($api_keys, $primary_language),
             "options" => Store_Helpers::get_store_options(),
             "search_engines" => $this->build_search_engines($api_keys, $primary_language)
         ];
@@ -225,16 +226,16 @@ class Store_Api
             $code = Helpers::format_locale_to_hyphen($code);
             $lang = Helpers::get_language_from_locale($code);
 
+            $home_url = $this->language->get_home_url($lang);
+
             // Prepare search engine body
             $this->log->log('Wizard Step 2 - Prepare Search Enginge body : ');
             $search_engines[] = [
                 'name' => $domain . ($code ? ' (' . strtoupper($code) . ')' : ''),
                 'language' => $code,
                 'currency' => $currency,
-                'site_url' => $this->language->get_home_url($lang),
-                'datatypes' => [
-                    $this->get_datatype($lang)
-                ]
+                'site_url' =>  $home_url,
+                "callback_url" => $this->build_callback_url($home_url, '/wp-json/doofinder/v1/index-status/?token=' . $this->api_key),
             ];
         }
 
@@ -257,80 +258,12 @@ class Store_Api
         return $primary_language;
     }
 
-    private function get_datatype($language)
-    {
-        return is_plugin_active('woocommerce/woocommerce.php') ?
-            $this->get_product_datatype($language) :
-            $this->get_post_datatype($language);
-    }
-
-    /**
-     * Generates the product datatype structure.
-     *
-     * @return array The product datatype structure.
-     */
-    private function get_product_datatype($language)
-    {
-        return [
-            "name" => "product",
-            "preset" => "product",
-            "datasources" => [
-                [
-                    "type" => "wordpress",
-                    "options" => [
-                        "feed_type" => "product",
-                        "lang" => $language
-                    ]
-                ]
-            ]
-        ];
-    }
-
-    /**
-     * Generates the post datatype structure.
-     *
-     * @return array The post datatype structure.
-     */
-    private function get_post_datatype($language)
-    {
-        return [
-            "name" => "posts",
-            "preset" => "generic",
-            "datasources" => [
-                [
-                    "type" => "wordpress",
-                    "options" => [
-                        "feed_type" => "posts",
-                        "lang" => $language
-                    ]
-                ]
-            ]
-        ];
-    }
-
-    private function get_callback_urls($api_keys, $primary_language)
-    {
-        $callback_urls = [];
-        $currency = is_plugin_active('woocommerce/woocommerce.php') ? get_woocommerce_currency() : "EUR";
-
-        foreach ($api_keys as $item) {
-            $code = $item['lang']['locale'] ?? $item['lang']['code'] ?? $primary_language;
-            $lang = Helpers::get_language_from_locale($code);
-            $code = Helpers::format_locale_to_hyphen($code);
-            $callback_urls[$code][$currency] = $this->build_callback_url(
-                $this->language->get_home_url($lang),
-                '/wp-json/doofinder/v1/index-status/?token=' . $this->api_key
-            );
-        }
-        return $callback_urls;
-    }
-
     /**
      * This method takes the base url and adds
      *
      * @param [type] $base_url
      * @param [type] $endpoint_path
-     * @return void
+     * @return string
      */
     private function build_callback_url($base_url, $endpoint_path)
     {
