@@ -32,13 +32,13 @@ class Store_Api
      */
     private $language;
 
-
     /**
-     * API Host
+     * Dooplugins Host
      *
      * @var string
      */
-    private $api_host;
+    private $dooplugins_host;
+
 
     /**
      * API Key
@@ -53,10 +53,10 @@ class Store_Api
         $this->log = new Log('store_create_api.log');
 
         $this->api_key = Settings::get_api_key();
-        $this->api_host = Settings::get_api_host();
+        $this->dooplugins_host = Settings::get_dooplugins_host();
 
-        $this->log->log('-------------  API HOST ------------- ');
-        $this->log->log($this->api_host);
+        $this->log->log('-------------  DOOPLUGINS HOST ------------- ');
+        $this->log->log($this->dooplugins_host);
 
         $this->language = Multilanguage::instance();
     }
@@ -78,7 +78,7 @@ class Store_Api
             unset($store_payload_log["options"]);
 
             $this->log->log($store_payload_log);
-            return $this->sendRequest("plugins/create-store", $store_payload);
+            return $this->sendRequest("install", $store_payload);
         }
     }
 
@@ -136,7 +136,7 @@ class Store_Api
         }
 
         $this->log->log("Sending request to normalize indices.");
-        $response = $this->sendRequest("plugins/wordpress/normalize-indices/", $payload, true);
+        $response = $this->sendRequest("wordpress/normalize-indices/", $payload, true);
 
         if (!is_array($response)) {
             $this->log->log("The store and indices normalization has failed due to an invalid response: " . print_r($response, true));
@@ -147,16 +147,6 @@ class Store_Api
             $this->log->log("The store and indices normalization has finished successfully!");
             $this->log->log("Response: \n" . print_r($response, true));
         }
-    }
-
-    /**
-     * This method checks if there is an application password set.
-     *
-     * @return boolean
-     */
-    public static function has_application_credentials()
-    {
-        return WP_Application_Passwords::application_name_exists_for_user(get_current_user_id(), 'doofinder');
     }
 
     /**
@@ -179,7 +169,7 @@ class Store_Api
             'timeout' => 20
         ];
 
-        $url = "{$this->api_host}/{$endpoint}";
+        $url = "{$this->dooplugins_host}/{$endpoint}";
         $this->log->log("Making a request to: $url");
         $response = wp_remote_post($url, $data);
         $response_code = wp_remote_retrieve_response_code($response);
@@ -204,7 +194,7 @@ class Store_Api
      * Generates the create-store payload
      *
      * @param array $api_keys The list of search engine ids
-     * @return void
+     * @return array Store payload
      */
     private function build_store_payload($api_keys)
     {
@@ -214,7 +204,6 @@ class Store_Api
             "name" =>  get_bloginfo('name'),
             "platform" =>  is_plugin_active('woocommerce/woocommerce.php') ? "woocommerce" : "wordpress",
             "primary_language" => $primary_language,
-            "search_engines" => [],
             "sector" => Settings::get_sector(),
             "callback_urls" => $this->get_callback_urls($api_keys, $primary_language),
             "options" => Store_Helpers::get_store_options(),
