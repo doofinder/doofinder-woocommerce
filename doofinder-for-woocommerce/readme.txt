@@ -1,7 +1,7 @@
 === Doofinder WP & WooCommerce Search ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.2.0
+Version: 2.1.16
 Requires at least: 5.6
 Tested up to: 6.3.1
 Requires PHP: 7.0
@@ -86,8 +86,8 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 2.2.0 =
-Fixed wrongly decoded HTML entities for custom attributes
+= 2.1.16 =
+Fixes wrongly decoded HTML entities for custom attributes (e.g. &amp; instead of &)
 
 = 2.1.15 =
 Improve JS and CSS secure load
