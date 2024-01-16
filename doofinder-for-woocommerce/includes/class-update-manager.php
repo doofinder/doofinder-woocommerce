@@ -157,6 +157,7 @@ class Update_Manager
 
         return true;
     }
+
     /**
      * Update: 2.0.2
      */
@@ -226,6 +227,25 @@ class Update_Manager
         }
         //Delete the custom_attributes transient
         delete_transient("df_product_rest_attributes");
+        return true;
+    }
+
+    /**
+     * Update: 2.2.0
+     * Normalize store and indices and create application credentials for
+     * accessing the rest API.
+     */
+    public static function update_020200()
+    {
+        //Update api host to point to admin.doofinder.com instead of api.doofinder.com
+        $dooplugins_host = Settings::get_dooplugins_host();
+        if (empty($dooplugins_host) || !strpos($dooplugins_host, "plugins.doofinder.com")) {
+            $api_host = Settings::get_api_host();
+            $api_host_parts = explode("-", $api_host);
+            $new_dooplugins_host = $api_host_parts[0] . '-' . 'plugins.doofinder.com';
+            Settings::set_dooplugins_host($new_dooplugins_host);
+        }
+
         return true;
     }
 }
