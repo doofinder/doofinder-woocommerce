@@ -86,6 +86,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 2.2.0 =
+Refactoring the code and applying the calls to the new service.
+
 = 2.1.15 =
 Improve JS and CSS secure load
 
