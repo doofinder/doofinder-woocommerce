@@ -88,13 +88,12 @@ class Store_Api
      * $payload = array(
      *    'store_options' => array(
      *        'url' => 'http://pedro-wordpress.ngrok.doofinder.com',
-     *        'api_pass' => 'G41cXNeVoX4JGL2bhvbcMlQ4',
-     *        'api_user' => 'pedro'
+     *        'df_token' => 'G41cXNeVoX4JGL2bhvbcMlQ4'
      *    ),
      *    'search_engines' => array(
      *        'fde92a8f364b8d769262974e95d82dba' => array(
      *          'feed_type' => 'post',
-     *          'url' => 'http://pedro-wordpress.ngrok.doofinder.com'
+     *          'lang' => 'http://pedro-wordpress.ngrok.doofinder.com'
      *        )
      *    )
      * )
@@ -129,9 +128,7 @@ class Store_Api
 
             if (isset($api_keys[$lang])) {
                 $se_hashid = $api_keys[$lang]['hash'];
-                $payload['search_engines'][$se_hashid] = [ 
-                    "feed_type" => is_plugin_active('woocommerce/woocommerce.php') ? "product" : "posts", 
-                    "lang" => $lang];
+                $payload['search_engines'][$se_hashid] = ["language" => $lang];
             } else {
                 $this->log->log("No search engine retrieved for the language - " . $lang);
             }
@@ -235,6 +232,7 @@ class Store_Api
                 'language' => $code,
                 'currency' => $currency,
                 'site_url' =>  $home_url,
+                "feed_type" => is_plugin_active('woocommerce/woocommerce.php') ? "product" : "posts", 
                 "callback_url" => $this->build_callback_url($home_url, '/wp-json/doofinder/v1/index-status/?token=' . $this->api_key),
             ];
         }
