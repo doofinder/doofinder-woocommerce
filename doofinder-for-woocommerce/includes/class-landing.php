@@ -73,6 +73,10 @@ class Landing
      */
     public static function init()
     {
+
+        // See: https://wpml.org/errata/htaccess-is-rewritten-with-language-folder/
+        add_filter('mod_rewrite_rules', array( __CLASS__, 'avoid_conflicts_with_wpml_rewrite_rules') );
+
         // Add a custom rewrite tag
         add_rewrite_tag('%df-landing%', '([^/]+)');
 
@@ -98,6 +102,32 @@ class Landing
             }
         });
         flush_rewrite_rules();
+    }
+
+    public static function avoid_conflicts_with_wpml_rewrite_rules( $rules ) 
+    {
+        if ( ! class_exists( 'SitePress' ) ) {
+            return $rules;
+        }
+        
+        $home_root = parse_url( home_url() );
+        if ( isset( $home_root['path'] ) ) {
+            $home_root = trailingslashit( $home_root['path'] );
+        } else {
+            $home_root = '/';
+        }
+     
+        $wpml_root = parse_url( get_option('home') );
+        if ( isset( $wpml_root['path'] ) ) {
+            $wpml_root = trailingslashit( $wpml_root['path'] );
+        } else {
+            $wpml_root = '/';
+        }
+     
+        $rules = str_replace( "RewriteBase $home_root", "RewriteBase $wpml_root", $rules );
+        $rules = str_replace( "RewriteRule . $home_root", "RewriteRule . $wpml_root", $rules );
+     
+        return $rules;
     }
 
     /**
@@ -410,7 +440,7 @@ class Landing
      */
     private static function have_params($hashid, $slug)
     {
-        return !empty($hashid) && !empty($slug) ? true : false;
+        return !empty($hashid) && !empty($slug);
     }
 
     /**
@@ -459,7 +489,7 @@ class Landing
     private function render_products($products_ids)
     {
         if (isset($products_ids['error'])) {
-            $this->log->log("Product ids could not be obtained in our request: " . $products_ids['error']);
+            $this->log->log( "Product ids could not be obtained in our request: " .  print_r( $products_ids['error'], true ) );
             echo self::translated_error();
         }
 
@@ -482,7 +512,7 @@ class Landing
 
             woocommerce_product_loop_end();
         } else {
-            $this->log->log("No products were found for the list of ids we have obtained: " . $products_ids);
+            $this->log->log( "No products were found for the list of ids we have obtained: " . print_r( $products_ids, true ) );
             echo self::translated_error();
         }
 
