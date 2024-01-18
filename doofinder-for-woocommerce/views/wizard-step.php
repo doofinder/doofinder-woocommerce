@@ -6,8 +6,8 @@ $wizard = Setup_Wizard::instance();
 
 $step = isset($step) ? $step : 1;
 $active = isset($active) ? $active : false;
-$active = $step === $step_state ? true : false;
-$finished = $step_state > $step ? true : false;
+$active = $step === $step_state;
+$finished = $step_state > $step;
 $error = $wizard->get_errors_html("wizard-step-$step");
 ?>
 <div class="df-setup-step df-setup-step-connect <?php echo $active ? 'active' : ''; ?> <?php echo !empty($error) ? 'has-error' : ''; ?> <?php echo $finished ? 'finished' : ''; ?>">

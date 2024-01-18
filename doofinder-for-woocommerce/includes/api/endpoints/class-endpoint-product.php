@@ -721,7 +721,7 @@ class Endpoint_Product
                     //If is an atributte with taxonomy, i need to get taxonomy value
                     if(taxonomy_exists($attribute_name)){
                         $term = get_term_by('slug', $option, $attribute_name);
-                        $option = $term ? $term->name : '';
+                        $option = $term ? html_entity_decode( strip_tags( $term->name ) ) : '';
                     }
                     $custom_attributes[$attribute_slug][] = $option;
                 }
