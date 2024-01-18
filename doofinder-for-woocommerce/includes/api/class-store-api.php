@@ -115,7 +115,8 @@ class Store_Api
         $store_payload = $this->build_store_payload($api_keys);
 
         $payload = [
-            'store_options' => $store_payload['options']
+            'store_options' => $store_payload['options'],
+            'platform' => $store_payload['platform']
         ];
 
         foreach ($store_payload['search_engines'] as $search_engine) {
