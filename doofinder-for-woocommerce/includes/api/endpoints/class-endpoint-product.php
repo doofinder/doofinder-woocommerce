@@ -551,7 +551,7 @@ class Endpoint_Product
         else{
             $product["availability"] = "out of stock";
         }
-        unset($product["stock_status"]);
+
         return $product;
     }
 
