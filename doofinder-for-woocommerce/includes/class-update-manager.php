@@ -142,6 +142,8 @@ class Update_Manager
      * Update: 2.0.0
      * Normalize store and indices and create application credentials for
      * accessing the rest API.
+     * 
+     * @return bool
      */
     public static function update_020000()
     {
@@ -160,6 +162,8 @@ class Update_Manager
 
     /**
      * Update: 2.0.2
+     * 
+     * @return bool
      */
     public static function update_020002()
     {
@@ -170,6 +174,8 @@ class Update_Manager
     /**
      * Update: 2.0.3
      * Remove the indexing failed notice to solve any existing problem
+     * 
+     * @return bool
      */
     public static function update_020003()
     {
@@ -180,6 +186,8 @@ class Update_Manager
     /**
      * Update: 2.0.13
      * Update the woocommerce product attributes
+     * 
+     * @return bool
      */
     public static function update_020013()
     {
@@ -200,6 +208,8 @@ class Update_Manager
     /**
      * Update: 2.1.1
      * Update the woocommerce product attributes
+     * 
+     * @return bool
      */
     public static function update_020101()
     {
@@ -213,6 +223,8 @@ class Update_Manager
     /**
      * Update: 2.1.12
      * Remove stock_status from custom_attributes
+     * 
+     * @return bool
      */
     public static function update_020112()
     {
@@ -232,8 +244,10 @@ class Update_Manager
 
     /**
      * Update: 2.2.0
-     * Normalize store and indices and create application credentials for
+     * * Normalize store and indices and create application credentials for
      * accessing the rest API.
+     * 
+     * @return bool
      */
     public static function update_020200()
     {
