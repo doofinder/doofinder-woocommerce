@@ -129,7 +129,7 @@ class Store_Api
 
             if (isset($api_keys[$lang])) {
                 $se_hashid = $api_keys[$lang]['hash'];
-                $payload['search_engines'][$se_hashid] = ["language" => $lang];
+                $payload['search_engines'][$se_hashid] = ["lang" => $lang];
             } else {
                 $this->log->log("No search engine retrieved for the language - " . $lang);
             }
@@ -171,7 +171,7 @@ class Store_Api
 
         $url = "{$this->dooplugins_host}/{$endpoint}";
         $this->log->log("Making a request to: $url");
-        $response = wp_remote_post($url, $data);
+        $response = wp_remote_request($url, $data);
         $response_code = wp_remote_retrieve_response_code($response);
 
         $this->log->log("Response code: $response_code");

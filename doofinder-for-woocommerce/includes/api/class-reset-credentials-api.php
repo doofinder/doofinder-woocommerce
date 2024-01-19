@@ -50,7 +50,7 @@ class Reset_Credentials_Api
     {
         $this->log                  = new Log('reset-credential-api.log');
         $this->api_key              = Settings::get_api_key();
-        $this->dooplugins_host             = Settings::get_dooplugins_host();
+        $this->dooplugins_host      = Settings::get_dooplugins_host();
         $this->hash                 = Settings::get_search_engine_hash($language);
         $this->authorization_header = array(
             'Authorization' => "Token $this->api_key",
@@ -96,6 +96,7 @@ class Reset_Credentials_Api
             $decoded_response = json_decode($response_body, true);
             $this->log->log("The request has been made correctly: $decoded_response");
         } else {
+            $this->log->log(print_r($response, true));
             $error_message = wp_remote_retrieve_response_message($response);
             $this->log->log("Error in the request: $error_message");
         }
@@ -103,7 +104,7 @@ class Reset_Credentials_Api
 
     public function buildURL($path)
     {
-        return "{$this->dooplugins_host}/{$path}";
+        return "https://edu-dooplugins.ngrok.doofinder.com/{$path}";
     }
 
     /**
