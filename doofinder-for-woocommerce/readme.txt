@@ -89,6 +89,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 = 2.2.0 =
 Refactoring the code and applying the calls to the new service.
 
+= 2.1.18 =
+Prevent stock_status field removal from the final response
+
 = 2.1.17 =
 Fixes some issues detected if it is used along with WPML plugin
 
