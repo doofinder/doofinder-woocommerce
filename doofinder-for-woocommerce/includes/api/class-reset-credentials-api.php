@@ -104,7 +104,7 @@ class Reset_Credentials_Api
 
     public function buildURL($path)
     {
-        return "https://edu-dooplugins.ngrok.doofinder.com/{$path}";
+        return "{$this->dooplugins_host}/{$path}";
     }
 
     /**
