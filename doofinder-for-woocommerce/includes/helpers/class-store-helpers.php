@@ -2,9 +2,6 @@
 
 namespace Doofinder\WP\Helpers;
 
-use Exception;
-use WP_Application_Passwords;
-
 class Store_Helpers
 {
 
