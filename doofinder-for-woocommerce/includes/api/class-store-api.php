@@ -87,13 +87,12 @@ class Store_Api
      * Payload example:
      * $payload = array(
      *    'store_options' => array(
-     *        'url' => 'http://pedro-wordpress.ngrok.doofinder.com',
+     *        'url' => 'http://wordpress.doofinder.com',
      *        'df_token' => 'G41cXNeVoX4JGL2bhvbcMlQ4'
      *    ),
      *    'search_engines' => array(
      *        'fde92a8f364b8d769262974e95d82dba' => array(
-     *          'feed_type' => 'post',
-     *          'lang' => 'http://pedro-wordpress.ngrok.doofinder.com'
+     *          'lang' => 'en'
      *        )
      *    )
      * )
