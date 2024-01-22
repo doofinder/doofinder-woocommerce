@@ -40,9 +40,10 @@ class Migration
         self::initialize_migration();
         $migration_result = self::do_woocommerce_migration();
 
-        //check if app credentials are set
-        if (!Store_Api::has_application_credentials() && Settings::is_configuration_complete()) {
-            self::$log->log('Migrate - We need to create the store and the indices.');
+        $token_auth = Settings::get_token_auth();
+
+        if ($token_auth == "" && Settings::is_configuration_complete()) {
+            self::$log->log('Migrate - We need to create the token.');
             $store_api = new Store_Api();
             $store_api->normalize_store_and_indices();
         }
@@ -98,7 +99,7 @@ class Migration
      * This function migrates the options from the former woocommerce plugin to
      * the current plugin options.
      *
-     * @return void
+     * @return bool
      */
     private static function do_woocommerce_migration()
     {

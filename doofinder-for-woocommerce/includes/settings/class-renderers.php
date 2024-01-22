@@ -244,6 +244,36 @@ trait Renderers
     }
 
     /**
+     * Print HTML for the "API Host" option.
+     *
+     * @param string $option_name
+     */
+    private function render_html_dooplugins_host($option_name)
+    {
+        $saved_value = get_option($option_name);
+
+        $key_eu = "https://eu1-plugins.doofinder.com";
+        $key_us = "https://us1-plugins.doofinder.com";
+
+    ?>
+
+        <span class="doofinder-tooltip"><span><?php _e(
+                                                    'The host for plugins must contain point to the server where you have registered.',
+                                                    'doofinder_for_wp'
+                                                ); ?></span></span>
+
+        <select name="<?php echo $option_name; ?>" class="widefat">
+            <?php
+            $selected_eu = $saved_value === $key_eu ? " selected " : "";
+            echo '<option value=" ' . $key_eu . ' "' . $selected_eu . '> Europa -  ' . $key_eu . '  </option>';
+            $selected_us = $saved_value === $key_us ? " selected " : "";
+            echo '<option value=" ' . $key_us . ' "' . $selected_us . '> USA -  ' . $key_us . '  </option>';
+            ?>
+        </select>
+    <?php
+    }
+
+    /**
      * Print HTML for the "Search engine hash" option.
      *
      * @param string $option_name

@@ -32,13 +32,13 @@ class Store_Api
      */
     private $language;
 
-
     /**
-     * API Host
+     * Dooplugins Host
      *
      * @var string
      */
-    private $api_host;
+    private $dooplugins_host;
+
 
     /**
      * API Key
@@ -53,10 +53,10 @@ class Store_Api
         $this->log = new Log('store_create_api.log');
 
         $this->api_key = Settings::get_api_key();
-        $this->api_host = Settings::get_api_host();
+        $this->dooplugins_host = Settings::get_dooplugins_host();
 
-        $this->log->log('-------------  API HOST ------------- ');
-        $this->log->log($this->api_host);
+        $this->log->log('-------------  DOOPLUGINS HOST ------------- ');
+        $this->log->log($this->dooplugins_host);
 
         $this->language = Multilanguage::instance();
     }
@@ -78,7 +78,7 @@ class Store_Api
             unset($store_payload_log["options"]);
 
             $this->log->log($store_payload_log);
-            return $this->sendRequest("plugins/create-store", $store_payload);
+            return $this->sendRequest("install", $store_payload);
         }
     }
 
@@ -87,14 +87,12 @@ class Store_Api
      * Payload example:
      * $payload = array(
      *    'store_options' => array(
-     *        'url' => 'http://pedro-wordpress.ngrok.doofinder.com',
-     *        'api_pass' => 'G41cXNeVoX4JGL2bhvbcMlQ4',
-     *        'api_user' => 'pedro'
+     *        'url' => 'http://wordpress.doofinder.com',
+     *        'df_token' => 'G41cXNeVoX4JGL2bhvbcMlQ4'
      *    ),
      *    'search_engines' => array(
      *        'fde92a8f364b8d769262974e95d82dba' => array(
-     *          'feed_type' => 'post',
-     *          'url' => 'http://pedro-wordpress.ngrok.doofinder.com'
+     *          'lang' => 'en'
      *        )
      *    )
      * )
@@ -116,7 +114,8 @@ class Store_Api
         $store_payload = $this->build_store_payload($api_keys);
 
         $payload = [
-            'store_options' => $store_payload['options']
+            'store_options' => $store_payload['options'],
+            'platform' => $store_payload['platform']
         ];
 
         foreach ($store_payload['search_engines'] as $search_engine) {
@@ -129,14 +128,14 @@ class Store_Api
 
             if (isset($api_keys[$lang])) {
                 $se_hashid = $api_keys[$lang]['hash'];
-                $payload['search_engines'][$se_hashid] = $search_engine['datatypes'][0]['datasources'][0]['options'];
+                $payload['search_engines'][$se_hashid] = ["lang" => $lang];
             } else {
                 $this->log->log("No search engine retrieved for the language - " . $lang);
             }
         }
 
         $this->log->log("Sending request to normalize indices.");
-        $response = $this->sendRequest("plugins/wordpress/normalize-indices/", $payload, true);
+        $response = $this->sendRequest("wordpress/normalize-indices/", $payload, true);
 
         if (!is_array($response)) {
             $this->log->log("The store and indices normalization has failed due to an invalid response: " . print_r($response, true));
@@ -147,16 +146,6 @@ class Store_Api
             $this->log->log("The store and indices normalization has finished successfully!");
             $this->log->log("Response: \n" . print_r($response, true));
         }
-    }
-
-    /**
-     * This method checks if there is an application password set.
-     *
-     * @return boolean
-     */
-    public static function has_application_credentials()
-    {
-        return WP_Application_Passwords::application_name_exists_for_user(get_current_user_id(), 'doofinder');
     }
 
     /**
@@ -179,9 +168,9 @@ class Store_Api
             'timeout' => 20
         ];
 
-        $url = "{$this->api_host}/{$endpoint}";
+        $url = "{$this->dooplugins_host}/{$endpoint}";
         $this->log->log("Making a request to: $url");
-        $response = wp_remote_post($url, $data);
+        $response = wp_remote_request($url, $data);
         $response_code = wp_remote_retrieve_response_code($response);
 
         $this->log->log("Response code: $response_code");
@@ -204,7 +193,7 @@ class Store_Api
      * Generates the create-store payload
      *
      * @param array $api_keys The list of search engine ids
-     * @return void
+     * @return array Store payload
      */
     private function build_store_payload($api_keys)
     {
@@ -214,9 +203,8 @@ class Store_Api
             "name" =>  get_bloginfo('name'),
             "platform" =>  is_plugin_active('woocommerce/woocommerce.php') ? "woocommerce" : "wordpress",
             "primary_language" => $primary_language,
-            "search_engines" => [],
+            "site_url" => get_bloginfo('url'),
             "sector" => Settings::get_sector(),
-            "callback_urls" => $this->get_callback_urls($api_keys, $primary_language),
             "options" => Store_Helpers::get_store_options(),
             "search_engines" => $this->build_search_engines($api_keys, $primary_language)
         ];
@@ -235,16 +223,17 @@ class Store_Api
             $code = Helpers::format_locale_to_hyphen($code);
             $lang = Helpers::get_language_from_locale($code);
 
+            $home_url = $this->language->get_home_url($lang);
+
             // Prepare search engine body
             $this->log->log('Wizard Step 2 - Prepare Search Enginge body : ');
             $search_engines[] = [
                 'name' => $domain . ($code ? ' (' . strtoupper($code) . ')' : ''),
                 'language' => $code,
                 'currency' => $currency,
-                'site_url' => $this->language->get_home_url($lang),
-                'datatypes' => [
-                    $this->get_datatype($lang)
-                ]
+                'site_url' =>  $home_url,
+                "feed_type" => is_plugin_active('woocommerce/woocommerce.php') ? "product" : "posts", 
+                "callback_url" => $this->build_callback_url($home_url, '/wp-json/doofinder/v1/index-status/?token=' . $this->api_key),
             ];
         }
 
@@ -267,80 +256,12 @@ class Store_Api
         return $primary_language;
     }
 
-    private function get_datatype($language)
-    {
-        return is_plugin_active('woocommerce/woocommerce.php') ?
-            $this->get_product_datatype($language) :
-            $this->get_post_datatype($language);
-    }
-
-    /**
-     * Generates the product datatype structure.
-     *
-     * @return array The product datatype structure.
-     */
-    private function get_product_datatype($language)
-    {
-        return [
-            "name" => "product",
-            "preset" => "product",
-            "datasources" => [
-                [
-                    "type" => "wordpress",
-                    "options" => [
-                        "feed_type" => "product",
-                        "lang" => $language
-                    ]
-                ]
-            ]
-        ];
-    }
-
-    /**
-     * Generates the post datatype structure.
-     *
-     * @return array The post datatype structure.
-     */
-    private function get_post_datatype($language)
-    {
-        return [
-            "name" => "posts",
-            "preset" => "generic",
-            "datasources" => [
-                [
-                    "type" => "wordpress",
-                    "options" => [
-                        "feed_type" => "posts",
-                        "lang" => $language
-                    ]
-                ]
-            ]
-        ];
-    }
-
-    private function get_callback_urls($api_keys, $primary_language)
-    {
-        $callback_urls = [];
-        $currency = is_plugin_active('woocommerce/woocommerce.php') ? get_woocommerce_currency() : "EUR";
-
-        foreach ($api_keys as $item) {
-            $code = $item['lang']['locale'] ?? $item['lang']['code'] ?? $primary_language;
-            $lang = Helpers::get_language_from_locale($code);
-            $code = Helpers::format_locale_to_hyphen($code);
-            $callback_urls[$code][$currency] = $this->build_callback_url(
-                $this->language->get_home_url($lang),
-                '/wp-json/doofinder/v1/index-status/?token=' . $this->api_key
-            );
-        }
-        return $callback_urls;
-    }
-
     /**
      * This method takes the base url and adds
      *
      * @param [type] $base_url
      * @param [type] $endpoint_path
-     * @return void
+     * @return string
      */
     private function build_callback_url($base_url, $endpoint_path)
     {

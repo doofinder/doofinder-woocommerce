@@ -131,7 +131,24 @@ trait Register_Settings
             ]
         );
 
-        register_setting(self::$top_level_menu, $api_host_option_name, array($this, 'validate_api_host'));
+        register_setting(self::$top_level_menu, $api_host_option_name, array($this, 'validate_hosts'));
+
+        // Dooplugins Host 
+        $api_host_option_name = 'doofinder_for_wp_dooplugins_host';
+        add_settings_field(
+            $api_host_option_name,
+            __('Server', 'doofinder_for_wp'),
+            function () use ($api_host_option_name) {
+                $this->render_html_dooplugins_host($api_host_option_name);
+            },
+            self::$top_level_menu,
+            $section_id,
+            [
+                'class' => 'hidden'
+            ]
+        );
+
+        register_setting(self::$top_level_menu, $api_host_option_name, array($this, 'validate_hosts'));
 
         // Search engine hash
         $search_engine_hash_option_name =
@@ -287,13 +304,13 @@ trait Register_Settings
      *
      * @return string
      */
-    function validate_api_host($input)
+    function validate_hosts($input)
     {
         if (null == $input) {
             add_settings_error(
                 'doofinder_for_wp_messages',
-                'doofinder_for_wp_message_api_host',
-                __('API Host is mandatory.', 'doofinder_for_wp')
+                'doofinder_for_wp_message_hosts',
+                __('Hosts are mandatory.', 'doofinder_for_wp')
             );
         }
 

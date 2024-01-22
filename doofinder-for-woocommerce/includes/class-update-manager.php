@@ -142,6 +142,8 @@ class Update_Manager
      * Update: 2.0.0
      * Normalize store and indices and create application credentials for
      * accessing the rest API.
+     * 
+     * @return bool
      */
     public static function update_020000()
     {
@@ -157,8 +159,11 @@ class Update_Manager
 
         return true;
     }
+
     /**
      * Update: 2.0.2
+     * 
+     * @return bool
      */
     public static function update_020002()
     {
@@ -169,6 +174,8 @@ class Update_Manager
     /**
      * Update: 2.0.3
      * Remove the indexing failed notice to solve any existing problem
+     * 
+     * @return bool
      */
     public static function update_020003()
     {
@@ -179,6 +186,8 @@ class Update_Manager
     /**
      * Update: 2.0.13
      * Update the woocommerce product attributes
+     * 
+     * @return bool
      */
     public static function update_020013()
     {
@@ -199,6 +208,8 @@ class Update_Manager
     /**
      * Update: 2.1.1
      * Update the woocommerce product attributes
+     * 
+     * @return bool
      */
     public static function update_020101()
     {
@@ -212,6 +223,8 @@ class Update_Manager
     /**
      * Update: 2.1.12
      * Remove stock_status from custom_attributes
+     * 
+     * @return bool
      */
     public static function update_020112()
     {
@@ -226,6 +239,27 @@ class Update_Manager
         }
         //Delete the custom_attributes transient
         delete_transient("df_product_rest_attributes");
+        return true;
+    }
+
+    /**
+     * Update: 2.2.0
+     * * Normalize store and indices and create application credentials for
+     * accessing the rest API.
+     * 
+     * @return bool
+     */
+    public static function update_020200()
+    {
+        //Update dooplugins host to point to plugins.doofinder.com from admin zone
+        $dooplugins_host = Settings::get_dooplugins_host();
+        if (empty($dooplugins_host) || !strpos($dooplugins_host, "plugins.doofinder.com")) {
+            $api_host = Settings::get_api_host();
+            $api_host_parts = explode("-", $api_host);
+            $new_dooplugins_host = $api_host_parts[0] . '-' . 'plugins.doofinder.com';
+            Settings::set_dooplugins_host($new_dooplugins_host);
+        }
+
         return true;
     }
 }

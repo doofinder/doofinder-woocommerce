@@ -22,7 +22,7 @@ class Reset_Credentials_Api
      *
      * @var string
      */
-    private $api_host;
+    private $dooplugins_host;
 
     /**
      * API Key
@@ -50,7 +50,7 @@ class Reset_Credentials_Api
     {
         $this->log                  = new Log('reset-credential-api.log');
         $this->api_key              = Settings::get_api_key();
-        $this->api_host             = Settings::get_api_host();
+        $this->dooplugins_host      = Settings::get_dooplugins_host();
         $this->hash                 = Settings::get_search_engine_hash($language);
         $this->authorization_header = array(
             'Authorization' => "Token $this->api_key",
@@ -59,7 +59,7 @@ class Reset_Credentials_Api
 
         $this->log->log('Create Management API Client');
         $this->log->log('API Key: ' . $this->api_key);
-        $this->log->log('API Host: ' . $this->api_host);
+        $this->log->log('Dooplugins Host: ' . $this->dooplugins_host);
         $this->log->log('Hash: ' . $this->hash);
     }
 
@@ -96,6 +96,7 @@ class Reset_Credentials_Api
             $decoded_response = json_decode($response_body, true);
             $this->log->log("The request has been made correctly: $decoded_response");
         } else {
+            $this->log->log(print_r($response, true));
             $error_message = wp_remote_retrieve_response_message($response);
             $this->log->log("Error in the request: $error_message");
         }
@@ -103,7 +104,7 @@ class Reset_Credentials_Api
 
     public function buildURL($path)
     {
-        return "{$this->api_host}/{$path}";
+        return "{$this->dooplugins_host}/{$path}";
     }
 
     /**
@@ -113,7 +114,7 @@ class Reset_Credentials_Api
     {
         $this->log->log('Reset Credentials');
 
-        $uri = $this->buildURL("plugins/wordpress/" . $this->hash . "/reset-credentials");
+        $uri = $this->buildURL("wordpress/" . $this->hash . "/reset-credentials");
         $this->log->log("Making a request to: $uri");
 
         return $this->sendRequest($uri, $data);
