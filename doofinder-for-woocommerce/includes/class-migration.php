@@ -40,7 +40,7 @@ class Migration
         self::initialize_migration();
         $migration_result = self::do_woocommerce_migration();
 
-        $token_auth = Settings::get_token_auth();
+        $token_auth = get_option('doofinder_for_wp_token');
 
         if ($token_auth == "" && Settings::is_configuration_complete()) {
             self::$log->log('Migrate - We need to create the token.');

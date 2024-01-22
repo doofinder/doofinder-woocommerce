@@ -21,3 +21,4 @@ node_modules
 build
 
 /vendor/
+.vscode/sftp.json
