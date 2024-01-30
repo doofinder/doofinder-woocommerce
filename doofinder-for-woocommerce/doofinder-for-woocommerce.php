@@ -351,7 +351,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
          */
         public static function register_notices_styles()
         {
-            wp_enqueue_style('doofinder-notice', Doofinder_For_WordPress::plugin_url() . '/assets/css/doofinder-notice.css');
+            wp_enqueue_style( 'doofinder-notice', Doofinder_For_WordPress::plugin_url() . '/assets/css/doofinder-notice.css', array(), self::$version );
         }
 
         public static function initialize_rest_endpoints()
