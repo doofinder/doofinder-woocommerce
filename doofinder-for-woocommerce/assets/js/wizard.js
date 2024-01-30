@@ -34,7 +34,7 @@ jQuery(() => {
     );
 
     if (window.focus) {
-      newWindow.focus();
+      newWindow.trigger("focus");
     }
 
     return newWindow;
