@@ -122,6 +122,7 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                     Setup_Wizard::instance();
                     Update_On_Save::register_hooks();
 
+                    self::register_notices_styles();
                     self::register_ajax_action();
                 }
 
@@ -319,7 +320,8 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
             }
         }
 
-        public static function load_only_doofinder_admin_scripts_and_styles() {
+        public static function load_only_doofinder_admin_scripts_and_styles()
+        {
             $current_screen = get_current_screen();
 
             // Verify if it is the specific page by its unique identifier
@@ -342,12 +344,22 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
             }
         }
 
+        /**
+         * Registers styles used across the admin.
+         *
+         * @return void
+         */
+        public static function register_notices_styles()
+        {
+            wp_enqueue_style('doofinder-notice', Doofinder_For_WordPress::plugin_url() . '/assets/css/doofinder-notice.css');
+        }
+
         public static function initialize_rest_endpoints()
         {
             add_action('rest_api_init', function () {
                 Config::register();
 
-                if(empty($_SERVER["HTTP_DOOFINDER_TOKEN"])){
+                if (empty($_SERVER["HTTP_DOOFINDER_TOKEN"])) {
                     REST_API_Handler::initialize();
                 }
 
