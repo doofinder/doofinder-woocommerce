@@ -393,8 +393,8 @@ class Endpoint_Product
     * @param array $product The product array to format prices.
     * @return array $product with formatted prices
     */
-   private static function format_prices($product)
-   {
+    private static function format_prices($product)
+    {
         $wc_product = wc_get_product($product["id"]);
 
         $regular_price = self::get_regular_price($wc_product);
@@ -406,7 +406,7 @@ class Endpoint_Product
         $product["sale_price"]    = $sale_price == "" && $price < $regular_price ? $price : $sale_price;
 
         return $product;
-   }
+    }
 
     /**
      * Returns the raw price for the given product.
@@ -420,6 +420,7 @@ class Endpoint_Product
         $fn_name = "get_$price_name";
         if (is_a($wc_product, 'WC_Product') && method_exists($wc_product, $fn_name)) {
             $price = $wc_product->$fn_name();
+            // If sale price is empty, do not attempt to get the raw real price, as we will get the original price
             $raw_price =  $price_name === "sale_price" && $price === "" ? "" : self::get_raw_real_price($price, $wc_product);
             //If price is equal to 0, return an empty string
             $raw_price = (0 == $raw_price) ? "" : $raw_price;
