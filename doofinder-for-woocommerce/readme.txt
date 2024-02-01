@@ -86,7 +86,8 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 = 2.2.3 =
-TODO
+Fix an issue that happened when a custom attribute had nested arrays without the key "name" deleting the whole custom attribute
+Get the sale price even when WC_Product->get_sale_price fails.
 
 = 2.2.2 =
 Fix an issue while setting search engine hashid and some notice styles issues.
