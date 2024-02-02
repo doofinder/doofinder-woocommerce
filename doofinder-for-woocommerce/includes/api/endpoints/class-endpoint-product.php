@@ -247,7 +247,7 @@ class Endpoint_Product
             if (is_array($data_with_attr[$fieldKey])) {
                 $name_column = array_column($data_with_attr[$fieldKey], "name");
 
-                if (!$name_column) {
+                if (!empty($name_column)) {
                     $data_with_attr[$fieldKey] = $name_column;
                 }    
             }
