@@ -1,7 +1,7 @@
 === Doofinder WP & WooCommerce Search ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.2.2
+Version: 2.2.3
 Requires at least: 5.6
 Tested up to: 6.3.1
 Requires PHP: 7.0
@@ -85,6 +85,10 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/doofinder-for-woocommerce)
 
 == Changelog ==
+= 2.2.3 =
+Fix an issue that happened when a custom attribute had nested arrays without the key "name" deleting the whole custom attribute
+Get the sale price even when WC_Product->get_sale_price fails.
+
 = 2.2.2 =
 Fix an issue while setting search engine hashid and some notice styles issues.
 

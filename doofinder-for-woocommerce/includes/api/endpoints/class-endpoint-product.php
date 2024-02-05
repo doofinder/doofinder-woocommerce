@@ -221,32 +221,38 @@ class Endpoint_Product
             return isset($attr['type']) && $attr['type'] !== 'metafield';
         }));
 
-        if (!empty($custom_attr)) {
-            $data_with_attr = array_merge($data, self::get_custom_attributes($data["id"], $custom_attr));
+        if (empty($custom_attr)) {
+            return $data;
+        }
 
-            foreach ($custom_attr as $custom) {
-                $attributeKey = $custom["attribute"];
-                $fieldKey     = $custom["field"];
+        $data_with_attr = array_merge($data, self::get_custom_attributes($data["id"], $custom_attr));
 
-                //Exchange renamed fields
-                if (isset($data_with_attr[$attributeKey])) {
-                    $data_with_attr[$fieldKey] = $data_with_attr[$attributeKey];
+        foreach ($custom_attr as $custom) {
+            $attributeKey = $custom["attribute"];
+            $fieldKey     = $custom["field"];
 
-                    //We delete the original key only if it has been renamed to a different alias.
-                    if ($fieldKey != $attributeKey) {
-                        unset($data_with_attr[$attributeKey]);
-                    }
-
-                    //List of value options
-                    if (is_array($data_with_attr[$fieldKey])) {
-                        $data_with_attr[$fieldKey] = array_column($data_with_attr[$fieldKey], "name");
-                    }
-                }
+            if (!isset($data_with_attr[$attributeKey])) {
+                continue;
             }
 
-            return $data_with_attr;
+            //Exchange renamed fields
+            $data_with_attr[$fieldKey] = $data_with_attr[$attributeKey];
+
+            //We delete the original key only if it has been renamed to a different alias.
+            if ($fieldKey != $attributeKey) {
+                unset($data_with_attr[$attributeKey]);
+            }
+
+            //List of value options
+            if (is_array($data_with_attr[$fieldKey])) {
+                $name_column = array_column($data_with_attr[$fieldKey], "name");
+
+                if (!empty($name_column)) {
+                    $data_with_attr[$fieldKey] = $name_column;
+                }    
+            }
         }
-        return $data;
+        return $data_with_attr;
     }
 
     /**
@@ -387,13 +393,17 @@ class Endpoint_Product
     * @param array $product The product array to format prices.
     * @return array $product with formatted prices
     */
-   private static function format_prices($product)
-   {
+    private static function format_prices($product)
+    {
         $wc_product = wc_get_product($product["id"]);
 
-        $product["regular_price"] = self::get_regular_price($product["id"], $wc_product);
-        $product["price"]         = !empty($product["regular_price"]) ? $product["regular_price"] : self::get_price($product["id"], $wc_product);
-        $product["sale_price"]    = self::get_sale_price($product["id"], $wc_product);
+        $regular_price = self::get_regular_price($wc_product);
+        $price = self::get_price($wc_product);
+        $sale_price = self::get_sale_price($wc_product);
+
+        $product["regular_price"] = $regular_price;
+        $product["price"]         = $regular_price == "" ? $price : $regular_price;
+        $product["sale_price"]    = $sale_price == "" && $price < $regular_price ? $price : $sale_price;
 
         return $product;
     }
@@ -410,6 +420,7 @@ class Endpoint_Product
         $fn_name = "get_$price_name";
         if (is_a($wc_product, 'WC_Product') && method_exists($wc_product, $fn_name)) {
             $price = $wc_product->$fn_name();
+            // If sale price is empty, do not attempt to get the raw real price, as we will get the original price
             $raw_price =  $price_name === "sale_price" && $price === "" ? "" : self::get_raw_real_price($price, $wc_product);
             //If price is equal to 0, return an empty string
             $raw_price = (0 == $raw_price) ? "" : $raw_price;
@@ -445,10 +456,10 @@ class Endpoint_Product
     /**
      * Get the raw price
      *
-     * @param integer $id Product ID to get field.
+     * @param object $product Product to get field.
      * @return float The raw price including or excluding taxes (defined in WC settings).
      */
-    private static function get_price($id, $product)
+    private static function get_price($product)
     {
         return self::get_raw_price($product);
     }
@@ -456,10 +467,10 @@ class Endpoint_Product
     /**
      * Get the raw sale price
      *
-     * @param integer $id Product ID to get field.
+     * @param integer $id Product to get field.
      * @return float The raw sale price including or excluding taxes (defined in WC settings).
      */
-    private static function get_sale_price($id, $product)
+    private static function get_sale_price($product)
     {
         return self::get_raw_price($product, 'sale_price');
     }
@@ -467,10 +478,10 @@ class Endpoint_Product
     /**
      * Get the raw regular price
      *
-     * @param integer $id Product ID to get field.
+     * @param integer $product Product to get field.
      * @return float The raw regular price including or excluding taxes (defined in WC settings).
      */
-    private static function get_regular_price($id, $product)
+    private static function get_regular_price($product)
     {
         return self::get_raw_price($product, 'regular_price');
     }
