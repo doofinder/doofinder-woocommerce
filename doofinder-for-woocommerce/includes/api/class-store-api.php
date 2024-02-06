@@ -88,7 +88,9 @@ class Store_Api
      * $payload = array(
      *    'store_options' => array(
      *        'url' => 'http://wordpress.doofinder.com',
-     *        'df_token' => 'G41cXNeVoX4JGL2bhvbcMlQ4'
+     *        'df_token' => 'G41cXNeVoX4JGL2bhvbcMlQ4',
+     *        'api_pass' => 'fwafwaG41cXNeVoX4JGL2bhvbcMlQ4',
+     *        'api_user' => 'doofinder'
      *    ),
      *    'search_engines' => array(
      *        'fde92a8f364b8d769262974e95d82dba' => array(
@@ -146,6 +148,16 @@ class Store_Api
             $this->log->log("The store and indices normalization has finished successfully!");
             $this->log->log("Response: \n" . print_r($response, true));
         }
+    }
+
+    /**
+     * This method checks if there is an application password set.
+     *
+     * @return boolean
+     */
+    public static function has_application_credentials()
+    {
+        return WP_Application_Passwords::application_name_exists_for_user(get_current_user_id(), 'doofinder');
     }
 
     /**
