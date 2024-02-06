@@ -151,16 +151,6 @@ class Store_Api
     }
 
     /**
-     * This method checks if there is an application password set.
-     *
-     * @return boolean
-     */
-    public static function has_application_credentials()
-    {
-        return WP_Application_Passwords::application_name_exists_for_user(get_current_user_id(), 'doofinder');
-    }
-
-    /**
      * Send a POST request with the given $body to the given $endpoint.
      *
      * @param string $endpoint The endpoint url.
