@@ -88,7 +88,9 @@ class Store_Api
      * $payload = array(
      *    'store_options' => array(
      *        'url' => 'http://wordpress.doofinder.com',
-     *        'df_token' => 'G41cXNeVoX4JGL2bhvbcMlQ4'
+     *        'df_token' => 'G41cXNeVoX4JGL2bhvbcMlQ4',
+     *        'api_pass' => 'fwafwaG41cXNeVoX4JGL2bhvbcMlQ4',
+     *        'api_user' => 'doofinder'
      *    ),
      *    'search_engines' => array(
      *        'fde92a8f364b8d769262974e95d82dba' => array(
