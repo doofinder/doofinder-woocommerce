@@ -108,6 +108,10 @@ class Endpoint_Product
             $products = self::get_variations($products);
 
             foreach ($products as $product_data) {
+                //If the product is not a valid WC product, ignore it.
+                if (false === wc_get_product($product_data["id"])) {
+                    continue;
+                }
 
                 $indexable_opt = get_post_meta($product_data["id"], "_doofinder_for_wp_indexing_visibility", true);
 
