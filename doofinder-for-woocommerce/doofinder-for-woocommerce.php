@@ -106,8 +106,6 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
                 Update_On_Save::init();
                 //Initialize reset credentials
                 Reset_Credentials::init();
-                //Initialize custom endpoints
-                Endpoints::init();
 
                 Landing::init();
 
@@ -354,8 +352,20 @@ if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
             wp_enqueue_style( 'doofinder-notice', Doofinder_For_WordPress::plugin_url() . '/assets/css/doofinder-notice.css', array(), self::$version );
         }
 
+        /**
+         * This method initializes REST API endpoints.
+         * 
+         * We must remember that 'rest_api_init' hooks should be added outside the 'init' hook to prevent endpoints from
+         * not being registered because the 'rest_api_init' hook is executed earlier. 
+         * This is because we cannot guarantee that the order will always be 'init > rest_api_init'.
+         *
+         * @return void
+         */
         public static function initialize_rest_endpoints()
         {
+            //Initialize custom endpoints
+            Endpoints::init();
+            
             add_action('rest_api_init', function () {
                 Config::register();
 
