@@ -218,26 +218,27 @@ trait Renderers
      *
      * @param string $option_name
      */
-    private function render_html_api_host($option_name)
+    private function render_html_zone_select($option_name)
     {
         $saved_value = get_option($option_name);
 
-        $key_eu = "https://eu1-admin.doofinder.com";
-        $key_us = "https://us1-admin.doofinder.com";
+        $key_eu = "eu1";
+        $key_us = "us1";
 
     ?>
 
         <span class="doofinder-tooltip"><span><?php _e(
-                                                    'The host API must contain point to the server where you have registered.',
+                                                    'The region in which you are registered in doofinder',
                                                     'doofinder_for_wp'
                                                 ); ?></span></span>
 
         <select name="<?php echo $option_name; ?>" class="widefat">
+            <option> - Select a region - </option>
             <?php
             $selected_eu = $saved_value === $key_eu ? " selected " : "";
-            echo '<option value=" ' . $key_eu . ' "' . $selected_eu . '> Europa -  ' . $key_eu . '  </option>';
+            echo '<option value=" ' . $key_eu . ' "' . $selected_eu . '> Europe -  ' . strtoupper( $key_eu ) . '  </option>';
             $selected_us = $saved_value === $key_us ? " selected " : "";
-            echo '<option value=" ' . $key_us . ' "' . $selected_us . '> USA -  ' . $key_us . '  </option>';
+            echo '<option value=" ' . $key_us . ' "' . $selected_us . '> USA -  ' . strtoupper( $key_us ) . '  </option>';
             ?>
         </select>
     <?php

@@ -67,4 +67,20 @@ class Helpers {
     {
         return str_replace("_", "-", $locale_code);
     }
+
+    /**
+     * Obtains the region from a given doofinder host.
+     *
+     * @param string $host
+     * @return string The region identifier (eu1 or us1).
+     */
+    public static function get_region_from_host( $host ){
+        $re = '/:\/\/(?<region>[a-z]{2}[0-9])-.*/m';
+        preg_match_all($re, $host , $matches, PREG_SET_ORDER, 0);
+
+        if(!empty($matches) && array_key_exists('region', $matches[0])){
+            return $matches[0]['region'];
+        }
+        return false;
+    }
 }
