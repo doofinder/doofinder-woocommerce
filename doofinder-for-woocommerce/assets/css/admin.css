@@ -221,37 +221,6 @@ Toggle
   transform: translateX(26px);
 }
 
-/* Notice styles */
-.df-notice .submit a {
-  margin: 5px !important;
-}
-
-.df-notice-row {
-  display: flex;
-  align-items: center;
-}
-
-.df-notice-row.flex-end {
-  display: flex-end;
-}
-
-.df-notice-col.logo {
-  width: 100px;
-}
-
-.df-notice-col.content {
-  flex-grow: 1;
-}
-
-.df-notice-col.extra {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.df-notice-col.align-center {
-  align-self: center;
-}
-
 /* Update on save buton */
 
 .update-on-save-btn .dashicons {
