@@ -139,6 +139,7 @@ class Migration
             }
 
             self::maybe_fix_api_host();
+            self::maybe_set_region();
 
             return true;
         }
@@ -165,6 +166,28 @@ class Migration
         if ($api_host_path != "admin.doofinder.com") {
             $new_api_host = $api_host_prefix . "-admin.doofinder.com";
             update_option($api_host_option_name, $new_api_host);
+        }
+    }
+
+    public static function maybe_set_region()
+    {
+        $api_host = get_option('doofinder_for_wp_api_host');
+        if (!$api_host){
+            return;
+        }
+
+        $re = '/:\/\/(?<region>[a-z]{2}[0-9])-.*/m';
+        preg_match_all($re, $api_host, $matches, PREG_SET_ORDER, 0);
+
+        if (!empty($matches) && array_key_exists('region', $matches[0])) {
+            $region = $matches[0]['region'];
+            Settings::set_region($region);
+
+            //Delete api_host and plugins_host as they are not needed any more
+            $del_keys = ['doofinder_for_wp_api_host', 'doofinder_for_wp_dooplugins_host'];
+            foreach ($del_keys as $del_key) {
+                delete_option($del_key);
+            }
         }
     }
 
@@ -215,6 +238,9 @@ class Migration
      */
     public static function transform_additional_attributes($additional_attributes)
     {
+        if (false === $additional_attributes){
+            return $additional_attributes;
+        }
         $transformed_attributes = [];
         foreach ($additional_attributes as $key => $value) {
             $attribute = [];

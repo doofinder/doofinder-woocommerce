@@ -148,10 +148,7 @@ class Update_Manager
      */
     public static function update_020000()
     {
-        if (Settings::is_configuration_complete()) {
-            Migration::migrate();
-        }
-
+        Migration::migrate();
         return true;
     }
 
@@ -217,7 +214,7 @@ class Update_Manager
 
     /**
      * Update: 2.2.6
-     * Create or update the Plugins Host.
+     * Set the region
      * 
      * @return bool
      */
@@ -225,20 +222,7 @@ class Update_Manager
     {
         //Set Region
         if (Settings::is_configuration_complete()) {
-            $api_host = get_option('doofinder_for_wp_api_host');
-            $re = '/:\/\/(?<region>[a-z]{2}[0-9])-.*/m';
-            preg_match_all($re, $api_host, $matches, PREG_SET_ORDER, 0);
-
-            if (!empty($matches) && array_key_exists('region', $matches[0])) {
-                $region = $matches[0]['region'];
-                Settings::set_region($region);
-
-                //Delete api_host and plugins_host as they are not needed any more
-                $del_keys = ['doofinder_for_wp_api_host', 'doofinder_for_wp_dooplugins_host'];
-                foreach ($del_keys as $del_key) {
-                    delete_option($del_key);
-                }
-            }
+            Migration::maybe_set_region();
         }
         return true;
     }
