@@ -182,12 +182,6 @@ class Migration
         if (!empty($matches) && array_key_exists('region', $matches[0])) {
             $region = $matches[0]['region'];
             Settings::set_region($region);
-
-            //Delete api_host and plugins_host as they are not needed any more
-            $del_keys = ['doofinder_for_wp_api_host', 'doofinder_for_wp_dooplugins_host'];
-            foreach ($del_keys as $del_key) {
-                delete_option($del_key);
-            }
         }
     }
 
