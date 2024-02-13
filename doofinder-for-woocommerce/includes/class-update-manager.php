@@ -29,7 +29,7 @@ class Update_Manager
             return false;
         }
         $current_normalized_version = self::normalize_plugin_version(Settings::get_plugin_version());
-        $plugin_normalized_version = self::normalize_plugin_version($plugin_version);
+        $plugin_normalized_version = (int)self::normalize_plugin_version($plugin_version);
 
         $result = NULL;
         for ($version = $current_normalized_version + 1; $version <= $plugin_normalized_version; $version++) {
@@ -132,6 +132,7 @@ class Update_Manager
         if (empty(static::$logger)) {
             static::$logger = new Log('updates.log');
         }
+        static::$logger->log($message);
     }
 
     /*
@@ -147,27 +148,10 @@ class Update_Manager
      */
     public static function update_020000()
     {
-        //Update api host to point to admin.doofinder.com instead of api.doofinder.com
-        $api_host = Settings::get_api_host();
-        if (!empty($api_host) && !strpos($api_host, "admin.doofinder.com")) {
-            $api_host_parts = explode("-", $api_host);
-            $new_api_host = $api_host_parts[0] . '-' . 'admin.doofinder.com';
-            Settings::set_api_host($new_api_host);
+        if (Settings::is_configuration_complete()) {
+            Migration::migrate();
         }
 
-        Migration::migrate();
-
-        return true;
-    }
-
-    /**
-     * Update: 2.0.2
-     * 
-     * @return bool
-     */
-    public static function update_020002()
-    {
-        //Leave empty and return true to remove the update error
         return true;
     }
 
@@ -191,7 +175,9 @@ class Update_Manager
      */
     public static function update_020013()
     {
-        Migration::migrate_custom_attributes();
+        if (get_option("woocommerce_doofinder_feed_attributes_additional_attributes")) {
+            Migration::migrate_custom_attributes();
+        }
         return true;
     }
 
@@ -201,22 +187,9 @@ class Update_Manager
      */
     public static function update_020100()
     {
-        Migration::create_token_auth();
-        return true;
-    }
-
-    /**
-     * Update: 2.1.1
-     * Update the woocommerce product attributes
-     * 
-     * @return bool
-     */
-    public static function update_020101()
-    {
-        $doomanager_host = Settings::get_api_host();
-        $dooplugins_host = str_replace("admin", "plugins", $doomanager_host);
-        Settings::set_dooplugins_host($dooplugins_host);
-
+        if (Settings::is_configuration_complete()) {
+            Migration::create_token_auth();
+        }
         return true;
     }
 
@@ -243,23 +216,30 @@ class Update_Manager
     }
 
     /**
-     * Update: 2.2.0
-     * * Normalize store and indices and create application credentials for
-     * accessing the rest API.
+     * Update: 2.2.6
+     * Create or update the Plugins Host.
      * 
      * @return bool
      */
-    public static function update_020200()
+    public static function update_020206()
     {
-        //Update dooplugins host to point to plugins.doofinder.com from admin zone
-        $dooplugins_host = Settings::get_dooplugins_host();
-        if (empty($dooplugins_host) || !strpos($dooplugins_host, "plugins.doofinder.com")) {
-            $api_host = Settings::get_api_host();
-            $api_host_parts = explode("-", $api_host);
-            $new_dooplugins_host = $api_host_parts[0] . '-' . 'plugins.doofinder.com';
-            Settings::set_dooplugins_host($new_dooplugins_host);
-        }
+        //Set Region
+        if (Settings::is_configuration_complete()) {
+            $api_host = get_option('doofinder_for_wp_api_host');
+            $re = '/:\/\/(?<region>[a-z]{2}[0-9])-.*/m';
+            preg_match_all($re, $api_host, $matches, PREG_SET_ORDER, 0);
 
+            if (!empty($matches) && array_key_exists('region', $matches[0])) {
+                $region = $matches[0]['region'];
+                Settings::set_region($region);
+
+                //Delete api_host and plugins_host as they are not needed any more
+                $del_keys = ['doofinder_for_wp_api_host', 'doofinder_for_wp_dooplugins_host'];
+                foreach ($del_keys as $del_key) {
+                    delete_option($del_key);
+                }
+            }
+        }
         return true;
     }
 }
