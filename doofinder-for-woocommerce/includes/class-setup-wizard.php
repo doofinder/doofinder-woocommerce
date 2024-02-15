@@ -1126,11 +1126,11 @@ class Setup_Wizard
     }
 
     private function save_api_settings($api_settings)
-    {
-        $region = Helpers::get_region_from_host($api_settings['api_host']);
+    {        
         $api_key = $api_settings['api_key'];
 
         if (!empty($api_settings['api_host'])) {
+            $region = Helpers::get_region_from_host($api_settings['api_host']);
             Settings::set_region($region);
         }
         // Check if api key already exists and is the same
