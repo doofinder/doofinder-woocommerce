@@ -22,6 +22,12 @@ class Update_Manager
         $db_version = Settings::get_plugin_version();
         self::log("Check updates from $db_version to $plugin_version");
 
+        if(Settings::is_plugin_update_running()){
+            //The update is being executed by another thread, ignore.
+            return;
+        }
+
+        Settings::plugin_update_started();
         if (empty($plugin_version)) {
 
             self::log("invalid plugin version: $plugin_version");
@@ -67,6 +73,7 @@ class Update_Manager
             Settings::set_plugin_version($plugin_version);
         }
 
+        Settings::plugin_update_ended();
         self::log("Updates ended, plugin db version is: " . Settings::get_plugin_version());
     }
 

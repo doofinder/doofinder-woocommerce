@@ -427,6 +427,20 @@ trait Accessors
         return get_option('doofinder_for_wp_plugin_version', '1.9.9');
     }
 
+    public static function plugin_update_started()
+    {
+        update_option('doofinder_for_wp_plugin_update_running', 1);
+    }
+
+    public static function plugin_update_ended()
+    {
+        update_option('doofinder_for_wp_plugin_update_running', 0);
+    }
+
+    public static function is_plugin_update_running()
+    {
+        return (bool) get_option('doofinder_for_wp_plugin_update_running', 0);
+    }
 
     public static function set_plugin_version($version)
     {
