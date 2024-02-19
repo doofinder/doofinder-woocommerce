@@ -53,6 +53,27 @@ trait Accessors
     }
 
     /**
+     * Sets the region.
+     *
+     * @param string $region The region identifier (eu1 or us1)
+     * @return bool The update_option result. True if successfully updated false in case of failure.
+     */
+    public static function set_region($region)
+    {
+        return update_option('doofinder_for_wp_region', $region);
+    }
+
+    /**
+     * Retrieve the region.
+     *
+     * @return string The Region ley (eu1 or us1).
+     */
+    public static function get_region()
+    {
+        return get_option('doofinder_for_wp_region');
+    }
+
+    /**
      * Retrieve the API Host.
      *
      * Just an alias for "get_option" to avoid repeating the string
@@ -62,9 +83,16 @@ trait Accessors
      */
     public static function get_dooplugins_host()
     {
-        $doopluginsHost = get_option('doofinder_for_wp_dooplugins_host', 'https://plugins.doofinder.com');
-    
-        return self::normalize_host($doopluginsHost);
+        //If we are in local environment, return the DF_PLUGINS_HOST set in wp-config
+        if (wp_get_environment_type() === 'local' && defined('DF_PLUGINS_HOST')) {
+            return DF_PLUGINS_HOST;
+        }
+
+        $region = self::get_region();
+        $region = empty($region) ?'': "$region-";
+        
+        $pluginsHost = sprintf('https://%splugins.doofinder.com', $region);
+        return self::normalize_host($pluginsHost);
     }
 
     /**
@@ -81,8 +109,10 @@ trait Accessors
         if (wp_get_environment_type() === 'local' && defined('DF_API_HOST')) {
             return DF_API_HOST;
         }
+        $region = self::get_region();
+        $region = empty($region) ?'': "$region-";
 
-        $adminHost = get_option('doofinder_for_wp_api_host', 'https://admin.doofinder.com');
+        $adminHost = sprintf('https://%sadmin.doofinder.com', $region);
         
         return self::normalize_host($adminHost);
     }
@@ -276,13 +306,13 @@ trait Accessors
     private static function option_name_for_language($option_name, $language = '')
     {
         if ($language) {
-            $option_name .= "_{$language}";
+            return $option_name .= "_{$language}";
+        } else if($language == ""){
+            return $option_name;
         } else {
             $language    = Multilanguage::instance();
-            $option_name = $language->get_option_name($option_name);
+            return $language->get_option_name($option_name);
         }
-
-        return $option_name;
     }
 
     /**
@@ -397,6 +427,20 @@ trait Accessors
         return get_option('doofinder_for_wp_plugin_version', '1.9.9');
     }
 
+    public static function plugin_update_started()
+    {
+        update_option('doofinder_for_wp_plugin_update_running', 1);
+    }
+
+    public static function plugin_update_ended()
+    {
+        update_option('doofinder_for_wp_plugin_update_running', 0);
+    }
+
+    public static function is_plugin_update_running()
+    {
+        return (bool) get_option('doofinder_for_wp_plugin_update_running', 0);
+    }
 
     public static function set_plugin_version($version)
     {

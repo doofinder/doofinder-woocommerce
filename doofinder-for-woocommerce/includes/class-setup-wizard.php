@@ -161,13 +161,6 @@ class Setup_Wizard
      */
     private $log;
 
-    /**
-     * Admin path used to get the connection details
-     *
-     * @var string
-     */
-    const ADMIN_PATH = "http://admin.doofinder.com";
-
     public function __construct()
     {
 
@@ -938,7 +931,6 @@ class Setup_Wizard
             return;
         }
 
-        extract($api_settings);
         $this->save_api_settings($api_settings);
         $this->log->log('Processing Wizard Step 2 - All data saved');
 
@@ -1134,8 +1126,13 @@ class Setup_Wizard
     }
 
     private function save_api_settings($api_settings)
-    {
-        extract($api_settings);
+    {        
+        $api_key = $api_settings['api_key'];
+
+        if (!empty($api_settings['api_host'])) {
+            $region = Helpers::get_region_from_host($api_settings['api_host']);
+            Settings::set_region($region);
+        }
         // Check if api key already exists and is the same
         // If api key is different clear all settings
         $saved_api_key = Settings::get_api_key();
@@ -1145,8 +1142,6 @@ class Setup_Wizard
         }
 
         Settings::set_api_key($api_key);
-        Settings::set_api_host($api_host);
-        Settings::set_dooplugins_host($dooplugins_host);
     }
 
 

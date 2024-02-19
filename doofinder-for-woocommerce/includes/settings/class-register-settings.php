@@ -116,39 +116,25 @@ trait Register_Settings
 
         register_setting(self::$top_level_menu, $api_key_option_name, array($this, 'validate_api_key'));
 
-        // API Host
-        $api_host_option_name = 'doofinder_for_wp_api_host';
+        // DF Server Region (Hidden once filled)
+        $region_option_name = 'doofinder_for_wp_region';
+        $saved_region_value = get_option($region_option_name);
+
         add_settings_field(
-            $api_host_option_name,
-            __('Server', 'doofinder_for_wp'),
-            function () use ($api_host_option_name) {
-                $this->render_html_api_host($api_host_option_name);
+            $region_option_name,
+            __('Region', 'doofinder_for_wp'),
+            function () use ($region_option_name) {
+                $this->render_html_zone_select($region_option_name);
             },
             self::$top_level_menu,
             $section_id,
             [
-                'class' => 'hidden'
+                'class' => empty($saved_region_value) ? '' : 'hidden'
             ]
         );
 
-        register_setting(self::$top_level_menu, $api_host_option_name, array($this, 'validate_hosts'));
+        register_setting(self::$top_level_menu, $region_option_name);
 
-        // Dooplugins Host 
-        $api_host_option_name = 'doofinder_for_wp_dooplugins_host';
-        add_settings_field(
-            $api_host_option_name,
-            __('Server', 'doofinder_for_wp'),
-            function () use ($api_host_option_name) {
-                $this->render_html_dooplugins_host($api_host_option_name);
-            },
-            self::$top_level_menu,
-            $section_id,
-            [
-                'class' => 'hidden'
-            ]
-        );
-
-        register_setting(self::$top_level_menu, $api_host_option_name, array($this, 'validate_hosts'));
 
         // Search engine hash
         $search_engine_hash_option_name =
