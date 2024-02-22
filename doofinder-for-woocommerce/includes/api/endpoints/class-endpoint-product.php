@@ -629,7 +629,6 @@ class Endpoint_Product
                 //Setting df_variants_information when variation attribute = true
                 $attr_variation                     = self::get_df_variants_information($product, $attributes);
                 $product["df_variants_information"] = $attr_variation;
-                #$products[]                         = self::remove_variants_attributes($product, $attr_variation);
                 $products[]                         = $product;
                 $products = array_merge($products, $variations_data);
             }
