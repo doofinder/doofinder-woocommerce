@@ -219,10 +219,11 @@ class Endpoint_Product
      * @return array The merged data.
      */
     private static function merge_custom_attributes($data, $custom_attr) {
-
-        // Filter out metafield custom attributes
-        $custom_attr = array_values(array_filter($custom_attr, function ($attr) {
-            return isset($attr['type']) && $attr['type'] !== 'metafield';
+        // Filter out metafield custom attributes and variants attributes
+        $custom_attr = array_values(array_filter($custom_attr, function ($attr) use ($data) {
+            return isset($attr['type']) && 
+                   $attr['type'] !== 'metafield' && 
+                   !in_array($attr["field"], $data["df_variants_information"]);
         }));
 
         if (empty($custom_attr)) {
@@ -626,8 +627,8 @@ class Endpoint_Product
                 $variations_data = self::processVariations($product);
 
                 //Setting df_variants_information when variation attribute = true
-                $attr_variation_true                = self::get_df_variants_information($product, $attributes);
-                $product["df_variants_information"] = $attr_variation_true;
+                $attr_variation                     = self::get_df_variants_information($product, $attributes);
+                $product["df_variants_information"] = $attr_variation;
                 $products[]                         = $product;
                 $products = array_merge($products, $variations_data);
             }
