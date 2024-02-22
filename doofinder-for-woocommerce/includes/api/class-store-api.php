@@ -201,8 +201,11 @@ class Store_Api
     {
         $primary_language = $this->get_primary_language();
 
+        $name = get_bloginfo('name');
+        $store_name = !empty($name) ? $name : "Default Store";
+
         $store_payload = [
-            "name" =>  get_bloginfo('name'),
+            "name" =>  $store_name,
             "platform" =>  is_plugin_active('woocommerce/woocommerce.php') ? "woocommerce" : "wordpress",
             "primary_language" => $primary_language,
             "site_url" => get_bloginfo('url'),
