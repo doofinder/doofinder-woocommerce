@@ -88,6 +88,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 2.2.7 =
 Fixed a bug that caused some stores to be created without a name.
+Exclude the attributes of the variants of the parent product
 
 = 2.2.6 =
 Added minor improvements.
