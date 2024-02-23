@@ -222,8 +222,8 @@ class Endpoint_Product
         // Filter out metafield custom attributes and variants attributes
         $custom_attr = array_values(array_filter($custom_attr, function ($attr) use ($data) {
             return isset($attr['type']) && 
-                   $attr['type'] !== 'metafield' && 
-                   !in_array($attr["field"], $data["df_variants_information"]);
+                   $attr['type'] !== 'metafield' && (empty($data["df_variants_information"]) ||
+                   !in_array($attr["field"], $data["df_variants_information"]));
         }));
 
         if (empty($custom_attr)) {
