@@ -4,6 +4,8 @@ namespace Doofinder\WP;
 
 class Log {
 
+	const LOG_FOLDER_NAME = 'doofinder-logs';
+
 	/**
 	 * Name of the file we'll be logging data into.
 	 *
@@ -36,12 +38,15 @@ class Log {
 	 * @param mixed $value
 	 */
 	public function log( $value ) {
+		$wp_upload_dir_array = wp_upload_dir();
+		$wp_upload_dir = $wp_upload_dir_array['basedir'];
+		$doofinder_logs_dir = trailingslashit( $wp_upload_dir . '/' . self::LOG_FOLDER_NAME );
 		// Check if logs directory exits. Create it if it doesn't.
-		if ( ! is_dir( Doofinder_For_WordPress::plugin_path() . 'logs' ) ) {
-			mkdir( Doofinder_For_WordPress::plugin_path() . 'logs' );
+		if ( ! is_dir( $doofinder_logs_dir ) ) {
+			mkdir( $doofinder_logs_dir );
 		}
 
-		$log_file = Doofinder_For_WordPress::plugin_path() . 'logs/' . $this->file_name;
+		$log_file = $doofinder_logs_dir . $this->file_name;
 
 		// We don't want the log file to grow to large, so clear it
 		// if it takes up more than 1 mb of disk space.
