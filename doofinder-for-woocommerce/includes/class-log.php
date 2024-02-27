@@ -45,6 +45,7 @@ class Log {
 		if ( ! is_dir( $doofinder_logs_dir ) ) {
 			mkdir( $doofinder_logs_dir );
 		}
+		self::maybe_add_security_files( $doofinder_logs_dir );
 
 		$log_file = $doofinder_logs_dir . $this->file_name;
 
@@ -76,5 +77,18 @@ class Log {
 			$to_log,
 			FILE_APPEND
 		);
+	}
+
+	private static function maybe_add_security_files( $doofinder_logs_dir ) {
+		$htaccess_filename = $doofinder_logs_dir . '.htaccess';
+		$index_filename = $doofinder_logs_dir . 'index.php';
+
+		if ( ! is_file( $htaccess_filename ) ) {
+			file_put_contents( $htaccess_filename, 'Deny from All' );
+		}
+
+		if ( ! is_file( $index_filename ) ) {
+			file_put_contents( $index_filename, '<?php // Silence is golden' );
+		}
 	}
 }
