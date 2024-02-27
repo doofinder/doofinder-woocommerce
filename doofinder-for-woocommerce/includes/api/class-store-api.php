@@ -72,12 +72,12 @@ class Store_Api
     {
         if (is_array($api_keys)) {
             $store_payload = $this->build_store_payload($api_keys);
-            $this->log->log("store_data: ");
+            // $this->log->log("store_data: ");
 
             $store_payload_log = $store_payload;
             unset($store_payload_log["options"]);
 
-            $this->log->log($store_payload_log);
+            // $this->log->log($store_payload_log);
             return $this->sendRequest("install", $store_payload);
         }
     }
@@ -122,9 +122,10 @@ class Store_Api
 
         foreach ($store_payload['search_engines'] as $search_engine) {
             $lang = Helpers::get_language_from_locale($search_engine['language']);
-
-            //If the installation is not multilanguage, replace the lang with ''
-            if (is_a($this->language, No_Language_Plugin::class) || $lang === $this->language->get_base_language()) {
+            $base_lang = Helpers::get_language_from_locale( $this->language->get_base_language() );
+            
+            //If the installation is not multilanguage or it's the base language, replace the lang with ''
+            if (is_a($this->language, No_Language_Plugin::class) || $lang === $base_lang) {
                 $lang = '';
             }
 
@@ -146,7 +147,7 @@ class Store_Api
             $this->log->log(print_r($response['errors'], true));
         } else {
             $this->log->log("The store and indices normalization has finished successfully!");
-            $this->log->log("Response: \n" . print_r($response, true));
+            // $this->log->log("Response: \n" . print_r($response, true));
         }
     }
 
@@ -175,18 +176,18 @@ class Store_Api
         $response = wp_remote_request($url, $data);
         $response_code = wp_remote_retrieve_response_code($response);
 
-        $this->log->log("Response code: $response_code");
-        $this->log->log("Response: " . print_r($response, true));
+        // $this->log->log("Response code: $response_code");
+        // $this->log->log("Response: " . print_r($response, true));
 
         if (!$migration) {
             $this->throw_exception($response, $response_code);
         }
 
         $response_body = wp_remote_retrieve_body($response);
-        $this->log->log("Response body: " . print_r($response_body, true));
+        // $this->log->log("Response body: " . print_r($response_body, true));
 
         $decoded_response = json_decode($response_body, true);
-        $this->log->log("Decoded response: " . print_r($decoded_response, true));
+        // $this->log->log("Decoded response: " . print_r($decoded_response, true));
 
         return $decoded_response;
     }
@@ -231,7 +232,7 @@ class Store_Api
             $home_url = $this->language->get_home_url($lang);
 
             // Prepare search engine body
-            $this->log->log('Wizard Step 2 - Prepare Search Enginge body : ');
+            $this->log->log('Wizard Step 2 - Prepare Search Engine body : ');
             $search_engines[] = [
                 'name' => $domain . ($code ? ' (' . strtoupper($code) . ')' : ''),
                 'language' => $code,

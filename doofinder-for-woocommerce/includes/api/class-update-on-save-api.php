@@ -69,7 +69,7 @@ class Update_On_Save_Api
         );
 
         $this->log->log('Create Management API Client');
-        $this->log->log('API Key: ' . $this->api_key);
+        // $this->log->log('API Key: ' . $this->api_key);
         $this->log->log('API Host: ' . $this->api_host);
         $this->log->log('Hash: ' . $this->hash);
     }
