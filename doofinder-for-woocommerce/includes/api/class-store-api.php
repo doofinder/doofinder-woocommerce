@@ -122,9 +122,10 @@ class Store_Api
 
         foreach ($store_payload['search_engines'] as $search_engine) {
             $lang = Helpers::get_language_from_locale($search_engine['language']);
-
-            //If the installation is not multilanguage, replace the lang with ''
-            if (is_a($this->language, No_Language_Plugin::class) || $lang === $this->language->get_base_language()) {
+            $base_lang = Helpers::get_language_from_locale( $this->language->get_base_language() );
+            
+            //If the installation is not multilanguage or it's the base language, replace the lang with ''
+            if (is_a($this->language, No_Language_Plugin::class) || $lang === $base_lang) {
                 $lang = '';
             }
 
@@ -231,7 +232,7 @@ class Store_Api
             $home_url = $this->language->get_home_url($lang);
 
             // Prepare search engine body
-            $this->log->log('Wizard Step 2 - Prepare Search Enginge body : ');
+            $this->log->log('Wizard Step 2 - Prepare Search Engine body : ');
             $search_engines[] = [
                 'name' => $domain . ($code ? ' (' . strtoupper($code) . ')' : ''),
                 'language' => $code,

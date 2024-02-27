@@ -172,7 +172,7 @@ class Landing_Api
             $this->log->log("Zone: $zone");
             return $zone;
         } else {
-            $error_url = "Invaid zone in server. {$api_host}";
+            $error_url = "Invalid zone in server. {$api_host}";
             $this->log->log($error_url);
             return ['error' => $error_url];
         }

@@ -88,6 +88,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 2.2.9 =
 Changed log directory to /WP_CONTENT_FOLDER/uploads/doofinder-logs to avoid permission issues
+Fixed a bug in Force Normalization when the language code has language and country (e.g. pt-PT)
 
 = 2.2.8 =
 Fixed a bug excluding the attributes of the variants of the parent product
