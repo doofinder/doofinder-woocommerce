@@ -58,7 +58,6 @@ class Reset_Credentials_Api
         );
 
         $this->log->log('Create Management API Client');
-        // $this->log->log('API Key: ' . $this->api_key);
         $this->log->log('Dooplugins Host: ' . $this->dooplugins_host);
         $this->log->log('Hash: ' . $this->hash);
     }
