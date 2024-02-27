@@ -1,7 +1,7 @@
 === Doofinder WP & WooCommerce Search ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.2.10
+Version: 2.2.9
 Requires at least: 5.6
 Tested up to: 6.3.1
 Requires PHP: 7.0
@@ -86,11 +86,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 2.2.10 =
-Fixed a bug in Force Normalization when the language code has language and country (e.g. pt-PT)
-
 = 2.2.9 =
 Changed log directory to /WP_CONTENT_FOLDER/uploads/doofinder-logs to avoid permission issues
+Fixed a bug in Force Normalization when the language code has language and country (e.g. pt-PT)
 
 = 2.2.8 =
 Fixed a bug excluding the attributes of the variants of the parent product
