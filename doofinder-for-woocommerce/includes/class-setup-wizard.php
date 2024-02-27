@@ -976,8 +976,8 @@ class Setup_Wizard
                     throw new Exception($message);
                 }
 
-                // $this->log->log('Store create result:');
-                // $this->log->log(print_r($store_data, true));
+                $this->log->log('Store create result:');
+                $this->log->log(print_r($store_data, true));
 
                 $this->set_search_engines($store_data['config']['search_engines']);
                 $this->set_layer_script($store_data['script']);

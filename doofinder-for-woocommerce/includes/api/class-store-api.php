@@ -72,12 +72,12 @@ class Store_Api
     {
         if (is_array($api_keys)) {
             $store_payload = $this->build_store_payload($api_keys);
-            // $this->log->log("store_data: ");
+            $this->log->log("store_data: ");
 
             $store_payload_log = $store_payload;
             unset($store_payload_log["options"]);
 
-            // $this->log->log($store_payload_log);
+            $this->log->log($store_payload_log);
             return $this->sendRequest("install", $store_payload);
         }
     }
@@ -147,7 +147,7 @@ class Store_Api
             $this->log->log(print_r($response['errors'], true));
         } else {
             $this->log->log("The store and indices normalization has finished successfully!");
-            // $this->log->log("Response: \n" . print_r($response, true));
+            $this->log->log("Response: \n" . print_r($response, true));
         }
     }
 
@@ -176,18 +176,18 @@ class Store_Api
         $response = wp_remote_request($url, $data);
         $response_code = wp_remote_retrieve_response_code($response);
 
-        // $this->log->log("Response code: $response_code");
-        // $this->log->log("Response: " . print_r($response, true));
+        $this->log->log("Response code: $response_code");
+        $this->log->log("Response: " . print_r($response, true));
 
         if (!$migration) {
             $this->throw_exception($response, $response_code);
         }
 
         $response_body = wp_remote_retrieve_body($response);
-        // $this->log->log("Response body: " . print_r($response_body, true));
+        $this->log->log("Response body: " . print_r($response_body, true));
 
         $decoded_response = json_decode($response_body, true);
-        // $this->log->log("Decoded response: " . print_r($decoded_response, true));
+        $this->log->log("Decoded response: " . print_r($decoded_response, true));
 
         return $decoded_response;
     }
