@@ -88,6 +88,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 2.2.10 =
 Changed stable tag information in the readme.txt
+Escaped / as // to prevent issues in the faceted search
 
 = 2.2.9 =
 Changed log directory to /WP_CONTENT_FOLDER/uploads/doofinder-logs to avoid permission issues
