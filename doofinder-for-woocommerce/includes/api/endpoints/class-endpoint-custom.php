@@ -171,7 +171,7 @@ class Endpoint_Custom
      * @return array The filtered data array with title information if requested.
      */
     private static function get_title($filtered_data, $fields) {
-        $filtered_data["title"] = $filtered_data["title"]["rendered"] ?? null;
+        $filtered_data["title"] = self::process_content( $filtered_data["title"]["rendered"] ?? '' );
 
         return $filtered_data;
     }
@@ -185,7 +185,7 @@ class Endpoint_Custom
      * @return array The filtered data array with content information if requested.
      */
     private static function get_content($filtered_data, $fields) {
-        $filtered_data["content"] = self::process_content($filtered_data["content"]["rendered"] ?? null);
+        $filtered_data["content"] = self::process_content( $filtered_data["content"]["rendered"] ?? '' );
 
         return $filtered_data;
     }
@@ -199,7 +199,7 @@ class Endpoint_Custom
      * @return array The filtered data array with description information if requested.
      */
     private static function get_description($filtered_data, $fields) {
-        $filtered_data["description"] = self::process_content($filtered_data["excerpt"]["rendered"] ?? null);
+        $filtered_data["description"] = self::process_content( $filtered_data["excerpt"]["rendered"] ?? '' );
 
         return $filtered_data;
     }
