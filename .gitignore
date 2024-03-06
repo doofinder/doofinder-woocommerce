@@ -22,3 +22,5 @@ build
 
 /vendor/
 .vscode/sftp.json
+
+/html
