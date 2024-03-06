@@ -312,7 +312,7 @@ trait Renderers
 
         <span class="doofinder-tooltip">
             <span>
-                <?php _e('You can select the time interval at which the update on save is launched.', 'doofinder_for_wp'); ?>
+                <?php _e('Configure how often changes will be sent to Doofinder. It will only be executed if there are changes.', 'doofinder_for_wp'); ?>
             </span>
         </span>
         <select name="<?php echo $option_name; ?>" class="widefat">

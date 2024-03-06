@@ -193,7 +193,7 @@ trait Accessors
         return get_option(self::option_name_for_language(
             'doofinder_for_wp_update_on_save',
             $language
-        ), 'wp_doofinder_each_day');
+        ), 'wp_doofinder_disabled');
     }
 
     /**
@@ -457,8 +457,8 @@ trait Accessors
      */
     public static function is_update_on_save_enabled()
     {
-        $option = get_option('doofinder_for_wp_update_on_save', 'wp_doofinder_each_day');
-        return  $option != 'wp_doofinder_each_day';
+        $option = get_option('doofinder_for_wp_update_on_save', 'wp_doofinder_disabled');
+        return  $option != 'wp_doofinder_disabled';
     }
 
     public static function get_image_size()

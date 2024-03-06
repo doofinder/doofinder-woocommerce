@@ -237,6 +237,10 @@ class Settings
 	public static function add_schedules($schedules)
 	{
 		$df_schedules = [
+			'wp_doofinder_each_5_minutes' => [
+				'display' => sprintf(__('Each %s minutes', 'doofinder_for_wp'), 5),
+				'interval' => 60 * 5
+			],
 			'wp_doofinder_each_15_minutes' => [
 				'display' => sprintf(__('Each %s minutes', 'doofinder_for_wp'), 15),
 				'interval' => 60 * 15
@@ -262,7 +266,11 @@ class Settings
 				'interval' => HOUR_IN_SECONDS * 12
 			],
 			'wp_doofinder_each_day' => [
-				'display' => __('Each day', 'doofinder_for_wp'),
+				'display' => __('Once a day', 'doofinder_for_wp'),
+				'interval' => DAY_IN_SECONDS
+			],
+			'wp_doofinder_disabled' => [
+				'display' => __('Disabled', 'doofinder_for_wp'),
 				'interval' => DAY_IN_SECONDS
 			]
 		];
