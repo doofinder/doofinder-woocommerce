@@ -326,12 +326,12 @@ trait Renderers
             ?>
         </select>
         <?php
-            if (Settings::is_update_on_save_enabled()) : ?>
+            if (Settings::is_update_on_save_enabled()): ?>
                 <a id="force-update-on-save" href="#" class="button-secondary update-on-save-btn update-icon">
                     <span class="dashicons dashicons-update"></span>
                     <?php _e('Update now!', 'wordpress-doofinder'); ?>
                 </a>
-        <?php endif;?>
+        <?php endif; ?>
         <span class="update-result-wrapper"></span>
     <?php
     }
