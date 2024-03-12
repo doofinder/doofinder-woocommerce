@@ -1,12 +1,20 @@
+class DoofinderAddToCartError extends Error {
+    constructor(reason, status = "") {
+        const message = "Error adding an item to the cart. Reason: " + reason + ". Status code: " + status;
+        super(message);
+        this.name = "DoofinderAddToCartError";
+    }
+}  
+
 (function ($) {
     $(document).ready(function () {
         document.addEventListener("doofinder.cart.add", function (event) {
-            const { item_id, amount } = event.detail;
-            addProductToCart(item_id, amount);
+            const { item_id, amount, statusPromise } = event.detail;
+            addProductToCart(item_id, amount, statusPromise);
         });
     });
 
-    function addProductToCart(item_id, amount) {
+    function addProductToCart(item_id, amount, statusPromise) {
         amount = !amount ? 1 : parseInt(amount);
         item_id = parseInt(item_id);
 
@@ -23,16 +31,21 @@
                     wc_add_to_cart(
                         response.product,
                         response.variation,
-                        amount
+                        amount,
+                        statusPromise
                     );
                 } else {
+                    statusPromise.reject(new DoofinderAddToCartError("Empty cart response"));
                     window.location = response.product_url;
                 }
             },
+            error: function(xhr, ajaxOptions, thrownError) {
+                statusPromise.reject(new DoofinderAddToCartError(thrownError, xhr.status));
+            }
         });
     }
 
-    function wc_add_to_cart(product_id, variation_id, product_qty) {
+    function wc_add_to_cart(product_id, variation_id, product_qty, statusPromise) {
         var data = {
             action: "doofinder_ajax_add_to_cart",
             product_id: product_id,
@@ -50,19 +63,25 @@
             data: data,
             success: function (response) {
                 if (response.error & response.product_url) {
+                    statusPromise.reject(new DoofinderAddToCartError("Invalid product or cart"));
                     window.location = response.product_url;
-                } else if (typeof wc_add_to_cart_params != "undefined") {
+                } else if (typeof wc_add_to_cart_params !== "undefined") {
                     //Woocommerce cart is included, trigger add to cart event
                     $(document.body).trigger("added_to_cart", [
                         response.fragments,
                         response.cart_hash,
                         $fakebutton,
                     ]);
+                    statusPromise.resolve("The item has been successfully added to the cart.");
                 } else {
                     //No woocommerce cart, reload the page
+                    statusPromise.reject(new DoofinderAddToCartError("No Woocommerce cart was found."));
                     location.reload();
                 }
             },
+            error: function(xhr, ajaxOptions, thrownError) {
+                statusPromise.reject(new DoofinderAddToCartError(thrownError, xhr.status));
+            }
         });
     }
 })(jQuery);
