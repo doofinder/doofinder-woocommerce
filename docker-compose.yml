@@ -3,6 +3,8 @@ version: '2'
 services:
   db:
     image: mysql:5.7
+    volumes:
+      - wordpress-db:/var/lib/mysql
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
