@@ -1,6 +1,8 @@
 <?php
 
 use Doofinder\WP\Endpoints;
+use Doofinder\WP\Settings;
+use Doofinder\WP\Thumbnail;
 
 /**
  * Class Endpoint_Custom
@@ -232,18 +234,44 @@ class Endpoint_Custom
     private static function get_image_link($filtered_data, $fields) {
         $filtered_data_array = json_decode(json_encode($filtered_data), true);
 
-        if (is_array($filtered_data_array)) {
-            $featured_media = is_array($filtered_data_array["_embedded"]["wp:featuredmedia"][0]["media_details"]["sizes"]["medium"]) ? $filtered_data_array["_embedded"]["wp:featuredmedia"][0]["media_details"]["sizes"]["medium"]["source_url"] : null;
-            $filtered_data_array["image_link"] = in_array('image_link', $fields) ? $featured_media : null;
-
-            return $filtered_data_array;
-        }
-
-        $filtered_data_array["image_link"] =  null;
+        $should_obtain_image_link = is_array($filtered_data_array) && in_array('image_link', $fields);
+        $filtered_data_array["image_link"] = $should_obtain_image_link ? self::obtain_image_link($filtered_data) : null;
 
         return $filtered_data_array;
     }
 
+    /**
+     * Obtains the image link, either from media sources or using methods from the thumbnail class
+     *
+     * @param array $filtered_data The filtered data array.
+     *
+     * @return string $image_link The image link
+     */
+    private static function obtain_image_link($filtered_data) {
+        $medium_size_image = $filtered_data["_embedded"]["wp:featuredmedia"][0]["media_details"]["sizes"]["medium"];
+        $image_link = is_array($medium_size_image) ? $medium_size_image["source_url"] : null;
+
+        if (is_null($image_link)) {
+            $post = get_post($filtered_data["id"]);
+            $thumbnail = new Thumbnail($post);
+            $image_link = $thumbnail->get();
+            $image_link = self::add_base_url_if_needed($image_link);
+        }
+        return $image_link;
+    }
+
+    /**
+     * Check that image link is absolute, if not, add the site url
+     *
+     * @param string $image_link
+     * @return string $image_link
+     */
+    private static function add_base_url_if_needed($image_link) {
+        if (0 === strpos($image_link, "/")) {
+            $image_link = get_site_url() . $image_link;
+        }
+        return $image_link;
+    }
 
     /**
      * Clears unused fields from the filtered data array.
