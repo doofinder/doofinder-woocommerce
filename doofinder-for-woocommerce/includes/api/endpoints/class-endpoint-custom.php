@@ -1,6 +1,7 @@
 <?php
 
 use Doofinder\WP\Endpoints;
+use Doofinder\WP\Log;
 use Doofinder\WP\Settings;
 use Doofinder\WP\Thumbnail;
 
@@ -248,15 +249,26 @@ class Endpoint_Custom
      * @return string $image_link The image link
      */
     private static function obtain_image_link($filtered_data) {
-        $medium_size_image = $filtered_data["_embedded"]["wp:featuredmedia"][0]["media_details"]["sizes"]["medium"];
-        $image_link = is_array($medium_size_image) ? $medium_size_image["source_url"] : null;
+        $image_link = null;
+        try {
+            $medium_size_image = @$filtered_data["_embedded"]["wp:featuredmedia"][0]["media_details"]["sizes"]["medium"];
+            $image_link = is_array($medium_size_image) ? $medium_size_image["source_url"] : null;
 
-        if (is_null($image_link)) {
-            $post = get_post($filtered_data["id"]);
-            $thumbnail = new Thumbnail($post);
-            $image_link = $thumbnail->get();
-            $image_link = self::add_base_url_if_needed($image_link);
+            if (is_null($image_link)) {
+                $post = get_post($filtered_data["id"]);
+                if( !empty($post)){
+                    $thumbnail = new Thumbnail($post);
+                    $image_link = $thumbnail->get();
+                    $image_link = self::add_base_url_if_needed($image_link);
+                }                
+            }
+        } catch (\Throwable $th) {
+            $logger = new Log('custom-endpoint.log');
+            $logger->log("An error ocurred while obtaining image link from item data. Error message: ". $th->getMessage());
+            $logger->log("Item Data: " . print_r($filtered_data, true));
+            $logger->log("Trace: " .$th->getTraceAsString());
         }
+
         return $image_link;
     }
 
