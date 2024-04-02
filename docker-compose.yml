@@ -35,3 +35,5 @@ services:
       WEB_SERVICE_PORT: 9010
     ports:
       - "9010:80"
+volumes:
+  wordpress-db:
