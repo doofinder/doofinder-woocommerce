@@ -42,7 +42,7 @@ class JS_Layer
             return;
         }
 
-        $this->log = new Log();
+        $this->log = new Log('');
 
         $this->insert_js_layer();
     }
@@ -64,7 +64,7 @@ class JS_Layer
     {
 
         $multilanguage = Multilanguage::instance();
-        $lang = $multilanguage->get_current_language();
+        $lang = str_replace("-", "_", $multilanguage->get_current_language());
         $layer = Settings::get_js_layer($lang);
 
         if (defined('WP_ENVIRONMENT_TYPE') && WP_ENVIRONMENT_TYPE === 'local' && defined('DF_SEARCH_HOST') && defined('DF_LAYER_HOST')) {
@@ -77,7 +77,6 @@ class JS_Layer
             $layer = str_replace('<script>', $local_constants, $layer);
             $layer = str_replace('https://cdn.doofinder.com/livelayer/1/js/loader.min.js', DF_LAYER_HOST . "/assets/js/loader.js", $layer);
         }
-
 
         echo $layer;
     }
