@@ -42,8 +42,6 @@ class JS_Layer
             return;
         }
 
-        $this->log = new Log('');
-
         $this->insert_js_layer();
     }
 

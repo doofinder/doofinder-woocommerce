@@ -87,7 +87,8 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Changelog ==
 
 = 2.2.16 =
-Improved script injection in languages with different suffixes.
+- Improved script injection in languages with different suffixes.
+- Fixed api bug in image link generate from custom type indices.
 
 = 2.2.15 =
 Added some error logs to help debugging indexing errors while obtaining images.
