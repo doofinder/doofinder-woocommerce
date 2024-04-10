@@ -1225,7 +1225,18 @@ class Setup_Wizard
             $options_suffix = '';
 
             if ($language_code !== $this->language->get_base_locale()) {
-                $options_suffix = Helpers::get_language_from_locale($language_code);
+                $language = str_replace("-", "_", $language_code);
+                
+                $lang_parts      = explode( "_", $language );
+                $options_preffix = strtolower( $lang_parts[0] );
+                $options_suffix  = strtolower( $lang_parts[1] );
+
+                if ( $options_preffix === $options_suffix) {
+                    $set_in_lang = $options_suffix;
+                } else {
+                    $set_in_lang = strtolower($language_code);
+                }
+                
             }
 
             //Convert language to hyphen format used by live layer (en-US)
@@ -1233,11 +1244,11 @@ class Setup_Wizard
             $lang_config = "language: '$language_code',\n    currency: '$currency',\n    installationId:";
             $aux_script  = !empty($language_code) ? str_replace("installationId:", $lang_config, $script) : $script;
 
-            $log->log('Installing script for language: ' . $language_code);
+            $log->log('Installing script for language: ' . $set_in_lang);
             $log->log($aux_script);
 
             // JS Layer Code
-            Settings::set_js_layer($aux_script, $options_suffix);
+            Settings::set_js_layer($aux_script, $set_in_lang); 
         }
     }
 
