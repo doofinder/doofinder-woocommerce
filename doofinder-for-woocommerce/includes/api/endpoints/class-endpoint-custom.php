@@ -251,8 +251,14 @@ class Endpoint_Custom
     private static function obtain_image_link($filtered_data) {
         $image_link = null;
         try {
-            $medium_size_image = @$filtered_data["_embedded"]["wp:featuredmedia"][0]["media_details"]["sizes"]["medium"];
-            $image_link = is_array($medium_size_image) ? $medium_size_image["source_url"] : null;
+            $size_image = @$filtered_data["_embedded"]["wp:featuredmedia"][0]["media_details"]["sizes"];
+
+            if (is_object($size_image)) {
+                $image_link = $filtered_data["_embedded"]["wp:featuredmedia"][0]["media_details"]["source_url"];
+            } else {
+                $medium_size_image = $filtered_data["_embedded"]["wp:featuredmedia"][0]["media_details"]["sizes"]["medium"];
+                $image_link = is_array($medium_size_image) ? $medium_size_image["source_url"] : null;
+            } 
 
             if (is_null($image_link)) {
                 $post = get_post($filtered_data["id"]);
