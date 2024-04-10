@@ -62,7 +62,7 @@ class JS_Layer
     {
 
         $multilanguage = Multilanguage::instance();
-        $lang = str_replace("-", "_", $multilanguage->get_current_language());
+        $lang = Helpers::format_locale_to_underscore($multilanguage->get_current_language());
         $layer = Settings::get_js_layer($lang);
 
         if (defined('WP_ENVIRONMENT_TYPE') && WP_ENVIRONMENT_TYPE === 'local' && defined('DF_SEARCH_HOST') && defined('DF_LAYER_HOST')) {

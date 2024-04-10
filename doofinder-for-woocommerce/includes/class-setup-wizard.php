@@ -1226,8 +1226,10 @@ class Setup_Wizard
 
             if ($language_code !== $this->language->get_base_locale()) {
                 $language = str_replace("-", "_", $language_code);
-                $options_preffix = strtolower(explode("_", $language)[0]);
-                $options_suffix = strtolower(explode("_", $language)[1]);
+                
+                $lang_parts      = explode( "_", $language );
+                $options_preffix = strtolower( $lang_parts[0] );
+                $options_suffix  = strtolower( $lang_parts[1] );
 
                 if ( $options_preffix === $options_suffix) {
                     $set_in_lang = $options_suffix;
