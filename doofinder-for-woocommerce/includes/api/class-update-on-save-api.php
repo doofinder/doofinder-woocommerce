@@ -91,12 +91,14 @@ class Update_On_Save_Api
 
         $response = wp_remote_request($url, $data);
 
-        if (!is_wp_error($response) && $response['response']['code'] === 200) {
+        if ($response['response']['code'] === 200) {
             $this->log->log("The update on save request has been processed correctly");
             return TRUE;
+        } elseif (!is_wp_error($response)) {
+            $this->log->log("Error in the request: " . print_r($response, true));  
         } else {
             $error_message = $response->get_error_message();
-            $this->log->log("Error in the request: $error_message");
+            $this->log->log("WP-Error in the request: $error_message");
         }
         return false;
     }
