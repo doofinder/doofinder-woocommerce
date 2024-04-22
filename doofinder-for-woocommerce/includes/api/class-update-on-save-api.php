@@ -94,7 +94,7 @@ class Update_On_Save_Api
         if (is_wp_error($response)) {
             $error_message = $response->get_error_message();
             $this->log->log("WP-Error in the request: $error_message");
-        } elseif ($response['response']['code'] === 200) {
+        } elseif ( WP_Http::OK === $response['response']['code'] ) {
             $this->log->log("The update on save request has been processed correctly");
             return TRUE;
         } else {
