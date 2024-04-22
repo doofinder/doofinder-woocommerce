@@ -173,9 +173,9 @@ class Update_On_Save
 
         $table_name = $wpdb->prefix . 'doofinder_update_on_save';
 
-        $resultado = $wpdb->get_var("SELECT * FROM $table_name WHERE post_id = $post_id");
+        $result = $wpdb->get_var("SELECT * FROM $table_name WHERE post_id = $post_id");
 
-        if ($resultado != null) {
+        if ($result != null) {
             $wpdb->update(
                 $table_name,
                 array(
@@ -183,7 +183,7 @@ class Update_On_Save
                     'type_post' => $post_type,
                     'type_action' => $action
                 ),
-                array('id' => $resultado)
+                array( 'post_id' => $result )
             );
         } else {
             $wpdb->insert(
