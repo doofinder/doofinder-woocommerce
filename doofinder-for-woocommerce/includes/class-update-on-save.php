@@ -183,7 +183,7 @@ class Update_On_Save
                     'type_post' => $post_type,
                     'type_action' => $action
                 ),
-                array( 'post_id' => $result )
+                array( 'post_id' => $post_id )
             );
         } else {
             $wpdb->insert(
