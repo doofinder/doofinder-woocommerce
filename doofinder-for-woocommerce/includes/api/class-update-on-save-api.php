@@ -7,6 +7,7 @@ use Doofinder\WP\Log;
 
 use Endpoint_Product;
 use Endpoint_Custom;
+use WP_Http;
 
 /**
  * Handles requests to the Management API.
