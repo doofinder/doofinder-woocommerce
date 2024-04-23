@@ -88,6 +88,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 2.2.18 =
 - Fixed fatal error regarding direct WP_Http class.
+- Fixed error on the product endpoint when the links are unset
 
 = 2.2.17 =
 - Fixed WPDB query in the update on save.
