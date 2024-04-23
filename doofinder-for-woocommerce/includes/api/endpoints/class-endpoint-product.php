@@ -179,7 +179,9 @@ class Endpoint_Product
         $items = self::custom_product_endpoint(false, $request_params)->data;
 
         array_walk($items, function (&$product) {
-            unset($product['_links']);
+            if ( is_array( $product ) && array_key_exists( '_links', $product ) ) {
+                unset($product['_links']);
+            }
         });
 
         return $items;
