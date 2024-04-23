@@ -1,11 +1,11 @@
 === Doofinder WP & WooCommerce Search ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.2.17
+Version: 2.2.18
 Requires at least: 5.6
 Tested up to: 6.3.1
 Requires PHP: 7.0
-Stable tag: 2.2.17
+Stable tag: 2.2.18
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,6 +85,9 @@ Just send your questions to <mailto:support@doofinder.com> and we will try to an
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/doofinder-for-woocommerce)
 
 == Changelog ==
+
+= 2.2.18 =
+- Fixed fatal error regarding direct WP_Http class.
 
 = 2.2.17 =
 - Fixed WPDB query in the update on save.
