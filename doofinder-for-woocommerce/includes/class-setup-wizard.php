@@ -1292,8 +1292,7 @@ class Setup_Wizard
             $api_keys_array = [];
 
             foreach ($language->get_languages() as $lang) {
-                $code = $lang['locale'];
-                $code = $code === $language->get_base_locale() ? '' : Helpers::get_language_from_locale($code);
+                $code = $lang['locale'] === $language->get_base_locale() ? '' : $lang['locale'];
                 $hash = Settings::get_search_engine_hash($code);
                 $hash = !$hash ? 'no-hash' : $hash;
 

@@ -236,6 +236,7 @@ class Store_Api
             $search_engines[] = [
                 'name' => $domain . ($code ? ' (' . strtoupper($code) . ')' : ''),
                 'language' => $code,
+                'locale' => $item['lang']['code'],
                 'currency' => $currency,
                 'site_url' =>  $home_url,
                 "feed_type" => is_plugin_active('woocommerce/woocommerce.php') ? "product" : "posts", 
