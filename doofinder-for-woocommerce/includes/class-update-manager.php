@@ -65,6 +65,9 @@ class Update_Manager
 
                 //Update the database version to the newer one
                 Settings::set_plugin_version($formatted_version);
+            }else{
+                //If the update function doesn't exists, return true to update the db version value
+                $result = true;
             }
         }
 
