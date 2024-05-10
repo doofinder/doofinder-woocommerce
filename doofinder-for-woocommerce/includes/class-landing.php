@@ -101,7 +101,7 @@ class Landing
                 exit;
             }
         });
-        self::maybe_flush_rewrite_rules();        
+        self::maybe_flush_rewrite_rules();
     }
 
     public static function avoid_conflicts_with_wpml_rewrite_rules( $rules ) 
