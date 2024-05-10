@@ -101,7 +101,7 @@ class Landing
                 exit;
             }
         });
-        flush_rewrite_rules();
+        self::maybe_flush_rewrite_rules();        
     }
 
     public static function avoid_conflicts_with_wpml_rewrite_rules( $rules ) 
@@ -128,6 +128,25 @@ class Landing
         $rules = str_replace( "RewriteRule . $home_root", "RewriteRule . $wpml_root", $rules );
      
         return $rules;
+    }
+
+    /**
+     * Checks if flushing rewrite rules is necessary and flushes them if there have been changes.
+     *
+     * This function compares the current state of rewrite rules with the previously stored state.
+     * If the rewrite rules have changed, it flushes them using `flush_rewrite_rules()` and stores the new state.
+     *
+     * @return void
+     */
+    public static function maybe_flush_rewrite_rules(){
+        $rewrite_obj = new \WP_Rewrite();
+        $rewrites    = $rewrite_obj->wp_rewrite_rules();
+        $current_state = md5(json_encode($rewrites));
+        $stored_state = Settings::get_rewrite_rules_state();
+        if ( $current_state !== $stored_state) {
+            flush_rewrite_rules();
+            Settings::set_rewrite_rules_state($current_state);
+        }
     }
 
     /**
