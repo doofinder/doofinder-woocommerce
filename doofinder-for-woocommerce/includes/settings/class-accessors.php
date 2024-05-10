@@ -471,6 +471,16 @@ trait Accessors
         return get_option(Settings::$custom_attributes_option, []);
     }
 
+    public static function set_rewrite_rules_state($state)
+    {
+        return update_option('doofinder_for_wp_rewrite_rules_state', $state);
+    }
+
+    public static function get_rewrite_rules_state()
+    {
+        return get_option('doofinder_for_wp_rewrite_rules_state', false);
+    }
+
     private static function normalize_host($host) 
     {
         if (strpos($host, 'https://') !== 0) {
