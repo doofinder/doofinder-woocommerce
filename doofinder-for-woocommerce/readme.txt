@@ -95,7 +95,7 @@ Here you can find a more detailed [installation guide](https://support.doofinder
 = How can I install the Doofinder Search and Discovery Module in my WooCommerce? =
 Check out our video tutorial: Installation Guide. 
 
-https://support.doofinder.com/images/woocommerce-integration-video.mp4
+https://www.youtube.com/watch?v=rNRH7jb_So8
 
 Or visit our Support Documentation for detailed steps. [https://support.doofinder.com/plugins/woocommerce/installation-guide/installation-steps-woocommerce.html](https://support.doofinder.com/plugins/woocommerce/installation-guide/installation-steps-woocommerce.html)
 
@@ -125,7 +125,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Changelog ==
 
 = 2.2.22 =
-- Plugin description, images and other public resources have been updated.
+- Plugin name, description, images and other public resources have been updated.
 
 = 2.2.21 =
 - Fix performance issues related with Landing Pages rewrite_rules.
