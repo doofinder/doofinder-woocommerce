@@ -1,90 +1,131 @@
-=== Doofinder WP & WooCommerce Search ===
+=== DOOFINDER Search and Discovery for WP & WooCommerce ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.2.21
+Version: 2.2.22
 Requires at least: 5.6
 Tested up to: 6.3.1
 Requires PHP: 7.0
-Stable tag: 2.2.21
+Stable tag: 2.2.22
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 This plugin integrates the Doofinder search service with your WordPress site.
 
+== Introduction ==
+
+Upgrade your eCommerce site with our advanced product search for WooCommerce. Install our search plugin in just 5 minutes, with no programming skills required! Experience the power of Doofinder's AI search today!
+
+[Doofinder sign up](https://www.doofinder.com/signup?utm_campaign=Content&utm_source=WooCommerce%20Profile&utm_content=Doofinder%20Sign%20Up) | [Features List](https://www.doofinder.com/es/product) | [Installation Steps](https://support.doofinder.com/plugins/woocommerce/installation-guide/installation-steps-woocommerce.html)
+
 == Description ==
 
-Doofinder provides fast, accurate results based on your website contents. Results appear in your search box at an incredible speed as the user types.
+Increase your WooCommerce store's conversion rates by up to 30% using our AI-driven search plugin for WordPress. Simplify the shopping experience for your customers with results in less than 0.025 seconds and personalized recommendations, cutting down on conversion time. Enhance user satisfaction with our lightning-fast search bar, voice, and image search options, advanced search by category feature, and intuitive product filters. Our plugin seamlessly integrates with Elementor, providing a smooth Ajax product search experience, a **motive** to upgrade your WordPress site today with our search and discovery solution, and see the difference in your online store!
 
-Doofinder can be installed in any website with very little configuration.
+== Features ==
 
-This extension allows you to easily populate the data Doofinder needs to be able to search your database and to insert the Doofinder layer script into your WordPress site.
+-   🔍 **Intelligent Product Filters**: Allow shoppers to effortlessly navigate through your catalog with our intuitive default and customizable filters.
+-   🔝 **Searchandising**: Create rules to prioritize products within your search results.  
+-   📱 **Mobile First**: Enjoy a specialized mobile search mode crafted for an optimal user experience.  
+-   🔍🗣️ **Multiple Ways to Search**: Empower users to search via voice, text, or image—whichever suits their preference. 
+-   📊 **Real-Time Analytics**: Gain valuable insights into user behavior and geolocation data. 
+-   🔀 **Multi-Index & Redirections**: Set up pre-configured results, seamlessly redirecting users to relevant pages based on their search query. 
+-   🎨 **Respect Your Theme Design**: Ensure seamless integration with your existing design aesthetic. 
+-   🔡 **Typo-Tolerance & Synonyms**: Enhance search accuracy with typo tolerance and synonym recognition.  
+-   🔮 **Predictive Search Suggestions**: Anticipate user needs with relevant search suggestions. 
+-   🖼️ **Customizable Appearance**: Tailor the layout and design of product cards to suit your brand.  
+-   🎉 **Promotional Banners**: Highlight special offers and promotions within search results to enhance your product merchandising.  
+-   🌐 **Multi-language and Multi-currency Support**: Reach a global audience with support for over 30 languages and currencies. 
+-   🛠️ **Technical Support**: Ensure continuous growth with a technical support team that’s always ready to help.  
+-   🧥👗**AI Product recommendation carousels**: Analyze user behavior to suggest relevant products for your home and product pages.
 
-With Doofinder you are confident that your visitors are finding what they are looking for.
+== Requirements ==
 
-These are some advantages of using Doofinder in your site:
+**Important**: To use this plugin you need to have an account with Doofinder. If you don't have an account, you can sign up [here](http://www.doofinder.com/signup?utm_campaign=Content&utm_source=WooCommerce%20Profile&utm_content=Doofinder%20Sign%20Up) to start your 30-day free trial period.
 
-- Instant, relevant results.
-- Tolerant of misspellings.
-- Search filters.
-- Increases the conversion rates.
-- No technical knowledge are required.
-- Allows the use of labels and synonyms.
-- Installs in minutes.
-- Provides statistical information.
-- Doofinder brings back the control over the searches in your site to you.
-
-When users start typing in the search box, Doofinder displays the best results for their search. If users make typos, our algorithms will detect them and will perform the search as if the term were correctly typed.
-
-Furthermore, Doofinder sorts the results displaying the most relevant first.
-
-More info: <http://www.doofinder.com>
-
-
-== Requirements==
-
-__Important:__ To use this plugin you need to have an account at Doofinder. If you don't have one you can signup [here](http://www.doofinder.com/signup) to get your 30 day free trial period.
-
-The minimum technical requirements are basically the same as the WordPress ones. Take a look at their [server requirements](https://docs.WordPress.com/document/server-requirements/) for more info.
-
-== Installation ==
-
-__Important__: If you're upgrading to v0.4.x or greater from v0.3.x or lower, deactivate the plugin and activate again to migrate settings.
-
-Doofinder installation and activation is made [as in any other plugin](https://codex.wordpress.org/Managing_Plugins).
-
-These are two ways you can install the plugin:
-
-1. In the WordPress admin panel go to Plugins / Add New. Click "Upload Plugin". Choose the *.zip file containing the plugin, and click "Install Now". or...
-2. Unpack the contents of the *.zip file containing the plugin to the plugins folder. In the typical WordPress installation that will be "/wp-contents/plugins" folder.
+The minimum technical requirements are the same as the WordPress ones.
 
 == Configuration ==
 
-Once activated, you will see a new entry in the main menu called _Doofinder_ with two sub-menus:
+**One-Click Indexing of All WordPress Content**
 
-- **Doofinder:** To access the main settings page of the module.
+Check out our support page and follow the steps for installation: [go to the support page!](https://support.doofinder.com/plugins/woocommerce/installation-guide/pre-requisites-woocommerce.html)
 
-**NOTICE:** Doofinder for WordPress has built-in support for [WPML](https://wpml.org/es/). In case you are using it, ensure you've switched _context_ to one of the defined languages. In _All Languages_ context you won't be able to configure anything. You will have to configure as many search engines as languages you have in your site.
+**NOTICE**:
 
-Doofinder Settings
-==================
+Doofinder for WordPress comes with built-in support for [WPML](https://wpml.org/). If you're using it, make sure you've switched to one of the defined languages. If you stay in the "All Languages" context, you won't be able to set up anything. You'll need to set up a search engine for each language on your site.
 
-General Settings
---------------
+== General Settings ==
 
-- **API Key:** This is the secret token you use to index contents (in ML environments you can share the same key). Your API key can be found in the Doofinder Control Panel. Click on your profile name (in the header) and then on *API Keys*. Make sure you're using a _Management_ API key and not a _Search_ API key.
-- **Search Engine HashID:** Id of the search engine that will index your contents. Can be found in the Doofinder Control Panel. Click on *Search Engines* in the header. Hash ID will be visible next to the name of your Search Engine. Remember to use different search engines for different languages if you're in a ML environment.
-- **Update on Save:** The period of time that must elapse before the posts / products are updated after making a change.
-- **JS Layer Script:** Here you can modify the Layer Javascript Code. It is required for the Javascript Layer to work.
+You will see that the installation is very simple, but to make it easier you should familiarize yourself with some basic concepts.
+
+-   **API Key**: This is the secret code you use to organize content (in machine learning setups, you can share the same code). You can find your API key in the Doofinder Control Panel. Click on your profile name (at the top) and then on API Keys. Make sure you're using a Management API key, not a Search API key.
+-   **Search Engine HashID**: This is the ID of the search engine that will organize your content. You can find it in the Doofinder Control Panel. Click on Search Engines in the top menu. The Hash ID will be shown next to the name of your Search Engine. Remember to use different search engines for different languages if you're in a machine-learning environment.
+-   **Update on Save**: This is the time it takes for posts/products to be refreshed after you make a change.
+-   **JS Layer Script**: Here, you can adjust the Layer JavaScript Code. The JavaScript Layer needs it to work properly.
+
+Visit our Support Documentation for detailed steps. [https://support.doofinder.com/plugins/woocommerce/installation-guide/installation-steps-woocommerce.html](https://support.doofinder.com/plugins/woocommerce/installation-guide/installation-steps-woocommerce.html)
+
+== Installation ==
+
+**Important**: If upgrading to v0.4.x or greater from v0.3.x or lower, deactivate the plugin and reactivate it to migrate your settings.
+
+The installation and activation process for Doofinder is the same as any other [WordPress plugin](https://codex.wordpress.org/Managing_Plugins).
+
+
+**Pre-Requisites**:
+
+-   WordPress installed (required).
+-   WordPress version is compatible with Application Passwords (minimum version 5.6) and PHP (minimum version 7.0).
+-   WooCommerce plugin installed and activated.
+-   WordPress and WooCommerce APIs are active and accessible.
+
+Additionally, you'll need a Doofinder account. If you don't have one yet, you can sign up [here](http://www.doofinder.com/signup?utm_campaign=Content&utm_source=WooCommerce%20Profile&utm_content=Doofinder%20Sign%20Up) to start your 30-day free trial. Or, you can also do this during the installation process.
+
+
+**You have two options to install the plugin**:
+
+1.  In the WordPress admin panel, navigate to Plugins > Add New. Click on "Upload Plugin." Select the *.zip file containing the plugin, and then click "Install Now."
+2.  Alternatively, you can unpack the contents of the *.zip file containing the plugin to the plugins folder. In a standard WordPress installation, this folder is typically located at "/wp-content/plugins."
+
+
+Here you can find a more detailed [installation guide](https://support.doofinder.com/plugins/woocommerce/installation-guide/installation-steps-woocommerce.html).
 
 == Frequently Asked Questions ==
 
-= I have problems with your plugin. What can I do? =
-Just send your questions to <mailto:support@doofinder.com> and we will try to answer as fast as possible with a working solution for you.
+= How can I install the Doofinder Search and Discovery Module in my WooCommerce? =
+Check out our video tutorial: Installation Guide. 
+
+https://www.youtube.com/watch?v=rNRH7jb_So8
+
+Or visit our Support Documentation for detailed steps. [https://support.doofinder.com/plugins/woocommerce/installation-guide/installation-steps-woocommerce.html](https://support.doofinder.com/plugins/woocommerce/installation-guide/installation-steps-woocommerce.html)
+
+= Once installed, where can I find the Module? =
+
+Once installed, you can find the Module within your WooCommerce admin panel. Look for the 'Doofinder' option to access and review your plugin's general settings.
+
+= Does Doofinder offer a search bar that can be integrated into my theme? =
+
+It's important to note that Doofinder doesn't include the search bar by default. You'll need to add it to your store's theme or design by activating Doofinder's layer via a CSS selector.
+
+= Can I use Doofinder in WordPress only? =
+
+The Doofinder plugin can be used on your WordPress site for searching blog posts and/or on your WooCommerce site for searching products. Depending on your site's setup, Doofinder will index either one or both types of content.
+
+= Is the plugin compatible with WordPress multisite? =
+
+Yes, the Doofinder plugin is compatible with WordPress multisite.
+
+= Where can I access more detailed information about Doofinder and its features? =
+
+For in-depth insights into Doofinder and its features, check out our comprehensive Support Documentation site. You'll find video tutorials, step-by-step guides, and tips for optimizing your use of Doofinder to enhance your online store.
 
 = How can I report security bugs? =
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/doofinder-for-woocommerce)
 
 == Changelog ==
+
+= 2.2.22 =
+- Plugin name, description, images and other public resources have been updated.
 
 = 2.2.21 =
 - Fix performance issues related with Landing Pages rewrite_rules.
@@ -166,7 +207,6 @@ Fixes some issues detected if it is used along with WPML plugin
 
 = 2.1.16 =
 Fixes wrongly decoded HTML entities for custom attributes (e.g. &amp; instead of &)
-
 
 = 2.1.15 =
 Improve JS and CSS secure load
