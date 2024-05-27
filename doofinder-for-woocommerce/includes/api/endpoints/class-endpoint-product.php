@@ -601,6 +601,20 @@ class Endpoint_Product
                             $products[$key2]["variants"] = array();
                         }
                         $products[$key2]["variants"][] = $products[$key];
+                        
+                        /* 
+                        Woocommerce API provides the parent product with only a single "price"
+                        corresponding to the minimum price of the variants. However, it is set
+                        in the "price" field, without any "sale_price". Hence, here
+                        we find what should be the sale_price and regular_price from the variants
+                        and populate it so the the indexed parent product has both the regular price
+                        and the sale price of the variant that is being represented
+                        */
+                        if (!empty($product["sale_price"]) && $products[$key2]["price"] === $product["sale_price"]) {
+                            $products[$key2]["sale_price"] = $product["sale_price"];
+                            $products[$key2]["price"] = $product["price"];
+                            $products[$key2]["regular_price"] = $product["regular_price"];
+                        }
                         unset($products[$key]);
                     }
                 }
