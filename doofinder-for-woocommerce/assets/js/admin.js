@@ -188,6 +188,13 @@ jQuery(function () {
     validate_custom_fields: function (elem) {
       CustomAttributesHandler.valid = true;
       let field_name = $(elem).val();
+
+      var regex = /^[_.]/;
+
+      if (regex.test(field_name)) {
+          CustomAttributesHandler.add_error(elem, "The name cannot start with _ or .");
+      }
+      
       let field_id = $(elem).attr("id");
       //Get the existing fields excluding the new one
       let existing_fields = $(".df-field-text")
