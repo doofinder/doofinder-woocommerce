@@ -15,11 +15,11 @@ This plugin integrates the Doofinder search service with your WordPress site.
 
 Upgrade your eCommerce site with our advanced product search for WooCommerce. Install our search plugin in just 5 minutes, with no programming skills required! Experience the power of Doofinder's AI search today!
 
-[Doofinder sign up](https://www.doofinder.com/signup?utm_campaign=Content&utm_source=WooCommerce%20Profile&utm_content=Doofinder%20Sign%20Up) | [Features List](https://www.doofinder.com/es/product) | [Installation Steps](https://support.doofinder.com/plugins/woocommerce/installation-guide/installation-steps-woocommerce.html)
+[Doofinder sign up](https://www.doofinder.com/signup?utm_campaign=Content&utm_source=WooCommerce%20Profile&utm_content=Doofinder%20Sign%20Up) | [Demo Store](https://woocommerce.doofinder.com) | [Installation Steps](https://support.doofinder.com/plugins/woocommerce/installation-guide/installation-steps-woocommerce.html)
 
 == Description ==
 
-Increase your WooCommerce store's conversion rates by up to 30% using our AI-driven search plugin for WordPress. Simplify the shopping experience for your customers with results in less than 0.025 seconds and personalized recommendations, cutting down on conversion time. Enhance user satisfaction with our lightning-fast search bar, voice, and image search options, advanced search by category feature, and intuitive product filters. Our plugin seamlessly integrates with Elementor, providing a smooth Ajax product search experience, a **motive** to upgrade your WordPress site today with our search and discovery solution, and see the difference in your online store!
+Increase your WooCommerce store's conversion rates by up to 30% using our AI-driven search plugin for WordPress. Simplify the shopping experience for your customers with results in less than 0.025 seconds and personalized recommendations, cutting down on conversion time. Enhance user satisfaction with our lightning-fast search bar, voice, and image search options, advanced search by category feature, and intuitive product filters. Our plugin seamlessly integrates with Elementor, providing a smooth Ajax product search experience, a motive to upgrade your WordPress site today with our search and discovery solution, and see the difference in your online store!
 
 == Features ==
 
