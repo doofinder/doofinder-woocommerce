@@ -34,7 +34,7 @@ class Endpoint_Single_Script {
     /**
      * Replaces the current Doofinder script with the single one.
      *
-     * @return string
+     * @return array
      */
     public static function update_script_to_single_script() {
         Endpoints::CheckSecureToken();
