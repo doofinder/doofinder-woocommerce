@@ -634,7 +634,7 @@ class Endpoint_Product
         $products = array();
 
         foreach($products_data as $product){
-            if (!isset($product["type"])) {
+            if (isset($product["type"])) {
                 $type       = $product["type"];
                 $attributes = $product["attributes"];
 
