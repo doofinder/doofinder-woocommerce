@@ -1,11 +1,11 @@
 === DOOFINDER Search and Discovery for WP & WooCommerce ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.2.23
+Version: 2.2.24
 Requires at least: 5.6
 Tested up to: 6.3.1
 Requires PHP: 7.0
-Stable tag: 2.2.23
+Stable tag: 2.2.24
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -124,8 +124,11 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 2.2.24 =
+- Added a new internal feature to implement changes in the Doofinder script.
+
 = 2.2.23 =
-- Populate sale_price on parent variation for the custom product endpoint
+- Populate sale_price on parent variation for the custom product endpoint.
 
 = 2.2.22 =
 - Plugin name, description, images and other public resources have been updated.
