@@ -1,5 +1,6 @@
 <?php
 
+use Doofinder\WP\Doofinder_For_WordPress;
 use Doofinder\WP\Endpoints;
 use Doofinder\WP\Helpers;
 use Doofinder\WP\Log;
@@ -67,7 +68,7 @@ class Endpoint_Single_Script {
             $region = Settings::get_region();
             
             ob_start();
-            require DOOFINDER_PLUGIN_PATH . '/views/single-script.php';
+            require Doofinder_For_WordPress::plugin_path() . '/views/single-script.php';
             $single_script = ob_get_clean();
 
             $scripts[ $language ] = $single_script;

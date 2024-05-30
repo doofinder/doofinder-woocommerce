@@ -19,7 +19,6 @@ use Doofinder\WP\Multilanguage\Multilanguage;
 use Doofinder\WP\Admin_Notices;
 
 defined('ABSPATH') or die;
-define( 'DOOFINDER_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 
 if (!class_exists('\Doofinder\WP\Doofinder_For_WordPress')) :
 
