@@ -72,7 +72,7 @@ class Endpoint_Single_Script {
 
             $scripts[ $language ] = $single_script;
 
-            Settings::set_js_layer( '', $options_suffix );
+            Settings::set_js_layer( $single_script, $language );
         }
 
         return $scripts;
