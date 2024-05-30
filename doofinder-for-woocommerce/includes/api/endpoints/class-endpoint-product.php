@@ -634,23 +634,25 @@ class Endpoint_Product
         $products = array();
 
         foreach($products_data as $product){
-            $type       = $product["type"];
-            $attributes = $product["attributes"];
+            if (!isset($product["type"])) {
+                $type       = $product["type"];
+                $attributes = $product["attributes"];
 
-            unset($product["type"]);
+                unset($product["type"]);
 
-            if($type == "variable"){
-                $variations_data = self::processVariations($product);
+                if($type == "variable"){
+                    $variations_data = self::processVariations($product);
 
-                //Setting df_variants_information when variation attribute = true
-                $attr_variation                     = self::get_df_variants_information($product, $attributes);
-                $product["df_variants_information"] = $attr_variation;
-                $products[]                         = $product;
-                $products = array_merge($products, $variations_data);
+                    //Setting df_variants_information when variation attribute = true
+                    $attr_variation                     = self::get_df_variants_information($product, $attributes);
+                    $product["df_variants_information"] = $attr_variation;
+                    $products[]                         = $product;
+                    $products = array_merge($products, $variations_data);
+                }
             }
             else{
                 $products[] = $product;
-            }
+            } 
         }
         return $products;
     }
