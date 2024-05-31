@@ -634,10 +634,14 @@ class Endpoint_Product
         $products = array();
 
         foreach($products_data as $product){
-            $type       = $product["type"];
-            $attributes = $product["attributes"];
+            $type = "";
 
-            unset($product["type"]);
+            if (isset($product["type"])) {
+                $type = $product["type"];
+                unset($product["type"]);
+            }
+            
+            $attributes = $product["attributes"];
 
             if($type == "variable"){
                 $variations_data = self::processVariations($product);
@@ -650,7 +654,7 @@ class Endpoint_Product
             }
             else{
                 $products[] = $product;
-            }
+            } 
         }
         return $products;
     }
