@@ -65,7 +65,8 @@ class Endpoint_Single_Script {
                 continue;
             }
 
-            $region = Settings::get_region();
+            $region   = Settings::get_region();
+            $currency = is_plugin_active('woocommerce/woocommerce.php') ? get_woocommerce_currency() : "EUR";
             
             ob_start();
             require Doofinder_For_WordPress::plugin_path() . '/views/single-script.php';
