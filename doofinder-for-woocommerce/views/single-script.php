@@ -15,4 +15,4 @@
   doofinderApp("config", "currency", "<?php echo $currency; ?>");
 </script>
 <?php endif; ?>
-<script src="https://<?php echo $region; ?>-config.doofinder.com/2.x/<?php echo $installation_id; ?>.js" async></script>
+<script src="https://<?php echo $region; ?>config.doofinder.com/2.x/<?php echo $installation_id; ?>.js" async></script>
