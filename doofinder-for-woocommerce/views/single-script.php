@@ -1,5 +1,5 @@
 <?php
-    if ( ! isset( $installation_id ) || ! isset( $region ) || ! isset( $language_code ) || ! isset($currency) ) {
+    if ( ! isset( $installation_id ) || ! isset( $region ) || ! isset( $language_code ) || ! isset( $currency ) ) {
         die();
     }
     $installation_id = htmlspecialchars( $installation_id, ENT_QUOTES, "UTF-8" );
