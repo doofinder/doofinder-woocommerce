@@ -9,8 +9,8 @@ use Doofinder\WP\Log;
 use Doofinder\WP\Multilanguage\Multilanguage;
 use Doofinder\WP\Multilanguage\No_Language_Plugin;
 use Doofinder\WP\Settings;
+use Doofinder\WP\Doofinder_For_WordPress;
 use Exception;
-use WP_Application_Passwords;
 use WP_Http;
 
 defined('ABSPATH') or die();
@@ -205,15 +205,17 @@ class Store_Api
         $name = get_bloginfo('name');
         $store_name = !empty($name) ? $name : "Default Store";
 
-        $store_payload = [
+        $store_payload = array(
             "name" =>  $store_name,
             "platform" =>  is_plugin_active('woocommerce/woocommerce.php') ? "woocommerce" : "wordpress",
             "primary_language" => $primary_language,
             "site_url" => get_bloginfo('url'),
             "sector" => Settings::get_sector(),
             "options" => Store_Helpers::get_store_options(),
-            "search_engines" => $this->build_search_engines($api_keys, $primary_language)
-        ];
+            "search_engines" => $this->build_search_engines($api_keys, $primary_language),
+            "plugin_version" => Doofinder_For_WordPress::$version
+        );
+
         return $store_payload;
     }
 
