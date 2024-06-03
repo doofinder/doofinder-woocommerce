@@ -633,13 +633,14 @@ class Endpoint_Product
 
         $products = array();
 
-        foreach($products_data as $product){
-            $type = "";
-
-            if (isset($product["type"])) {
-                $type = $product["type"];
-                unset($product["type"]);
+        foreach ( $products_data as $product ) {
+            if ( ! is_array( $product ) ) {
+                continue;
             }
+
+            $type       = $product["type"];
+            $attributes = $product["attributes"];
+            unset( $product["type"] );
             
             $attributes = $product["attributes"];
 
