@@ -1,11 +1,11 @@
 === DOOFINDER Search and Discovery for WP & WooCommerce ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.3.0
+Version: 2.3.1
 Requires at least: 5.6
 Tested up to: 6.3.1
 Requires PHP: 7.0
-Stable tag: 2.3.0
+Stable tag: 2.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,6 +16,8 @@ This plugin integrates the Doofinder search service with your WordPress site.
 Upgrade your eCommerce site with our advanced product search for WooCommerce. Install our search plugin in just 5 minutes, with no programming skills required! Experience the power of Doofinder's AI search today!
 
 [Doofinder sign up](https://www.doofinder.com/signup?utm_campaign=Content&utm_source=WooCommerce%20Profile&utm_content=Doofinder%20Sign%20Up) | [Demo Store](https://woocommerce.doofinder.com) | [Installation Steps](https://support.doofinder.com/plugins/woocommerce/installation-guide/installation-steps-woocommerce.html)
+
+https://www.youtube.com/watch?v=Bgrq1tL4D3o
 
 == Description ==
 
@@ -123,6 +125,9 @@ For in-depth insights into Doofinder and its features, check out our comprehensi
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/doofinder-for-woocommerce)
 
 == Changelog ==
+
+= 2.3.1 =
+- Updated readme.txt
 
 = 2.3.0 =
 - Added a new internal feature to implement changes in the Doofinder script.
