@@ -614,6 +614,7 @@ class Endpoint_Product
                             $products[$key2]["sale_price"] = $product["sale_price"];
                             $products[$key2]["price"] = $product["price"];
                             $products[$key2]["regular_price"] = $product["regular_price"];
+                            $products[$key2]["link"] = $product["link"];
                         }
                         unset($products[$key]);
                     }
