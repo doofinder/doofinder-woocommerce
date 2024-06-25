@@ -2,10 +2,8 @@
 
 namespace Doofinder\WP\Settings;
 
-use Doofinder\WP\Helpers;
 use Doofinder\WP\Index_Status_Handler;
 use Doofinder\WP\Multilanguage\Multilanguage;
-use Doofinder\WP\Multilanguage\No_Language_Plugin;
 use Doofinder\WP\Settings;
 
 defined('ABSPATH') or die();
@@ -268,12 +266,32 @@ trait Accessors
      *
      * @return string
      */
-    public static function get_js_layer($language = '')
+    public static function get_js_layer( $language = '' )
     {
-        return wp_unslash(get_option(self::option_name_for_language(
+        $base_script = self::get_correct_script_version( $language );
+        return self::maybe_prepend_extra_config( $base_script, $language );
+    }
+
+    private static function get_correct_script_version( $language ) {
+        $is_doofinder_script_migrated = get_option( 'doofinder_script_migrated', '0' );
+        // Unique script will be unified for every language
+        $language_to_use = '';
+
+        if ( ! $is_doofinder_script_migrated ) {
+            $language_to_use = $language;
+        }
+
+        $base_script = wp_unslash( get_option( self::option_name_for_language(
             'doofinder_for_wp_js_layer',
-            $language
-        )));
+            $language_to_use
+        ) ) );
+
+        if ( ! $is_doofinder_script_migrated && ( empty( $base_script ) || str_contains( $base_script, 'config.doofinder.com' ) ) ) {
+            add_option( 'doofinder_script_migrated', true );
+            $base_script = wp_unslash( get_option( 'doofinder_for_wp_js_layer', '' ) );
+        }
+
+        return $base_script;
     }
 
     /**
@@ -488,5 +506,26 @@ trait Accessors
         }
 
         return $host;
+    }
+
+    private static function maybe_prepend_extra_config( $base_script, $language ) {
+        if ( empty( $language ) || 
+        str_contains( $base_script, 'dfLayerOptions' ) || 
+        str_contains( $base_script, 'doofinderApp' ) ) {
+            return $base_script;
+        }
+
+        $language = htmlspecialchars( $language, ENT_QUOTES, "UTF-8" );
+        ob_start();
+        ?>
+        <script>
+        (function(w, k) {w[k] = window[k] || function () { (window[k].q = window[k].q || []).push(arguments) }})(window, "doofinderApp");
+
+        doofinderApp("config", "language", "<?php echo $language; ?>");
+        </script>
+        <?php
+        $extra_config = ob_get_clean();
+
+        return $extra_config . $base_script;
     }
 }
