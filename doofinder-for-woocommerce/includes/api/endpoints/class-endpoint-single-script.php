@@ -47,8 +47,8 @@ class Endpoint_Single_Script {
         $multilanguage = Multilanguage::instance();
         $languages     = $multilanguage->get_formatted_languages();
 
-        if ( ! $languages ) {
-            $languages[''] = '';
+        if ( ! is_array( $languages ) ) {
+            $languages = array();
         }
 
         foreach ( $languages as $language_code => $language_name ) {
