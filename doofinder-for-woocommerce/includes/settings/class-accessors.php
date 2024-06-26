@@ -287,7 +287,7 @@ trait Accessors
         ) ) );
 
         if ( ! $is_doofinder_script_migrated && ( empty( $base_script ) || str_contains( $base_script, 'config.doofinder.com' ) ) ) {
-            add_option( 'doofinder_script_migrated', true );
+            update_option( 'doofinder_script_migrated', true );
             $base_script = wp_unslash( get_option( 'doofinder_for_wp_js_layer', '' ) );
         }
 

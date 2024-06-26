@@ -1,7 +1,9 @@
 <?php
 
 use Doofinder\WP\Endpoints;
+use Doofinder\WP\Helpers;
 use Doofinder\WP\Log;
+use Doofinder\WP\Multilanguage\Multilanguage;
 use Doofinder\WP\Settings;
 
 /**
@@ -42,6 +44,22 @@ class Endpoint_Single_Script {
             return '';
         }
 
+        $multilanguage = Multilanguage::instance();
+        $languages     = $multilanguage->get_formatted_languages();
+
+        if ( ! $languages ) {
+            $languages[''] = '';
+        }
+
+        foreach ( $languages as $language_code => $language_name ) {
+            if ( empty( $language_code ) || $language_code === $multilanguage->get_base_locale() ) {
+                continue;
+            }
+
+            $language = Helpers::get_language_from_locale( $language_code );
+            Settings::set_js_layer( '', $language );
+        }
+
         $region = Settings::get_region();
         if ( ! empty( $region ) ) {
             $region .= '-';
@@ -49,6 +67,8 @@ class Endpoint_Single_Script {
 
         $single_script = sprintf( '<script src="https://%1$sconfig.doofinder.com/2.x/%2$s.js" async></script>', $region, $installation_id );
         Settings::set_js_layer( $single_script );
+
+        update_option( 'doofinder_script_migrated', true );
 
         return $single_script;
     }
