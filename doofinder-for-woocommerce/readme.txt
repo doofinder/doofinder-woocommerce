@@ -1,11 +1,11 @@
 === DOOFINDER Search and Discovery for WP & WooCommerce ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.3.2
+Version: 2.4.0
 Requires at least: 5.6
 Tested up to: 6.3.1
 Requires PHP: 7.0
-Stable tag: 2.3.2
+Stable tag: 2.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -126,8 +126,11 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 2.4.0 =
+- Improved Doofinder script injection and retrieval.
+
 = 2.3.2 =
-- Start indexing parent product with URL of the minimum priced variant
+- Start indexing parent product with URL of the minimum priced variant.
 
 = 2.3.1 =
 - Updated readme.txt

@@ -65,6 +65,10 @@ class JS_Layer
         $lang = Helpers::format_locale_to_underscore($multilanguage->get_current_language());
         $layer = Settings::get_js_layer($lang);
 
+        /* 
+        TODO: When all the customer have migrated to the single script
+        this one should be adapted too.
+        */
         if (defined('WP_ENVIRONMENT_TYPE') && WP_ENVIRONMENT_TYPE === 'local' && defined('DF_SEARCH_HOST') && defined('DF_LAYER_HOST')) {
             $local_constants = "<script>
     // FOR DEVELOPMENT PURPOSES ONLY!!!

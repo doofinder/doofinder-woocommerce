@@ -1,6 +1,5 @@
 <?php
 
-use Doofinder\WP\Doofinder_For_WordPress;
 use Doofinder\WP\Endpoints;
 use Doofinder\WP\Helpers;
 use Doofinder\WP\Log;
@@ -34,54 +33,44 @@ class Endpoint_Single_Script {
     /**
      * Replaces the current Doofinder script with the single one.
      *
-     * @return array
+     * @return string
      */
     public static function update_script_to_single_script() {
         Endpoints::CheckSecureToken();
-        $log           = new Log();
-        $multilanguage = Multilanguage::instance();
-
-        // If there's no Multilanguage plugin active we still need to process 1 language.
-        $languages = $multilanguage->get_formatted_languages();
-
-        if ( ! $languages ) {
-            $languages[''] = '';
+        $log             = new Log();
+        $installation_id = self::get_installation_id_from_database_script();
+        if ( empty( $installation_id ) ) {
+            $log->log( "Single script could not be updated because Installation ID could not be determined." );
+            return '';
         }
 
-        $scripts = array();
+        $multilanguage = Multilanguage::instance();
+        $languages     = $multilanguage->get_formatted_languages();
+
+        if ( ! is_array( $languages ) ) {
+            $languages = array();
+        }
 
         foreach ( $languages as $language_code => $language_name ) {
-            /*
-            Suffix for options.
-            This should be empty for default language, and language code
-            for any other.
-            */
-            // These ones will be used in the template
-            $language        = ( $language_code === $multilanguage->get_base_locale() ) ? '' : Helpers::get_language_from_locale( $language_code );
-            $installation_id = self::get_installation_id_from_database_script( $language );
-
-            if ( empty( $installation_id ) ) {
-                $log->log( "Single script could not be updated for language: $language because Installation ID could not be determined." );
+            if ( empty( $language_code ) || $language_code === $multilanguage->get_base_locale() ) {
                 continue;
             }
 
-            $region = Settings::get_region();
-            if ( ! empty( $region ) ) {
-                $region .= '-';
-            }
-
-            $currency = is_plugin_active('woocommerce/woocommerce.php') ? get_woocommerce_currency() : "EUR";
-            
-            ob_start();
-            require Doofinder_For_WordPress::plugin_path() . '/views/single-script.php';
-            $single_script = ob_get_clean();
-
-            $scripts[ $language ] = $single_script;
-
-            Settings::set_js_layer( $single_script, $language );
+            $language = Helpers::get_language_from_locale( $language_code );
+            Settings::set_js_layer( '', $language );
         }
 
-        return $scripts;
+        $region = Settings::get_region();
+        if ( ! empty( $region ) ) {
+            $region .= '-';
+        }
+
+        $single_script = sprintf( '<script src="https://%1$sconfig.doofinder.com/2.x/%2$s.js" async></script>', $region, $installation_id );
+        Settings::set_js_layer( $single_script );
+
+        update_option( 'doofinder_script_migrated', true );
+
+        return $single_script;
     }
 
     /**
@@ -89,7 +78,7 @@ class Endpoint_Single_Script {
      *
      * @return string
      */
-    private static function get_installation_id_from_database_script( $language ) {
+    private static function get_installation_id_from_database_script( $language = '' ) {
         $current_script = Settings::get_js_layer( $language );
         preg_match( "/installationId: '([a-z0-9-]+)'/", $current_script, $matches );
         if ( empty( $matches[1] ) ) {
