@@ -268,11 +268,15 @@ trait Accessors
      */
     public static function get_js_layer( $language = '' )
     {
-        $base_script = self::get_correct_script_version( $language );
+        $base_script = self::get_script_backwards_compatibility( $language );
         return self::maybe_prepend_extra_config( $base_script, $language );
     }
 
-    private static function get_correct_script_version( $language ) {
+    /*
+     * The legacy script required one specific script per language, but
+     * with the single script it will be inserted inly for the default language.
+     */
+    private static function get_script_backwards_compatibility( $language ) {
         $is_doofinder_script_migrated = get_option( 'doofinder_script_migrated', '0' );
         // Unique script will be unified for every language
         $language_to_use = '';
@@ -289,6 +293,11 @@ trait Accessors
         if ( ! $is_doofinder_script_migrated && ( empty( $base_script ) || str_contains( $base_script, 'config.doofinder.com' ) ) ) {
             update_option( 'doofinder_script_migrated', true );
             $base_script = wp_unslash( get_option( 'doofinder_for_wp_js_layer', '' ) );
+            // Ensure that the script in the DB is the one-liner version
+            if ( preg_match( '/<script src="https:\/\/(?P<region>eu1|us1)-config\.doofinder\.com\/2\.x\/(?P<installation_id>[a-zA-Z0-9-]+)\.js" async><\/script>/', $base_script, $matches ) ) {
+                $base_script = sprintf( '<script src="https://%1$s-config.doofinder.com/2.x/%2$s.js" async></script>', $matches['region'], $matches['installation_id'] );
+                Settings::set_js_layer( $base_script );
+            }
         }
 
         return $base_script;
@@ -507,7 +516,11 @@ trait Accessors
 
         return $host;
     }
-
+    /*
+     * There are some customers that may still have the legacy Live Layer script or
+     * the single script with the languages variations inserted directly on the database.
+     * For these cases, we must skip this step of adding the extra doofinderApp config
+     */
     private static function maybe_prepend_extra_config( $base_script, $language ) {
         if ( empty( $language ) || 
         str_contains( $base_script, 'dfLayerOptions' ) || 
