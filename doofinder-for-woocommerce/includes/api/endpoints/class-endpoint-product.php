@@ -760,7 +760,7 @@ class Endpoint_Product
                         $term = get_term_by('slug', $option, $attribute_name);
                         $option = $term ? preg_replace( '/(?<!\/)\/(?!\/)/', '//', html_entity_decode( strip_tags( $term->name ) ) ) : '';
                     }
-                    $custom_attributes[$attribute_slug][] = $option;
+                    $custom_attributes[ $attribute_slug ] = $option;
                 }
             }
         }
