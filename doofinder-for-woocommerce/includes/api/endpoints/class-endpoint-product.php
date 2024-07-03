@@ -753,16 +753,21 @@ class Endpoint_Product
             }
 
             if ($found_key !== false) {
-                $attribute_options = is_string( $attribute_data ) ? [ $attribute_data ] : $attribute_data->get_slugs();
-                /* It should be only one option per variant, so we can use 
-                end( $attribute_options ) or $attribute_options[0] to get only one */
-                $option = empty( $attribute_options ) ? '' : end( $attribute_options );
-                //If is an attribute with taxonomy, we need to get taxonomy value
-                if ( taxonomy_exists( $attribute_name ) ){
-                    $term = get_term_by( 'slug', $option, $attribute_name );
-                    $option = $term ? preg_replace( '/(?<!\/)\/(?!\/)/', '//', html_entity_decode( strip_tags( $term->name ) ) ) : '';
+                $attribute_options = is_string($attribute_data) ? [$attribute_data] : $attribute_data->get_slugs();
+                foreach ($attribute_options as $option) {
+                    //If is an attribute with taxonomy, we need to get taxonomy value
+                    if(taxonomy_exists($attribute_name)){
+                        $term = get_term_by('slug', $option, $attribute_name);
+                        $option = $term ? preg_replace( '/(?<!\/)\/(?!\/)/', '//', html_entity_decode( strip_tags( $term->name ) ) ) : '';
+                    }
+                    $custom_attributes[$attribute_slug][] = $option;
                 }
-                $custom_attributes[ $attribute_slug ] = $option;
+                
+                if ( 0 === count( $custom_attributes[ $attribute_slug ] ) ) {
+                    $custom_attributes[ $attribute_slug ] = '';
+                } elseif ( 1 === count( $custom_attributes[ $attribute_slug ] ) ) {
+                    $custom_attributes[ $attribute_slug ] = $custom_attributes[ $attribute_slug ][0];
+                }
             }
         }
 
