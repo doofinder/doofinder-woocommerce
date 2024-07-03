@@ -762,6 +762,12 @@ class Endpoint_Product
                     }
                     $custom_attributes[$attribute_slug][] = $option;
                 }
+                
+                if ( 0 === count( $custom_attributes[ $attribute_slug ] ) ) {
+                    $custom_attributes[ $attribute_slug ] = '';
+                } elseif ( 1 === count( $custom_attributes[ $attribute_slug ] ) ) {
+                    $custom_attributes[ $attribute_slug ] = $custom_attributes[ $attribute_slug ][0];
+                }
             }
         }
 
