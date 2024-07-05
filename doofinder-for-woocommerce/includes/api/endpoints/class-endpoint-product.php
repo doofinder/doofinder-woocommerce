@@ -763,7 +763,7 @@ class Endpoint_Product
                     $custom_attributes[$attribute_slug][] = $option;
                 }
                 
-                if ( is_array( $custom_attributes[ $attribute_slug ] ) ) {
+                if ( ! empty( $custom_attributes[ $attribute_slug ] ) && is_array( $custom_attributes[ $attribute_slug ] ) ) {
                     if ( 0 === count( $custom_attributes[ $attribute_slug ] ) ) {
                         $custom_attributes[ $attribute_slug ] = '';
                     } elseif ( 1 === count( $custom_attributes[ $attribute_slug ] ) ) {
