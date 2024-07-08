@@ -754,6 +754,7 @@ class Endpoint_Product
 
             if ($found_key !== false) {
                 $attribute_options = is_string($attribute_data) ? [$attribute_data] : $attribute_data->get_slugs();
+                $custom_attributes[ $attribute_slug ] = array();
                 foreach ($attribute_options as $option) {
                     //If is an attribute with taxonomy, we need to get taxonomy value
                     if(taxonomy_exists($attribute_name)){
