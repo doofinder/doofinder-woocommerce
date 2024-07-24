@@ -8,115 +8,109 @@ use Doofinder\WP\Log;
 /**
  * Handles requests to the Management API.
  */
-class Reset_Credentials_Api
-{
-    /**
-     * Instance of a class used to log to a file.
-     *
-     * @var Log
-     */
-    private $log;
+class Reset_Credentials_Api {
 
-    /**
-     * API Host
-     *
-     * @var string
-     */
-    private $dooplugins_host;
+	/**
+	 * Instance of a class used to log to a file.
+	 *
+	 * @var Log
+	 */
+	private $log;
 
-    /**
-     * API Key
-     *
-     * @var string
-     */
-    private $api_key;
+	/**
+	 * API Host
+	 *
+	 * @var string
+	 */
+	private $dooplugins_host;
 
-    /**
-     * Hash
-     * The search engine's unique id
-     *
-     * @var string
-     */
-    private $hash;
+	/**
+	 * API Key
+	 *
+	 * @var string
+	 */
+	private $api_key;
 
-    /**
-     * Authorization Header
-     *
-     * @var string
-     */
-    private $authorization_header;
+	/**
+	 * Hash
+	 * The search engine's unique id
+	 *
+	 * @var string
+	 */
+	private $hash;
 
-    public function __construct($language)
-    {
-        $this->log                  = new Log('reset-credential-api.log');
-        $this->api_key              = Settings::get_api_key();
-        $this->dooplugins_host      = Settings::get_dooplugins_host();
-        $this->hash                 = Settings::get_search_engine_hash($language);
-        $this->authorization_header = array(
-            'Authorization' => "Token $this->api_key",
-            'content-type'  => 'application/json'
-        );
+	/**
+	 * Authorization Header
+	 *
+	 * @var string
+	 */
+	private $authorization_header;
 
-        $this->log->log('Create Management API Client');
-        $this->log->log('Dooplugins Host: ' . $this->dooplugins_host);
-        $this->log->log('Hash: ' . $this->hash);
-    }
+	public function __construct( $language ) {
+		$this->log                  = new Log( 'reset-credential-api.log' );
+		$this->api_key              = Settings::get_api_key();
+		$this->dooplugins_host      = Settings::get_dooplugins_host();
+		$this->hash                 = Settings::get_search_engine_hash( $language );
+		$this->authorization_header = array(
+			'Authorization' => "Token $this->api_key",
+			'content-type'  => 'application/json',
+		);
 
-    /**
-     * Handle sending requests to API
-     *
-     * @param $url
-     * @param $data
-     *
-     */
-    /**
-     * Send a POST request with the given $body to the given $endpoint.
-     *
-     * @param array $body The array containing the payload to be sent.
-     * @return array The request decoded response
-     */
-    private function sendRequest($url, $body)
-    {
-        $data = [
-            'headers' => [
-                'Authorization' => "Token {$this->api_key}",
-                'Content-Type' => 'application/json; charset=utf-8'
-            ],
-            'body' => json_encode($body),
-            'method'      => 'POST',
-            'data_format' => 'body',
-            'timeout' => 20
-        ];
+		$this->log->log( 'Create Management API Client' );
+		$this->log->log( 'Dooplugins Host: ' . $this->dooplugins_host );
+		$this->log->log( 'Hash: ' . $this->hash );
+	}
 
-        $response = wp_remote_request($url, $data);
-        $resp_code = wp_remote_retrieve_response_code($response);
-        if (!is_wp_error($response) && $resp_code >= 200 && $resp_code < 400 ) {
-            $response_body = wp_remote_retrieve_body($response);
-            $decoded_response = json_decode($response_body, true);
-            $this->log->log("The request has been made correctly: $decoded_response");
-        } else {
-            $this->log->log(print_r($response, true));
-            $error_message = wp_remote_retrieve_response_message($response);
-            $this->log->log("Error in the request: $error_message");
-        }
-    }
+	/**
+	 * Handle sending requests to API
+	 *
+	 * @param $url
+	 * @param $data
+	 */
+	/**
+	 * Send a POST request with the given $body to the given $endpoint.
+	 *
+	 * @param array $body The array containing the payload to be sent.
+	 * @return array The request decoded response
+	 */
+	private function sendRequest( $url, $body ) {
+		$data = array(
+			'headers'     => array(
+				'Authorization' => "Token {$this->api_key}",
+				'Content-Type'  => 'application/json; charset=utf-8',
+			),
+			'body'        => json_encode( $body ),
+			'method'      => 'POST',
+			'data_format' => 'body',
+			'timeout'     => 20,
+		);
 
-    public function buildURL($path)
-    {
-        return "{$this->dooplugins_host}/{$path}";
-    }
+		$response  = wp_remote_request( $url, $data );
+		$resp_code = wp_remote_retrieve_response_code( $response );
+		if ( ! is_wp_error( $response ) && $resp_code >= 200 && $resp_code < 400 ) {
+			$response_body    = wp_remote_retrieve_body( $response );
+			$decoded_response = json_decode( $response_body, true );
+			$this->log->log( "The request has been made correctly: $decoded_response" );
+		} else {
+			$this->log->log( print_r( $response, true ) );
+			$error_message = wp_remote_retrieve_response_message( $response );
+			$this->log->log( "Error in the request: $error_message" );
+		}
+	}
 
-    /**
-     * @since 1.0.0
-     */
-    public function resetCredentials($data)
-    {
-        $this->log->log('Reset Credentials');
+	public function buildURL( $path ) {
+		return "{$this->dooplugins_host}/{$path}";
+	}
 
-        $uri = $this->buildURL("wordpress/" . $this->hash . "/reset-credentials");
-        $this->log->log("Making a request to: $uri");
+	/**
+	 * @since 1.0.0
+	 */
+	public function resetCredentials( $data ) {
+		$this->log->log( 'Reset Credentials' );
 
-        return $this->sendRequest($uri, $data);
-    }
+		$uri = $this->buildURL( 'wordpress/' . $this->hash . '/reset-credentials' );
+		$this->log->log( "Making a request to: $uri" );
 
+		return $this->sendRequest( $uri, $data );
+	}
 }

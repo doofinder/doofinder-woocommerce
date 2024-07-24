@@ -113,14 +113,14 @@ class Multilanguage {
 	 *
 	 * @return string
 	 */
-	public function get_choose_language_notice($hide_button = true) {
+	public function get_choose_language_notice( $hide_button = true ) {
 		if ( ! $this->is_active() ) {
 			return '';
 		}
 
-		if($hide_button) {
+		if ( $hide_button ) {
 
-			$GLOBALS['hide_save_button']  = true;
+			$GLOBALS['hide_save_button'] = true;
 		}
 
 		$notice_html =

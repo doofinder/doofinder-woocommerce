@@ -14,14 +14,14 @@ class Post {
 	 * @var array[]
 	 */
 	public static $options = array(
-		'visibility' => array(
+		'visibility'       => array(
 			'form_name' => 'doofinder-for-wp-indexing-visibility',
 			'meta_name' => '_doofinder_for_wp_indexing_visibility',
 		),
 
 		'yoast_visibility' => array(
-			'meta_name' => '_yoast_wpseo_meta-robots-noindex'
-		)
+			'meta_name' => '_yoast_wpseo_meta-robots-noindex',
+		),
 	);
 
 	/**
@@ -79,21 +79,27 @@ class Post {
 	 * post types.
 	 */
 	public static function add_additional_settings() {
-		add_action( 'add_meta_boxes', function () {
-			add_meta_box(
-				'doofinder-for-wp-visibility-settings',
-				__( 'Doofinder - Indexing', 'doofinder_for_wp' ),
-				function () {
-					self::render_html_indexing_visibility();
-				},
-				get_post_types( array( 'public' => true ) ),
-				'side'
-			);
-		} );
+		add_action(
+			'add_meta_boxes',
+			function () {
+				add_meta_box(
+					'doofinder-for-wp-visibility-settings',
+					__( 'Doofinder - Indexing', 'doofinder_for_wp' ),
+					function () {
+						self::render_html_indexing_visibility();
+					},
+					get_post_types( array( 'public' => true ) ),
+					'side'
+				);
+			}
+		);
 
-		add_action( 'save_post', function ( $post_id ) {
-			self::handle_additional_settings_save( $post_id );
-		} );
+		add_action(
+			'save_post',
+			function ( $post_id ) {
+				self::handle_additional_settings_save( $post_id );
+			}
+		);
 	}
 
 	/**
@@ -107,18 +113,18 @@ class Post {
 
 		?>
 
-        <select name="<?php echo $option_name; ?>" class="widefat">
-			<?php foreach ( self::$visibilityOptions as $option ): ?>
-                <option value="<?php echo $option; ?>"
+		<select name="<?php echo $option_name; ?>" class="widefat">
+			<?php foreach ( self::$visibilityOptions as $option ) : ?>
+				<option value="<?php echo $option; ?>"
 
-					<?php if ( $saved_value && $saved_value === $option ): ?>
-                        selected
+					<?php if ( $saved_value && $saved_value === $option ) : ?>
+						selected
 					<?php endif; ?>
-                >
+				>
 					<?php echo $option; ?>
-                </option>
+				</option>
 			<?php endforeach; ?>
-        </select>
+		</select>
 
 		<?php
 	}
@@ -155,7 +161,7 @@ class Post {
 	 * Post constructor.
 	 *
 	 * @param \WP_Post|int $post
-	 * @param \stdClass[] $meta
+	 * @param \stdClass[]  $meta
 	 */
 	public function __construct( $post, $meta = null ) {
 		if ( $meta !== null ) {
@@ -181,7 +187,7 @@ class Post {
 	 * @return bool
 	 */
 	public function is_indexable() {
-		if (  $this->post->post_status === 'trash' ) {
+		if ( $this->post->post_status === 'trash' ) {
 			return false;
 		}
 
@@ -241,22 +247,22 @@ class Post {
 		// All other data will be added if present.
 		$data = array(
 			'id'        => (string) $this->post->ID,
-			'title'     => $this->sanitize_html_entities($this->post->post_title),
+			'title'     => $this->sanitize_html_entities( $this->post->post_title ),
 			'link'      => get_the_permalink( $this->post ),
-			'post_date' => $this->get_post_date()
+			'post_date' => $this->get_post_date(),
 		);
 
 		// Post content.
 		$content = $this->get_content();
 		if ( $content ) {
-			$data['content'] = $this->sanitize_html_entities($content);
+			$data['content'] = $this->sanitize_html_entities( $content );
 		}
 
 		// Post description.
 		// Excerpt serves as a description.
 		$description = $this->get_excerpt();
 		if ( $description ) {
-			$data['description'] = $this->sanitize_html_entities($description);
+			$data['description'] = $this->sanitize_html_entities( $description );
 		}
 
 		// Post thumbnail.
@@ -285,8 +291,8 @@ class Post {
 	 *
 	 * @return string
 	 */
-	private function sanitize_html_entities($text){
-		return html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+	private function sanitize_html_entities( $text ) {
+		return html_entity_decode( $text, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
 	}
 
 	/**
@@ -296,12 +302,12 @@ class Post {
 	 * @return string[]
 	 */
 	private function get_categories() {
-		$all_categories = get_categories();
-		$post_categories = wp_get_post_categories($this->post->ID, array('fields' => 'all'));
+		$all_categories  = get_categories();
+		$post_categories = wp_get_post_categories( $this->post->ID, array( 'fields' => 'all' ) );
 
-		if(taxonomy_exists("portfolio_category")){
-			$all_categories = array_merge($all_categories, get_terms('portfolio_category'));
-			$post_categories = array_merge($post_categories, wp_get_object_terms($this->post->ID, 'portfolio_category', array('fields' => 'all')));
+		if ( taxonomy_exists( 'portfolio_category' ) ) {
+			$all_categories  = array_merge( $all_categories, get_terms( 'portfolio_category' ) );
+			$post_categories = array_merge( $post_categories, wp_get_object_terms( $this->post->ID, 'portfolio_category', array( 'fields' => 'all' ) ) );
 		}
 
 		$formatted_categories = array();
@@ -318,10 +324,12 @@ class Post {
 		foreach ( $post_categories as $category ) {
 			$formatted_categories[] = join(
 				' > ',
-				array_reverse( $this->get_category_full_path(
-					$categories,
-					$category
-				) )
+				array_reverse(
+					$this->get_category_full_path(
+						$categories,
+						$category
+					)
+				)
 			);
 		}
 
@@ -333,7 +341,7 @@ class Post {
 	 * and generates array representing chain of parents of categories.
 	 *
 	 * @param \WP_Term[] $categories
-	 * @param \WP_Term $category
+	 * @param \WP_Term   $category
 	 *
 	 * @return string[]
 	 */

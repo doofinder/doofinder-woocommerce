@@ -13,305 +13,297 @@ use Doofinder\WP\Doofinder_For_WordPress;
 use Exception;
 use WP_Http;
 
-defined('ABSPATH') or die();
+defined( 'ABSPATH' ) or die();
 
-class Store_Api
-{
-
-    /**
-     * Instance of a class used to log to a file.
-     *
-     * @var Log
-     */
-    private $log;
-
-    /**
-     * Instance of a class used to log to a file.
-     *
-     * @var Multilanguage
-     */
-    private $language;
-
-    /**
-     * Dooplugins Host
-     *
-     * @var string
-     */
-    private $dooplugins_host;
+class Store_Api {
 
 
-    /**
-     * API Key
-     *
-     * @var string
-     */
-    private $api_key;
+	/**
+	 * Instance of a class used to log to a file.
+	 *
+	 * @var Log
+	 */
+	private $log;
 
-    public function __construct()
-    {
-        // Get global disable_api_calls flag
-        $this->log = new Log('store_create_api.log');
+	/**
+	 * Instance of a class used to log to a file.
+	 *
+	 * @var Multilanguage
+	 */
+	private $language;
 
-        $this->api_key = Settings::get_api_key();
-        $this->dooplugins_host = Settings::get_dooplugins_host();
+	/**
+	 * Dooplugins Host
+	 *
+	 * @var string
+	 */
+	private $dooplugins_host;
 
-        $this->log->log('-------------  DOOPLUGINS HOST ------------- ');
-        $this->log->log($this->dooplugins_host);
 
-        $this->language = Multilanguage::instance();
-    }
+	/**
+	 * API Key
+	 *
+	 * @var string
+	 */
+	private $api_key;
 
-    /**
-     * Create a Store, Search Engine and Datatype
-     *
-     * @param array  $api_keys
-     *
-     * @return mixed
-     */
-    public function create_store($api_keys)
-    {
-        if (is_array($api_keys)) {
-            $store_payload = $this->build_store_payload($api_keys);
-            $this->log->log("store_data: ");
+	public function __construct() {
+		// Get global disable_api_calls flag
+		$this->log = new Log( 'store_create_api.log' );
 
-            $store_payload_log = $store_payload;
-            unset($store_payload_log["options"]);
+		$this->api_key         = Settings::get_api_key();
+		$this->dooplugins_host = Settings::get_dooplugins_host();
 
-            $this->log->log($store_payload_log);
-            return $this->sendRequest("install", $store_payload);
-        }
-    }
+		$this->log->log( '-------------  DOOPLUGINS HOST ------------- ' );
+		$this->log->log( $this->dooplugins_host );
 
-    /**
-     * Sends a request to update the store options with the api password and to create any missing datatype
-     * Payload example:
-     * $payload = array(
-     *    'store_options' => array(
-     *        'url' => 'http://wordpress.doofinder.com',
-     *        'df_token' => 'G41cXNeVoX4JGL2bhvbcMlQ4',
-     *        'api_pass' => 'fwafwaG41cXNeVoX4JGL2bhvbcMlQ4',
-     *        'api_user' => 'doofinder'
-     *    ),
-     *    'search_engines' => array(
-     *        'fde92a8f364b8d769262974e95d82dba' => array(
-     *          'lang' => 'en'
-     *        )
-     *    )
-     * )
-     * @return void
-     */
-    public function normalize_store_and_indices()
-    {
-        $wizard = Setup_Wizard::instance();
-        $api_keys = Setup_Wizard::are_api_keys_present($wizard->process_all_languages, $wizard->language);
+		$this->language = Multilanguage::instance();
+	}
 
-        if (!Multilanguage::$is_multilang) {
-            $api_keys = [
-                '' => [
-                    'hash' => Settings::get_search_engine_hash()
-                ]
-            ];
-        }
+	/**
+	 * Create a Store, Search Engine and Datatype
+	 *
+	 * @param array $api_keys
+	 *
+	 * @return mixed
+	 */
+	public function create_store( $api_keys ) {
+		if ( is_array( $api_keys ) ) {
+			$store_payload = $this->build_store_payload( $api_keys );
+			$this->log->log( 'store_data: ' );
 
-        $store_payload = $this->build_store_payload($api_keys);
+			$store_payload_log = $store_payload;
+			unset( $store_payload_log['options'] );
 
-        $payload = [
-            'store_options' => $store_payload['options'],
-            'platform' => $store_payload['platform']
-        ];
+			$this->log->log( $store_payload_log );
+			return $this->sendRequest( 'install', $store_payload );
+		}
+	}
 
-        foreach ($store_payload['search_engines'] as $search_engine) {
-            $lang = Helpers::get_language_from_locale($search_engine['language']);
-            $base_lang = Helpers::get_language_from_locale( $this->language->get_base_language() );
-            
-            //If the installation is not multilanguage or it's the base language, replace the lang with ''
-            if (is_a($this->language, No_Language_Plugin::class) || $lang === $base_lang) {
-                $lang = '';
-            }
+	/**
+	 * Sends a request to update the store options with the api password and to create any missing datatype
+	 * Payload example:
+	 * $payload = array(
+	 *    'store_options' => array(
+	 *        'url' => 'http://wordpress.doofinder.com',
+	 *        'df_token' => 'G41cXNeVoX4JGL2bhvbcMlQ4',
+	 *        'api_pass' => 'fwafwaG41cXNeVoX4JGL2bhvbcMlQ4',
+	 *        'api_user' => 'doofinder'
+	 *    ),
+	 *    'search_engines' => array(
+	 *        'fde92a8f364b8d769262974e95d82dba' => array(
+	 *          'lang' => 'en'
+	 *        )
+	 *    )
+	 * )
+	 *
+	 * @return void
+	 */
+	public function normalize_store_and_indices() {
+		$wizard   = Setup_Wizard::instance();
+		$api_keys = Setup_Wizard::are_api_keys_present( $wizard->process_all_languages, $wizard->language );
 
-            if (isset($api_keys[$lang])) {
-                $se_hashid = $api_keys[$lang]['hash'];
-                $payload['search_engines'][$se_hashid] = ["lang" => $lang];
-            } else {
-                $this->log->log("No search engine retrieved for the language - " . $lang);
-            }
-        }
+		if ( ! Multilanguage::$is_multilang ) {
+			$api_keys = array(
+				'' => array(
+					'hash' => Settings::get_search_engine_hash(),
+				),
+			);
+		}
 
-        $this->log->log("Sending request to normalize indices.");
-        $response = $this->sendRequest("wordpress/normalize-indices/", $payload, true);
+		$store_payload = $this->build_store_payload( $api_keys );
 
-        if (!is_array($response)) {
-            $this->log->log("The store and indices normalization has failed due to an invalid response: " . print_r($response, true));
-        } else if (array_key_exists('errors', $response)) {
-            $this->log->log("The store and indices normalization has failed!");
-            $this->log->log(print_r($response['errors'], true));
-        } else {
-            $this->log->log("The store and indices normalization has finished successfully!");
-            $this->log->log("Response: \n" . print_r($response, true));
-        }
-    }
+		$payload = array(
+			'store_options' => $store_payload['options'],
+			'platform'      => $store_payload['platform'],
+		);
 
-    /**
-     * Send a POST request with the given $body to the given $endpoint.
-     *
-     * @param string $endpoint The endpoint url.
-     * @param array $body The array containing the payload to be sent.
-     * @return array The request decoded response
-     */
-    private function sendRequest($endpoint, $body, $migration = false)
-    {
-        $data = [
-            'headers' => [
-                'Authorization' => "Token {$this->api_key}",
-                'Content-Type' => 'application/json; charset=utf-8'
-            ],
-            'body' => json_encode($body),
-            'method'      => 'POST',
-            'data_format' => 'body',
-            'timeout' => 20
-        ];
+		foreach ( $store_payload['search_engines'] as $search_engine ) {
+			$lang      = Helpers::get_language_from_locale( $search_engine['language'] );
+			$base_lang = Helpers::get_language_from_locale( $this->language->get_base_language() );
 
-        $url = "{$this->dooplugins_host}/{$endpoint}";
-        $this->log->log("Making a request to: $url");
-        $response = wp_remote_request($url, $data);
-        $response_code = wp_remote_retrieve_response_code($response);
+			// If the installation is not multilanguage or it's the base language, replace the lang with ''
+			if ( is_a( $this->language, No_Language_Plugin::class ) || $lang === $base_lang ) {
+				$lang = '';
+			}
 
-        $this->log->log("Response code: $response_code");
-        $this->log->log("Response: " . print_r($response, true));
+			if ( isset( $api_keys[ $lang ] ) ) {
+				$se_hashid                               = $api_keys[ $lang ]['hash'];
+				$payload['search_engines'][ $se_hashid ] = array( 'lang' => $lang );
+			} else {
+				$this->log->log( 'No search engine retrieved for the language - ' . $lang );
+			}
+		}
 
-        if (!$migration) {
-            $this->throw_exception($response, $response_code);
-        }
+		$this->log->log( 'Sending request to normalize indices.' );
+		$response = $this->sendRequest( 'wordpress/normalize-indices/', $payload, true );
 
-        $response_body = wp_remote_retrieve_body($response);
-        $this->log->log("Response body: " . print_r($response_body, true));
+		if ( ! is_array( $response ) ) {
+			$this->log->log( 'The store and indices normalization has failed due to an invalid response: ' . print_r( $response, true ) );
+		} elseif ( array_key_exists( 'errors', $response ) ) {
+			$this->log->log( 'The store and indices normalization has failed!' );
+			$this->log->log( print_r( $response['errors'], true ) );
+		} else {
+			$this->log->log( 'The store and indices normalization has finished successfully!' );
+			$this->log->log( "Response: \n" . print_r( $response, true ) );
+		}
+	}
 
-        $decoded_response = json_decode($response_body, true);
-        $this->log->log("Decoded response: " . print_r($decoded_response, true));
+	/**
+	 * Send a POST request with the given $body to the given $endpoint.
+	 *
+	 * @param string $endpoint The endpoint url.
+	 * @param array  $body The array containing the payload to be sent.
+	 * @return array The request decoded response
+	 */
+	private function sendRequest( $endpoint, $body, $migration = false ) {
+		$data = array(
+			'headers'     => array(
+				'Authorization' => "Token {$this->api_key}",
+				'Content-Type'  => 'application/json; charset=utf-8',
+			),
+			'body'        => json_encode( $body ),
+			'method'      => 'POST',
+			'data_format' => 'body',
+			'timeout'     => 20,
+		);
 
-        return $decoded_response;
-    }
+		$url = "{$this->dooplugins_host}/{$endpoint}";
+		$this->log->log( "Making a request to: $url" );
+		$response      = wp_remote_request( $url, $data );
+		$response_code = wp_remote_retrieve_response_code( $response );
 
-    /**
-     * Generates the create-store payload
-     *
-     * @param array $api_keys The list of search engine ids
-     * @return array Store payload
-     */
-    private function build_store_payload($api_keys)
-    {
-        $primary_language = $this->get_primary_language();
+		$this->log->log( "Response code: $response_code" );
+		$this->log->log( 'Response: ' . print_r( $response, true ) );
 
-        $name = get_bloginfo('name');
-        $store_name = !empty($name) ? $name : "Default Store";
+		if ( ! $migration ) {
+			$this->throw_exception( $response, $response_code );
+		}
 
-        $store_payload = array(
-            "name" =>  $store_name,
-            "platform" =>  is_plugin_active('woocommerce/woocommerce.php') ? "woocommerce" : "wordpress",
-            "primary_language" => $primary_language,
-            "site_url" => get_bloginfo('url'),
-            "sector" => Settings::get_sector(),
-            "options" => Store_Helpers::get_store_options(),
-            "search_engines" => $this->build_search_engines($api_keys, $primary_language),
-            "plugin_version" => Doofinder_For_WordPress::$version
-        );
+		$response_body = wp_remote_retrieve_body( $response );
+		$this->log->log( 'Response body: ' . print_r( $response_body, true ) );
 
-        return $store_payload;
-    }
+		$decoded_response = json_decode( $response_body, true );
+		$this->log->log( 'Decoded response: ' . print_r( $decoded_response, true ) );
 
-    private function build_search_engines($api_keys, $primary_language)
-    {
-        $search_engines = [];
-        $domain = str_ireplace('www.', '', parse_url(get_bloginfo('url'), PHP_URL_HOST));
-        $currency = is_plugin_active('woocommerce/woocommerce.php') ? get_woocommerce_currency() : "EUR";
+		return $decoded_response;
+	}
 
-        foreach ($api_keys as $item) {
-            //Prioritize the locale code
-            $code = $item['lang']['locale'] ?? $item['lang']['code'] ?? $primary_language;
-            $code = Helpers::format_locale_to_hyphen($code);
-            $lang = Helpers::get_language_from_locale($code);
+	/**
+	 * Generates the create-store payload
+	 *
+	 * @param array $api_keys The list of search engine ids
+	 * @return array Store payload
+	 */
+	private function build_store_payload( $api_keys ) {
+		$primary_language = $this->get_primary_language();
 
-            $home_url = $this->language->get_home_url($lang);
+		$name       = get_bloginfo( 'name' );
+		$store_name = ! empty( $name ) ? $name : 'Default Store';
 
-            // Prepare search engine body
-            $this->log->log('Wizard Step 2 - Prepare Search Engine body : ');
-            $search_engines[] = [
-                'name' => $domain . ($code ? ' (' . strtoupper($code) . ')' : ''),
-                'language' => $code,
-                'locale' => $item['lang']['code'],
-                'currency' => $currency,
-                'site_url' =>  $home_url,
-                "feed_type" => is_plugin_active('woocommerce/woocommerce.php') ? "product" : "posts", 
-                "callback_url" => $this->build_callback_url($home_url, '/wp-json/doofinder/v1/index-status/?token=' . $this->api_key),
-            ];
-        }
+		$store_payload = array(
+			'name'             => $store_name,
+			'platform'         => is_plugin_active( 'woocommerce/woocommerce.php' ) ? 'woocommerce' : 'wordpress',
+			'primary_language' => $primary_language,
+			'site_url'         => get_bloginfo( 'url' ),
+			'sector'           => Settings::get_sector(),
+			'options'          => Store_Helpers::get_store_options(),
+			'search_engines'   => $this->build_search_engines( $api_keys, $primary_language ),
+			'plugin_version'   => Doofinder_For_WordPress::$version,
+		);
 
-        return $search_engines;
-    }
+		return $store_payload;
+	}
 
-    /**
-     * This function returns the primary language in locale format: en-US,
-     * es-ES, etc.
-     *
-     * @return string Primary language.
-     */
-    private function get_primary_language()
-    {
-        $primary_language = get_locale();
-        if ($this->language->get_languages() != null) {
-            $primary_language = $this->language->get_base_locale();
-        }
-        $primary_language = Helpers::format_locale_to_hyphen($primary_language);
-        return $primary_language;
-    }
+	private function build_search_engines( $api_keys, $primary_language ) {
+		$search_engines = array();
+		$domain         = str_ireplace( 'www.', '', parse_url( get_bloginfo( 'url' ), PHP_URL_HOST ) );
+		$currency       = is_plugin_active( 'woocommerce/woocommerce.php' ) ? get_woocommerce_currency() : 'EUR';
 
-    /**
-     * This method takes the base url and adds
-     *
-     * @param [type] $base_url
-     * @param [type] $endpoint_path
-     * @return string
-     */
-    private function build_callback_url($base_url, $endpoint_path)
-    {
-        $parsed_url = parse_url($base_url);
-        $parameters = null;
-        if (array_key_exists('query', $parsed_url)) {
-            parse_str($parsed_url['query'], $parameters);
-        }
+		foreach ( $api_keys as $item ) {
+			// Prioritize the locale code
+			$code = $item['lang']['locale'] ?? $item['lang']['code'] ?? $primary_language;
+			$code = Helpers::format_locale_to_hyphen( $code );
+			$lang = Helpers::get_language_from_locale( $code );
 
-        $callback_url = $parsed_url['scheme'] . '://' . $parsed_url['host'];
-        $callback_url .= isset($parsed_url['path']) ? rtrim($parsed_url['path'], '/') : '';
-        $callback_url .= '/' . ltrim($endpoint_path, '/');
+			$home_url = $this->language->get_home_url( $lang );
 
-        // Combine any existing parameters with any possible endopoint path parameters
-        if (!empty($parameters)) {
-            parse_str(parse_url($callback_url, PHP_URL_QUERY), $endpoint_parameters);
-            $combined_parameters = array_merge($parameters, $endpoint_parameters);
-            $callback_url = strtok($callback_url, '?');
-            $callback_url .= '?' . http_build_query($combined_parameters);
-        }
+			// Prepare search engine body
+			$this->log->log( 'Wizard Step 2 - Prepare Search Engine body : ' );
+			$search_engines[] = array(
+				'name'         => $domain . ( $code ? ' (' . strtoupper( $code ) . ')' : '' ),
+				'language'     => $code,
+				'locale'       => $item['lang']['code'],
+				'currency'     => $currency,
+				'site_url'     => $home_url,
+				'feed_type'    => is_plugin_active( 'woocommerce/woocommerce.php' ) ? 'product' : 'posts',
+				'callback_url' => $this->build_callback_url( $home_url, '/wp-json/doofinder/v1/index-status/?token=' . $this->api_key ),
+			);
+		}
 
-        return $callback_url;
-    }
+		return $search_engines;
+	}
 
-    /**
-     * This method throw_exception
-     *
-     * @param [type] $response
-     * @return void
-     */
-    private function throw_exception($response, $response_code)
-    {
+	/**
+	 * This function returns the primary language in locale format: en-US,
+	 * es-ES, etc.
+	 *
+	 * @return string Primary language.
+	 */
+	private function get_primary_language() {
+		$primary_language = get_locale();
+		if ( $this->language->get_languages() != null ) {
+			$primary_language = $this->language->get_base_locale();
+		}
+		$primary_language = Helpers::format_locale_to_hyphen( $primary_language );
+		return $primary_language;
+	}
 
-        if (is_wp_error($response)) {
-            $error_message = $response->get_error_message();
-            throw new Exception($error_message, (int)$response->get_error_code());
-        }
+	/**
+	 * This method takes the base url and adds
+	 *
+	 * @param [type] $base_url
+	 * @param [type] $endpoint_path
+	 * @return string
+	 */
+	private function build_callback_url( $base_url, $endpoint_path ) {
+		$parsed_url = parse_url( $base_url );
+		$parameters = null;
+		if ( array_key_exists( 'query', $parsed_url ) ) {
+			parse_str( $parsed_url['query'], $parameters );
+		}
 
-        if ($response_code < WP_Http::OK || $response_code >= WP_Http::BAD_REQUEST) {
-            $error_message = wp_remote_retrieve_response_message($response);
-            throw new Exception($error_message, $response_code);
-        }
-    }
+		$callback_url  = $parsed_url['scheme'] . '://' . $parsed_url['host'];
+		$callback_url .= isset( $parsed_url['path'] ) ? rtrim( $parsed_url['path'], '/' ) : '';
+		$callback_url .= '/' . ltrim( $endpoint_path, '/' );
+
+		// Combine any existing parameters with any possible endopoint path parameters
+		if ( ! empty( $parameters ) ) {
+			parse_str( parse_url( $callback_url, PHP_URL_QUERY ), $endpoint_parameters );
+			$combined_parameters = array_merge( $parameters, $endpoint_parameters );
+			$callback_url        = strtok( $callback_url, '?' );
+			$callback_url       .= '?' . http_build_query( $combined_parameters );
+		}
+
+		return $callback_url;
+	}
+
+	/**
+	 * This method throw_exception
+	 *
+	 * @param [type] $response
+	 * @return void
+	 */
+	private function throw_exception( $response, $response_code ) {
+
+		if ( is_wp_error( $response ) ) {
+			$error_message = $response->get_error_message();
+			throw new Exception( $error_message, (int) $response->get_error_code() );
+		}
+
+		if ( $response_code < WP_Http::OK || $response_code >= WP_Http::BAD_REQUEST ) {
+			$error_message = wp_remote_retrieve_response_message( $response );
+			throw new Exception( $error_message, $response_code );
+		}
+	}
 }
