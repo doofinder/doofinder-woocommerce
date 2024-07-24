@@ -50,7 +50,7 @@ interface I18n_Handler {
 	public function get_formatted_languages();
 
 	/**
-	 * Retrieve the name of the wordpress option
+	 * Retrieve the name of the WordPress option
 	 * for the current languages.
 	 *
 	 * Some fields in Doofinder settings will have different values,

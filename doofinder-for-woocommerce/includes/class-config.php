@@ -7,165 +7,161 @@ use Doofinder\WP\Settings;
 use Doofinder\WP\Setup_Wizard;
 use WP_REST_Response;
 
-defined('ABSPATH') or die;
+defined( 'ABSPATH' ) or die;
 
-class Config
-{
+class Config {
 
-    /**
-     * Plugin configuration that Doofinder website will read.
-     *
-     * @var array
-     */
-    private $config;
 
-    /**
-     * Register the feed with WordPress.
-     * Necessary for Doofinder website to access plugin configuration.
-     *
-     * @since 1.0.0
-     */
-    public static function register()
-    {
-        $class = __CLASS__;
-        $config = new $class();
+	/**
+	 * Plugin configuration that Doofinder website will read.
+	 *
+	 * @var array
+	 */
+	private $config;
 
-        register_rest_route('doofinder/v1', '/config', array(
-            'methods' => 'GET',
-            'callback' => [$config, 'generate'],
-            'permission_callback' => '__return_true'
-        ));
-    }
+	/**
+	 * Register the feed with WordPress.
+	 * Necessary for Doofinder website to access plugin configuration.
+	 *
+	 * @since 1.0.0
+	 */
+	public static function register() {
+		$class  = __CLASS__;
+		$config = new $class();
 
-    /**
-     * Prepare the Doofinder configuration feed.
-     *
-     * @since 1.0.0
-     */
-    public function __construct()
-    {
-        global $wp_version;
-        $multilanguage = Multilanguage::instance();
+		register_rest_route(
+			'doofinder/v1',
+			'/config',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $config, 'generate' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+	}
 
-        if ($multilanguage->is_active()) {
-            $configuration = $this->get_multilanguage_configuration();
-        } else {
-            $configuration = $this->get_single_language_configuration();
-        }
+	/**
+	 * Prepare the Doofinder configuration feed.
+	 *
+	 * @since 1.0.0
+	 */
+	public function __construct() {
+		global $wp_version;
+		$multilanguage = Multilanguage::instance();
 
-        $config = array(
-            'platform' => array(
-                'name'    => 'WordPress',
-                'version' => $wp_version
-            ),
-            'module' => array(
-                'configuration' => $configuration,
-                'options' => array(
-                    'language' => array_map('strtoupper', $this->get_languages()),
-                ),
-                'version' => Doofinder_For_WordPress::$version,
-                'wizard' => $this->get_wizard_status()
-            )
-        );
+		if ( $multilanguage->is_active() ) {
+			$configuration = $this->get_multilanguage_configuration();
+		} else {
+			$configuration = $this->get_single_language_configuration();
+		}
 
-        if (is_plugin_active('woocommerce/woocommerce.php')) {
-            $config['platform'] = array(
-                'name' => 'WooCommerce',
-                'version' => \WC()->version,
-                'wordpress_version' => $wp_version
-            );
-        }
+		$config = array(
+			'platform' => array(
+				'name'    => 'WordPress',
+				'version' => $wp_version,
+			),
+			'module'   => array(
+				'configuration' => $configuration,
+				'options'       => array(
+					'language' => array_map( 'strtoupper', $this->get_languages() ),
+				),
+				'version'       => Doofinder_For_WordPress::$version,
+				'wizard'        => $this->get_wizard_status(),
+			),
+		);
 
-        $this->config = $config;
-    }
+		if ( is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
+			$config['platform'] = array(
+				'name'              => 'WooCommerce',
+				'version'           => \WC()->version,
+				'wordpress_version' => $wp_version,
+			);
+		}
 
-    public function generate()
-    {
-        return new WP_REST_Response($this->config);
-    }
+		$this->config = $config;
+	}
 
-    /**
-     * Get module.configuration part of the feed for the multilanguage installations.
-     *
-     * @return array
-     */
-    private function get_multilanguage_configuration()
-    {
-        $multilanguage = Multilanguage::instance();
-        $configuration = array();
+	public function generate() {
+		return new WP_REST_Response( $this->config );
+	}
 
-        $languages = $multilanguage->get_languages();
-        foreach ($languages as $code => $language) {
-            $code_label = strtoupper($code);
+	/**
+	 * Get module.configuration part of the feed for the multilanguage installations.
+	 *
+	 * @return array
+	 */
+	private function get_multilanguage_configuration() {
+		$multilanguage = Multilanguage::instance();
+		$configuration = array();
 
-            $configuration[$code_label] = array(
-                'currency' => get_woocommerce_currency(),
-                'language' => $code_label
-            );
-        }
+		$languages = $multilanguage->get_languages();
+		foreach ( $languages as $code => $language ) {
+			$code_label = strtoupper( $code );
 
-        return $configuration;
-    }
+			$configuration[ $code_label ] = array(
+				'currency' => get_woocommerce_currency(),
+				'language' => $code_label,
+			);
+		}
 
-    /**
-     * Get module.configuration part of the feed for installations without internationalization.
-     *
-     * @return array
-     */
-    private function get_single_language_configuration()
-    {
-        $language_code = $this->get_locale_language_code();
+		return $configuration;
+	}
 
-        $currency = is_plugin_active('woocommerce/woocommerce.php') ? get_woocommerce_currency() : "EUR";
-        $configuration = array();
-        $configuration[$language_code] = array(
-            'currency' => $currency,
-            'language' => $language_code
-        );
+	/**
+	 * Get module.configuration part of the feed for installations without internationalization.
+	 *
+	 * @return array
+	 */
+	private function get_single_language_configuration() {
+		$language_code = $this->get_locale_language_code();
 
-        return $configuration;
-    }
+		$currency                        = is_plugin_active( 'woocommerce/woocommerce.php' ) ? get_woocommerce_currency() : 'EUR';
+		$configuration                   = array();
+		$configuration[ $language_code ] = array(
+			'currency' => $currency,
+			'language' => $language_code,
+		);
 
-    /**
-     * Get (capitalized) language code from WP locale.
-     */
-    private function get_locale_language_code()
-    {
-        $locale = get_locale();
-        $parts = preg_split('/_/', $locale);
+		return $configuration;
+	}
 
-        return strtoupper($parts[0]);
-    }
+	/**
+	 * Get (capitalized) language code from WP locale.
+	 */
+	private function get_locale_language_code() {
+		$locale = get_locale();
+		$parts  = preg_split( '/_/', $locale );
 
-    /**
-     * Get the list of languages.
-     * Comes from internationalization plugin if internationalization is available,
-     * and from WP locale otherwise.
-     */
-    private function get_languages()
-    {
-        $multilanguage = Multilanguage::instance();
-        if ($multilanguage->is_active()) {
-            return array_keys($multilanguage->get_languages());
-        }
+		return strtoupper( $parts[0] );
+	}
 
-        return array($this->get_locale_language_code());
-    }
+	/**
+	 * Get the list of languages.
+	 * Comes from internationalization plugin if internationalization is available,
+	 * and from WP locale otherwise.
+	 */
+	private function get_languages() {
+		$multilanguage = Multilanguage::instance();
+		if ( $multilanguage->is_active() ) {
+			return array_keys( $multilanguage->get_languages() );
+		}
 
-    /**
-     * Get wizard status for configuration
-     *
-     * @return string
-     */
-    private function get_wizard_status()
-    {
-        $wizard = get_option(Setup_Wizard::$wizard_status);
-        if ($wizard) {
-            return $wizard;
-        }
+		return array( $this->get_locale_language_code() );
+	}
 
-        return Settings::is_configuration_complete()
-            ? Setup_Wizard::$wizard_status_finished
-            : Setup_Wizard::$wizard_status_pending;
-    }
+	/**
+	 * Get wizard status for configuration
+	 *
+	 * @return string
+	 */
+	private function get_wizard_status() {
+		$wizard = get_option( Setup_Wizard::$wizard_status );
+		if ( $wizard ) {
+			return $wizard;
+		}
+
+		return Settings::is_configuration_complete()
+			? Setup_Wizard::$wizard_status_finished
+			: Setup_Wizard::$wizard_status_pending;
+	}
 }

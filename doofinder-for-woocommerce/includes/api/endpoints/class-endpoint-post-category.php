@@ -5,93 +5,101 @@ use Doofinder\WP\Endpoints;
 /**
  * Class Endpoint_Post_Category
  *
- * This class defines various methods for handling item wordpress endpoints.
+ * This class defines various methods for handling item WordPress endpoints.
  */
-class Endpoint_Post_Category
-{
-    const PER_PAGE = 100;
-    const CONTEXT  = "doofinder/v1";
-    const ENDPOINT = "/post_category";
-    const FIELDS = [
-        "description",
-        "_embedded",
-        "id",
-        "image_link",
-        "link",
-        "name",
-        "parent",
-        "slug"
-        ];
+class Endpoint_Post_Category {
 
-    /**
-     * Initialize the custom item endpoint.
-     *
-     * @return void
-     */
-    public static function initialize() {
-        add_action('rest_api_init', function () {
-            register_rest_route(self::CONTEXT, self::ENDPOINT, array(
-                'methods'             => 'GET',
-                'callback'            => array(self::class, 'post_category_endpoint'),
-                'permission_callback' => '__return_true'
-            ));
-        });
-    }
+	const PER_PAGE = 100;
+	const CONTEXT  = 'doofinder/v1';
+	const ENDPOINT = '/post_category';
+	const FIELDS   = array(
+		'description',
+		'_embedded',
+		'id',
+		'image_link',
+		'link',
+		'name',
+		'parent',
+		'slug',
+	);
 
-    /**
-     * Custom item endpoint callback.
-     *
-     * @param WP_REST_Request $request The REST request object.
-     * @return WP_REST_Response Response containing modified data.
-     */
-    public static function post_category_endpoint($request) {
+	/**
+	 * Initialize the custom item endpoint.
+	 *
+	 * @return void
+	 */
+	public static function initialize() {
+		add_action(
+			'rest_api_init',
+			function () {
+				register_rest_route(
+					self::CONTEXT,
+					self::ENDPOINT,
+					array(
+						'methods'             => 'GET',
+						'callback'            => array( self::class, 'post_category_endpoint' ),
+						'permission_callback' => '__return_true',
+					)
+				);
+			}
+		);
+	}
 
-        Endpoints::CheckSecureToken();
+	/**
+	 * Custom item endpoint callback.
+	 *
+	 * @param WP_REST_Request $request The REST request object.
+	 * @return WP_REST_Response Response containing modified data.
+	 */
+	public static function post_category_endpoint( $request ) {
 
-        $config_request["per_page"] = $request->get_param('per_page') ?? self::PER_PAGE;
-        $config_request["page"]     = $request->get_param('page') ?? 1;
-        $config_request["lang"]     = $request->get_param('lang') ?? "";
-        $config_request["fields"]   = $request->get_param('fields') == "all" ? "" : implode(",", self::get_fields());
+		Endpoints::CheckSecureToken();
 
-        // Retrieve the original items data
-        $items = self::get_items($config_request);
+		$config_request['per_page'] = $request->get_param( 'per_page' ) ?? self::PER_PAGE;
+		$config_request['page']     = $request->get_param( 'page' ) ?? 1;
+		$config_request['lang']     = $request->get_param( 'lang' ) ?? '';
+		$config_request['fields']   = $request->get_param( 'fields' ) == 'all' ? '' : implode( ',', self::get_fields() );
 
-        // Return the modified items data as a response
-        return new WP_REST_Response($items);
-    }
+		// Retrieve the original items data
+		$items = self::get_items( $config_request );
 
-    /**
-     * Retrieve a list of items with pagination.
-     *
-     * @param array $config_request Config request params (page, per_page, type)
-     * @return array|null   An array of items data or null on failure.
-     */
-    private static function get_items($config_request){
-        // Retrieve the original items data
-        $request = new WP_REST_Request('GET', "/wp/v2/categories");
-        $request->set_query_params(array(
-            'page'     => $config_request["page"],
-            'per_page' => $config_request["per_page"],
-            'lang'     => $config_request["lang"],
-            '_fields'  => $config_request["fields"]
-        ));
-        $response = rest_do_request($request);
-        $data = rest_get_server()->response_to_data($response, true);
+		// Return the modified items data as a response
+		return new WP_REST_Response( $items );
+	}
 
-        if(!empty($data["data"]["status"]) && $data["data"]["status"] != 200){
-            $data = [];
-        }
+	/**
+	 * Retrieve a list of items with pagination.
+	 *
+	 * @param array $config_request Config request params (page, per_page, type)
+	 * @return array|null   An array of items data or null on failure.
+	 */
+	private static function get_items( $config_request ) {
+		// Retrieve the original items data
+		$request = new WP_REST_Request( 'GET', '/wp/v2/categories' );
+		$request->set_query_params(
+			array(
+				'page'     => $config_request['page'],
+				'per_page' => $config_request['per_page'],
+				'lang'     => $config_request['lang'],
+				'_fields'  => $config_request['fields'],
+			)
+		);
+		$response = rest_do_request( $request );
+		$data     = rest_get_server()->response_to_data( $response, true );
 
-        return $data;
-    }
+		if ( ! empty( $data['data']['status'] ) && $data['data']['status'] != 200 ) {
+			$data = array();
+		}
 
-    /**
-     * Get the array of fields.
-     *
-     * @return array The array of fields.
-     */
-    public static function get_fields() {
-        return self::FIELDS;
-    }
+		return $data;
+	}
+
+	/**
+	 * Get the array of fields.
+	 *
+	 * @return array The array of fields.
+	 */
+	public static function get_fields() {
+		return self::FIELDS;
+	}
 }
-?>
