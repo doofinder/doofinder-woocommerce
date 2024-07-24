@@ -10,5 +10,5 @@ for phpVersion in ${phpVersions[@]}; do
     echo "---------------------------------------------"
     echo "---- Checking compatibility with PHP ${phpVersion} ----"
     echo "---------------------------------------------"
-    ./vendor/bin/phpcs -p . --standard=PHPCompatibilityWP --ignore=*/tests/*,*/vendor/* --extensions=php --runtime-set testVersion $phpVersion-
+    ./vendor/bin/phpcs -p . --standard=PHPCompatibilityWP --ignore=*/tests/*,*/vendor/*,/html/* --extensions=php --runtime-set testVersion $phpVersion-
 done
