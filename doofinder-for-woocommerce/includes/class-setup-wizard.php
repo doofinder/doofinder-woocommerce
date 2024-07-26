@@ -183,9 +183,9 @@ class Setup_Wizard {
 		$this->language              = Multilanguage::instance();
 		$this->process_all_languages = empty( $this->language->get_languages() ) ? false : true;
 
-		// @codingStandardsIgnoreStart
+		// phpcs:disable
 		// $this->log->log("Setup Wizard Construct");
-		// @codingStandardsIgnoreEnd
+		// phpcs:enable
 
 		// Load errors stored in cookies and delete after.
 		if ( isset( $_COOKIE['doofinderError'] ) ) {
@@ -755,7 +755,7 @@ class Setup_Wizard {
 			'admin_notices',
 			function () {
 				if ( Setup_Wizard::should_show_notice() ) {
-					echo Setup_Wizard::get_setup_wizard_notice_html(); // @codingStandardsIgnoreLine
+					echo Setup_Wizard::get_setup_wizard_notice_html(); // phpcs:ignore
 				}
 			}
 		);
@@ -993,7 +993,7 @@ class Setup_Wizard {
 				}
 
 				$this->log->log( 'Store create result:' );
-				$this->log->log( print_r( $store_data, true ) ); // @codingStandardsIgnoreLine
+				$this->log->log( print_r( $store_data, true ) ); // phpcs:ignore
 
 				$this->set_search_engines( $store_data['config']['search_engines'] );
 				$this->set_layer_script( $store_data['script'] );
