@@ -2,7 +2,7 @@
 /**
  * DooFinder config. Allows to view relevant data like the Installation ID, Search Engines, etc. accessing the URL.
  *
- * @package  Doofinder\WP\Config
+ * @package Doofinder\WP\Config
  */
 
 namespace Doofinder\WP;

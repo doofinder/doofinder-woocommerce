@@ -1,8 +1,8 @@
 <?php
 /**
- * DooFinder main helper methods
+ * DooFinder main helper methods.
  *
- * @package  Doofinder\WP\Helpers
+ * @package Doofinder\WP\Helpers
  */
 
 namespace Doofinder\WP;
@@ -27,6 +27,7 @@ class Helpers {
 	 * en.
 	 *
 	 * @param string $language_code The language code separated with a hyphen.
+	 *
 	 * @return string The language code
 	 */
 	public static function get_language_from_locale( $language_code ) {
@@ -60,6 +61,7 @@ class Helpers {
 	 * 'en-US' to 'en_US' format.
 	 *
 	 * @param string $locale_code Locale with a hyphen.
+	 *
 	 * @return string The formatted locale code, with an underscore.
 	 */
 	public static function format_locale_to_underscore( $locale_code ) {
@@ -71,6 +73,7 @@ class Helpers {
 	 * 'en_US' to 'en-US' format used by Live Layer.
 	 *
 	 * @param string $locale_code Locale with an underscore.
+	 *
 	 * @return string The formatted locale code with a hyphen.
 	 */
 	public static function format_locale_to_hyphen( $locale_code ) {
@@ -81,6 +84,7 @@ class Helpers {
 	 * Obtains the region from a given DooFinder host.
 	 *
 	 * @param string $host WordPress website host.
+	 *
 	 * @return string The region identifier (eu1 or us1).
 	 */
 	public static function get_region_from_host( $host ) {

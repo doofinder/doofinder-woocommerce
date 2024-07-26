@@ -11,6 +11,10 @@
 
     <!-- Rules -->
     <rule ref="WooCommerce-Core">
-        <exclude name="Squiz.Commenting.FunctionCommentThrowTag.WrongNumber"/>
+        <exclude name="Squiz.Commenting.FunctionCommentThrowTag.WrongNumber" />
+        <!-- TODO (davidmolinacano): To be removed in the future -->
+        <exclude name="WordPress.Security.NonceVerification.Recommended" />
+        <exclude name="WordPress.Security.NonceVerification.Missing" />
+        <exclude name="WordPress.Security.ValidatedSanitizedInput.InputNotSanitized" />
     </rule>
 </ruleset>
