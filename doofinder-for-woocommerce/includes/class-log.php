@@ -39,8 +39,8 @@ class Log {
 	 */
 	public function log( $value ) {
 		$wp_upload_dir_array = wp_upload_dir();
-		$wp_upload_dir = $wp_upload_dir_array['basedir'];
-		$doofinder_logs_dir = trailingslashit( $wp_upload_dir . '/' . self::LOG_FOLDER_NAME );
+		$wp_upload_dir       = $wp_upload_dir_array['basedir'];
+		$doofinder_logs_dir  = trailingslashit( $wp_upload_dir . '/' . self::LOG_FOLDER_NAME );
 		// Check if logs directory exits. Create it if it doesn't.
 		if ( ! is_dir( $doofinder_logs_dir ) ) {
 			mkdir( $doofinder_logs_dir );
@@ -81,7 +81,7 @@ class Log {
 
 	private static function maybe_add_security_files( $doofinder_logs_dir ) {
 		$htaccess_filename = $doofinder_logs_dir . '.htaccess';
-		$index_filename = $doofinder_logs_dir . 'index.php';
+		$index_filename    = $doofinder_logs_dir . 'index.php';
 
 		if ( ! is_file( $htaccess_filename ) ) {
 			file_put_contents( $htaccess_filename, 'Deny from All' );

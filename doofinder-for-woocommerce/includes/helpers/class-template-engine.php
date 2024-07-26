@@ -8,7 +8,7 @@ class Template_Engine {
 	 *
 	 * @var $this
 	 */
-	private static $_instances = [];
+	private static $_instances = array();
 
 	/**
 	 * Where template files are located.
@@ -76,11 +76,13 @@ class Template_Engine {
 		}
 
 		if ( true === WP_DEBUG ) {
-			throw new \LogicException( sprintf(
-				__( 'Template "%s" cannot be found in "%s".' ),
-				$template,
-				$location
-			) );
+			throw new \LogicException(
+				sprintf(
+					__( 'Template "%1$s" cannot be found in "%2$s".' ),
+					$template,
+					$location
+				)
+			);
 		}
 
 		return false;
@@ -95,7 +97,7 @@ class Template_Engine {
 	 * @param array  $data     Data to pass to the template.
 	 * @param string $folder   Overrides the default location.
 	 */
-	public function render( $template, $data = [], $folder = '' ) {
+	public function render( $template, $data = array(), $folder = '' ) {
 		$file = $this->resolve_file( $template, $folder );
 		extract( $data );
 		include $file;
@@ -107,7 +109,7 @@ class Template_Engine {
 	 * @param string $template
 	 * @param array  $data
 	 */
-	public function insert( $template, $data = [] ) {
+	public function insert( $template, $data = array() ) {
 		$this->render( $template, $data );
 	}
 
@@ -122,7 +124,7 @@ class Template_Engine {
 	 */
 	public static function get_template( $part, $data = array(), $folder = '' ) {
 
-		if ( !$folder ) {
+		if ( ! $folder ) {
 			$folder = \Doofinder\WP\Doofinder_For_WordPress::plugin_path() . 'views';
 		}
 
@@ -131,12 +133,13 @@ class Template_Engine {
 	}
 
 	/**
-	* Clean SVG function - helper for get_svg() function
-	* @param $img (string) (required) - File source;
-	*/
-	public static function get_clean_svg ( $img ) {
+	 * Clean SVG function - helper for get_svg() function
+	 *
+	 * @param $img (string) (required) - File source;
+	 */
+	public static function get_clean_svg( $img ) {
 		$img_svg = file_get_contents( $img );
-		preg_match('/<svg[\s\S]*\/svg>/m', $img_svg, $matches);
+		preg_match( '/<svg[\s\S]*\/svg>/m', $img_svg, $matches );
 
 		if ( isset( $matches[0] ) ) {
 			return $matches[0];
@@ -146,42 +149,43 @@ class Template_Engine {
 	}
 
 	/**
-	* Retrieve an image or an svg to represent an attachment - based on file name or WP Image ID;
-	* @param $attachment (string|int) (required) - File name or WP image ID;
-	* @param $thumbnail (string|array) (optional) - WP thumbnail size - usable only with image ID and NOT SVG files;
-	* @param $path (string) (optional) - Path to file;
-	* @param $ext (string) (optional) - File extension;
-	*/
-	public static function get_svg ( $attachment, $thumbnail = 'full-size', $path = '/assets/svg/', $ext = '.svg' ) {
+	 * Retrieve an image or an svg to represent an attachment - based on file name or WP Image ID;
+	 *
+	 * @param $attachment (string|int) (required) - File name or WP image ID;
+	 * @param $thumbnail (string|array) (optional) - WP thumbnail size - usable only with image ID and NOT SVG files;
+	 * @param $path (string) (optional) - Path to file;
+	 * @param $ext (string) (optional) - File extension;
+	 */
+	public static function get_svg( $attachment, $thumbnail = 'full-size', $path = '/assets/svg/', $ext = '.svg' ) {
 
-		if ( is_int ( $attachment ) ) {
+		if ( is_int( $attachment ) ) {
 			$src = wp_get_attachment_image_src( $attachment, $thumbnail );
 
 			if ( ! $src ) {
 				return '';
 			}
 
-			$ext = pathinfo($src[0], PATHINFO_EXTENSION);
+			$ext = pathinfo( $src[0], PATHINFO_EXTENSION );
 
 			if ( $ext != 'svg' ) {
 				return wp_get_attachment_image( $attachment, $thumbnail );
 			}
 
 			$file = get_attached_file( $attachment, true );
-			$img = realpath( $file );
+			$img  = realpath( $file );
 
 			if ( $img ) {
-				return self::get_clean_svg($img);
+				return self::get_clean_svg( $img );
 			}
 		} else {
-			$filename = strpos($attachment, $ext) !== false ? $attachment : $attachment . $ext;
-			$file = \Doofinder\WP\Doofinder_For_WordPress::plugin_path() . $path . $filename;
+			$filename = strpos( $attachment, $ext ) !== false ? $attachment : $attachment . $ext;
+			$file     = \Doofinder\WP\Doofinder_For_WordPress::plugin_path() . $path . $filename;
 
 			if ( ! file_exists( $file ) ) {
 				return '';
 			}
 
-			return self::get_clean_svg($file);
+			return self::get_clean_svg( $file );
 		}
 	}
 }
