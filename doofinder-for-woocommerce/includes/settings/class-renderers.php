@@ -433,18 +433,12 @@ trait Renderers {
 			'Paste here the JS Layer code obtained from Doofinder.',
 			'doofinder_for_wp'
 		);
+		$textarea_value = ! empty( $saved_value ) ? wp_unslash( $saved_value ) : '';
 		?>
 												</span></span>
-		<textarea name="<?php echo $option_name; ?>" class="widefat" rows="16">
-									<?php
-
-									if ( $saved_value ) {
-										echo wp_unslash( $saved_value );
-									}
-
-									?>
-																				</textarea>
-
+		<textarea 
+			name="<?php echo $option_name; ?>" 
+			class="widefat" rows="16"><?php echo $textarea_value; ?></textarea>
 		<?php
 	}
 

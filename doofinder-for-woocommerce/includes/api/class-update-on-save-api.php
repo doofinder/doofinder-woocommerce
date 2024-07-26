@@ -118,7 +118,8 @@ class Update_On_Save_Api {
 	 */
 	public function updateBulk( $post_type, $ids ) {
 		$this->log->log( 'Update items' );
-		$uri = $this->buildURL( $this->dp_host, 'item/' . $this->hash . '/' . $post_type . '?action=update&platform=WordPress' );
+		// phpcs:ignore I had to add a phpcs:ignore because the formatter was changing wordpress to WordPress, thus causing issues.
+		$uri = $this->buildURL( $this->dp_host, 'item/' . $this->hash . '/' . $post_type . '?action=update&platform=wordpress' ); // phpcs:ignore
 
 		$chunks = array_chunk( $ids, 100 );
 		$resp   = true;
@@ -186,7 +187,8 @@ class Update_On_Save_Api {
 	public function deleteBulk( $post_type, $ids ) {
 		$this->log->log( 'Delete items' );
 
-		$uri = $this->buildURL( $this->dp_host, 'item/' . $this->hash . '/' . $post_type . '?action=delete&platform=WordPress' );
+		// phpcs:ignore I had to add a phpcs:ignore because the formatter was changing wordpress to WordPress, thus causing issues.
+		$uri = $this->buildURL( $this->dp_host, 'item/' . $this->hash . '/' . $post_type . '?action=delete&platform=wordpress' ); // phpcs:ignore
 
 		return $this->sendRequest( $uri, $ids );
 	}
