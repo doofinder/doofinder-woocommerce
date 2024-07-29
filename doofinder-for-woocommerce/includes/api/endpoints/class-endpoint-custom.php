@@ -8,7 +8,6 @@
 use Doofinder\WP\Endpoints;
 use Doofinder\WP\Log;
 use Doofinder\WP\Thumbnail;
-use WP_Http;
 
 /**
  * Class Endpoint_Custom

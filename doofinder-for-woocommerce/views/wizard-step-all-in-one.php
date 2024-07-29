@@ -1,19 +1,26 @@
 <?php
+/**
+ * DooFinder Store Wizard all steps in one.
+ *
+ * @package Doofinder\WP\Setup_Wizard
+ */
 
 namespace Doofinder\WP;
 
 use Doofinder\WP\Helpers\Template_Engine;
 
 /**
- * @var Setup_Wizard $this
+ * What is $this in this context?
+ *
+ * @var Setup_Wizard $this The Setup Wizard object.
  */
 
-// Reset wizard step in DB if GET step is set to 1
-if ( isset( $_GET['step'] ) && (int) $_GET['step'] === 1 ) {
+// Reset wizard step in DB if GET step is set to 1.
+if ( isset( $_GET['step'] ) && 1 === (int) $_GET['step'] ) {
 	update_option( Setup_Wizard::$wizard_step_option, 1 );
 }
-// Get current wizard step to show/process either from GET or DB
-$step_state = isset( $_GET['step'] ) ? (int) $_GET['step'] : ( $this->get_step() ?: 1 );
+// Get current wizard step to show/process either from GET or DB.
+$step_state = isset( $_GET['step'] ) ? (int) $_GET['step'] : ( $this->get_step() ?? 1 );
 
 
 $this->process_wizard_step( $step_state );
@@ -23,7 +30,7 @@ $this->process_wizard_step( $step_state );
 <div class="dfwc-setup-steps <?php echo $step_state < $this::$no_steps ? 'active' : ''; ?>">
 	<?php
 
-	// Render step 1
+	// Render step 1.
 	Template_Engine::get_template(
 		'wizard-step',
 		array(
@@ -32,7 +39,7 @@ $this->process_wizard_step( $step_state );
 			'title'      => __( 'Select your sector', 'wordpress-doofinder' ),
 			'desc'       => __( 'Please select your business sector', 'wordpress-doofinder' ),
 		)
-	); // Render step 2
+	); // Render step 2.
 
 	Template_Engine::get_template(
 		'wizard-step',
@@ -46,7 +53,7 @@ $this->process_wizard_step( $step_state );
 	?>
 </div>
 <?php
-// Render (final) step 3
+// Render (final) step 3.
 Template_Engine::get_template(
 	'wizard-step-3',
 	array(
