@@ -701,7 +701,6 @@ class Setup_Wizard {
 						</div>
 						<div class="df-notice-col content">
 							<h3><?php esc_html_e( 'Doofinder Indexing Status', 'wordpress-doofinder' ); ?></h3>
-							<!-- TODO: translate this string since the domain was wrong, doofinder_for_wp -->
 							<p><?php esc_html_e( 'The product feed has been processed.', 'wordpress-doofinder' ); ?></p>
 						</div>
 						<div class="df-notice-col extra align-center">
