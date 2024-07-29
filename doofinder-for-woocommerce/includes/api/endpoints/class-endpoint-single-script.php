@@ -1,4 +1,9 @@
 <?php
+/**
+ * DooFinder Endpoint_Single_Script methods.
+ *
+ * @package Endpoint_Single_Script
+ */
 
 use Doofinder\WP\Endpoints;
 use Doofinder\WP\Helpers;
@@ -7,7 +12,7 @@ use Doofinder\WP\Multilanguage\Multilanguage;
 use Doofinder\WP\Settings;
 
 /**
- * Class Endpoint_Custom
+ * Class Endpoint_Single_Script
  *
  * This class defines a method to update the current script to the single script version.
  */
@@ -43,7 +48,7 @@ class Endpoint_Single_Script {
 	 * @return string
 	 */
 	public static function update_script_to_single_script() {
-		Endpoints::CheckSecureToken();
+		Endpoints::check_secure_token();
 		$log             = new Log();
 		$installation_id = self::get_installation_id_from_database_script();
 		if ( empty( $installation_id ) ) {
@@ -72,7 +77,7 @@ class Endpoint_Single_Script {
 			$region .= '-';
 		}
 
-		$single_script = sprintf( '<script src="https://%1$sconfig.doofinder.com/2.x/%2$s.js" async></script>', $region, $installation_id );
+		$single_script = sprintf( '<script src="https://%1$sconfig.doofinder.com/2.x/%2$s.js" async></script>', $region, $installation_id ); // phpcs:ignore
 		Settings::set_js_layer( $single_script );
 
 		update_option( 'doofinder_script_migrated', true );
@@ -82,6 +87,8 @@ class Endpoint_Single_Script {
 
 	/**
 	 * Gets the installation ID from the script stored in the database.
+	 *
+	 * @param string $language Language code with two letters.
 	 *
 	 * @return string
 	 */

@@ -82,7 +82,7 @@ class Endpoint_Product {
 		$custom_attr_fields = self::get_field_attributes( $custom_attr );
 
 		if ( ! $config_request ) {
-			Endpoints::CheckSecureToken();
+			Endpoints::check_secure_token();
 
 			$fields = ( $request->get_param( 'fields' ) == 'all' ) ? array() : array_merge( self::get_fields(), array_values( $custom_attr_fields ) );
 
