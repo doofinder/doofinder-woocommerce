@@ -43,11 +43,11 @@ $wp_styles  = wp_styles();
 		const Doofinder = <?php echo json_encode( array( 'ajaxUrl' => admin_url( 'admin-ajax.php' ) ) ); ?>;
 		const doofinderConnectEmail = '<?php echo get_bloginfo( 'admin_email' ); ?>';
 		<?php
-		$token = $this->generateToken();
-		$this->saveToken( $token );
+		$token = $this->generate_token();
+		$this->save_token( $token );
 		?>
 		const doofinderConnectToken = '<?php echo $token; ?>';
-		const doofinderConnectReturnPath = '<?php echo $this->getReturnPath(); ?>';
+		const doofinderConnectReturnPath = '<?php echo $this->get_return_path(); ?>';
 		const doofinderAdminPath = '<?php echo Settings::get_api_host(); ?>';
 		const doofinderSetupWizardUrl = '<?php echo $this->get_url(); ?>';
 	</script>

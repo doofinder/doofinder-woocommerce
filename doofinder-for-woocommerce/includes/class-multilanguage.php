@@ -1,10 +1,18 @@
 <?php
+/**
+ * DooFinder Multilanguage methods. For now, only WPML is supported.
+ *
+ * @package Doofinder\WP\Multilanguage
+ */
 
 namespace Doofinder\WP;
 
 use Doofinder\WP\Multilanguage\I18n_Handler;
 use Doofinder\WP\Multilanguage\WPML;
 
+/**
+ * Multilanguage Class.
+ */
 class Multilanguage {
 
 	/**
@@ -12,7 +20,7 @@ class Multilanguage {
 	 *
 	 * @var Multilanguage
 	 */
-	private static $_instance;
+	private static $instance;
 
 	/**
 	 * Class handling the internationalization of the plugin. Handler classes represent
@@ -31,11 +39,11 @@ class Multilanguage {
 	 * @return Multilanguage
 	 */
 	public static function instance() {
-		if ( is_null( self::$_instance ) ) {
-			self::$_instance = new self();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
 
-		return self::$_instance;
+		return self::$instance;
 	}
 
 	/**
@@ -57,11 +65,15 @@ class Multilanguage {
 	 * @since 1.0.0
 	 * @param string $name      Name of the method called.
 	 * @param array  $arguments Parameters.
+	 *
+	 * @throws \BadMethodCallException If the provided method does not exist.
+	 *
 	 * @return mixed Method return value.
 	 */
 	public function __call( $name, $arguments ) {
 		if ( ! method_exists( $this->handler, $name ) ) {
-			throw new \BadMethodCallException( "Method $name doesn't exist in $this->handler or " . __CLASS__ );
+			$handler_name = is_object( $this->handler ) ? get_class( $this->handler ) : 'NULL';
+			throw new \BadMethodCallException( sprintf( 'Method %1$s doesn\'t exist in %2$s or %3$s', esc_html( $name ), esc_html( $handler_name ), __CLASS__ ) );
 		}
 
 		return call_user_func_array( array( $this->handler, $name ), $arguments );
@@ -76,7 +88,7 @@ class Multilanguage {
 	 * @return bool True if internationalization is active, false otherwise.
 	 */
 	public function is_active() {
-		return $this->handler !== null;
+		return null !== $this->handler;
 	}
 
 	/**
@@ -109,7 +121,9 @@ class Multilanguage {
 	}
 
 	/**
-	 * Retrieve html for notice when is mulilang site and no language is selected
+	 * Retrieve HTML for notice when is mulilang site and no language is selected.
+	 *
+	 * @param bool $hide_button Hides or shows the save button in the displayed HTML.
 	 *
 	 * @return string
 	 */

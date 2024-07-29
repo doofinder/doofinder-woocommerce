@@ -1,4 +1,9 @@
 <?php
+/**
+ * DooFinder config. Allows to view relevant data like the Installation ID, Search Engines, etc. accessing the URL.
+ *
+ * @package Doofinder\WP\Config
+ */
 
 namespace Doofinder\WP;
 
@@ -7,8 +12,13 @@ use Doofinder\WP\Settings;
 use Doofinder\WP\Setup_Wizard;
 use WP_REST_Response;
 
-defined( 'ABSPATH' ) or die;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
+/**
+ * Config Class.
+ */
 class Config {
 
 
@@ -81,6 +91,11 @@ class Config {
 		$this->config = $config;
 	}
 
+	/**
+	 * Generates the REST Response from the config data.
+	 *
+	 * @return \WP_REST_Response
+	 */
 	public function generate() {
 		return new WP_REST_Response( $this->config );
 	}
