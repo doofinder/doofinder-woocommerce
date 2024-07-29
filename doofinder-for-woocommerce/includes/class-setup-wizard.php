@@ -178,10 +178,7 @@ class Setup_Wizard {
 
 		$this->log                   = new Log();
 		$this->language              = Multilanguage::instance();
-		$this->process_all_languages = empty( $this->language->get_languages() ) ? false : true;
-		$this->log                   = new Log();
-		$this->language              = Multilanguage::instance();
-		$this->process_all_languages = empty( $this->language->get_languages() ) ? false : true;
+		$this->process_all_languages = ! empty( $this->language->get_languages() );
 
 		// phpcs:disable
 		// $this->log->log("Setup Wizard Construct");
