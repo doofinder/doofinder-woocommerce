@@ -7,8 +7,7 @@
 
 namespace Doofinder\WP;
 
-// TODO (@davidmolinacano) Research about this before submitting the PR.
-$df_error = $error ?? false;
+$df_error = $df_error ?? false;
 
 use Doofinder\WP\Settings;
 use Doofinder\WP\Setup_Wizard;
