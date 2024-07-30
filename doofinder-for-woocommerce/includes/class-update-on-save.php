@@ -1,4 +1,9 @@
 <?php
+/**
+ * DooFinder Update_On_Save methods.
+ *
+ * @package Update_On_Save
+ */
 
 namespace Doofinder\WP;
 
@@ -7,20 +12,31 @@ use Doofinder\WP\Log;
 use Doofinder\WP\Post;
 use Doofinder\WP\Multilanguage\Multilanguage;
 
+/**
+ * Handles the update on save process.
+ */
 class Update_On_Save {
 
+	/**
+	 * Adds the actions for the update on save and its associated AJAX to force it via clicking the button.
+	 */
 	public static function init() {
 		$class = __CLASS__;
 		add_action( 'doofinder_update_on_save', array( $class, 'launch_update_on_save_task' ), 10, 0 );
 
-		// Force Update on save
+		// Force Update on save.
 		add_action(
 			'wp_ajax_doofinder_force_update_on_save',
 			function () {
-				if ( ! current_user_can( 'manage_options' ) || ! wp_verify_nonce( $_POST['nonce'], 'doofinder-ajax-nonce' ) ) {
+				if ( ! isset( $_POST['nonce'] ) || ! current_user_can( 'manage_options' ) || ! wp_verify_nonce( wp_unslash( $_POST['nonce'] ), 'doofinder-ajax-nonce' ) ) {
 					status_header( \WP_Http::UNAUTHORIZED );
 					die( 'Unauthorized request' );
 				}
+				/**
+				 * Triggers the `doofinder_update_on_save` action.
+				 *
+				 * @since 1.0.0
+				 */
 				do_action( 'doofinder_update_on_save' );
 				wp_send_json_success();
 			}
