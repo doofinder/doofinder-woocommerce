@@ -105,7 +105,7 @@ class Reset_Credentials_Api {
 	/**
 	 * @since 1.0.0
 	 */
-	public function resetCredentials( $data ) {
+	public function reset_credentials( $data ) {
 		$this->log->log( 'Reset Credentials' );
 
 		$uri = $this->buildURL( 'wordpress/' . $this->hash . '/reset-credentials' );
