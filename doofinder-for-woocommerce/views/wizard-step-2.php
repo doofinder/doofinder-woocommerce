@@ -2,9 +2,8 @@
 
 namespace Doofinder\WP;
 
-$error = $error ?? false;
+$df_error = $df_error ?? false;
 
-use Doofinder\WP\Settings;
 use Doofinder\WP\Setup_Wizard;
 
 /** @var Setup_Wizard $this */
