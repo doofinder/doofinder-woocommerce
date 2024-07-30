@@ -1,4 +1,9 @@
 <?php
+/**
+ * DooFinder Endpoint_Product_Category methods.
+ *
+ * @package Endpoint_Product_Category
+ */
 
 use Doofinder\WP\Endpoints;
 use Doofinder\WP\Thumbnail;
@@ -54,29 +59,29 @@ class Endpoint_Product_Category {
 	 */
 	public static function product_category_endpoint( $request ) {
 
-		Endpoints::CheckSecureToken();
+		Endpoints::check_secure_token();
 
 		$config_request['per_page'] = $request->get_param( 'per_page' ) ?? self::PER_PAGE;
 		$config_request['page']     = $request->get_param( 'page' ) ?? 1;
 		$config_request['lang']     = $request->get_param( 'lang' ) ?? '';
-		$config_request['fields']   = $request->get_param( 'fields' ) == 'all' ? '' : implode( ',', self::get_fields() );
+		$config_request['fields']   = ( 'all' === $request->get_param( 'fields' ) ) ? '' : implode( ',', self::get_fields() );
 
-		// Get the 'fields' parameter from the request
+		// Get the 'fields' parameter from the request.
 		$fields = ! empty( $config_request['fields'] ) ? self::get_fields() : array();
 
-		// Retrieve the original items data
+		// Retrieve the original items data.
 		$items = self::get_items( $config_request );
 
 		if ( ! empty( $items ) ) {
 			foreach ( $items as &$item_data ) {
 
-				if ( in_array( 'image_link', $fields ) || empty( $fields ) ) {
+				if ( in_array( 'image_link', $fields, true ) || empty( $fields ) ) {
 					$item_data['image_link'] = self::get_product_cat_df_image_link( $item_data );
 				}
 			}
 		}
 
-		// Return the modified items data as a response
+		// Return the modified items data as a response.
 		return new WP_REST_Response( $items );
 	}
 
@@ -92,7 +97,8 @@ class Endpoint_Product_Category {
 	/**
 	 * Check that image link is absolute, if not, add the site url
 	 *
-	 * @param string $image_link
+	 * @param string $image_link URL of the image.
+	 *
 	 * @return string $image_link
 	 */
 	private static function add_base_url_if_needed( $image_link ) {
@@ -105,11 +111,12 @@ class Endpoint_Product_Category {
 	/**
 	 * Returns the image link for a given term.
 	 *
-	 * @param array $product WooCommerce Product or Variable Product as array.
-	 * @return string The image link
+	 * @param array $term WordPress Term as array.
+	 *
+	 * @return string The image link.
 	 */
 	public static function get_product_cat_df_image_link( $term ) {
-		// get the thumbnail id using the queried category term_id
+		// get the thumbnail id using the queried category term_id.
 		$thumbnail_id = get_term_meta( $term['id'], 'thumbnail_id', true );
 		$image_link   = empty( $thumbnail_id ) ? '' : wp_get_attachment_url( $thumbnail_id );
 		$image_link   = empty( $image_link ) ? wc_placeholder_img_src( Thumbnail::get_size() ) : $image_link;
@@ -120,11 +127,12 @@ class Endpoint_Product_Category {
 	/**
 	 * Retrieve a list of items with pagination.
 	 *
-	 * @param array $config_request Config request params (page, per_page, type)
+	 * @param array $config_request Config request params (page, per_page, type).
+	 *
 	 * @return array|null   An array of items data or null on failure.
 	 */
 	private static function get_items( $config_request ) {
-		// Retrieve the original items data
+		// Retrieve the original items data.
 		$request = new WP_REST_Request( 'GET', '/wp/v2/product_cat' );
 		$request->set_query_params(
 			array(
@@ -137,7 +145,7 @@ class Endpoint_Product_Category {
 		$response = rest_do_request( $request );
 		$data     = rest_get_server()->response_to_data( $response, true );
 
-		if ( ! empty( $data['data']['status'] ) && $data['data']['status'] != 200 ) {
+		if ( ! empty( $data['data']['status'] ) && WP_Http::OK !== $data['data']['status'] ) {
 			$data = array();
 		}
 

@@ -1,4 +1,9 @@
 <?php
+/**
+ * DooFinder Endpoint_Post_Category methods.
+ *
+ * @package Endpoint_Post_Category
+ */
 
 use Doofinder\WP\Endpoints;
 
@@ -53,28 +58,28 @@ class Endpoint_Post_Category {
 	 */
 	public static function post_category_endpoint( $request ) {
 
-		Endpoints::CheckSecureToken();
+		Endpoints::check_secure_token();
 
 		$config_request['per_page'] = $request->get_param( 'per_page' ) ?? self::PER_PAGE;
 		$config_request['page']     = $request->get_param( 'page' ) ?? 1;
 		$config_request['lang']     = $request->get_param( 'lang' ) ?? '';
-		$config_request['fields']   = $request->get_param( 'fields' ) == 'all' ? '' : implode( ',', self::get_fields() );
+		$config_request['fields']   = ( 'all' === $request->get_param( 'fields' ) ) ? '' : implode( ',', self::get_fields() );
 
-		// Retrieve the original items data
+		// Retrieve the original items data.
 		$items = self::get_items( $config_request );
 
-		// Return the modified items data as a response
+		// Return the modified items data as a response.
 		return new WP_REST_Response( $items );
 	}
 
 	/**
 	 * Retrieve a list of items with pagination.
 	 *
-	 * @param array $config_request Config request params (page, per_page, type)
+	 * @param array $config_request Config request params (page, per_page, type).
 	 * @return array|null   An array of items data or null on failure.
 	 */
 	private static function get_items( $config_request ) {
-		// Retrieve the original items data
+		// Retrieve the original items data.
 		$request = new WP_REST_Request( 'GET', '/wp/v2/categories' );
 		$request->set_query_params(
 			array(
@@ -87,7 +92,7 @@ class Endpoint_Post_Category {
 		$response = rest_do_request( $request );
 		$data     = rest_get_server()->response_to_data( $response, true );
 
-		if ( ! empty( $data['data']['status'] ) && $data['data']['status'] != 200 ) {
+		if ( ! empty( $data['data']['status'] ) && WP_Http::OK !== $data['data']['status'] ) {
 			$data = array();
 		}
 

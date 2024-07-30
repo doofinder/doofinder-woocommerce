@@ -1,8 +1,12 @@
 <?php
+/**
+ * DooFinder Endpoint_Custom methods.
+ *
+ * @package Endpoint_Custom
+ */
 
 use Doofinder\WP\Endpoints;
 use Doofinder\WP\Log;
-use Doofinder\WP\Settings;
 use Doofinder\WP\Thumbnail;
 
 /**
@@ -62,10 +66,10 @@ class Endpoint_Custom {
 	public static function custom_endpoint( $request, $config_request = false ) {
 
 		if ( ! $config_request ) {
-			Endpoints::CheckSecureToken();
+			Endpoints::check_secure_token();
 
-			// Get the 'fields' parameter from the request
-			$fields = $request->get_param( 'fields' ) == 'all' ? array() : self::get_fields();
+			// Get the 'fields' parameter from the request.
+			$fields = ( 'all' === $request->get_param( 'fields' ) ) ? array() : self::get_fields();
 
 			$config_request = array(
 				'per_page' => $request->get_param( 'per_page' ) ?? self::PER_PAGE,
@@ -83,15 +87,15 @@ class Endpoint_Custom {
 
 		foreach ( $items as $item_data ) {
 
-			if ( get_post_meta( $item_data['id'], '_doofinder_for_wp_indexing_visibility', true ) == 'noindex' ) {
+			if ( 'noindex' === get_post_meta( $item_data['id'], '_doofinder_for_wp_indexing_visibility', true ) ) {
 				continue;
 			}
 
 			$filtered_data = ! empty( $fields ) ? array_intersect_key( $item_data, array_flip( $fields ) ) : $item_data;
 
-			$filtered_data = self::get_title( $filtered_data, $fields );
-			$filtered_data = self::get_content( $filtered_data, $fields );
-			$filtered_data = self::get_description( $filtered_data, $fields );
+			$filtered_data = self::get_title( $filtered_data );
+			$filtered_data = self::get_content( $filtered_data );
+			$filtered_data = self::get_description( $filtered_data );
 			$filtered_data = self::get_author( $filtered_data, $fields, $config_request );
 			$filtered_data = self::get_image_link( $filtered_data, $fields );
 			$filtered_data = self::get_post_tags( $filtered_data, $fields );
@@ -101,7 +105,7 @@ class Endpoint_Custom {
 			$modified_items[] = $filtered_data;
 		}
 
-		// Return the modified items data as a response
+		// Return the modified items data as a response.
 		return new WP_REST_Response( $modified_items ?? array() );
 	}
 
@@ -117,9 +121,10 @@ class Endpoint_Custom {
 	/**
 	 * Get custom data from our endpoint products
 	 *
-	 * @param array  $ids ID product we want to get data
-	 * @param string $type Type of custom data
-	 * @return array  Array of custom data
+	 * @param array  $ids ID product we want to get data.
+	 * @param string $type Type of custom data.
+	 *
+	 * @return array  Array of custom data.
 	 */
 	public static function get_data( $ids, $type ) {
 
@@ -150,7 +155,7 @@ class Endpoint_Custom {
 	 * @return array The filtered data array with post tags information if requested.
 	 */
 	private static function get_post_tags( $filtered_data, $fields ) {
-		if ( in_array( 'post_tags', $fields ) && isset( $filtered_data['_embedded']['wp:term'][0] ) ) {
+		if ( in_array( 'post_tags', $fields, true ) && isset( $filtered_data['_embedded']['wp:term'][0] ) ) {
 			$filtered_data['post_tags'] = self::get_terms( 'post_tag', $filtered_data['_embedded']['wp:term'] );
 		}
 
@@ -166,7 +171,7 @@ class Endpoint_Custom {
 	 * @return array The filtered data array with categories information if requested.
 	 */
 	private static function get_categories( $filtered_data, $fields ) {
-		if ( in_array( 'categories', $fields ) && isset( $filtered_data['_embedded']['wp:term'][0] ) ) {
+		if ( in_array( 'categories', $fields, true ) && isset( $filtered_data['_embedded']['wp:term'][0] ) ) {
 			$filtered_data['categories'] = self::get_terms( 'category', $filtered_data['_embedded']['wp:term'] );
 		}
 
@@ -178,11 +183,10 @@ class Endpoint_Custom {
 	 * Retrieves and processes the title information if requested by the fields.
 	 *
 	 * @param array $filtered_data The filtered data array.
-	 * @param array $fields        The requested fields.
 	 *
 	 * @return array The filtered data array with title information if requested.
 	 */
-	private static function get_title( $filtered_data, $fields ) {
+	private static function get_title( $filtered_data ) {
 		$filtered_data['title'] = self::process_content( $filtered_data['title']['rendered'] ?? '' );
 
 		return $filtered_data;
@@ -192,11 +196,10 @@ class Endpoint_Custom {
 	 * Retrieves and processes the content information if requested by the fields.
 	 *
 	 * @param array $filtered_data The filtered data array.
-	 * @param array $fields        The requested fields.
 	 *
 	 * @return array The filtered data array with content information if requested.
 	 */
-	private static function get_content( $filtered_data, $fields ) {
+	private static function get_content( $filtered_data ) {
 		$filtered_data['content'] = self::process_content( $filtered_data['content']['rendered'] ?? '' );
 
 		return $filtered_data;
@@ -206,11 +209,10 @@ class Endpoint_Custom {
 	 * Retrieves and processes the description information if requested by the fields.
 	 *
 	 * @param array $filtered_data The filtered data array.
-	 * @param array $fields        The requested fields.
 	 *
 	 * @return array The filtered data array with description information if requested.
 	 */
-	private static function get_description( $filtered_data, $fields ) {
+	private static function get_description( $filtered_data ) {
 		$filtered_data['description'] = self::process_content( $filtered_data['excerpt']['rendered'] ?? '' );
 
 		return $filtered_data;
@@ -226,7 +228,7 @@ class Endpoint_Custom {
 	 * @return array The filtered data array with author information if requested.
 	 */
 	private static function get_author( $filtered_data, $fields, $config_request ) {
-		if ( in_array( 'author', $fields ) && $config_request['type'] != 'posts' ) {
+		if ( in_array( 'author', $fields, true ) && 'posts' !== $config_request['type'] ) {
 			$filtered_data['author'] = $filtered_data['_embedded']['author'][0]['name'] ?? 'Default';
 		}
 
@@ -242,9 +244,9 @@ class Endpoint_Custom {
 	 * @return array The filtered data array with image link information if requested.
 	 */
 	private static function get_image_link( $filtered_data, $fields ) {
-		$filtered_data_array = json_decode( json_encode( $filtered_data ), true );
+		$filtered_data_array = json_decode( wp_json_encode( $filtered_data ), true );
 
-		$should_obtain_image_link          = is_array( $filtered_data_array ) && in_array( 'image_link', $fields );
+		$should_obtain_image_link          = is_array( $filtered_data_array ) && in_array( 'image_link', $fields, true );
 		$filtered_data_array['image_link'] = $should_obtain_image_link ? self::obtain_image_link( $filtered_data ) : null;
 
 		return $filtered_data_array;
@@ -255,17 +257,23 @@ class Endpoint_Custom {
 	 *
 	 * @param array $filtered_data The filtered data array.
 	 *
+	 * @throws \Exception If the filtered fields don't include any image size.
+	 *
 	 * @return string $image_link The image link
 	 */
 	private static function obtain_image_link( $filtered_data ) {
 		$image_link = null;
 		try {
-			$size_image = @$filtered_data['_embedded']['wp:featuredmedia'][0]['media_details']['sizes'];
+			if ( empty( $filtered_data['_embedded']['wp:featuredmedia'][0]['media_details']['sizes'] ) ) {
+				throw new \Exception( 'Sizes field is not available in the media details', WP_Http::NOT_FOUND );
+			}
+
+			$size_image = $filtered_data['_embedded']['wp:featuredmedia'][0]['media_details']['sizes'];
 
 			if ( is_object( $size_image ) ) {
 				$image_link = $filtered_data['_embedded']['wp:featuredmedia'][0]['media_details']['source_url'];
 			} else {
-				$medium_size_image = $filtered_data['_embedded']['wp:featuredmedia'][0]['media_details']['sizes']['medium'];
+				$medium_size_image = $size_image['medium'];
 				$image_link        = is_array( $medium_size_image ) ? $medium_size_image['source_url'] : null;
 			}
 
@@ -277,11 +285,11 @@ class Endpoint_Custom {
 					$image_link = self::add_base_url_if_needed( $image_link );
 				}
 			}
-		} catch ( \Throwable $th ) {
+		} catch ( \Exception $e ) {
 			$logger = new Log( 'custom-endpoint.log' );
-			$logger->log( 'An error ocurred while obtaining image link from item data. Error message: ' . $th->getMessage() );
-			$logger->log( 'Item Data: ' . print_r( $filtered_data, true ) );
-			$logger->log( 'Trace: ' . $th->getTraceAsString() );
+			$logger->log( 'An error ocurred while obtaining image link from item data. Error message: ' . $e->getMessage() );
+			$logger->log( 'Item Data: ' . print_r( $filtered_data, true ) ); // phpcs:ignore
+			$logger->log( 'Trace: ' . $e->getTraceAsString() );
 		}
 
 		return $image_link;
@@ -290,7 +298,7 @@ class Endpoint_Custom {
 	/**
 	 * Check that image link is absolute, if not, add the site url
 	 *
-	 * @param string $image_link
+	 * @param string $image_link Absolute or relative URL of the image.
 	 * @return string $image_link
 	 */
 	private static function add_base_url_if_needed( $image_link ) {
@@ -325,7 +333,7 @@ class Endpoint_Custom {
 	 * @return string The processed content with HTML entities decoded, HTML tags removed, and whitespace sequences replaced with a single space.
 	 */
 	private static function process_content( $content ) {
-		$content = html_entity_decode( strip_tags( $content ) );
+		$content = html_entity_decode( wp_strip_all_tags( $content ) );
 		$content = preg_replace( '/[ \t\r\n]+/', ' ', $content );
 
 		return trim( $content );
@@ -342,7 +350,7 @@ class Endpoint_Custom {
 		$names = array();
 		foreach ( $array_items as $array_item ) {
 			foreach ( $array_item as $item ) {
-				if ( isset( $item['taxonomy'] ) && $item['taxonomy'] == $type ) {
+				if ( isset( $item['taxonomy'] ) && $type === $item['taxonomy'] ) {
 					$names[] = self::process_content( $item['name'] );
 				}
 			}
@@ -353,11 +361,11 @@ class Endpoint_Custom {
 	/**
 	 * Retrieve a list of items with pagination.
 	 *
-	 * @param array $config_request Config request params (page, per_page, type)
+	 * @param array $config_request Config request params (page, per_page, type).
 	 * @return array|null   An array of items data or null on failure.
 	 */
 	private static function get_items( $config_request ) {
-		// Retrieve the original items data
+		// Retrieve the original items data.
 		$request = new WP_REST_Request( 'GET', '/wp/v2/' . $config_request['type'] );
 		$request->set_query_params(
 			array(
@@ -372,7 +380,7 @@ class Endpoint_Custom {
 		$response = rest_do_request( $request );
 		$data     = rest_get_server()->response_to_data( $response, true );
 
-		if ( ! empty( $data['data']['status'] ) && $data['data']['status'] != 200 ) {
+		if ( ! empty( $data['data']['status'] ) && WP_Http::OK !== $data['data']['status'] ) {
 			$data = array();
 		}
 
