@@ -380,7 +380,7 @@ class Endpoint_Custom {
 		$response = rest_do_request( $request );
 		$data     = rest_get_server()->response_to_data( $response, true );
 
-		if ( ! empty( $data['data']['status'] ) && 200 !== $data['data']['status'] ) {
+		if ( ! empty( $data['data']['status'] ) && WP_Http::OK !== $data['data']['status'] ) {
 			$data = array();
 		}
 
