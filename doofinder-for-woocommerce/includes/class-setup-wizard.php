@@ -567,11 +567,11 @@ class Setup_Wizard {
 	public static function check_data() {
 
 		$has_error = false;
-		$error     = '';
+		$df_error  = '';
 		$errors    = self::get_wizard_errors();
 		if ( isset( $errors['wizard-step-2'] ) && ! empty( $errors['wizard-step-2'] ) ) {
 			$has_error = true;
-			$error     = $errors['wizard-step-2'];
+			$df_error  = $errors['wizard-step-2'];
 		}
 
 		if ( $has_error ) {
@@ -842,19 +842,19 @@ class Setup_Wizard {
 	 * @return string
 	 */
 	public function get_errors_html( $name ) {
-		$error          = $this->get_error( $name );
+		$df_error       = $this->get_error( $name );
 		$error_template = '<div class="error-text">%s</div>';
 
 		$html = '';
 
-		if ( $error ) {
+		if ( $df_error ) {
 
-			if ( is_array( $error ) ) {
-				foreach ( $error as $err ) {
+			if ( is_array( $df_error ) ) {
+				foreach ( $df_error as $err ) {
 					$html .= sprintf( $error_template, $err );
 				}
 			} else {
-				$html .= sprintf( $error_template, $error );
+				$html .= sprintf( $error_template, $df_error );
 			}
 		}
 
@@ -982,8 +982,8 @@ class Setup_Wizard {
 
 				if ( array_key_exists( 'errors', $store_data ) ) {
 					$message = '';
-					foreach ( $store_data['errors'] as $error ) {
-						$message .= $error . '. ';
+					foreach ( $store_data['errors'] as $store_error ) {
+						$message .= $store_error . '. ';
 					}
 					throw new Exception( $message );
 				}
@@ -1196,15 +1196,15 @@ class Setup_Wizard {
 	 *
 	 * @param int    $step Step number of the Setup Wizard.
 	 * @param string $field_name Setup Wizard field name.
-	 * @param string $error Specific error message.
+	 * @param string $df_error Specific error message.
 	 *
 	 * @return void
 	 */
-	private function add_wizard_step_error( $step, $field_name, $error ) {
-		$this->log->log( 'Processing Wizard Step ' . $step . ' - Error - ' . $error );
+	private function add_wizard_step_error( $step, $field_name, $df_error ) {
+		$this->log->log( 'Processing Wizard Step ' . $step . ' - Error - ' . $df_error );
 
 		$errors = $this->get_wizard_errors();
-		$this->errors[ 'wizard-step-' . $step ][ $field_name ] = $error;
+		$this->errors[ 'wizard-step-' . $step ][ $field_name ] = $df_error;
 
 		if ( ! isset( $errors[ 'wizard-step-' . $step ] ) ) {
 			$errors[ 'wizard-step-' . $step ] = array();

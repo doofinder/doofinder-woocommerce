@@ -1,4 +1,9 @@
 <?php
+/**
+ * View for Landings
+ *
+ * @package Doofinder\WP\Landing
+ */
 
 namespace Doofinder\WP;
 
@@ -7,24 +12,24 @@ use Doofinder\WP\Landing;
 if ( ! class_exists( 'Doofinder\WP\Landing' ) ) {
 	// The Landing class is not defined, it loads the WordPress core.
 	// This means that it is accessed directly from the PHP file.
-	$parse_uri = explode( 'wp-content', $_SERVER['SCRIPT_FILENAME'] );
+	$script_name = ( isset( $_SERVER['SCRIPT_FILENAME'] ) ) ? wp_unslash( $_SERVER['SCRIPT_FILENAME'] ) : '';
+	$parse_uri   = explode( 'wp-content', $script_name );
 	require_once $parse_uri[0] . 'wp-load.php';
 }
 
 if ( is_plugin_active( 'doofinder-for-woocommerce/doofinder-for-woocommerce.php' ) ) {
-	/**
-	 * @var Landing $landing
-	 */
+
 	$landing = new Landing();
 
 	$landing_slug = get_query_var( 'df-landing' );
 
 
-	if ( $landing_slug != false ) {
+	if ( false !== (bool) $landing_slug ) {
 		$hashid = get_query_var( 'hashid' );
-
+	} elseif ( isset( $_GET['slug'], $_GET['hashid'] ) ) {
+		$landing->create_redirect( wp_unslash( $_GET['slug'] ), wp_unslash( $_GET['hashid'] ) );
 	} else {
-		$landing->create_redirect( $_GET['slug'], $_GET['hashid'] );
+		echo '';
 	}
 
 	$landing_data = $landing->get_landing_info( $hashid, $landing_slug );
@@ -36,7 +41,7 @@ if ( is_plugin_active( 'doofinder-for-woocommerce/doofinder-for-woocommerce.php'
 		$landing->set_meta_data( $meta_title, $meta_description, $index );
 	}
 
-	echo $landing->get_landing_html( $landing_data, $landing_slug );
+	echo $landing->get_landing_html( $landing_data, $landing_slug ); // phpcs:ignore WordPress.Security.EscapeOutput
 } else {
-	echo $landing->get_disabled_html();
+	echo $landing->get_disabled_html(); // phpcs:ignore WordPress.Security.EscapeOutput
 }

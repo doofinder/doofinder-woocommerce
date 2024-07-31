@@ -237,7 +237,7 @@ class Store_Api {
 				'currency'     => $currency,
 				'site_url'     => $home_url,
 				'feed_type'    => is_plugin_active( 'woocommerce/woocommerce.php' ) ? 'product' : 'posts',
-                'callback_url' => $this->build_callback_url( $home_url, '/?rest_route=/doofinder/v1/index-status&token=' . $this->api_key ),
+				'callback_url' => $this->build_callback_url( $home_url, '/?rest_route=/doofinder/v1/index-status&token=' . $this->api_key ),
 			);
 		}
 
