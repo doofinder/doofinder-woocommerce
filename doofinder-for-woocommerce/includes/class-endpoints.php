@@ -1,4 +1,9 @@
 <?php
+/**
+ * DooFinder Endpoints methods.
+ *
+ * @package Endpoints
+ */
 
 namespace Doofinder\WP;
 
@@ -14,7 +19,9 @@ namespace Doofinder\WP;
 class Endpoints {
 
 	/**
-	 * @var array $endpoints_api An array to store registered API endpoints.
+	 * An array to store registered API endpoints.
+	 *
+	 * @var array $endpoints_api
 	 */
 	public static $endpoints_api = array();
 
@@ -49,8 +56,8 @@ class Endpoints {
 
 		add_filter(
 			'woocommerce_rest_check_permissions',
-			function ( $permission, $context, $object_id, $post_type ) {
-				if ( isset( $_GET['rest_route'] ) && in_array( $_GET['rest_route'], self::$endpoints_api ) ) {
+			function ( $permission ) {
+				if ( isset( $_GET['rest_route'] ) && in_array( $_GET['rest_route'], self::$endpoints_api, true ) ) {
 					return true;
 				}
 				return $permission;
@@ -68,13 +75,13 @@ class Endpoints {
 	 */
 	public static function check_secure_token() {
 
-		$token_rcv = $_SERVER['HTTP_DOOFINDER_TOKEN'] ?? false;
+		$token_rcv = isset( $_SERVER['HTTP_DOOFINDER_TOKEN'] ) ? wp_unslash( $_SERVER['HTTP_DOOFINDER_TOKEN'] ) : false;
 		$token_chk = get_option( 'doofinder_for_wp_token' );
 
-		if ( ! $token_chk || $token_chk != $token_rcv ) {
+		if ( ! $token_chk || $token_chk !== $token_rcv ) {
 			header( 'HTTP/1.1 403 Forbidden', true, 403 );
-			$msgError = 'Forbidden access. Maybe security token missed.';
-			exit( $msgError );
+			$msg_error = 'Forbidden access. Maybe security token missed.';
+			exit( esc_html( $msg_error ) );
 		}
 	}
 }

@@ -1,7 +1,15 @@
 <?php
+/**
+ * DooFinder Language_Plugin methods.
+ *
+ * @package Doofinder\WP\Multilanguage
+ */
 
 namespace Doofinder\WP\Multilanguage;
 
+/**
+ * Include abstracts functions to be used by the different language plugins.
+ */
 abstract class Language_Plugin {
 
 
@@ -64,18 +72,7 @@ abstract class Language_Plugin {
 	 */
 	abstract public function get_home_url( $language );
 
-	/**
-	 * Retrieve the name of the WordPress option
-	 * for the current languages.
-	 *
-	 * Some fields in Doofinder settings will have different values,
-	 * depending on language.
-	 *
-	 * @param string $base
-	 *
-	 * @return string
-	 */
-
+	// phpcs:disable
 	/**
 	 * Retrieve the name of the WordPress option
 	 * for the current languages.
@@ -88,4 +85,5 @@ abstract class Language_Plugin {
 	 * @return string
 	 */
 	// abstract public function get_option_name( $base );
+	// phpcs:enable
 }
