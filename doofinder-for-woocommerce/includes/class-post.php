@@ -1,9 +1,19 @@
 <?php
+/**
+ * DooFinder Post methods.
+ *
+ * @package Doofinder\WP\Post
+ */
 
 namespace Doofinder\WP;
 
-defined( 'ABSPATH' ) or die();
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
+/**
+ * Doofinder Post Class, which has more DooFinder-related properties.
+ */
 class Post {
 
 	/**
@@ -30,7 +40,7 @@ class Post {
 	 *
 	 * @var string[]
 	 */
-	private static $visibilityOptions = array(
+	private static $visibility_options = array(
 		'auto',
 		'index',
 		'noindex',
@@ -113,15 +123,15 @@ class Post {
 
 		?>
 
-		<select name="<?php echo $option_name; ?>" class="widefat">
-			<?php foreach ( self::$visibilityOptions as $option ) : ?>
-				<option value="<?php echo $option; ?>"
+		<select name="<?php echo esc_attr( $option_name ); ?>" class="widefat">
+			<?php foreach ( self::$visibility_options as $option ) : ?>
+				<option value="<?php echo esc_attr( $option ); ?>"
 
 					<?php if ( $saved_value && $saved_value === $option ) : ?>
 						selected
 					<?php endif; ?>
 				>
-					<?php echo $option; ?>
+					<?php echo esc_html( $option ); ?>
 				</option>
 			<?php endforeach; ?>
 		</select>
@@ -135,7 +145,7 @@ class Post {
 	 * If the indexing visibility settings is present in the request
 	 * save it in the meta for later use.
 	 *
-	 * @param int $post_id
+	 * @param int $post_id numeric ID of the WP_Post.
 	 */
 	private static function handle_additional_settings_save( $post_id ) {
 		$option_name = self::$options['visibility']['form_name'];
@@ -148,8 +158,8 @@ class Post {
 
 		// We only allow few specific values, so make sure
 		// someone does not try to save some funny business.
-		$visibility = $_REQUEST[ $option_name ];
-		if ( ! in_array( $visibility, self::$visibilityOptions ) ) {
+		$visibility = wp_unslash( $_REQUEST[ $option_name ] );
+		if ( ! in_array( $visibility, self::$visibility_options, true ) ) {
 			return;
 		}
 
@@ -160,11 +170,11 @@ class Post {
 	/**
 	 * Post constructor.
 	 *
-	 * @param \WP_Post|int $post
-	 * @param \stdClass[]  $meta
+	 * @param \WP_Post|int $post WordPress Post object or its integer ID.
+	 * @param \stdClass[]  $meta Additional post metadata.
 	 */
 	public function __construct( $post, $meta = null ) {
-		if ( $meta !== null ) {
+		if ( null !== $meta ) {
 			$this->meta = $meta;
 			$this->process_meta();
 		}
@@ -187,7 +197,7 @@ class Post {
 	 * @return bool
 	 */
 	public function is_indexable() {
-		if ( $this->post->post_status === 'trash' ) {
+		if ( 'trash' === $this->post->post_status ) {
 			return false;
 		}
 
@@ -198,11 +208,11 @@ class Post {
 		}
 
 		// Visibility setting from the metabox has the highest priority.
-		if ( $this->visibility === 'index' ) {
+		if ( 'index' === $this->visibility ) {
 			return true;
 		}
 
-		if ( $this->visibility === 'noindex' ) {
+		if ( 'noindex' === $this->visibility ) {
 			return false;
 		}
 
@@ -211,11 +221,11 @@ class Post {
 		// If Yoast settings is set to "auto" Yoast will remove meta
 		// from DB entirely, so we don't have to worry about that.
 		if ( $this->yoast_visibility ) {
-			if ( (int) $this->yoast_visibility === 1 ) {
+			if ( 1 === (int) $this->yoast_visibility ) {
 				return false;
 			}
 
-			if ( (int) $this->yoast_visibility === 2 ) {
+			if ( 2 === (int) $this->yoast_visibility ) {
 				return true;
 			}
 		}
@@ -230,7 +240,7 @@ class Post {
 
 		// Default post_status of attachments is "inherit"
 		// so we need to check it separately.
-		if ( $this->post->post_status === 'publish' || ( $this->post->post_type === 'attachment' && $this->post->post_status === 'inherit' ) ) {
+		if ( 'publish' === $this->post->post_status || ( 'attachment' === $this->post->post_type && 'inherit' === $this->post->post_status ) ) {
 			return true;
 		}
 
@@ -238,7 +248,7 @@ class Post {
 	}
 
 	/**
-	 * Generate (from post data and post meta) array that Doofinder API accepts.
+	 * Generate (from post data and post meta) array that DooFinder API accepts.
 	 *
 	 * @return array
 	 */
@@ -287,7 +297,7 @@ class Post {
 	/**
 	 * Replaces the html entity of a text with their corresponding character
 	 *
-	 * @param {string} text
+	 * @param string $text String to decode.
 	 *
 	 * @return string
 	 */
@@ -316,7 +326,11 @@ class Post {
 		// array indexed by Term ID for easier lookup.
 		$categories = array();
 
-		/** @var \WP_Term $term */
+		/**
+		 * A WordPress Term object.
+		 *
+		 * @var \WP_Term $term
+		 */
 		foreach ( $all_categories as $term ) {
 			$categories[ $term->term_id ] = $term;
 		}
@@ -340,8 +354,8 @@ class Post {
 	 * From a given category this function recursively follows the parents,
 	 * and generates array representing chain of parents of categories.
 	 *
-	 * @param \WP_Term[] $categories
-	 * @param \WP_Term   $category
+	 * @param \WP_Term[] $categories Category objects array.
+	 * @param \WP_Term   $category Category object.
 	 *
 	 * @return string[]
 	 */
@@ -388,7 +402,7 @@ class Post {
 	 */
 	public function get_meta_fields() {
 		// Fetch meta fields from DB if we don't have them yet.
-		if ( $this->meta === null ) {
+		if ( null === $this->meta ) {
 			$this->fetch_meta();
 		}
 
@@ -398,7 +412,7 @@ class Post {
 				continue;
 			}
 
-			$meta[ 'meta_' . $post_meta->meta_key ] = strip_tags( $post_meta->meta_value );
+			$meta[ 'meta_' . $post_meta->meta_key ] = wp_strip_all_tags( $post_meta->meta_value );
 		}
 
 		return $meta;
@@ -411,7 +425,7 @@ class Post {
 	 * @return string
 	 */
 	public function get_post_date() {
-		return date( 'Y-m-d\TH:i:s\Z', strtotime( $this->post->post_date ) );
+		return gmdate( 'Y-m-d\TH:i:s\Z', strtotime( $this->post->post_date ) );
 	}
 
 	/**
@@ -423,9 +437,16 @@ class Post {
 	 * @return string
 	 */
 	public function get_content() {
+		/**
+		 * Filters the post content (e.g. interprets shortcodes).
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $print Post content filtered.
+		 */
 		$content = apply_filters( 'the_content', $this->post->post_content );
 		$content = str_replace( ']]>', ']]&gt;', $content );
-		$content = strip_tags( $content );
+		$content = wp_strip_all_tags( $content );
 		$content = trim( str_replace( array( "\n", "\r" ), ' ', $content ) );
 
 		return $content;
@@ -443,7 +464,7 @@ class Post {
 	public function get_excerpt() {
 		if ( ! $this->post->post_excerpt ) {
 			// Return trimmed version of content if
-			// excerpt field is empty
+			// excerpt field is empty.
 			return wp_trim_words( $this->get_content(), 55, '' );
 		}
 
@@ -517,7 +538,7 @@ class Post {
 	private function fetch_meta() {
 		global $wpdb;
 
-		if ( $this->meta !== null ) {
+		if ( null !== $this->meta ) {
 			return;
 		}
 
@@ -531,16 +552,17 @@ class Post {
 		$query            = "
 			SELECT post_id, meta_key, meta_value
 			FROM $wpdb->postmeta
-			WHERE $wpdb->postmeta.post_id = $post_id
+			WHERE $wpdb->postmeta.post_id = " . esc_sql( $post_id ) . "
 			AND (
               $wpdb->postmeta.meta_key NOT LIKE '\_%' OR
-              $wpdb->postmeta.meta_key = '$visibility_meta' OR
-              $wpdb->postmeta.meta_key = '$yoast_visibility'
+              $wpdb->postmeta.meta_key = '" . esc_sql( $visibility_meta ) . "' OR
+              $wpdb->postmeta.meta_key = '" . esc_sql( $yoast_visibility ) . "'
             )
 			ORDER BY $wpdb->postmeta.post_id
 		 ";
 
-		$this->meta = $wpdb->get_results( $query, OBJECT );
+		// WordPress.DB.PreparedSQL can be ignored because we are sanitizing every sensitive data with `esc_sql()` function instead.
+		$this->meta = $wpdb->get_results( $query, OBJECT ); // phpcs:ignore WordPress.DB.PreparedSQL
 		$this->process_meta();
 	}
 }
