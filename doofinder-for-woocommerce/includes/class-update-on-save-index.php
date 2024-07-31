@@ -146,9 +146,8 @@ class Update_On_Save_Index {
 	 */
 	public function get_posts_ids_by_type_indexation( $post_type, $action ) {
 		global $wpdb;
-		$table_name = $wpdb->prefix . 'doofinder_update_on_save';
 
-		$ids = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %s WHERE type_post = %s AND type_action = %s', $table_name, $post_type, $action ), ARRAY_N );
+		$ids = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . $wpdb->prefix . 'doofinder_update_on_save WHERE type_post = %s AND type_action = %s', $post_type, $action ), ARRAY_N );
 
 		if ( ! $ids ) {
 			return array();

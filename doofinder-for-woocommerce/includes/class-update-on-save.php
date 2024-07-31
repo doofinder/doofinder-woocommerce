@@ -201,7 +201,7 @@ class Update_On_Save {
 
 		$table_name = $wpdb->prefix . 'doofinder_update_on_save';
 
-		$result = $wpdb->get_var( $wpdb->prepare( 'SELECT * FROM %s WHERE post_id = %d', $table_name, $post_id ) );
+		$result = $wpdb->get_var( $wpdb->prepare( 'SELECT * FROM ' . $wpdb->prefix . 'doofinder_update_on_save WHERE post_id = %d', $post_id ) );
 
 		if ( null !== $result ) {
 			$wpdb->update(
@@ -272,9 +272,8 @@ class Update_On_Save {
 	 */
 	public static function clean_update_on_save_db() {
 		global $wpdb;
-		$table_name = $wpdb->prefix . 'doofinder_update_on_save';
 
-		$wpdb->query( $wpdb->prepare( 'TRUNCATE TABLE %s', $table_name ) );
+		$wpdb->query( 'TRUNCATE TABLE ' . $wpdb->prefix . 'doofinder_update_on_save' );
 
 		$log = new Log( 'update-on-save-add-item.log' );
 		$log->log( 'Cleaned database' );
@@ -289,7 +288,7 @@ class Update_On_Save {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'doofinder_update_on_save';
 
-		$wpdb->query( $wpdb->prepare( 'DROP TABLE %s', $table_name ) );
+		$wpdb->query( 'DROP TABLE ' . $wpdb->prefix . 'doofinder_update_on_save' );
 
 		$log = new Log( 'update-on-save-add-item.log' );
 		$log->log( 'Deleted database' );
