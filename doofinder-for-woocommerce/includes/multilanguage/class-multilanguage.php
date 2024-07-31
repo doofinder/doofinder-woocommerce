@@ -1,7 +1,15 @@
 <?php
+/**
+ * DooFinder Multilanguage methods.
+ *
+ * @package Doofinder\WP\Multilanguage
+ */
 
 namespace Doofinder\WP\Multilanguage;
 
+/**
+ * Handles the Multilanguage in the site.
+ */
 class Multilanguage {
 
 	/**
@@ -13,7 +21,9 @@ class Multilanguage {
 	private static $instance;
 
 	/**
-	 * Flag if site is multilang or not
+	 * Flag if site is multilang or not.
+	 *
+	 * @var bool
 	 */
 	public static $is_multilang = false;
 
@@ -33,7 +43,8 @@ class Multilanguage {
 				return self::$instance;
 			}
 
-			// TODO Test and finish Polylang support implementation
+			// TODO Test and finish Polylang support implementation.
+			// phpcs:disable
 			/*
 			if ( defined( 'POLYLANG_BASENAME' ) ) {
 				self::$instance = new Polylang();
@@ -42,6 +53,7 @@ class Multilanguage {
 				return self::$instance;
 			}
 			*/
+			// phpcs:enable
 		}
 
 		// Still no instance?
