@@ -1,9 +1,17 @@
 <?php
+/**
+ * DooFinder Add_To_Cart methods.
+ *
+ * @package Doofinder\WP\Add_To_Cart
+ */
 
 namespace Doofinder\WP;
 
-// use Doofinder\WP\Settings;
+use WP_Http;
 
+/**
+ * Handles the add to cart workflow.
+ */
 class Add_To_Cart {
 
 
@@ -12,7 +20,7 @@ class Add_To_Cart {
 	 *
 	 * @var Add_To_Cart
 	 */
-	private static $_instance;
+	private static $instance;
 
 	/**
 	 * Returns the only instance of Add_To_Cart.
@@ -20,11 +28,11 @@ class Add_To_Cart {
 	 * @return Add_To_Cart
 	 */
 	public static function instance() {
-		if ( is_null( self::$_instance ) ) {
-			self::$_instance = new self();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
 
-		return self::$_instance;
+		return self::$instance;
 	}
 
 	/**
@@ -40,10 +48,10 @@ class Add_To_Cart {
 	}
 
 	/**
-	 * Returns the product info for a given id
+	 * Returns the product info for a given id.
 	 */
 	public static function product_info() {
-		$post_id = $_REQUEST['id'] ?? null;
+		$post_id = isset( $_REQUEST['id'] ) ? wp_unslash( $_REQUEST['id'] ) : null;
 		if ( empty( $post_id ) ) {
 			return '';
 		}
@@ -80,15 +88,53 @@ class Add_To_Cart {
 		return wp_send_json( $data );
 	}
 
-
+	/**
+	 * Adds item to the WooCommerce cart from an AJAX request by using WooCommerce add to cart method.
+	 *
+	 * @return void
+	 */
 	public static function doofinder_ajax_add_to_cart() {
-		$product_id        = apply_filters( 'woocommerce_add_to_cart_product_id', absint( $_POST['product_id'] ) );
-		$quantity          = empty( $_POST['quantity'] ) ? 1 : wc_stock_amount( $_POST['quantity'] );
-		$variation_id      = absint( $_POST['variation_id'] );
+		if ( ! isset( $_POST['product_id'] ) || ! isset( $_POST['variation_id'] ) ) {
+			wp_send_json_error( __( 'Required params are missing.', 'wordpress-doofinder' ), WP_Http::BAD_REQUEST );
+		}
+
+		/**
+		 * Add to cart Product ID.
+		 *
+		 * Allows to modify the Product ID (as integer) to be added to the cart.
+		 *
+		 * @param $product_id ID of the product.
+		 *
+		 * @since 1.0
+		 */
+		$product_id   = apply_filters( 'woocommerce_add_to_cart_product_id', absint( $_POST['product_id'] ) );
+		$quantity     = empty( $_POST['quantity'] ) ? 1 : wc_stock_amount( wp_unslash( $_POST['quantity'] ) );
+		$variation_id = absint( $_POST['variation_id'] );
+
+		/**
+		 * Add to cart validation.
+		 *
+		 * Filters if an item being added to the cart passed validation checks.
+		 *
+		 * @param boolean $passed_validation True if the item passed validation.
+		 * @param integer $product_id        Product ID being validated.
+		 * @param integer $quantity          Quantity added to the cart.
+		 *
+		 * @since 1.0
+		 */
 		$passed_validation = apply_filters( 'woocommerce_add_to_cart_validation', true, $product_id, $quantity );
 		$product_status    = get_post_status( $product_id );
 
 		if ( $passed_validation && WC()->cart->add_to_cart( $product_id, $quantity, $variation_id ) && 'publish' === $product_status ) {
+			/**
+			 * Added to cart Product ID.
+			 *
+			 * Function for `woocommerce_ajax_added_to_cart` action-hook.
+			 *
+			 * @param $product_id ID of the product.
+			 *
+			 * @since 1.0
+			 */
 			do_action( 'woocommerce_ajax_added_to_cart', $product_id );
 
 			if ( 'yes' === get_option( 'woocommerce_cart_redirect_after_add' ) ) {
@@ -99,10 +145,22 @@ class Add_To_Cart {
 		} else {
 			$data = array(
 				'error'       => true,
+				/**
+				 * Function for `woocommerce_cart_redirect_after_error` filter-hook.
+				 *
+				 * @param $permalink Product permalink.
+				 * @param $product_id ID of the product.
+				 *
+				 * @since 1.0
+				 */
 				'product_url' => apply_filters( 'woocommerce_cart_redirect_after_error', get_permalink( $product_id ), $product_id ),
 			);
 
-			echo wp_send_json( $data );
+			/*
+			TODO (@davidmolinacano): This should be `wp_send_json_error()`
+			instead, but it requires to modify the AJAX structure carefully.
+			*/
+			wp_send_json( $data );
 		}
 
 		wp_die();
@@ -122,7 +180,7 @@ class Add_To_Cart {
 						'doofinder-add-to-cart',
 						Doofinder_For_WordPress::plugin_url() . 'assets/js/df-add-to-cart.js',
 						array( 'jquery' ),
-						false,
+						Doofinder_For_WordPress::$version,
 						true
 					);
 					wp_localize_script(

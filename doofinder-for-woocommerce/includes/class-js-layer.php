@@ -1,9 +1,17 @@
 <?php
+/**
+ * DooFinder Script (formerly JS_Layer) methods.
+ *
+ * @package Doofinder\WP\Script
+ */
 
 namespace Doofinder\WP;
 
 use Doofinder\WP\Multilanguage\Multilanguage;
 
+/**
+ * JS_Layer Class.
+ */
 class JS_Layer {
 
 
@@ -15,6 +23,9 @@ class JS_Layer {
 	private static $instance;
 
 	/**
+	 *
+	 * Log object.
+	 *
 	 * @var Log
 	 */
 	private $log;
@@ -33,10 +44,13 @@ class JS_Layer {
 		return self::$instance;
 	}
 
+	/**
+	 * JS_Layer constructor.
+	 *
+	 * @since 1.0.0
+	 */
 	private function __construct() {
-		if (
-			! Settings::is_js_layer_enabled() || Settings::get_js_layer() === ''
-		) {
+		if ( ! Settings::is_js_layer_enabled() || '' === Settings::get_js_layer() ) {
 			return;
 		}
 
@@ -79,6 +93,6 @@ class JS_Layer {
 			$layer           = str_replace( 'https://cdn.doofinder.com/livelayer/1/js/loader.min.js', DF_LAYER_HOST . '/assets/js/loader.js', $layer );
 		}
 
-		echo $layer;
+		echo $layer; // phpcs:ignore WordPress.Security.EscapeOutput
 	}
 }
