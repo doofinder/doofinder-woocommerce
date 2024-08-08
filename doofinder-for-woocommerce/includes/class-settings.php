@@ -1,8 +1,12 @@
 <?php
+/**
+ * DooFinder Settings methods.
+ *
+ * @package Doofinder\WP\Settings
+ */
 
 namespace Doofinder\WP;
 
-use Doofinder\WP\Api\Store_Api;
 use Doofinder\WP\Multilanguage\Language_Plugin;
 use Doofinder\WP\Multilanguage\Multilanguage;
 
@@ -11,8 +15,14 @@ use Doofinder\WP\Settings\Register_Settings;
 use Doofinder\WP\Settings\Renderers;
 use Doofinder\WP\Settings\Helpers;
 
-defined( 'ABSPATH' ) or die;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
+
+/**
+ * Settings Class.
+ */
 class Settings {
 
 	use Accessors;
@@ -82,7 +92,7 @@ class Settings {
 	 *
 	 * @var Settings
 	 */
-	private static $_instance = null;
+	private static $instance = null;
 
 	/**
 	 * Instance of the class handling multilanguage.
@@ -91,8 +101,18 @@ class Settings {
 	 */
 	private $language;
 
+	/**
+	 * DooFinder custom attributes name in options table.
+	 *
+	 * @var string
+	 */
 	public static $custom_attributes_option = 'doofinder_for_wp_custom_attributes';
 
+	/**
+	 * DooFinder image size name in options table.
+	 *
+	 * @var string
+	 */
 	public static $image_size_option = 'doofinder_for_wp_image_size';
 
 	/**
@@ -102,11 +122,11 @@ class Settings {
 	 * @return Settings
 	 */
 	public static function instance() {
-		if ( is_null( self::$_instance ) ) {
-			self::$_instance = new self();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
 
-		return self::$_instance;
+		return self::$instance;
 	}
 
 	/**
@@ -133,11 +153,16 @@ class Settings {
 		static::initialize();
 	}
 
+	/**
+	 * Initialize the settings by updating the WordPress options.
+	 *
+	 * @return void
+	 */
 	public static function initialize() {
 		$option = static::$custom_attributes_option;
 		add_action(
 			"update_option_{$option}",
-			function ( $old_value, $value, $option ) {
+			function () {
 				add_settings_error(
 					'doofinder_for_wp_messages',
 					'doofinder_for_wp_message',
@@ -149,7 +174,7 @@ class Settings {
 			3
 		);
 
-		add_filter( 'cron_schedules', array( self::class, 'add_schedules' ), 100, 1 );
+		add_filter( 'cron_schedules', array( __CLASS__, 'add_schedules' ), 100, 1 ); // phpcs:ignore WordPress.WP.CronInterval
 	}
 	/**
 	 * Returns an array with select options structured by option groups
@@ -193,7 +218,7 @@ class Settings {
 	public static function get_product_rest_attributes() {
 		$transient_name  = 'df_product_rest_attributes';
 		$rest_attributes = get_transient( $transient_name );
-		if ( $rest_attributes === false || isset( $_GET['force'] ) ) {
+		if ( false === $rest_attributes || isset( $_GET['force'] ) ) {
 			try {
 				$request         = new \WP_REST_Request( 'GET', '/wc/v3/products' );
 				$result          = rest_get_server()->dispatch( $request );
@@ -211,7 +236,8 @@ class Settings {
 	/**
 	 * Method that removes unwanted attributes from rest attribute list
 	 *
-	 * @param array $rest_attributes All the attributes returned by WC REST API
+	 * @param array $rest_attributes All the attributes returned by WC REST API.
+	 *
 	 * @return array List of valid attributes
 	 */
 	private static function filter_product_rest_attributes( $rest_attributes ) {
@@ -235,34 +261,46 @@ class Settings {
 		return array_diff( $rest_attributes, static::RESERVED_CUSTOM_ATTRIBUTES_NAMES );
 	}
 
-
+	/**
+	 * Method that adds some custom schedules to be used in WP Cron.
+	 *
+	 * @param array $schedules Current WP Schedules as array.
+	 *
+	 * @return array List of previous schedules + DooFinder ones.
+	 */
 	public static function add_schedules( $schedules ) {
 		$df_schedules = array(
 			'wp_doofinder_each_5_minutes'  => array(
+				/* translators: %s is replaced with an integer number representing the minutes. */
 				'display'  => sprintf( __( 'Each %s minutes', 'doofinder_for_wp' ), 5 ),
-				'interval' => 60 * 5,
+				'interval' => MINUTE_IN_SECONDS * 5,
 			),
 			'wp_doofinder_each_15_minutes' => array(
+				/* translators: %s is replaced with an integer number representing the minutes. */
 				'display'  => sprintf( __( 'Each %s minutes', 'doofinder_for_wp' ), 15 ),
-				'interval' => 60 * 15,
+				'interval' => MINUTE_IN_SECONDS * 15,
 			),
 			'wp_doofinder_each_30_minutes' => array(
+				/* translators: %s is replaced with an integer number representing the minutes. */
 				'display'  => sprintf( __( 'Each %s minutes', 'doofinder_for_wp' ), 30 ),
-				'interval' => 60 * 30,
+				'interval' => MINUTE_IN_SECONDS * 30,
 			),
 			'wp_doofinder_each_60_minutes' => array(
 				'display'  => __( 'Each hour', 'doofinder_for_wp' ),
 				'interval' => HOUR_IN_SECONDS,
 			),
 			'wp_doofinder_each_2_hours'    => array(
+				/* translators: %s is replaced with an integer number representing the hours. */
 				'display'  => sprintf( __( 'Each %s hours', 'doofinder_for_wp' ), 2 ),
 				'interval' => HOUR_IN_SECONDS * 2,
 			),
 			'wp_doofinder_each_6_hours'    => array(
+				/* translators: %s is replaced with an integer number representing the hours. */
 				'display'  => sprintf( __( 'Each %s hours', 'doofinder_for_wp' ), 6 ),
 				'interval' => HOUR_IN_SECONDS * 6,
 			),
 			'wp_doofinder_each_12_hours'   => array(
+				/* translators: %s is replaced with an integer number representing the hours. */
 				'display'  => sprintf( __( 'Each %s hours', 'doofinder_for_wp' ), 12 ),
 				'interval' => HOUR_IN_SECONDS * 12,
 			),
