@@ -1,4 +1,9 @@
 <?php
+/**
+ * DooFinder Landing methods.
+ *
+ * @package Doofinder\WP\Landing
+ */
 
 namespace Doofinder\WP;
 
@@ -9,10 +14,23 @@ use Doofinder\WP\Multilanguage\Multilanguage;
 use Doofinder\WP\Multilanguage\No_Language_Plugin;
 use Doofinder\WP\Settings;
 
+/**
+ * Handles the Conversion pages (formerly known as Landings) methods.
+ */
 class Landing {
 
+	/**
+	 * Products array.
+	 *
+	 * @var array
+	 */
 	public $products = array();
 
+	/**
+	 * Landing data from cache or from Doomanager.
+	 *
+	 * @var array
+	 */
 	public $landing_data = array();
 
 	/**
@@ -58,6 +76,12 @@ class Landing {
 	 */
 	private $landing_api;
 
+
+	/**
+	 * Landing constructor.
+	 *
+	 * @since 1.0.0
+	 */
 	public function __construct() {
 
 		$this->log              = new Log( 'landing.log' );
@@ -68,34 +92,36 @@ class Landing {
 
 	/**
 	 * Initializes the custom functionality of Doofinder for WordPress, including setting up rewrite rules and including custom templates.
+	 *
+	 * @return void
 	 */
 	public static function init() {
 
-		// See: https://wpml.org/errata/htaccess-is-rewritten-with-language-folder/
+		// See: https://wpml.org/errata/htaccess-is-rewritten-with-language-folder/.
 		add_filter( 'mod_rewrite_rules', array( __CLASS__, 'avoid_conflicts_with_wpml_rewrite_rules' ) );
 
-		// Add a custom rewrite tag
+		// Add a custom rewrite tag.
 		add_rewrite_tag( '%df-landing%', '([^/]+)' );
 
-		// Add a custom rewrite rule
+		// Add a custom rewrite rule.
 		add_rewrite_rule(
-			'^df/(.+)/?$', // The rewrite pattern
-			'index.php?df-landing=$matches[1]', // The corresponding query
-			'top' // Rule priority
+			'^df/(.+)/?$', // The rewrite pattern.
+			'index.php?df-landing=$matches[1]', // The corresponding query.
+			'top' // Rule priority.
 		);
 
-		// Add an action to redirect to the custom template when the rewrite rule is matched
+		// Add an action to redirect to the custom template when the rewrite rule is matched.
 		add_action(
 			'template_redirect',
 			function () {
 				global $wp_query;
 
-				// Get the value of 'df-landing' from the query
+				// Get the value of 'df-landing' from the query.
 				$model = $wp_query->get( 'df-landing' );
 
-				// If 'df-landing' is not empty, include the custom template and exit the normal flow
+				// If 'df-landing' is not empty, include the custom template and exit the normal flow.
 				if ( ! empty( $model ) ) {
-					// Include the custom template
+					// Include the custom template.
 					include Doofinder_For_WordPress::plugin_path() . '/views/landing.php';
 					exit;
 				}
@@ -104,19 +130,26 @@ class Landing {
 		self::maybe_flush_rewrite_rules();
 	}
 
+	/**
+	 * If WPML is active, we have to define rules which don't conflict with the WPML ones.
+	 *
+	 * @param array $rules Array of rewrite rules.
+	 *
+	 * @return array
+	 */
 	public static function avoid_conflicts_with_wpml_rewrite_rules( $rules ) {
 		if ( ! class_exists( 'SitePress' ) ) {
 			return $rules;
 		}
 
-		$home_root = parse_url( home_url() );
+		$home_root = wp_parse_url( home_url() );
 		if ( isset( $home_root['path'] ) ) {
 			$home_root = trailingslashit( $home_root['path'] );
 		} else {
 			$home_root = '/';
 		}
 
-		$wpml_root = parse_url( get_option( 'home' ) );
+		$wpml_root = wp_parse_url( get_option( 'home' ) );
 		if ( isset( $wpml_root['path'] ) ) {
 			$wpml_root = trailingslashit( $wpml_root['path'] );
 		} else {
@@ -140,7 +173,7 @@ class Landing {
 	public static function maybe_flush_rewrite_rules() {
 		$rewrite_obj   = new \WP_Rewrite();
 		$rewrites      = $rewrite_obj->wp_rewrite_rules();
-		$current_state = md5( json_encode( $rewrites ) );
+		$current_state = md5( wp_json_encode( $rewrites ) );
 		$stored_state  = Settings::get_rewrite_rules_state();
 		if ( $current_state !== $stored_state ) {
 			flush_rewrite_rules();
@@ -156,7 +189,7 @@ class Landing {
 	 * @param bool   $index Determines the indexing policies for the landing page. If false, the page will be set to 'noindex, nofollow'.
 	 */
 	public static function set_meta_data( $meta_title, $meta_description, $index ) {
-		// Add classes to the body element
+		// Add classes to the body element.
 		add_filter(
 			'body_class',
 			function ( $classes ) {
@@ -166,17 +199,17 @@ class Landing {
 			}
 		);
 
-		// Configure the page meta title
+		// Configure the page meta title.
 		add_filter(
 			'wp_title',
-			function ( $title ) use ( $meta_title ) {
+			function () use ( $meta_title ) {
 				return $meta_title;
 			},
 			10,
 			2
 		);
 
-		// Configure the meta description
+		// Configure the meta description.
 		add_filter(
 			'document_title_parts',
 			function ( $title_parts ) use ( $meta_description ) {
@@ -185,11 +218,11 @@ class Landing {
 			}
 		);
 
-		// Configure indexing policies
-		if ( $index === false ) {
+		// Configure indexing policies.
+		if ( false === $index ) {
 			add_filter(
 				'wp_robots',
-				function ( $robots ) {
+				function () {
 					return 'noindex,nofollow';
 				}
 			);
@@ -230,20 +263,20 @@ class Landing {
 	 * @return array An array containing landing page information or an error message if the page is not well-constructed.
 	 */
 	public function get_landing_info( $hashid, $slug ) {
-		// Determine the hashid to use based on the provided parameter or settings
+		// Determine the hashid to use based on the provided parameter or settings.
 		$hashid = ! empty( $hashid ) ? $hashid : Settings::get_search_engine_hash( $this->current_language );
 
-		// Define an error message for cases where required parameters are missing
+		// Define an error message for cases where required parameters are missing.
 		$error_not_set = array( 'error' => 'The page is not well constructed. The hashid or slug is missing.' );
 
-		// Check if the necessary parameters are available or return the error message
+		// Check if the necessary parameters are available or return the error message.
 		$this->landing_data = self::have_params( $hashid, $slug ) ? $this->request_landing_info( $hashid, $slug ) : $error_not_set;
 
 		if ( isset( $this->landing_data['error'] ) ) {
 			$this->log->log( $this->landing_data['error'] );
 		}
 
-		// Return the landing page information or error message
+		// Return the landing page information or error message.
 		return $this->landing_data;
 	}
 
@@ -273,18 +306,18 @@ class Landing {
 		<html <?php language_attributes(); ?>>
 
 		<head>
-			<link rel="stylesheet" href="<?php echo Doofinder_For_WordPress::plugin_url(); ?>assets/css/landing.css">
+			<link rel="stylesheet" href="<?php echo esc_url( Doofinder_For_WordPress::plugin_url() ); ?>assets/css/landing.css"><?php // phpcs:ignore WordPress.WP.EnqueuedResources ?>
 			<?php get_header(); ?>
 		</head>
 
 		<body class="woocommerce woocommerce-page woocommerce-js">
 			<?php
 			if ( isset( $landing_data['error'] ) ) {
-				echo $this->get_error_html();
+				echo $this->get_error_html(); // phpcs:ignore WordPress.Security.EscapeOutput
 			} elseif ( isset( $landing_data['data_not_set'] ) ) {
-				echo $this->get_error_html();
+				echo $this->get_error_html(); // phpcs:ignore WordPress.Security.EscapeOutput
 			} elseif ( isset( $landing_data['data'] ) ) {
-				echo $this->get_data_html( $landing_slug );
+				echo $this->get_data_html( $landing_slug ); // phpcs:ignore WordPress.Security.EscapeOutput
 			}
 			?>
 
@@ -310,16 +343,16 @@ class Landing {
 
 		<section id="primary" class="df-content-area content-area">
 			<header class="woocommerce-products-header df-products-header">
-				<h1 class="woocommerce-products-header__title page-title"><?php echo $this->landing_data['data']['title']; ?></h1>
+				<h1 class="woocommerce-products-header__title page-title"><?php echo esc_html( $this->landing_data['data']['title'] ); ?></h1>
 			</header>
 			<?php
 
 			foreach ( $this->landing_data['data']['blocks'] as &$block ) {
 				?>
-				<div class="df-landing-block df-landing-block-<?php echo $landing_slug; ?>">
-					<div class="df-above-block"><?php echo $block['above']; ?></div>
-					<div class="df-product-block"><?php echo $this->render_products( $block['products'] ); ?></div>
-					<div class="df-below-block"><?php echo $block['below']; ?></div>
+				<div class="df-landing-block df-landing-block-<?php echo esc_attr( $landing_slug ); ?>">
+					<div class="df-above-block"><?php echo wp_kses_post( $block['above'] ); ?></div>
+					<div class="df-product-block"><?php echo wp_kses_post( $this->render_products( $block['products'] ) ); ?></div>
+					<div class="df-below-block"><?php echo wp_kses_post( $block['below'] ); ?></div>
 
 				</div>
 				<?php
@@ -343,7 +376,7 @@ class Landing {
 			<main id="main" class="site-main">
 				<div class="df-error-col content">
 					<p>
-						<?php echo self::translated_error(); ?>
+						<?php echo self::translated_error(); // phpcs:ignore WordPress.Security.EscapeOutput ?> 
 					</p>
 				</div>
 		</div>
@@ -354,7 +387,7 @@ class Landing {
 	}
 
 	/**
-	 * Generates HTML content for displaying an error message on the landing page becouse doofinder is disabled.
+	 * Generates HTML content for displaying an error message on the landing page because DooFinder is disabled.
 	 *
 	 * @return string The HTML content for the error message.
 	 */
@@ -409,7 +442,7 @@ class Landing {
 	 * @return string The formatted URL with the slug included.
 	 */
 	private function formatted_url( $home_url, $slug ) {
-		if ( substr( $home_url, -1 ) != '/' ) {
+		if ( substr( $home_url, -1 ) !== '/' ) {
 			$home_url .= '/';
 		}
 
@@ -432,13 +465,21 @@ class Landing {
 		exit;
 	}
 
+	/**
+	 * Gets the landing info as array from the Transient cache if it's available. If not, the data is requested from Doomanager.
+	 *
+	 * @param string $hashid The Search Engine hashid.
+	 * @param string $slug The slug of the landing.
+	 *
+	 * @return array
+	 */
 	private function request_landing_info( $hashid, $slug ) {
 		$lang_cache  = self::is_no_multilang() ? Landing_Cache::lang_cache() : Landing_Cache::lang_cache( $this->current_language );
 		$cached_data = Landing_Cache::get_cache_data( $lang_cache );
 
 		if ( false === $cached_data ) {
 			$this->landing_data = $this->landing_api->get_landing_info( $hashid, $slug );
-			// If landing page data is available, build its blocks
+			// If landing page data is available, build its blocks.
 			if ( isset( $this->landing_data['data'] ) ) {
 				$this->build_blocks( $hashid );
 				Landing_Cache::set_cache( $lang_cache, $this->landing_data );
@@ -446,7 +487,7 @@ class Landing {
 			return $this->landing_data;
 		}
 
-		// Return the landing page information or error message
+		// Return the landing page information or error message.
 		return $cached_data;
 	}
 
@@ -469,18 +510,18 @@ class Landing {
 	 */
 	private function build_blocks( $hashid ) {
 		foreach ( $this->landing_data['data']['blocks'] as &$block ) {
-			// Get custom search results based on the provided query
+			// Get custom search results based on the provided query.
 			$products = $this->landing_api->get_custom_result( $hashid, $block['query'] );
 
 			if ( isset( $products['results'] ) ) {
-				// Extract product IDs from the search results
+				// Extract product IDs from the search results.
 				$products_ids = $this->get_product_ids( $products['results'] );
 
 				if ( is_array( $products_ids ) && ! empty( $products_ids ) ) {
 					$block['products'] = $products_ids;
 				}
 			} else {
-				// If no results were found, store the original products array or an error message
+				// If no results were found, store the original products array or an error message.
 				$block['products'] = isset( $products['error'] ) ? $products : $products['results'];
 			}
 		}
@@ -508,8 +549,8 @@ class Landing {
 	 */
 	private function render_products( $products_ids ) {
 		if ( isset( $products_ids['error'] ) ) {
-			$this->log->log( 'Product ids could not be obtained in our request: ' . print_r( $products_ids['error'], true ) );
-			echo self::translated_error();
+			$this->log->log( 'Product ids could not be obtained in our request: ' . print_r( $products_ids['error'], true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions
+			echo self::translated_error(); // phpcs:ignore WordPress.Security.EscapeOutput
 		}
 
 		$args = array(
@@ -531,16 +572,25 @@ class Landing {
 
 			woocommerce_product_loop_end();
 		} else {
-			$this->log->log( 'No products were found for the list of ids we have obtained: ' . print_r( $products_ids, true ) );
-			echo self::translated_error();
+			$this->log->log( 'No products were found for the list of ids we have obtained: ' . print_r( $products_ids, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions
+			echo self::translated_error(); // phpcs:ignore WordPress.Security.EscapeOutput
 		}
 
 		wp_reset_postdata();
 	}
+
+	/**
+	 * Translated 500 error message.
+	 */
 	private static function translated_error() {
-		_e( "[500] - Oops! We're experiencing some technical difficulties at the moment. Please check back later. We apologize for any inconvenience.", 'wordpress-doofinder' );
+		esc_html_e( "[500] - Oops! We're experiencing some technical difficulties at the moment. Please check back later. We apologize for any inconvenience.", 'wordpress-doofinder' );
 	}
 
+	/**
+	 * Checks if there is no supported language plugin available.
+	 *
+	 * @return bool
+	 */
 	private function is_no_multilang() {
 		return is_a( $this->language, No_Language_Plugin::class );
 	}
