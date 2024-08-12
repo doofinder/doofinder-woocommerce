@@ -1,13 +1,20 @@
 <?php
+/**
+ * DooFinder Landing_Cache methods.
+ *
+ * @package Cache
+ */
 
 namespace Doofinder\WP;
 
 use Doofinder\WP\Multilanguage\Multilanguage;
 use Doofinder\WP\Multilanguage\No_Language_Plugin;
 use WP_Http;
-use WP_REST_Request;
 use WP_REST_Response;
 
+/**
+ * Handles the transient cache for the Landings.
+ */
 class Landing_Cache {
 
 
@@ -106,13 +113,11 @@ class Landing_Cache {
 	/**
 	 * Clears the landings cache from doomanager using the custom REST endpoint.
 	 *
-	 * @param WP_REST_Request $request The REST request object.
-	 *
 	 * @return WP_REST_Response The REST response.
 	 *
 	 * @since 1.0.0
 	 */
-	public static function doomanager_clear_cache( WP_REST_Request $request ) {
+	public static function doomanager_clear_cache() {
 		$language = Multilanguage::instance();
 
 		if ( is_a( $language, No_Language_Plugin::class ) ) {

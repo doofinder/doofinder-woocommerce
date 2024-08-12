@@ -1,4 +1,9 @@
 <?php
+/**
+ * DooFinder Update_On_Save_Index methods.
+ *
+ * @package Indexing
+ */
 
 namespace Doofinder\WP;
 
@@ -7,7 +12,9 @@ use Doofinder\WP\Log;
 use Doofinder\WP\Multilanguage\Language_Plugin;
 use Doofinder\WP\Multilanguage\Multilanguage;
 
-defined( 'ABSPATH' ) or die;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Handles the process of indexing the posts.
@@ -61,6 +68,9 @@ class Update_On_Save_Index {
 	 */
 	private $post_types = array( 'product', 'product_variation', 'posts', 'pages' );
 
+	/**
+	 * Update_On_Save_Index constructor.
+	 */
 	public function __construct() {
 		$this->language         = Multilanguage::instance();
 		$this->current_language = $this->language->get_current_language();
@@ -81,8 +91,8 @@ class Update_On_Save_Index {
 		$this->log->log( 'Launch Doofinder update on save' );
 		$this->update_on_save( 'update' );
 		$this->update_on_save( 'delete' );
-		// Update last exec
-		update_option( 'doofinder_update_on_save_last_exec', date( 'Y-m-d H:i:s' ) );
+		// Update last exec.
+		update_option( 'doofinder_update_on_save_last_exec', gmdate( 'Y-m-d H:i:s' ) );
 	}
 
 	/**
@@ -103,9 +113,9 @@ class Update_On_Save_Index {
 
 			if ( ! empty( $posts_ids_to_update ) ) {
 				$result = false;
-				$this->log->log( 'Ids ready to send ' . print_r( $posts_ids_to_update, true ) );
+				$this->log->log( 'Ids ready to send ' . print_r( $posts_ids_to_update, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions
 
-				// Call the function passing the post type name as a parameter
+				// Call the function passing the post type name as a parameter.
 				switch ( $action ) {
 					case 'update':
 						$this->log->log( 'We send the request to UPDATE items with this data:' );
@@ -130,16 +140,14 @@ class Update_On_Save_Index {
 	 *
 	 * @param string $post_type The type of posts to retrieve IDs for.
 	 * @param string $action The action type ('update' or 'delete').
+	 *
 	 * @return array An array of post IDs.
 	 * @since 1.0.0
 	 */
 	public function get_posts_ids_by_type_indexation( $post_type, $action ) {
 		global $wpdb;
-		$table_name = $wpdb->prefix . 'doofinder_update_on_save';
 
-		$query = "SELECT * FROM $table_name WHERE type_post = '$post_type' AND type_action = '$action'";
-
-		$ids = $wpdb->get_results( $query, ARRAY_N );
+		$ids = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . $wpdb->prefix . 'doofinder_update_on_save WHERE type_post = %s AND type_action = %s', $post_type, $action ), ARRAY_N );
 
 		if ( ! $ids ) {
 			return array();

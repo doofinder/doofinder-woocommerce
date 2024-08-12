@@ -189,9 +189,9 @@ class Landing_Api {
 
 		if ( is_wp_error( $response ) ) {
 			// If an error occurs in the request, returns error information.
-			$error = $response->get_error_message();
-			$this->log->log( 'Try request: ' . $error );
-			return array( 'error' => $error );
+			$df_error = $response->get_error_message();
+			$this->log->log( 'Try request: ' . $df_error );
+			return array( 'error' => $df_error );
 		}
 
 		$response_code    = wp_remote_retrieve_response_code( $response );
