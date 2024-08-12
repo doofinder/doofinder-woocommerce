@@ -254,7 +254,12 @@ class Update_On_Save {
 
 		$last_exec_ts = strtotime( $last_exec );
 
-		$diff_min = ( time() - $last_exec_ts );
+		/*
+		 * We are using strtotime( gmdate( 'Y-m-d H:i:s' ) ) instead of time() since time
+		 * is relying on the timezone (when it shouldn't). The dates are now saved using
+		 * gmdate instead of date to fulfill WordPress standards. https://github.com/WordPress/WordPress-Coding-Standards/issues/1713.
+		 */
+		$diff_min = ( strtotime( gmdate( 'Y-m-d H:i:s' ) ) - $last_exec_ts );
 
 		$log->log( 'The difference is:  ' . $diff_min );
 
