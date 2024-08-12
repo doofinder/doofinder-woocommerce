@@ -1,7 +1,15 @@
 <?php
+/**
+ * DooFinder I18n_Handler methods.
+ *
+ * @package Doofinder\WP\Multilanguage
+ */
 
 namespace Doofinder\WP\Multilanguage;
 
+/**
+ * Interface with useful functions to handle the Multi-language.
+ */
 interface I18n_Handler {
 
 	/**
@@ -56,7 +64,7 @@ interface I18n_Handler {
 	 * Some fields in Doofinder settings will have different values,
 	 * depending on language.
 	 *
-	 * @param string $base
+	 * @param string $base Country code or language.
 	 *
 	 * @return string
 	 */

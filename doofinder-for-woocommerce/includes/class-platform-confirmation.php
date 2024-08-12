@@ -1,10 +1,18 @@
 <?php
+/**
+ * DooFinder Platform_Confirmation methods.
+ *
+ * @package Doofinder\WP\Platform
+ */
 
 namespace Doofinder\WP;
 
 use Doofinder\WP\Multilanguage\Language_Plugin;
 use Doofinder\WP\Multilanguage\Multilanguage;
 
+/**
+ * Handles the platform decision process.
+ */
 class Platform_Confirmation {
 
 
@@ -45,6 +53,11 @@ class Platform_Confirmation {
 		);
 	}
 
+	/**
+	 * Platform_Confirmation constructor.
+	 *
+	 * @since 1.0.0
+	 */
 	private function __construct() {
 		$this->language   = Multilanguage::instance();
 		$this->wp_version = get_bloginfo( 'version' );
@@ -75,7 +88,7 @@ class Platform_Confirmation {
 				'version' => \WC()->version,
 			);
 		}
-		echo json_encode( $config );
+		echo wp_json_encode( $config );
 	}
 
 	/**
