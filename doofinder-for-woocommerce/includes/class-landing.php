@@ -222,8 +222,11 @@ class Landing {
 		if ( false === $index ) {
 			add_filter(
 				'wp_robots',
-				function () {
-					return 'noindex,nofollow';
+				function ( $robots ) {
+					$robots['noindex']  = true;
+					$robots['nofollow'] = true;
+
+					return $robots;
 				}
 			);
 		}
