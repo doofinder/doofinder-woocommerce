@@ -316,11 +316,11 @@ class Landing {
 		<body class="woocommerce woocommerce-page woocommerce-js">
 			<?php
 			if ( isset( $landing_data['error'] ) ) {
-				echo $this->get_error_html(); // phpcs:ignore WordPress.Security.EscapeOutput
+				echo wp_kses_post( $this->get_error_html() );
 			} elseif ( isset( $landing_data['data_not_set'] ) ) {
-				echo $this->get_error_html(); // phpcs:ignore WordPress.Security.EscapeOutput
+				echo wp_kses_post( $this->get_error_html() );
 			} elseif ( isset( $landing_data['data'] ) ) {
-				echo $this->get_data_html( $landing_slug ); // phpcs:ignore WordPress.Security.EscapeOutput
+				echo wp_kses_post( $this->get_data_html( $landing_slug ) );
 			}
 			?>
 
@@ -379,7 +379,7 @@ class Landing {
 			<main id="main" class="site-main">
 				<div class="df-error-col content">
 					<p>
-						<?php echo self::translated_error(); // phpcs:ignore WordPress.Security.EscapeOutput ?> 
+						<?php echo esc_html( self::translated_error() ); ?>
 					</p>
 				</div>
 		</div>
@@ -553,7 +553,7 @@ class Landing {
 	private function render_products( $products_ids ) {
 		if ( isset( $products_ids['error'] ) ) {
 			$this->log->log( 'Product ids could not be obtained in our request: ' . print_r( $products_ids['error'], true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions
-			echo self::translated_error(); // phpcs:ignore WordPress.Security.EscapeOutput
+			echo esc_html( self::translated_error() );
 		}
 
 		$args = array(
@@ -576,7 +576,7 @@ class Landing {
 			woocommerce_product_loop_end();
 		} else {
 			$this->log->log( 'No products were found for the list of ids we have obtained: ' . print_r( $products_ids, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions
-			echo self::translated_error(); // phpcs:ignore WordPress.Security.EscapeOutput
+			echo esc_html( self::translated_error() );
 		}
 
 		wp_reset_postdata();
