@@ -3,7 +3,7 @@
  * Plugin Name: DOOFINDER Search and Discovery for WP & WooCommerce
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 2.4.6
+ * Version: 2.4.7
  * Requires at least: 5.6
  * Requires PHP: 7.0
  * Author: Doofinder
@@ -37,7 +37,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 		 * @var string
 		 */
 
-		public static $version = '2.4.6';
+		public static $version = '2.4.7';
 
 		/**
 		 * The only instance of Doofinder_For_WordPress
@@ -342,8 +342,10 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 					'nonce'                            => wp_create_nonce( 'doofinder-ajax-nonce' ),
 					'show_indexing_notice'             => Setup_Wizard::should_show_indexing_notice() ? 'true' : 'false',
 					'RESERVED_CUSTOM_ATTRIBUTES_NAMES' => Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES,
-					'reserved_custom_attributes_error_message' => __( "The '%1\$field_name%2\$' field name is reserved, please use a different field name, e.g.: 'custom_%3\$field_name%'", 'wordpress-doofinder' ),
-					'duplicated_custom_attributes_error_message' => __( "The '%1\$field_name%2\$' field name is already in use, please use a different field name", 'wordpress-doofinder' ),
+					/* translators: %1$s is replaced with the field name. */
+					'reserved_custom_attributes_error_message' => sprintf( __( "The '%1\$s' field name is reserved, please use a different field name, e.g.: 'custom_%1\$s'", 'wordpress-doofinder' ), '%field_name%' ),
+					/* translators: %s is replaced with the field name. */
+					'duplicated_custom_attributes_error_message' => sprintf( __( "The '%s' field name is already in use, please use a different field name", 'wordpress-doofinder' ), '%field_name%' ),
 				)
 			);
 

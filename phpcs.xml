@@ -16,6 +16,12 @@
         <exclude name="WordPress.Security.NonceVerification.Recommended" />
         <exclude name="WordPress.Security.NonceVerification.Missing" />
         <exclude name="WordPress.Security.ValidatedSanitizedInput.InputNotSanitized" />
+        <exclude name="WordPress.PHP.DontExtract" />
+    </rule>
+
+    <!-- Main plugin file does not need to have `class-` prepended to the name -->
+    <rule ref="WordPress.Files.FileName">
+        <exclude-pattern>\/doofinder-for-woocommerce\/doofinder-for-woocommerce\.php</exclude-pattern>
     </rule>
 
     <!-- Main plugin file does not need to have `class-` prepended to the name -->

@@ -1,6 +1,15 @@
 <?php
+/**
+ * DooFinder Template_Engine helper methods.
+ *
+ * @package Doofinder\WP\Helpers
+ */
+
 namespace Doofinder\WP\Helpers;
 
+/**
+ * Adds helper methods regarding to the Template_Engine.
+ */
 class Template_Engine {
 
 	/**
@@ -8,7 +17,7 @@ class Template_Engine {
 	 *
 	 * @var $this
 	 */
-	private static $_instances = array();
+	private static $instances = array();
 
 	/**
 	 * Where template files are located.
@@ -30,18 +39,18 @@ class Template_Engine {
 	 * Retrieve the global instance of this class. Create it if one
 	 * doesn't exist yet.
 	 *
-	 * @param $location
+	 * @param string $location Where template files are located.
 	 *
 	 * @return $this
 	 */
 	public static function create( $location ) {
-		if ( isset( self::$_instances[ $location ] ) ) {
-			return self::$_instances[ $location ];
+		if ( isset( self::$instances[ $location ] ) ) {
+			return self::$instances[ $location ];
 		}
 
-		self::$_instances[ $location ] = new self( $location );
+		self::$instances[ $location ] = new self( $location );
 
-		return self::$_instances[ $location ];
+		return self::$instances[ $location ];
 	}
 
 	/**
@@ -54,7 +63,7 @@ class Template_Engine {
 	 *
 	 * @return mixed|string Full path to the template file.
 	 *
-	 * @throws LogicException If the file doesn't exist.
+	 * @throws \LogicException If the file doesn't exist.
 	 */
 	private function resolve_file( $template, $folder = '' ) {
 		$location = $this->location;
@@ -78,9 +87,10 @@ class Template_Engine {
 		if ( true === WP_DEBUG ) {
 			throw new \LogicException(
 				sprintf(
-					__( 'Template "%1$s" cannot be found in "%2$s".' ),
-					$template,
-					$location
+					/* translators: %1$s is replaced with the template name and %2$s by the path where the template is located. */
+					esc_html__( 'Template "%1$s" cannot be found in "%2$s".' ),
+					esc_html( $template ),
+					esc_html( $location )
 				)
 			);
 		}
@@ -106,8 +116,8 @@ class Template_Engine {
 	/**
 	 * Alias for "render".
 	 *
-	 * @param string $template
-	 * @param array  $data
+	 * @param string $template Template to render.
+	 * @param array  $data Data to pass to the template.
 	 */
 	public function insert( $template, $data = array() ) {
 		$this->render( $template, $data );
@@ -115,12 +125,13 @@ class Template_Engine {
 
 	/**
 	 * Retrieve part of the template.
+	 *
 	 * Uses template engine build into theme to grab the file (relative to "parts" directory),
 	 * and pass variables to this files local scope.
 	 *
-	 * @param string $part
-	 * @param array  $data
-	 * @param string $folder
+	 * @param string $part Template to render.
+	 * @param array  $data Data to pass to the template.
+	 * @param string $folder Overrides the default location.
 	 */
 	public static function get_template( $part, $data = array(), $folder = '' ) {
 
@@ -133,12 +144,12 @@ class Template_Engine {
 	}
 
 	/**
-	 * Clean SVG function - helper for get_svg() function
+	 * Clean SVG function - helper for get_svg() function.
 	 *
-	 * @param $img (string) (required) - File source;
+	 * @param string $img (required) - File source;.
 	 */
 	public static function get_clean_svg( $img ) {
-		$img_svg = file_get_contents( $img );
+		$img_svg = file_get_contents( $img ); // phpcs:ignore WordPress.WP.AlternativeFunctions
 		preg_match( '/<svg[\s\S]*\/svg>/m', $img_svg, $matches );
 
 		if ( isset( $matches[0] ) ) {
@@ -151,10 +162,10 @@ class Template_Engine {
 	/**
 	 * Retrieve an image or an svg to represent an attachment - based on file name or WP Image ID;
 	 *
-	 * @param $attachment (string|int) (required) - File name or WP image ID;
-	 * @param $thumbnail (string|array) (optional) - WP thumbnail size - usable only with image ID and NOT SVG files;
-	 * @param $path (string) (optional) - Path to file;
-	 * @param $ext (string) (optional) - File extension;
+	 * @param string|int   $attachment (required) - File name or WP image ID.
+	 * @param string|array $thumbnail (optional) - WP thumbnail size - usable only with image ID and NOT SVG files.
+	 * @param string       $path (optional) - Path to file.
+	 * @param string       $ext (optional) - File extension.
 	 */
 	public static function get_svg( $attachment, $thumbnail = 'full-size', $path = '/assets/svg/', $ext = '.svg' ) {
 
@@ -167,7 +178,7 @@ class Template_Engine {
 
 			$ext = pathinfo( $src[0], PATHINFO_EXTENSION );
 
-			if ( $ext != 'svg' ) {
+			if ( 'svg' !== $ext ) {
 				return wp_get_attachment_image( $attachment, $thumbnail );
 			}
 

@@ -12,7 +12,7 @@ use Doofinder\WP\Landing;
 if ( ! class_exists( 'Doofinder\WP\Landing' ) ) {
 	// The Landing class is not defined, it loads the WordPress core.
 	// This means that it is accessed directly from the PHP file.
-	$script_name = ( isset( $_SERVER['SCRIPT_FILENAME'] ) ) ? wp_unslash( $_SERVER['SCRIPT_FILENAME'] ) : '';
+	$script_name = ( isset( $_SERVER['SCRIPT_FILENAME'] ) ) ? $_SERVER['SCRIPT_FILENAME'] : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash
 	$parse_uri   = explode( 'wp-content', $script_name );
 	require_once $parse_uri[0] . 'wp-load.php';
 }

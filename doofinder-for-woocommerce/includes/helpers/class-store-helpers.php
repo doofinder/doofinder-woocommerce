@@ -1,9 +1,17 @@
 <?php
+/**
+ * DooFinder Store_Helpers methods.
+ *
+ * @package Doofinder\WP\Helpers
+ */
 
 namespace Doofinder\WP\Helpers;
 
 use WP_Application_Passwords;
 
+/**
+ * Adds helper methods regarding to the store.
+ */
 class Store_Helpers {
 
 
@@ -76,7 +84,7 @@ class Store_Helpers {
 	 * @return string New token to authenticate woocommerce endpoints created by doofinder
 	 */
 	public static function create_endpoints_token() {
-		$randomString = uniqid();
-		return md5( $randomString );
+		$random_string = uniqid();
+		return md5( $random_string );
 	}
 }
