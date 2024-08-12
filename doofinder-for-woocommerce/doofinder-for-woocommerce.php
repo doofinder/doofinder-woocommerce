@@ -352,7 +352,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 			// Add the Select2 CSS file.
 			wp_enqueue_style( 'select2-css', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', array(), '4.1.0-rc.0' );
 			// Add the Select2 JavaScript file.
-			wp_enqueue_script( 'select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', 'jquery', '4.1.0-rc.0', array( 'in_footer' => false ) );
+			wp_enqueue_script( 'select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', array( 'jquery' ), '4.1.0-rc.0', array( 'in_footer' => false ) );
 		}
 
 		/**
@@ -425,7 +425,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 			add_action(
 				'wp_ajax_doofinder_notice_dismiss',
 				function () {
-					if ( ! isset( $_POST['nonce'] ) && ! isset( $_POST['notice_id'] ) && ! wp_verify_nonce( wp_unslash( $_POST['nonce'] ), 'doofinder-ajax-nonce' ) ) {
+					if ( ! isset( $_POST['nonce'] ) || ! isset( $_POST['notice_id'] ) || ! wp_verify_nonce( wp_unslash( $_POST['nonce'] ), 'doofinder-ajax-nonce' ) ) {
 						status_header( WP_Http::UNAUTHORIZED );
 						die( 'Unauthorized request' );
 					}

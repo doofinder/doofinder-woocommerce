@@ -425,7 +425,7 @@ class Post {
 	 * @return string
 	 */
 	public function get_post_date() {
-		return gmdate( 'Y-m-d\TH:i:s\Z', strtotime( $this->post->post_date ) );
+		return get_the_date( 'Y-m-d\TH:i:s\Z', $this->post->ID );
 	}
 
 	/**

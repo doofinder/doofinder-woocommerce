@@ -23,4 +23,9 @@
     <rule ref="WordPress.Files.FileName">
         <exclude-pattern>\/doofinder-for-woocommerce\/doofinder-for-woocommerce\.php</exclude-pattern>
     </rule>
+
+    <!-- Main plugin file does not need to have `class-` prepended to the name -->
+    <rule ref="WordPress.Files.FileName">
+        <exclude-pattern>\/doofinder-for-woocommerce\/doofinder-for-woocommerce\.php</exclude-pattern>
+    </rule>
 </ruleset>
