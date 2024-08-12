@@ -342,8 +342,10 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 					'nonce'                            => wp_create_nonce( 'doofinder-ajax-nonce' ),
 					'show_indexing_notice'             => Setup_Wizard::should_show_indexing_notice() ? 'true' : 'false',
 					'RESERVED_CUSTOM_ATTRIBUTES_NAMES' => Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES,
-					'reserved_custom_attributes_error_message' => __( "The '%1\$field_name%2\$' field name is reserved, please use a different field name, e.g.: 'custom_%3\$field_name%'", 'wordpress-doofinder' ),
-					'duplicated_custom_attributes_error_message' => __( "The '%1\$field_name%2\$' field name is already in use, please use a different field name", 'wordpress-doofinder' ),
+					/* translators: %1$s is replaced with the field name. */
+					'reserved_custom_attributes_error_message' => sprintf( __( "The '%1\$s' field name is reserved, please use a different field name, e.g.: 'custom_%1\$s'", 'wordpress-doofinder' ), '%field_name%' ),
+					/* translators: %s is replaced with the field name. */
+					'duplicated_custom_attributes_error_message' => sprintf( __( "The '%s' field name is already in use, please use a different field name", 'wordpress-doofinder' ), '%field_name%' ),
 				)
 			);
 
