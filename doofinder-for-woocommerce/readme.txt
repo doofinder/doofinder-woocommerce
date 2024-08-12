@@ -1,11 +1,11 @@
 === DOOFINDER Search and Discovery for WP & WooCommerce ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.4.6
+Version: 2.4.7
 Requires at least: 5.6
 Tested up to: 6.6.1
 Requires PHP: 7.0
-Stable tag: 2.4.6
+Stable tag: 2.4.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -126,8 +126,11 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 2.4.7 =
+- Fixed a bug in the reserved field names message.
+
 = 2.4.6 =
-- Generate callback without depending on friendly urls
+- Generate callback without depending on friendly urls.
 
 = 2.4.5 =
 - Tested in WordPress 6.6.1 and applied full automatic reformat according to the WordPress PHP coding standards.
