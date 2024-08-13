@@ -253,43 +253,37 @@ class Endpoint_Custom {
 	}
 
 	/**
-	 * Obtains the image link, either from media sources or using methods from the thumbnail class
+	 * Obtains the image link, either from media sources or using methods from the thumbnail class.
 	 *
 	 * @param array $filtered_data The filtered data array.
 	 *
-	 * @throws \Exception If the filtered fields don't include any image size.
-	 *
 	 * @return string $image_link The image link
+	 * 
+	 * @return null If the filtered fields don't include any image size
 	 */
 	private static function obtain_image_link( $filtered_data ) {
 		$image_link = null;
-		try {
-			if ( empty( $filtered_data['_embedded']['wp:featuredmedia'][0]['media_details']['sizes'] ) ) {
-				throw new \Exception( 'Sizes field is not available in the media details', WP_Http::NOT_FOUND );
-			}
 
-			$size_image = $filtered_data['_embedded']['wp:featuredmedia'][0]['media_details']['sizes'];
+		if ( empty( $filtered_data['_embedded']['wp:featuredmedia'][0]['media_details']['sizes'] ) ) {
+			return $image_link;
+		}
 
-			if ( is_object( $size_image ) ) {
-				$image_link = $filtered_data['_embedded']['wp:featuredmedia'][0]['media_details']['source_url'];
-			} else {
-				$medium_size_image = $size_image['medium'];
-				$image_link        = is_array( $medium_size_image ) ? $medium_size_image['source_url'] : null;
-			}
+		$size_image = $filtered_data['_embedded']['wp:featuredmedia'][0]['media_details']['sizes'];
 
-			if ( is_null( $image_link ) ) {
-				$post = get_post( $filtered_data['id'] );
-				if ( ! empty( $post ) ) {
-					$thumbnail  = new Thumbnail( $post );
-					$image_link = $thumbnail->get();
-					$image_link = self::add_base_url_if_needed( $image_link );
-				}
+		if ( is_object( $size_image ) ) {
+			$image_link = $filtered_data['_embedded']['wp:featuredmedia'][0]['media_details']['source_url'];
+		} else {
+			$medium_size_image = $size_image['medium'];
+			$image_link        = is_array( $medium_size_image ) ? $medium_size_image['source_url'] : null;
+		}
+
+		if ( is_null( $image_link ) ) {
+			$post = get_post( $filtered_data['id'] );
+			if ( ! empty( $post ) ) {
+				$thumbnail  = new Thumbnail( $post );
+				$image_link = $thumbnail->get();
+				$image_link = self::add_base_url_if_needed( $image_link );
 			}
-		} catch ( \Exception $e ) {
-			$logger = new Log( 'custom-endpoint.log' );
-			$logger->log( 'An error ocurred while obtaining image link from item data. Error message: ' . $e->getMessage() );
-			$logger->log( 'Item Data: ' . print_r( $filtered_data, true ) ); // phpcs:ignore
-			$logger->log( 'Trace: ' . $e->getTraceAsString() );
 		}
 
 		return $image_link;
