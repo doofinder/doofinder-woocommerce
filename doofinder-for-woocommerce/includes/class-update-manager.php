@@ -1,19 +1,34 @@
 <?php
+/**
+ * DooFinder Update_Manager methods.
+ *
+ * @package Doofinder\WP\Update;
+ */
 
 namespace Doofinder\WP;
 
-use Doofinder\WP\Api\Store_Api;
-use Doofinder\WP\Multilanguage\Multilanguage;
 use Doofinder\WP\Settings;
 
-defined( 'ABSPATH' ) or die;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
+/**
+ * Handles the plugin Update_Manager process.
+ */
 class Update_Manager {
 
+	/**
+	 * To log anything.
+	 *
+	 * @var Log
+	 */
 	private static $logger = null;
 
 	/**
 	 * Checks and performs any pending DB updates.
+	 *
+	 * @param string $plugin_version Version of the plugin.
 	 *
 	 * @since 1.0
 	 */
@@ -52,7 +67,7 @@ class Update_Manager {
 				}
 
 				if ( $result ) {
-					// Remove the current update notice in case it exists
+					// Remove the current update notice in case it exists.
 					self::remove_admin_notice( $version_number );
 				} else {
 					self::update_failed( $version_number );
@@ -62,16 +77,16 @@ class Update_Manager {
 				self::log( "The update $update_function Succeeded" );
 				$formatted_version = self::format_normalized_plugin_version( $version_number );
 
-				// Update the database version to the newer one
+				// Update the database version to the newer one.
 				Settings::set_plugin_version( $formatted_version );
 			} else {
-				// If the update function doesn't exists, return true to update the db version value
+				// If the update function doesn't exists, return true to update the db version value.
 				$result = true;
 			}
 		}
 
 		if ( $result ) {
-			// All updates executed successfully, update the plugin version to the latest one
+			// All updates executed successfully, update the plugin version to the latest one.
 			Settings::set_plugin_version( $plugin_version );
 		}
 
@@ -82,6 +97,8 @@ class Update_Manager {
 	/**
 	 * Formats the plugin version to a normalized version.
 	 * Example: 1.5.13 => 010513
+	 *
+	 * @param string $version Version of the plugin (SemVer).
 	 */
 	private static function normalize_plugin_version( $version ) {
 		$normalized = '';
@@ -95,6 +112,10 @@ class Update_Manager {
 	/**
 	 * Formats a normalized version back to the x.y.z format version.
 	 * Example: 010513 => 1.5.13
+	 *
+	 * @param string $normalized Normalized version.
+	 *
+	 * @return string Version as SemVer.
 	 */
 	private static function format_normalized_plugin_version( $normalized ) {
 		$version = str_split( $normalized, 2 );
@@ -109,7 +130,12 @@ class Update_Manager {
 	}
 
 	/**
-	 * Logs the error and adds an admin notice
+	 * Logs the error and adds an admin notice.
+	 *
+	 * @param string $version Normalized version (e.g. 010513).
+	 * @param string $message Error message to display.
+	 *
+	 * @return void
 	 */
 	private static function update_failed( $version, $message = '' ) {
 		$formatted_version = self::format_normalized_plugin_version( $version );
@@ -119,21 +145,35 @@ class Update_Manager {
 
 	/**
 	 * Adds an admin notice using WooCommerce.
+	 *
+	 * @param string $version Normalized version (e.g. 010513).
+	 * @param string $message Error message to display.
+	 *
+	 * @return void
 	 */
 	private static function add_admin_notice( $version, $message = '' ) {
 		$formatted_version = self::format_normalized_plugin_version( $version );
-		$title             = sprintf( __( 'An error occurred while updating the Doofinder Database to the %s version.', 'doofinder_for_wp' ), $formatted_version );
-		$message          .= '<p>' . sprintf( __( 'For more details please contact us at our %1$s support center%2$s.', 'doofinder_for_wp' ), '<a target="_blank" href="https://support.doofinder.com/pages/contact-us.html">', '</a>' ) . '</p>';
+		/* translators: %s is replaced with the version number. */
+		$title = sprintf( __( 'An error occurred while updating the Doofinder Database to the %s version.', 'wordpress-doofinder' ), $formatted_version );
+		/* translators: %1$s is replaced with the `<a>` opening tag and %2$s by `</a>`. */
+		$message .= '<p>' . sprintf( __( 'For more details please contact us at our %1$s support center%2$s.', 'wordpress-doofinder' ), '<a target="_blank" href="https://support.doofinder.com/pages/contact-us.html">', '</a>' ) . '</p>';
 		Admin_Notices::add_notice( 'update-' . $version, $title, $message, 'error', null, '', true );
 	}
 
 	/**
 	 * Removes an admin notice using WooCommerce.
+	 *
+	 * @param string $version Normalized version (e.g. 010513).
 	 */
 	private static function remove_admin_notice( $version ) {
 		Admin_Notices::remove_notice( 'update-' . $version );
 	}
 
+	/**
+	 * Logs messages to the updates.log.
+	 *
+	 * @param string $message Message to store in the updates.log.
+	 */
 	private static function log( $message ) {
 		if ( empty( static::$logger ) ) {
 			static::$logger = new Log( 'updates.log' );
@@ -159,7 +199,7 @@ class Update_Manager {
 
 	/**
 	 * Update: 2.0.3
-	 * Remove the indexing failed notice to solve any existing problem
+	 * Remove the indexing failed notice to solve any existing problem.
 	 *
 	 * @return bool
 	 */
@@ -170,7 +210,7 @@ class Update_Manager {
 
 	/**
 	 * Update: 2.0.13
-	 * Update the woocommerce product attributes
+	 * Update the woocommerce product attributes.
 	 *
 	 * @return bool
 	 */
@@ -183,7 +223,7 @@ class Update_Manager {
 
 	/**
 	 * Update: 2.1.0
-	 * Update the woocommerce product attributes
+	 * Update the woocommerce product attributes.
 	 */
 	public static function update_020100() {
 		if ( Settings::is_configuration_complete() ) {
@@ -194,21 +234,21 @@ class Update_Manager {
 
 	/**
 	 * Update: 2.1.12
-	 * Remove stock_status from custom_attributes
+	 * Remove stock_status from custom_attributes.
 	 *
 	 * @return bool
 	 */
 	public static function update_020112() {
-		// Remove the stock_status custom_attribute if existing
+		// Remove the stock_status custom_attribute if existing.
 		$custom_attributes = Settings::get_custom_attributes();
 		foreach ( $custom_attributes as $key => $attr ) {
-			if ( $attr['attribute'] === 'stock_status' ) {
+			if ( 'stock_status' === $attr['attribute'] ) {
 				unset( $custom_attributes[ $key ] );
 				update_option( Settings::$custom_attributes_option, $custom_attributes );
 				break;
 			}
 		}
-		// Delete the custom_attributes transient
+		// Delete the custom_attributes transient.
 		delete_transient( 'df_product_rest_attributes' );
 		return true;
 	}
@@ -220,7 +260,7 @@ class Update_Manager {
 	 * @return bool
 	 */
 	public static function update_020206() {
-		// Set Region
+		// Set Region.
 		if ( Settings::is_configuration_complete() ) {
 			Migration::maybe_set_region();
 		}
