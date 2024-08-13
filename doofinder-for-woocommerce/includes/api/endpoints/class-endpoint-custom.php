@@ -257,9 +257,9 @@ class Endpoint_Custom {
 	 *
 	 * @param array $filtered_data The filtered data array.
 	 *
-	 * @return string $image_link The image link
+	 * @return string $image_link The image link.
 	 * 
-	 * @return null If the filtered fields don't include any image size
+	 * @return null If the filtered fields don't include any image size.
 	 */
 	private static function obtain_image_link( $filtered_data ) {
 		$image_link = null;
