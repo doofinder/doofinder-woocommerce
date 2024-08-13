@@ -1,4 +1,9 @@
 <?php
+/**
+ * DooFinder Landing_Api methods.
+ *
+ * @package Doofinder\WP\Api
+ */
 
 namespace Doofinder\WP\Api;
 
@@ -6,8 +11,13 @@ use Doofinder\WP\Log;
 use Doofinder\WP\Multilanguage\Multilanguage;
 use Doofinder\WP\Settings;
 
-defined( 'ABSPATH' ) or die();
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
+/**
+ * Handles requests to the Landing API.
+ */
 class Landing_Api {
 
 
@@ -42,8 +52,11 @@ class Landing_Api {
 
 	const SEARCH_API_HOST = 'search.doofinder.com/';
 
+	/**
+	 * Landing_Api constructor.
+	 */
 	public function __construct() {
-		// Get global disable_api_calls flag
+		// Get global disable_api_calls flag.
 		$this->log = new Log( 'landing_api.log' );
 
 		$this->api_key  = Settings::get_api_key();
@@ -54,12 +67,13 @@ class Landing_Api {
 	/**
 	 * Retrieves landing page information from the API using the provided hashid and slug.
 	 *
-	 * @param string $hashid The hashid parameter
+	 * @param string $hashid The hashid parameter.
 	 * @param string $slug The slug parameter for the landing page.
 	 *
 	 * @return array An array containing landing page information or an error message.
 	 *
 	 * Example of 'data' array:
+	 * ```
 	 *   [
 	 *     'title' => 'Landing Page Title',
 	 *     'meta_title' => 'Meta Title',
@@ -75,6 +89,7 @@ class Landing_Api {
 	 *       // Additional blocks...
 	 *     ]
 	 *   ]
+	 * ```
 	 */
 	public function get_landing_info( $hashid, $slug ) {
 
@@ -89,7 +104,7 @@ class Landing_Api {
 		);
 
 		$url              = "{$this->api_host}/{$endpoint}";
-		$decoded_response = $this->sendRequest( $url, $data );
+		$decoded_response = $this->send_request( $url, $data );
 
 		if ( isset( $decoded_response['error'] ) ) {
 			return $decoded_response;
@@ -106,8 +121,8 @@ class Landing_Api {
 			$data['blocks'] = array();
 			foreach ( $decoded_response['blocks'] as $block ) {
 				$data['blocks'][] = array(
-					'above'    => base64_decode( $block['above'] ),
-					'below'    => base64_decode( $block['below'] ),
+					'above'    => base64_decode( $block['above'] ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions
+					'below'    => base64_decode( $block['below'] ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions
 					'position' => $block['position'],
 					'query'    => $block['query'],
 				);
@@ -145,7 +160,7 @@ class Landing_Api {
 		$url = 'https://' . $zone . '-' . self::SEARCH_API_HOST . $endpoint;
 		$this->log->log( "Making a request to: $url" );
 
-		$decoded_response = $this->sendRequest( $url, $data );
+		$decoded_response = $this->send_request( $url, $data );
 
 		return $decoded_response;
 	}
@@ -161,10 +176,10 @@ class Landing_Api {
 	private function get_zone() {
 		$api_host = $this->api_host;
 		// Split the URL into parts using the '-' separator.
-		$parts = explode( '-', parse_url( $api_host, PHP_URL_HOST ) );
+		$parts = explode( '-', wp_parse_url( $api_host, PHP_URL_HOST ) );
 
 		// Check if the second element is "admin".
-		if ( isset( $parts[1] ) && $parts[1] === 'admin.doofinder.com' ) {
+		if ( isset( $parts[1] ) && 'admin.doofinder.com' === $parts[1] ) {
 			// The zone is in the first element.
 			$zone = $parts[0];
 			$this->log->log( "Zone: $zone" );
@@ -184,7 +199,7 @@ class Landing_Api {
 	 *
 	 * @return array An array containing the response data or an error message.
 	 */
-	private function sendRequest( $url, $data ) {
+	private function send_request( $url, $data ) {
 		$response = wp_remote_post( $url, $data );
 
 		if ( is_wp_error( $response ) ) {

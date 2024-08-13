@@ -989,7 +989,7 @@ class Setup_Wizard {
 				}
 
 				$this->log->log( 'Store create result:' );
-				$this->log->log( print_r( $store_data, true ) ); // phpcs:ignore
+				$this->log->log( print_r( $store_data, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions
 
 				$this->set_search_engines( $store_data['config']['search_engines'] );
 				$this->set_layer_script( $store_data['script'] );

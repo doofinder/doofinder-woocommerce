@@ -119,11 +119,11 @@ class Update_On_Save_Index {
 				switch ( $action ) {
 					case 'update':
 						$this->log->log( 'We send the request to UPDATE items with this data:' );
-						$result = $this->api->updateBulk( $post_type, $posts_ids_to_update );
+						$result = $this->api->update_bulk( $post_type, $posts_ids_to_update );
 						break;
 					case 'delete':
 						$this->log->log( 'We send the request to DELETE items with this data:' );
-						$result = $this->api->deleteBulk( $post_type, $posts_ids_to_update );
+						$result = $this->api->delete_bulk( $post_type, $posts_ids_to_update );
 						break;
 				}
 				if ( $result ) {

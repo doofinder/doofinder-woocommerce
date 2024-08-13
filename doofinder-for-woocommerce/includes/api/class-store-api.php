@@ -1,4 +1,9 @@
 <?php
+/**
+ * DooFinder Reset_Credentials_Api methods.
+ *
+ * @package Doofinder\WP\Api
+ */
 
 namespace Doofinder\WP\Api;
 
@@ -13,8 +18,13 @@ use Doofinder\WP\Doofinder_For_WordPress;
 use Exception;
 use WP_Http;
 
-defined( 'ABSPATH' ) or die();
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
+/**
+ * Handles requests to the Store API.
+ */
 class Store_Api {
 
 
@@ -47,8 +57,11 @@ class Store_Api {
 	 */
 	private $api_key;
 
+	/**
+	 * Store_Api constructor.
+	 */
 	public function __construct() {
-		// Get global disable_api_calls flag
+		// Get global disable_api_calls flag.
 		$this->log = new Log( 'store_create_api.log' );
 
 		$this->api_key         = Settings::get_api_key();
@@ -63,7 +76,7 @@ class Store_Api {
 	/**
 	 * Create a Store, Search Engine and Datatype
 	 *
-	 * @param array $api_keys
+	 * @param array $api_keys The list of API keys with search engine ids.
 	 *
 	 * @return mixed
 	 */
@@ -76,12 +89,13 @@ class Store_Api {
 			unset( $store_payload_log['options'] );
 
 			$this->log->log( $store_payload_log );
-			return $this->sendRequest( 'install', $store_payload );
+			return $this->send_request( 'install', $store_payload );
 		}
 	}
 
 	/**
-	 * Sends a request to update the store options with the api password and to create any missing datatype
+	 * Sends a request to update the store options with the api password and to create any missing datatype.
+	 *
 	 * Payload example:
 	 * $payload = array(
 	 *    'store_options' => array(
@@ -122,7 +136,7 @@ class Store_Api {
 			$lang      = Helpers::get_language_from_locale( $search_engine['language'] );
 			$base_lang = Helpers::get_language_from_locale( $this->language->get_base_language() );
 
-			// If the installation is not multilanguage or it's the base language, replace the lang with ''
+			// If the installation is not multilanguage or it's the base language, replace the lang with ''.
 			if ( is_a( $this->language, No_Language_Plugin::class ) || $lang === $base_lang ) {
 				$lang = '';
 			}
@@ -136,15 +150,18 @@ class Store_Api {
 		}
 
 		$this->log->log( 'Sending request to normalize indices.' );
-		$response = $this->sendRequest( 'wordpress/normalize-indices/', $payload, true );
+		$response = $this->send_request( 'wordpress/normalize-indices/', $payload, true );
 
 		if ( ! is_array( $response ) ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions
 			$this->log->log( 'The store and indices normalization has failed due to an invalid response: ' . print_r( $response, true ) );
 		} elseif ( array_key_exists( 'errors', $response ) ) {
 			$this->log->log( 'The store and indices normalization has failed!' );
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions
 			$this->log->log( print_r( $response['errors'], true ) );
 		} else {
 			$this->log->log( 'The store and indices normalization has finished successfully!' );
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions
 			$this->log->log( "Response: \n" . print_r( $response, true ) );
 		}
 	}
@@ -154,15 +171,17 @@ class Store_Api {
 	 *
 	 * @param string $endpoint The endpoint url.
 	 * @param array  $body The array containing the payload to be sent.
-	 * @return array The request decoded response
+	 * @param bool   $migration This must be set manually to true, otherwise it will throw an exception.
+	 *
+	 * @return array The request decoded response.
 	 */
-	private function sendRequest( $endpoint, $body, $migration = false ) {
+	private function send_request( $endpoint, $body, $migration = false ) {
 		$data = array(
 			'headers'     => array(
 				'Authorization' => "Token {$this->api_key}",
 				'Content-Type'  => 'application/json; charset=utf-8',
 			),
-			'body'        => json_encode( $body ),
+			'body'        => wp_json_encode( $body ),
 			'method'      => 'POST',
 			'data_format' => 'body',
 			'timeout'     => 20,
@@ -174,6 +193,7 @@ class Store_Api {
 		$response_code = wp_remote_retrieve_response_code( $response );
 
 		$this->log->log( "Response code: $response_code" );
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions
 		$this->log->log( 'Response: ' . print_r( $response, true ) );
 
 		if ( ! $migration ) {
@@ -181,19 +201,22 @@ class Store_Api {
 		}
 
 		$response_body = wp_remote_retrieve_body( $response );
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions
 		$this->log->log( 'Response body: ' . print_r( $response_body, true ) );
 
 		$decoded_response = json_decode( $response_body, true );
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions
 		$this->log->log( 'Decoded response: ' . print_r( $decoded_response, true ) );
 
 		return $decoded_response;
 	}
 
 	/**
-	 * Generates the create-store payload
+	 * Generates the create-store payload.
 	 *
-	 * @param array $api_keys The list of search engine ids
-	 * @return array Store payload
+	 * @param array $api_keys The list of search engine ids.
+	 *
+	 * @return array Store payload.
 	 */
 	private function build_store_payload( $api_keys ) {
 		$primary_language = $this->get_primary_language();
@@ -215,20 +238,31 @@ class Store_Api {
 		return $store_payload;
 	}
 
+	/**
+	 * Builds an array of search engines configurations based on the provided API keys and primary language.
+	 *
+	 * This function creates a list of search engine configurations, each containing details such as
+	 * the domain name, language, locale, currency, site URL, feed type, and callback URL.
+	 *
+	 * @param array  $api_keys         An array of API keys and associated language information used to configure search engines.
+	 * @param string $primary_language The primary language code to use as a fallback if specific language codes are not available in the API keys.
+	 *
+	 * @return array An array of search engine configurations, each represented as an associative array.
+	 */
 	private function build_search_engines( $api_keys, $primary_language ) {
 		$search_engines = array();
-		$domain         = str_ireplace( 'www.', '', parse_url( get_bloginfo( 'url' ), PHP_URL_HOST ) );
+		$domain         = str_ireplace( 'www.', '', wp_parse_url( get_bloginfo( 'url' ), PHP_URL_HOST ) );
 		$currency       = is_plugin_active( 'woocommerce/woocommerce.php' ) ? get_woocommerce_currency() : 'EUR';
 
 		foreach ( $api_keys as $item ) {
-			// Prioritize the locale code
+			// Prioritize the locale code.
 			$code = $item['lang']['locale'] ?? $item['lang']['code'] ?? $primary_language;
 			$code = Helpers::format_locale_to_hyphen( $code );
 			$lang = Helpers::get_language_from_locale( $code );
 
 			$home_url = $this->language->get_home_url( $lang );
 
-			// Prepare search engine body
+			// Prepare search engine body.
 			$this->log->log( 'Wizard Step 2 - Prepare Search Engine body : ' );
 			$search_engines[] = array(
 				'name'         => $domain . ( $code ? ' (' . strtoupper( $code ) . ')' : '' ),
@@ -252,7 +286,7 @@ class Store_Api {
 	 */
 	private function get_primary_language() {
 		$primary_language = get_locale();
-		if ( $this->language->get_languages() != null ) {
+		if ( null !== $this->language->get_languages() ) {
 			$primary_language = $this->language->get_base_locale();
 		}
 		$primary_language = Helpers::format_locale_to_hyphen( $primary_language );
@@ -260,14 +294,18 @@ class Store_Api {
 	}
 
 	/**
-	 * This method takes the base url and adds
+	 * Constructs a full callback URL by combining a base URL with an endpoint path.
 	 *
-	 * @param [type] $base_url
-	 * @param [type] $endpoint_path
-	 * @return string
+	 * This function parses the base URL, handles any existing query parameters, and appends the specified endpoint path.
+	 * If both the base URL and endpoint path contain query parameters, they are merged into the final callback URL.
+	 *
+	 * @param string $base_url      The base URL to which the endpoint path will be appended.
+	 * @param string $endpoint_path The endpoint path to append to the base URL.
+	 *
+	 * @return string The fully constructed callback URL with combined query parameters, if any.
 	 */
 	private function build_callback_url( $base_url, $endpoint_path ) {
-		$parsed_url = parse_url( $base_url );
+		$parsed_url = wp_parse_url( $base_url );
 		$parameters = null;
 		if ( array_key_exists( 'query', $parsed_url ) ) {
 			parse_str( $parsed_url['query'], $parameters );
@@ -277,9 +315,9 @@ class Store_Api {
 		$callback_url .= isset( $parsed_url['path'] ) ? rtrim( $parsed_url['path'], '/' ) : '';
 		$callback_url .= '/' . ltrim( $endpoint_path, '/' );
 
-		// Combine any existing parameters with any possible endopoint path parameters
+		// Combine any existing parameters with any possible endpoint path parameters.
 		if ( ! empty( $parameters ) ) {
-			parse_str( parse_url( $callback_url, PHP_URL_QUERY ), $endpoint_parameters );
+			parse_str( wp_parse_url( $callback_url, PHP_URL_QUERY ), $endpoint_parameters );
 			$combined_parameters = array_merge( $parameters, $endpoint_parameters );
 			$callback_url        = strtok( $callback_url, '?' );
 			$callback_url       .= '?' . http_build_query( $combined_parameters );
@@ -289,21 +327,26 @@ class Store_Api {
 	}
 
 	/**
-	 * This method throw_exception
+	 * Throws an exception based on the response or response code.
 	 *
-	 * @param [type] $response
-	 * @return void
+	 * This function checks if the response is a WordPress error (`WP_Error`). If so, it throws an exception with the error message and code.
+	 * If the response code indicates an HTTP error (anything below 200 or 400 and above), it retrieves the response message and throws an exception with the message and the response code.
+	 *
+	 * @param mixed $response      The response from a WordPress HTTP request. This could be a `WP_Error` object or a successful response array.
+	 * @param int   $response_code The HTTP status code of the response.
+	 *
+	 * @throws Exception If the response is an error or the response code indicates a failure.
 	 */
 	private function throw_exception( $response, $response_code ) {
 
 		if ( is_wp_error( $response ) ) {
 			$error_message = $response->get_error_message();
-			throw new Exception( $error_message, (int) $response->get_error_code() );
+			throw new Exception( wp_kses_data( $error_message ), (int) $response->get_error_code() );
 		}
 
 		if ( $response_code < WP_Http::OK || $response_code >= WP_Http::BAD_REQUEST ) {
 			$error_message = wp_remote_retrieve_response_message( $response );
-			throw new Exception( $error_message, $response_code );
+			throw new Exception( wp_kses_data( $error_message ), (int) $response_code );
 		}
 	}
 }
