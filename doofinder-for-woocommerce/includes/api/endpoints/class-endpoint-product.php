@@ -845,7 +845,7 @@ class Endpoint_Product {
 		$all_attributes = wc_get_attribute_taxonomies();
 
 		foreach ( $all_attributes as $attribute ) {
-			if ( $attribute->attribute_name == $attribute_slug ) {
+			if ( $attribute->attribute_name === $attribute_slug ) {
 				$found_key    = (int) $attribute->attribute_id;
 				$custom_index = array_search( 'wc_' . $found_key, array_column( $custom_attr, 'attribute' ), true );
 
