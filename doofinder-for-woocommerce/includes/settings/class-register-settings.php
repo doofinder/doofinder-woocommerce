@@ -1,13 +1,18 @@
 <?php
+/**
+ * DooFinder Register_Settings methods.
+ *
+ * @package Doofinder\WP\Settings
+ */
 
 namespace Doofinder\WP\Settings;
 
 use Doofinder\WP\Multilanguage\Language_Plugin;
-use Doofinder\WP\Setup_Wizard;
-use Doofinder\WP\Log;
 use Doofinder\WP\Settings;
 
-defined( 'ABSPATH' ) or die();
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Contains all settings registration / all calls to Settings API.
@@ -34,7 +39,8 @@ trait Register_Settings {
 				// the settings page of another plugin it might cause conflicts.
 				if (
 				// If we are saving the settings...
-				$_SERVER['REQUEST_METHOD'] === 'POST'
+				( ! isset( $_SERVER['REQUEST_METHOD'] )
+				|| 'POST' === $_SERVER['REQUEST_METHOD'] )
 				&& (
 					// ...and "option_page" is either not present...
 					! isset( $_POST['option_page'] )
@@ -47,10 +53,13 @@ trait Register_Settings {
 				}
 
 				// Figure out which tab is open / which tab is being saved.
-				if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
-					$selected_tab = $_POST['doofinder_for_wp_selected_tab'];
+				if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
+					if ( ! isset( $_POST['doofinder_for_wp_selected_tab'] ) ) {
+						return;
+					}
+					$selected_tab = wp_unslash( $_POST['doofinder_for_wp_selected_tab'] );
 				} elseif ( isset( $_GET['tab'] ) ) {
-					$selected_tab = $_GET['tab'];
+					$selected_tab = wp_unslash( $_GET['tab'] );
 				} else {
 					$selected_tab = array_keys( self::$tabs )[0];
 				}
@@ -76,14 +85,14 @@ trait Register_Settings {
 
 		add_settings_section(
 			$section_id,
-			__( 'General Settings', 'doofinder_for_wp' ),
+			__( 'General Settings', 'wordpress-doofinder' ),
 			function () {
 				?>
 			<p class="description">
 				<?php
-				_e(
+				esc_html_e(
 					'The following options allow to identify you and your search engine in Doofinder servers.',
-					'doofinder_for_wp'
+					'wordpress-doofinder'
 				);
 				?>
 									</p>
@@ -92,12 +101,12 @@ trait Register_Settings {
 			self::$top_level_menu
 		);
 
-		// Enable JS Layer
+		// Enable JS Layer.
 		$enable_js_layer_option_name =
 			$this->language->get_option_name( 'doofinder_for_wp_enable_js_layer' );
 		add_settings_field(
 			$enable_js_layer_option_name,
-			__( 'Enable Doofinder Layer', 'doofinder_for_wp' ),
+			__( 'Enable Doofinder Layer', 'wordpress-doofinder' ),
 			function () use ( $enable_js_layer_option_name ) {
 				$this->render_html_enable_js_layer( $enable_js_layer_option_name );
 			},
@@ -107,11 +116,11 @@ trait Register_Settings {
 
 		register_setting( self::$top_level_menu, $enable_js_layer_option_name );
 
-		// API Key
+		// API Key.
 		$api_key_option_name = 'doofinder_for_wp_api_key';
 		add_settings_field(
 			$api_key_option_name,
-			__( 'Api Key', 'doofinder_for_wp' ),
+			__( 'Api Key', 'wordpress-doofinder' ),
 			function () use ( $api_key_option_name ) {
 				$this->render_html_api_key( $api_key_option_name );
 			},
@@ -121,13 +130,13 @@ trait Register_Settings {
 
 		register_setting( self::$top_level_menu, $api_key_option_name, array( $this, 'validate_api_key' ) );
 
-		// DF Server Region (Hidden once filled)
+		// DF Server Region (Hidden once filled).
 		$region_option_name = 'doofinder_for_wp_region';
 		$saved_region_value = get_option( $region_option_name );
 
 		add_settings_field(
 			$region_option_name,
-			__( 'Region', 'doofinder_for_wp' ),
+			__( 'Region', 'wordpress-doofinder' ),
 			function () use ( $region_option_name ) {
 				$this->render_html_zone_select( $region_option_name );
 			},
@@ -140,12 +149,12 @@ trait Register_Settings {
 
 		register_setting( self::$top_level_menu, $region_option_name );
 
-		// Search engine hash
+		// Search engine hash.
 		$search_engine_hash_option_name =
 			$this->language->get_option_name( 'doofinder_for_wp_search_engine_hash' );
 		add_settings_field(
 			$search_engine_hash_option_name,
-			__( 'Search Engine HashID', 'doofinder_for_wp' ),
+			__( 'Search Engine HashID', 'wordpress-doofinder' ),
 			function () use ( $search_engine_hash_option_name ) {
 				$this->render_html_search_engine_hash( $search_engine_hash_option_name );
 			},
@@ -162,11 +171,11 @@ trait Register_Settings {
 			)
 		);
 
-		// Update on save
+		// Update on save.
 		$update_on_save_option_name = $this->language->get_option_name( 'doofinder_for_wp_update_on_save' );
 		add_settings_field(
 			$update_on_save_option_name,
-			__( 'Automatically process modified products', 'doofinder_for_wp' ),
+			__( 'Automatically process modified products', 'wordpress-doofinder' ),
 			function () use ( $update_on_save_option_name ) {
 				$this->render_html_update_on_save( $update_on_save_option_name );
 			},
@@ -176,12 +185,12 @@ trait Register_Settings {
 
 		register_setting( self::$top_level_menu, $update_on_save_option_name, array( $this, 'validate_update_on_save' ) );
 
-		// JS Layer
+		// JS Layer.
 		$js_layer_option_name =
 			$this->language->get_option_name( 'doofinder_for_wp_js_layer' );
 		add_settings_field(
 			$js_layer_option_name,
-			__( 'JS Layer Script', 'doofinder_for_wp' ),
+			__( 'JS Layer Script', 'wordpress-doofinder' ),
 			function () use ( $js_layer_option_name ) {
 				$this->render_html_js_layer( $js_layer_option_name );
 			},
@@ -192,19 +201,27 @@ trait Register_Settings {
 		register_setting( self::$top_level_menu, $js_layer_option_name );
 	}
 
+	/**
+	 * Adds the product data settings section and fields to the DooFinder plugin settings page.
+	 *
+	 * This function creates a new settings section on the plugin's settings page, allowing users to configure product data options.
+	 * It adds fields for setting the image size and custom attributes that will be indexed by the DooFinder plugin.
+	 *
+	 * @return void This function does not return any value, as it directly registers settings and fields with WordPress.
+	 */
 	private function add_product_data_settings() {
 		$section_id = 'doofinder-for-wp-data';
 
 		add_settings_section(
 			$section_id,
-			__( 'Product Data Settings', 'doofinder_for_wp' ),
+			__( 'Product Data Settings', 'wordpress-doofinder' ),
 			function () {
 				?>
 			<p class="description">
 				<?php
-				_e(
+				esc_html_e(
 					'The following options allow you to set up which data would you like to index',
-					'doofinder_for_wp'
+					'wordpress-doofinder'
 				);
 				?>
 									</p>
@@ -213,11 +230,11 @@ trait Register_Settings {
 			self::$top_level_menu
 		);
 
-		// Image Size
-		$image_size_option_name = \Doofinder\WP\Settings::$image_size_option;
+		// Image Size.
+		$image_size_option_name = Settings::$image_size_option;
 		add_settings_field(
 			$image_size_option_name,
-			__( 'Image Size', 'doofinder_for_wp' ),
+			__( 'Image Size', 'wordpress-doofinder' ),
 			function () use ( $image_size_option_name ) {
 				$this->render_html_image_size_field( $image_size_option_name );
 			},
@@ -227,11 +244,11 @@ trait Register_Settings {
 
 		register_setting( self::$top_level_menu, $image_size_option_name );
 
-		// Custom Attributes
-		$additional_attributes_option_name = \Doofinder\WP\Settings::$custom_attributes_option;
+		// Custom Attributes.
+		$additional_attributes_option_name = Settings::$custom_attributes_option;
 		add_settings_field(
 			$additional_attributes_option_name,
-			__( 'Custom Attributes', 'doofinder_for_wp' ),
+			__( 'Custom Attributes', 'wordpress-doofinder' ),
 			function () {
 				$this->render_html_additional_attributes();
 			},
@@ -266,22 +283,22 @@ trait Register_Settings {
 	}
 
 	/**
-	 * Validate api key.
+	 * Validate API key.
 	 *
-	 * @param string
+	 * @param string $input The API Key to be validated.
 	 *
 	 * @return string|null
 	 */
-	function validate_api_key( $input ) {
-		if ( null == $input ) {
+	public function validate_api_key( $input ) {
+		if ( null === $input ) {
 			add_settings_error(
 				'doofinder_for_wp_messages',
 				'doofinder_for_wp_message_api_key',
-				__( 'API Key is mandatory.', 'doofinder_for_wp' )
+				__( 'API Key is mandatory.', 'wordpress-doofinder' )
 			);
 		}
 
-		$sanitized_api_key = strip_tags( $input );
+		$sanitized_api_key = wp_strip_all_tags( $input );
 
 		/**
 		 * Old API keys use prefixes like eu1- and us1-,
@@ -297,16 +314,16 @@ trait Register_Settings {
 	/**
 	 * Validate api host.
 	 *
-	 * @param string
+	 * @param string $input The host to be validated.
 	 *
 	 * @return string
 	 */
-	function validate_hosts( $input ) {
-		if ( null == $input ) {
+	private function validate_hosts( $input ) {
+		if ( null === $input ) {
 			add_settings_error(
 				'doofinder_for_wp_messages',
 				'doofinder_for_wp_message_hosts',
-				__( 'Hosts are mandatory.', 'doofinder_for_wp' )
+				__( 'Hosts are mandatory.', 'wordpress-doofinder' )
 			);
 		}
 
@@ -314,11 +331,11 @@ trait Register_Settings {
 		 * New API host must include https:// protocol.
 		 */
 		if ( ! empty( $input ) ) {
-			$url = parse_url( $input );
+			$url = wp_parse_url( $input );
 
-			if ( $url['scheme'] !== 'https' && $url['scheme'] !== 'http' ) {
+			if ( 'https' !== $url['scheme'] && 'http' !== $url['scheme'] ) {
 				return 'https://' . $input;
-			} elseif ( $url['scheme'] == 'http' ) {
+			} elseif ( 'http' === $url['scheme'] ) {
 				return 'https://' . substr( $input, 7 );
 			} else {
 				return $input;
@@ -329,37 +346,37 @@ trait Register_Settings {
 	/**
 	 * Validate search engine hash.
 	 *
-	 * @param string $input
+	 * @param string $input The Search Engine Hash to be validated.
 	 *
 	 * @return string|null $input
 	 */
 	public function validate_search_engine_hash( $input ) {
-		if ( null == $input ) {
+		if ( null === $input ) {
 			add_settings_error(
 				'doofinder_for_wp_messages',
 				'doofinder_for_wp_message_search_engine_hash',
-				__( 'HashID is mandatory.', 'doofinder_for_wp' )
+				__( 'HashID is mandatory.', 'wordpress-doofinder' )
 			);
 		}
 
-		$sanitized_engine_hash = strip_tags( $input );
+		$sanitized_engine_hash = wp_strip_all_tags( $input );
 
 		return $sanitized_engine_hash;
 	}
 
 	/**
-	 * Validate api host.
+	 * Validate update on save.
 	 *
-	 * @param string
+	 * @param string $input update on save value.
 	 *
 	 * @return string|null
 	 */
-	function validate_update_on_save( $input ) {
-		if ( null == $input ) {
+	public function validate_update_on_save( $input ) {
+		if ( null === $input ) {
 			add_settings_error(
 				'doofinder_for_wp_messages',
 				'doofinder_for_wp_message_update_on_save',
-				__( 'Update on save is mandatory.', 'doofinder_for_wp' )
+				__( 'Update on save is mandatory.', 'wordpress-doofinder' )
 			);
 		}
 		return $input;
@@ -374,7 +391,7 @@ trait Register_Settings {
 	 * regular numerically-indexed array, and removes all records
 	 * that are either selected to be deleted, or invalid.
 	 *
-	 * @param array $input
+	 * @param array $input Additional attributes.
 	 *
 	 * @return array
 	 */
@@ -388,7 +405,7 @@ trait Register_Settings {
 		// removing all the records that we want to delete, and those
 		// with empty "field" value along the way.
 		foreach ( $input as $attribute ) {
-			$attribute['field'] = strip_tags( $attribute['field'] );
+			$attribute['field'] = wp_strip_all_tags( $attribute['field'] );
 			if ( ! $attribute['field'] ) {
 				continue;
 			}
@@ -397,13 +414,14 @@ trait Register_Settings {
 				continue;
 			}
 
-			if ( in_array( $attribute['field'], Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES ) ) {
+			if ( in_array( $attribute['field'], Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES, true ) ) {
 				$field_name         = $attribute['field'];
 				$attribute['field'] = 'custom_' . $field_name;
 				add_settings_error(
 					'doofinder_for_wp_messages',
 					'doofinder_for_wp_message_update_on_save',
-					__( sprintf( "The '%s' field name is reserved, we have changed it to '%s' automatically, but you can change it if you want", $field_name, $attribute['field'] ), 'doofinder_for_wp' )
+					/* translators: %1$s is replaced with the reserved field name and %2$s by the new field name (non-conflicting one). */
+					sprintf( __( "The '%1\$s' field name is reserved, we have changed it to '%2\$s' automatically, but you can change it if you want", 'wordpress-doofinder' ), $field_name, $attribute['field'] )
 				);
 				return false;
 			}
