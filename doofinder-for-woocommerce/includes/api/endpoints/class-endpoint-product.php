@@ -235,7 +235,6 @@ class Endpoint_Product {
 	 *
 	 * @param array $data        The data to merge into.
 	 * @param array $custom_attr The custom attributes to merge.
-	 *
 	 * @return array The merged data.
 	 */
 	private static function merge_custom_attributes( $data, $custom_attr ) {
@@ -788,8 +787,10 @@ class Endpoint_Product {
 			// If the slug was not found, it is because the field has been renamed in the plugin's DooFinder panel.
 			if ( false === $found_key ) {
 				$attribute_slug = self::get_slug_from_map_attributes( $custom_attr, $attribute_slug );
-				$found_key      = $attribute_slug ? true : false;
-			} else {
+				$found_key      = (bool) $attribute_slug;
+			}
+
+			if ( false !== $found_key ) {
 				$attribute_options                    = is_string( $attribute_data ) ? array( $attribute_data ) : $attribute_data->get_slugs();
 				$custom_attributes[ $attribute_slug ] = array();
 				foreach ( $attribute_options as $option ) {
