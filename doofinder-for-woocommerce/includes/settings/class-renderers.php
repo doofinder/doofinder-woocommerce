@@ -536,13 +536,13 @@ trait Renderers {
 				$type = ( null !== $attribute ) ? $attribute['type'] : null;
 				if ( 'metafield' === $type && 'new' !== $index ) :
 					?>
-					<input class="df-attribute-text" type="text" name="<?php echo esc_attr( $option_name ); ?>[<?php echo (int) $index; ?>][attribute]" 
+					<input class="df-attribute-text" type="text" name="<?php echo esc_attr( $option_name ); ?>[<?php echo esc_attr( $index ); ?>][attribute]" 
 																					<?php
 																					if ( $attribute ) :
 																						?>
 						value="<?php echo esc_attr( $attribute['attribute'] ); ?>" <?php endif; ?> />
 				<?php else : ?>
-					<select class="df-attribute-select df-select-2" name="<?php echo esc_attr( $option_name ); ?>[<?php echo (int) $index; ?>][attribute]" required>
+					<select class="df-attribute-select df-select-2" name="<?php echo esc_attr( $option_name ); ?>[<?php echo esc_attr( $index ); ?>][attribute]" required>
 						<option disabled <?php echo ( 'new' === $index ) ? 'selected' : ''; ?>>- <?php esc_html_e( 'Select an attribute', 'wordpress-doofinder' ); ?> -</option>
 						<?php foreach ( $option_groups as $group ) : ?>
 							<optgroup label="<?php echo esc_attr( $group['title'] ); ?>">
@@ -566,12 +566,12 @@ trait Renderers {
 			</td>
 
 			<td>
-				<input id="df-field-text-<?php echo esc_attr( $index ); ?>" class="df-field-text" type="text" name="<?php echo esc_attr( $option_name ); ?>[<?php echo (int) $index; ?>][field]" 
+				<input id="df-field-text-<?php echo esc_attr( $index ); ?>" class="df-field-text" type="text" name="<?php echo esc_attr( $option_name ); ?>[<?php echo esc_attr( $index ); ?>][field]" 
 													<?php
 													if ( $attribute ) :
 														?>
 					value="<?php echo esc_attr( htmlspecialchars( $attribute['field'] ) ); ?>" <?php endif; ?> />
-				<input class="df-field-type" type="hidden" name="<?php echo esc_attr( $option_name ); ?>[<?php echo (int) $index; ?>][type]" 
+				<input class="df-field-type" type="hidden" name="<?php echo esc_attr( $option_name ); ?>[<?php echo esc_attr( $index ); ?>][type]" 
 																			<?php
 																			if ( $attribute ) :
 																				?>
