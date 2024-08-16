@@ -3,7 +3,7 @@
  * Plugin Name: DOOFINDER Search and Discovery for WP & WooCommerce
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 2.4.8
+ * Version: 2.5.0
  * Requires at least: 5.6
  * Requires PHP: 7.0
  * Author: Doofinder
@@ -37,7 +37,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 		 * @var string
 		 */
 
-		public static $version = '2.4.8';
+		public static $version = '2.5.0';
 
 		/**
 		 * The only instance of Doofinder_For_WordPress
@@ -105,8 +105,6 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 					Update_On_Save::init();
 					// Initialize reset credentials.
 					Reset_Credentials::init();
-
-					Landing::init();
 
 					// Init admin functionalities.
 					if ( is_admin() ) {
@@ -389,7 +387,6 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 					}
 
 					Index_Status_Handler::initialize();
-					Landing_Cache::register_endpoint();
 				}
 			);
 		}

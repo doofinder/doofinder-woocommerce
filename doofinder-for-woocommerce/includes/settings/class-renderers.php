@@ -107,12 +107,6 @@ trait Renderers {
 			$store_api->normalize_store_and_indices();
 		}
 
-		if ( isset( $_GET['clear_landing_cache'] ) ) {
-			echo '<h1>Conversion page cache is clear</h1>';
-			$landing = new Landing();
-			$landing->clear_cache_by_prefix();
-		}
-
 		// add update messages if doesn't exist.
 		$errors = get_settings_errors( 'doofinder_for_wp_messages' );
 
