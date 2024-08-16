@@ -2,7 +2,7 @@
 /**
  * DooFinder Endpoint_Post_Category methods.
  *
- * @package Endpoint_Post_Category
+ * @package Doofinder\WP\Endpoints
  */
 
 use Doofinder\WP\Endpoints;

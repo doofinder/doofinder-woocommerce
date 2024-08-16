@@ -2,7 +2,7 @@
 /**
  * DooFinder Endpoint_Custom methods.
  *
- * @package Endpoint_Custom
+ * @package Doofinder\WP\Endpoints
  */
 
 use Doofinder\WP\Endpoints;

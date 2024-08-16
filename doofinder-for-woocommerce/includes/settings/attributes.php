@@ -1,15 +1,17 @@
 <?php
-
-// Predefined attributes that will always be present in the dropdown.
-/*
-* WordPress fields
-*/
+/**
+ * Predefined attributes that will always be present in the dropdown.
+ *
+ * WordPress fields
+ *
+ * @package Doofinder\WP\Settings
+ */
 
 use Doofinder\WP\Settings;
 
 $attributes = array(
 	'post_excerpt' => array(
-		'title'      => __( 'Short Description', 'doofinder_for_wp' ),
+		'title'      => __( 'Short Description', 'wordpress-doofinder' ),
 		'type'       => 'base_attribute',
 		'source'     => 'post_excerpt',
 		'field_name' => 'excerpt',
@@ -22,21 +24,21 @@ if ( is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
 	 */
 	$wc_default_attributes = array(
 		'dimensions:length' => array(
-			'title'      => __( 'Length', 'doofinder_for_wp' ),
+			'title'      => __( 'Length', 'wordpress-doofinder' ),
 			'type'       => 'base_attribute',
 			'source'     => 'length',
 			'field_name' => 'length',
 		),
 
 		'dimensions:width'  => array(
-			'title'      => __( 'Width', 'doofinder_for_wp' ),
+			'title'      => __( 'Width', 'wordpress-doofinder' ),
 			'type'       => 'base_attribute',
 			'source'     => 'width',
 			'field_name' => 'width',
 		),
 
 		'dimensions:height' => array(
-			'title'      => __( 'Height', 'doofinder_for_wp' ),
+			'title'      => __( 'Height', 'wordpress-doofinder' ),
 			'type'       => 'base_attribute',
 			'source'     => 'height',
 			'field_name' => 'height',
@@ -45,11 +47,11 @@ if ( is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
 
 	$attributes = array_merge( $attributes, $wc_default_attributes );
 	// WooCommerce attributes.
-	// (the taxonomy registered by WC, in Products > Attributes)
+	// (the taxonomy registered by WC, in Products > Attributes).
 	$wc_attributes = wc_get_attribute_taxonomies();
 	foreach ( $wc_attributes as $wc_attribute ) {
 		$field_name                                        = $wc_attribute->attribute_name;
-		$field_name                                        = in_array( $field_name, Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES ) ? 'custom_' . $field_name : $field_name;
+		$field_name                                        = in_array( $field_name, Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES, true ) ? 'custom_' . $field_name : $field_name;
 		$attributes[ 'wc_' . $wc_attribute->attribute_id ] = array(
 			'title'      => $wc_attribute->attribute_label,
 			'type'       => 'wc_attribute',
@@ -75,15 +77,15 @@ if ( ! empty( $rest_attributes ) ) {
 // Custom attribute.
 // Allowing user to provide a custom meta field name.
 $attributes['metafield'] = array(
-	'title' => __( 'Custom (Post Meta)', 'doofinder_for_wp' ),
+	'title' => __( 'Custom (Post Meta)', 'wordpress-doofinder' ),
 	'type'  => 'metafield',
 );
 
-// Sort alphabetically
+// Sort alphabetically.
 uasort(
 	$attributes,
 	function ( $a, $b ) {
-		if ( $a['title'] == $b['title'] ) {
+		if ( $a['title'] === $b['title'] ) {
 			return 0;
 		}
 		return ( $a['title'] < $b['title'] ) ? -1 : 1;

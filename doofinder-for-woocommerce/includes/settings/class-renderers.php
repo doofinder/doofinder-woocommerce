@@ -1,4 +1,9 @@
 <?php
+/**
+ * DooFinder Renderers methods.
+ *
+ * @package Doofinder\WP\Settings
+ */
 
 namespace Doofinder\WP\Settings;
 
@@ -10,16 +15,20 @@ use Doofinder\WP\Reset_Credentials;
 use Doofinder\WP\Settings;
 use Doofinder\WP\Setup_Wizard;
 
-defined( 'ABSPATH' ) or die();
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
+ * Contains all methods used to render the admin panel HTML.
+ *
  * @property Language_Plugin $language
  */
 trait Renderers {
 
 
 	/**
-	 * Display form for doofinder settings page.
+	 * Display form for DooFinder settings page.
 	 *
 	 * If language plugin is active, but no language is selected we'll prompt the user
 	 * to select a language instead of displaying settings.
@@ -61,19 +70,19 @@ trait Renderers {
 						( isset( $_GET['tab'] ) && $_GET['tab'] === $id )
 
 						// No tab is selected, and current tab is the first one.
-						|| ( ! isset( $_GET['tab'] ) && $id === array_keys( self::$tabs )[0] )
+						|| ( ! isset( $_GET['tab'] ) && array_keys( self::$tabs )[0] === $id )
 					) {
 						$is_active = true;
 					}
 
 					?>
 
-					<a href="<?php echo $current_tab_url; ?>" class="nav-tab 
+					<a href="<?php echo esc_url( $current_tab_url ); ?>" class="nav-tab 
 										<?php
 										if ( $is_active ) :
 											?>
 						nav-tab-active<?php endif; ?>">
-						<?php echo $options['label']; ?>
+						<?php echo esc_html( $options['label'] ); ?>
 					</a>
 
 				<?php endforeach; ?>
@@ -87,7 +96,7 @@ trait Renderers {
 	 * Display the settings.
 	 */
 	private function render_html_settings() {
-		// only users that have access to wp settings can view this form
+		// Only users that have access to wp settings can view this form.
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
@@ -104,19 +113,19 @@ trait Renderers {
 			$landing->clear_cache_by_prefix();
 		}
 
-		// add update messages if doesn't exist
+		// add update messages if doesn't exist.
 		$errors = get_settings_errors( 'doofinder_for_wp_messages' );
 
 		if ( isset( $_GET['settings-updated'] ) && ! $this->in_2d_array( 'doofinder_for_wp_message', $errors ) ) {
 			add_settings_error(
 				'doofinder_for_wp_messages',
 				'doofinder_for_wp_message',
-				__( 'Settings Saved', 'doofinder_for_wp' ),
+				__( 'Settings Saved', 'wordpress-doofinder' ),
 				'updated'
 			);
 		}
 
-		// show error/update messages
+		// show error/update messages.
 		settings_errors( 'doofinder_for_wp_messages' );
 		get_settings_errors( 'doofinder_for_wp_messages' );
 
@@ -139,11 +148,11 @@ trait Renderers {
 			</form>
 
 			<?php
-			if ( ! isset( $_GET['tab'] ) || $_GET['tab'] === 'authentication' ) {
-				if ( in_array( 'administrator', wp_get_current_user()->roles ) ) {
-					echo Reset_Credentials::get_configure_via_reset_credentials_button_html();
+			if ( ! isset( $_GET['tab'] ) || 'authentication' === $_GET['tab'] ) {
+				if ( in_array( 'administrator', wp_get_current_user()->roles, true ) ) {
+					echo wp_kses_post( Reset_Credentials::get_configure_via_reset_credentials_button_html() );
 				}
-				echo Setup_Wizard::get_configure_via_setup_wizard_button_html();
+				echo wp_kses_post( Setup_Wizard::get_configure_via_setup_wizard_button_html() );
 			}
 
 			?>
@@ -164,9 +173,9 @@ trait Renderers {
 			<div class="notice notice-error">
 				<p>
 				<?php
-				_e(
+				esc_html_e(
 					'You have a multi-language plugin installed. Please choose language first to configure Doofinder.',
-					'doofinder_for_wp'
+					'wordpress-doofinder'
 				);
 				?>
 					</p>
@@ -187,11 +196,11 @@ trait Renderers {
 	 * in POST request), we'll submit it in the hidden field.
 	 */
 	private function render_html_current_tab_id() {
-		$selected_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : array_keys( self::$tabs )[0];
+		$selected_tab = isset( $_GET['tab'] ) ? wp_unslash( $_GET['tab'] ) : array_keys( self::$tabs )[0];
 
 		?>
 
-		<input type="hidden" name="doofinder_for_wp_selected_tab" value="<?php echo htmlspecialchars( $selected_tab ); ?>">
+		<input type="hidden" name="doofinder_for_wp_selected_tab" value="<?php echo esc_attr( htmlspecialchars( $selected_tab ) ); ?>">
 
 		<?php
 	}
@@ -199,7 +208,7 @@ trait Renderers {
 	/**
 	 * Print HTML for the "API Key" option.
 	 *
-	 * @param string $option_name
+	 * @param string $option_name Name of the option.
 	 */
 	private function render_html_api_key( $option_name ) {
 		$saved_value = get_option( $option_name );
@@ -208,17 +217,17 @@ trait Renderers {
 
 		<span class="doofinder-tooltip"><span>
 		<?php
-		_e(
+		esc_html_e(
 			'The secret token is used to authenticate requests. Don`t need to use eu1- or us1- prefix.',
-			'doofinder_for_wp'
+			'wordpress-doofinder'
 		);
 		?>
 												</span></span>
-		<input type="text" name="<?php echo $option_name; ?>" class="widefat" 
+		<input type="text" name="<?php echo esc_attr( $option_name ); ?>" class="widefat" 
 											<?php
 											if ( $saved_value ) :
 												?>
-			value="<?php echo htmlspecialchars( $saved_value ); ?>" <?php endif; ?>>
+			value="<?php echo esc_attr( htmlspecialchars( $saved_value ) ); ?>" <?php endif; ?>>
 
 		<?php
 	}
@@ -226,7 +235,7 @@ trait Renderers {
 	/**
 	 * Print HTML for the "API Host" option.
 	 *
-	 * @param string $option_name
+	 * @param string $option_name Name of the option.
 	 */
 	private function render_html_zone_select( $option_name ) {
 		$saved_value = get_option( $option_name );
@@ -238,20 +247,27 @@ trait Renderers {
 
 		<span class="doofinder-tooltip"><span>
 		<?php
-		_e(
+		esc_html_e(
 			'The region in which you are registered in doofinder',
-			'doofinder_for_wp'
+			'wordpress-doofinder'
+		);
+		// Allow `<option>` and its attributes in `wp_kses()` function.
+		$kses_args = array(
+			'option' => array(
+				'value'    => true,
+				'selected' => true,
+			),
 		);
 		?>
 												</span></span>
 
-		<select name="<?php echo $option_name; ?>" class="widefat">
+		<select name="<?php echo esc_attr( $option_name ); ?>" class="widefat">
 			<option> - Select a region - </option>
 			<?php
 			$selected_eu = $saved_value === $key_eu ? ' selected ' : '';
-			echo '<option value=" ' . $key_eu . ' "' . $selected_eu . '> Europe -  ' . strtoupper( $key_eu ) . '  </option>';
+			echo wp_kses( '<option value=" ' . esc_attr( $key_eu ) . ' "' . $selected_eu . '> Europe -  ' . strtoupper( $key_eu ) . '  </option>', $kses_args );
 			$selected_us = $saved_value === $key_us ? ' selected ' : '';
-			echo '<option value=" ' . $key_us . ' "' . $selected_us . '> USA -  ' . strtoupper( $key_us ) . '  </option>';
+			echo wp_kses( '<option value=" ' . esc_attr( $key_us ) . ' "' . $selected_us . '> USA -  ' . strtoupper( $key_us ) . '  </option>', $kses_args );
 			?>
 		</select>
 		<?php
@@ -260,7 +276,7 @@ trait Renderers {
 	/**
 	 * Print HTML for the "API Host" option.
 	 *
-	 * @param string $option_name
+	 * @param string $option_name Name of the option.
 	 */
 	private function render_html_dooplugins_host( $option_name ) {
 		$saved_value = get_option( $option_name );
@@ -268,23 +284,31 @@ trait Renderers {
 		$key_eu = 'https://eu1-plugins.doofinder.com';
 		$key_us = 'https://us1-plugins.doofinder.com';
 
+		// Allow `<option>` and its attributes in `wp_kses()` function.
+		$kses_args = array(
+			'option' => array(
+				'value'    => true,
+				'selected' => true,
+			),
+		);
+
 		?>
 
 		<span class="doofinder-tooltip"><span>
 		<?php
-		_e(
+		esc_html_e(
 			'The host for plugins must contain point to the server where you have registered.',
-			'doofinder_for_wp'
+			'wordpress-doofinder'
 		);
 		?>
 												</span></span>
 
-		<select name="<?php echo $option_name; ?>" class="widefat">
+		<select name="<?php echo esc_attr( $option_name ); ?>" class="widefat">
 			<?php
 			$selected_eu = $saved_value === $key_eu ? ' selected ' : '';
-			echo '<option value=" ' . $key_eu . ' "' . $selected_eu . '> Europa -  ' . $key_eu . '  </option>';
+			echo wp_kses( '<option value=" ' . esc_attr( $key_eu ) . ' "' . $selected_eu . '> Europa -  ' . $key_eu . '  </option>', $kses_args );
 			$selected_us = $saved_value === $key_us ? ' selected ' : '';
-			echo '<option value=" ' . $key_us . ' "' . $selected_us . '> USA -  ' . $key_us . '  </option>';
+			echo wp_kses( '<option value=" ' . esc_attr( $key_us ) . ' "' . $selected_us . '> USA -  ' . $key_us . '  </option>', $kses_args );
 			?>
 		</select>
 		<?php
@@ -293,7 +317,7 @@ trait Renderers {
 	/**
 	 * Print HTML for the "Search engine hash" option.
 	 *
-	 * @param string $option_name
+	 * @param string $option_name Name of the option.
 	 */
 	private function render_html_search_engine_hash( $option_name ) {
 		$saved_value = get_option( $option_name );
@@ -302,18 +326,18 @@ trait Renderers {
 
 		<span class="doofinder-tooltip"><span>
 		<?php
-		_e(
+		esc_html_e(
 			'The Hash id of a search engine in your Doofinder Account.',
-			'doofinder_for_wp'
+			'wordpress-doofinder'
 		);
 		?>
 												</span></span>
 
-		<input type="text" name="<?php echo $option_name; ?>" class="widefat" 
+		<input type="text" name="<?php echo esc_attr( $option_name ); ?>" class="widefat" 
 											<?php
 											if ( $saved_value ) :
 												?>
-			value="<?php echo htmlspecialchars( $saved_value ); ?>" <?php endif; ?>>
+			value="<?php echo esc_attr( htmlspecialchars( $saved_value ) ); ?>" <?php endif; ?>>
 
 		<?php
 	}
@@ -321,31 +345,39 @@ trait Renderers {
 	/**
 	 * Print HTML for the "API Host" option.
 	 *
-	 * @param string $option_name
+	 * @param string $option_name Name of the option.
 	 */
 	private function render_html_update_on_save( $option_name ) {
 		$saved_value = Settings::get_update_on_save( $this->language->get_current_language() );
 		$schedules   = wp_get_schedules();
-		// Sort by interval
+		// Sort by interval.
 		uasort(
 			$schedules,
 			function ( $a, $b ) {
 				return $a['interval'] - $b['interval'];
 			}
 		);
+
+		// Allow `<option>` and its attributes in `wp_kses()` function.
+		$kses_args = array(
+			'option' => array(
+				'value'    => true,
+				'selected' => true,
+			),
+		);
 		?>
 
 		<span class="doofinder-tooltip">
 			<span>
-				<?php _e( 'Configure how often changes will be sent to Doofinder. It will only be executed if there are changes.', 'doofinder_for_wp' ); ?>
+				<?php esc_html_e( 'Configure how often changes will be sent to Doofinder. It will only be executed if there are changes.', 'wordpress-doofinder' ); ?>
 			</span>
 		</span>
-		<select name="<?php echo $option_name; ?>" class="widefat">
+		<select name="<?php echo esc_attr( $option_name ); ?>" class="widefat">
 			<?php
 			foreach ( $schedules as $key => $schedule ) {
 				if ( strpos( $key, 'wp_doofinder' ) === 0 ) {
 					$selected = $saved_value === $key ? " selected='selected' " : '';
-					echo '<option value="' . $key . '" ' . $selected . '>' . $schedule['display'] . '</option>';
+					echo wp_kses( '<option value="' . esc_attr( $key ) . '" ' . $selected . '>' . esc_html( $schedule['display'] ) . '</option>', $kses_args );
 				}
 			}
 			?>
@@ -355,7 +387,7 @@ trait Renderers {
 			?>
 				<a id="force-update-on-save" href="#" class="button-secondary update-on-save-btn update-icon">
 					<span class="dashicons dashicons-update"></span>
-					<?php _e( 'Update now!', 'wordpress-doofinder' ); ?>
+					<?php esc_html_e( 'Update now!', 'wordpress-doofinder' ); ?>
 				</a>
 		<?php endif; ?>
 		<span class="update-result-wrapper"></span>
@@ -365,7 +397,7 @@ trait Renderers {
 	/**
 	 * Render a checkbox allowing user to enable / disable the JS layer.
 	 *
-	 * @param string $option_name
+	 * @param string $option_name Name of the option.
 	 */
 	private function render_html_enable_js_layer( $option_name ) {
 		$saved_value = get_option( $option_name );
@@ -373,12 +405,12 @@ trait Renderers {
 		?>
 		<span class="doofinder-tooltip">
 			<span>
-				<?php _e( 'Enables or disables the Doofinder Search Bar.', 'doofinder_for_wp' ); ?>
+				<?php esc_html_e( 'Enables or disables the Doofinder Search Bar.', 'wordpress-doofinder' ); ?>
 			</span>
 		</span>
 
 		<label class="df-toggle-switch">
-			<input type="checkbox" name="<?php echo $option_name; ?>" 
+			<input type="checkbox" name="<?php echo esc_attr( $option_name ); ?>" 
 													<?php
 													if ( $saved_value ) :
 														?>
@@ -391,7 +423,7 @@ trait Renderers {
 	/**
 	 * Render a checkbox allowing user to enable / disable the JS layer.
 	 *
-	 * @param string $option_name
+	 * @param string $option_name Name of the option.
 	 */
 	private function render_html_load_js_layer_from_doofinder( $option_name ) {
 		$saved_value = get_option( $option_name );
@@ -399,20 +431,20 @@ trait Renderers {
 		?>
 		<span class="doofinder-tooltip"><span>
 		<?php
-		_e(
+		esc_html_e(
 			'The script is obtained from Doofinder servers instead of from the JS Layer Script field.',
-			'doofinder_for_wp'
+			'wordpress-doofinder'
 		);
 		?>
 												</span></span>
 		<label>
-			<input type="checkbox" name="<?php echo $option_name; ?>" 
+			<input type="checkbox" name="<?php echo esc_attr( $option_name ); ?>" 
 													<?php
 													if ( $saved_value ) :
 														?>
 				checked <?php endif; ?>>
 
-			<?php _e( 'Load JS Layer directly from Doofinder', 'doofinder_for_wp' ); ?>
+			<?php esc_html_e( 'Load JS Layer directly from Doofinder', 'wordpress-doofinder' ); ?>
 		</label>
 
 		<?php
@@ -421,7 +453,7 @@ trait Renderers {
 	/**
 	 * Render the textarea containing Doofinder JS Layer code.
 	 *
-	 * @param string $option_name
+	 * @param string $option_name Name of the option.
 	 */
 	private function render_html_js_layer( $option_name ) {
 		$saved_value = get_option( $option_name );
@@ -429,16 +461,16 @@ trait Renderers {
 		?>
 		<span class="doofinder-tooltip"><span>
 		<?php
-		_e(
+		esc_html_e(
 			'Paste here the JS Layer code obtained from Doofinder.',
-			'doofinder_for_wp'
+			'wordpress-doofinder'
 		);
 		$textarea_value = ! empty( $saved_value ) ? wp_unslash( $saved_value ) : '';
 		?>
 												</span></span>
 		<textarea 
-			name="<?php echo $option_name; ?>" 
-			class="widefat" rows="16"><?php echo $textarea_value; ?></textarea>
+			name="<?php echo esc_attr( $option_name ); ?>" 
+			class="widefat" rows="16"><?php echo $textarea_value; // phpcs:ignore WordPress.Security.EscapeOutput ?></textarea>
 		<?php
 	}
 
@@ -447,8 +479,6 @@ trait Renderers {
 	 * Render the inputs for Additional Attributes. This is a table
 	 * of inputs and selects where the user can choose any additional
 	 * fields to add to the exported data.
-	 *
-	 * @param string $option_name
 	 */
 	private function render_html_additional_attributes() {
 		$saved_attributes = get_option( Settings::$custom_attributes_option );
@@ -456,9 +486,9 @@ trait Renderers {
 		<table class="doofinder-for-wp-attributes">
 			<thead>
 				<tr>
-					<th><?php _e( 'Attribute', 'doofinder_for_wp' ); ?></th>
-					<th><?php _e( 'Field', 'doofinder_for_wp' ); ?></th>
-					<th colspan="10"><?php _e( 'Action', 'doofinder_for_wp' ); ?></th>
+					<th><?php esc_html_e( 'Attribute', 'wordpress-doofinder' ); ?></th>
+					<th><?php esc_html_e( 'Field', 'wordpress-doofinder' ); ?></th>
+					<th colspan="10"><?php esc_html_e( 'Action', 'wordpress-doofinder' ); ?></th>
 					<th colspan="100%"></th>
 				</tr>
 			</thead>
@@ -490,9 +520,9 @@ trait Renderers {
 	 *
 	 * @see Renderers::render_html_additional_attributes
 	 *
-	 * @param string     $option_name
-	 * @param string|int $index
-	 * @param ?array     $attribute
+	 * @param string     $option_name Name of the option.
+	 * @param string|int $index       Index number.
+	 * @param ?array     $attribute   WooCommerce Attribute. Defaults to null.
 	 */
 	private function render_html_single_additional_attribute( $option_name, $index, $attribute = null ) {
 		$option_groups = Settings::get_additional_attributes_options();
@@ -503,29 +533,29 @@ trait Renderers {
 
 
 				<?php
-				$type = ( $attribute !== null ) ? $attribute['type'] : null;
-				if ( $type === 'metafield' && $index !== 'new' ) :
+				$type = ( null !== $attribute ) ? $attribute['type'] : null;
+				if ( 'metafield' === $type && 'new' !== $index ) :
 					?>
-					<input class="df-attribute-text" type="text" name="<?php echo $option_name; ?>[<?php echo $index; ?>][attribute]" 
+					<input class="df-attribute-text" type="text" name="<?php echo esc_attr( $option_name ); ?>[<?php echo esc_attr( $index ); ?>][attribute]" 
 																					<?php
 																					if ( $attribute ) :
 																						?>
-						value="<?php echo $attribute['attribute']; ?>" <?php endif; ?> />
+						value="<?php echo esc_attr( $attribute['attribute'] ); ?>" <?php endif; ?> />
 				<?php else : ?>
-					<select class="df-attribute-select df-select-2" name="<?php echo $option_name; ?>[<?php echo $index; ?>][attribute]" required>
-						<option disabled <?php echo ( $index === 'new' ) ? 'selected' : ''; ?>>- <?php _e( 'Select an attribute', 'doofinder_for_wp' ); ?> -</option>
-						<?php foreach ( $option_groups as $group_id => $group ) : ?>
-							<optgroup label="<?php echo $group['title']; ?>">
+					<select class="df-attribute-select df-select-2" name="<?php echo esc_attr( $option_name ); ?>[<?php echo esc_attr( $index ); ?>][attribute]" required>
+						<option disabled <?php echo ( 'new' === $index ) ? 'selected' : ''; ?>>- <?php esc_html_e( 'Select an attribute', 'wordpress-doofinder' ); ?> -</option>
+						<?php foreach ( $option_groups as $group ) : ?>
+							<optgroup label="<?php echo esc_attr( $group['title'] ); ?>">
 								<?php foreach ( $group['options'] as $id => $attr ) : ?>
-									<option value="<?php echo $id; ?>" 
+									<option value="<?php echo esc_attr( $id ); ?>" 
 																<?php
 																if ( $attribute && $attribute['attribute'] === $id ) :
 																	?>
 										selected="selected" <?php endif; ?> <?php
 										if ( isset( $attr['field_name'] ) && ! empty( $attr['field_name'] ) ) :
 											?>
-	data-field-name="<?php echo $attr['field_name']; ?>" <?php endif; ?> data-type="<?php echo $attr['type']; ?>">
-										<?php echo $attr['title']; ?>
+	data-field-name="<?php echo esc_attr( $attr['field_name'] ); ?>" <?php endif; ?> data-type="<?php echo esc_attr( $attr['type'] ); ?>">
+										<?php echo esc_html( $attr['title'] ); ?>
 									</option>
 								<?php endforeach; ?>
 							</optgroup>
@@ -536,20 +566,20 @@ trait Renderers {
 			</td>
 
 			<td>
-				<input id="df-field-text-<?php echo $index; ?>" class="df-field-text" type="text" name="<?php echo $option_name; ?>[<?php echo $index; ?>][field]" 
+				<input id="df-field-text-<?php echo esc_attr( $index ); ?>" class="df-field-text" type="text" name="<?php echo esc_attr( $option_name ); ?>[<?php echo esc_attr( $index ); ?>][field]" 
 													<?php
 													if ( $attribute ) :
 														?>
-					value="<?php echo htmlspecialchars( $attribute['field'] ); ?>" <?php endif; ?> />
-				<input class="df-field-type" type="hidden" name="<?php echo $option_name; ?>[<?php echo $index; ?>][type]" 
+					value="<?php echo esc_attr( htmlspecialchars( $attribute['field'] ) ); ?>" <?php endif; ?> />
+				<input class="df-field-type" type="hidden" name="<?php echo esc_attr( $option_name ); ?>[<?php echo esc_attr( $index ); ?>][type]" 
 																			<?php
 																			if ( $attribute ) :
 																				?>
-					value="<?php echo $attribute['type']; ?>" <?php endif; ?> />
+					value="<?php echo esc_attr( $attribute['type'] ); ?>" <?php endif; ?> />
 			</td>
 
 			<td>
-				<?php if ( $index === 'new' ) : ?>
+				<?php if ( 'new' === $index ) : ?>
 					<a href="#" class="df-add-attribute-btn df-action-btn"><span class="dashicons dashicons-insert"></span></a>
 				<?php else : ?>
 					<a href="#" class="df-delete-attribute-btn df-action-btn"><span class="dashicons dashicons-trash"></span></a>
@@ -563,20 +593,30 @@ trait Renderers {
 		<?php
 	}
 
+	/**
+	 * Renders an HTML select field for choosing the image size option.
+	 *
+	 * This function generates and renders a select dropdown field in the HTML form, allowing the user to choose
+	 * from the available image sizes. The current value is pre-selected, and the "medium" size is recommended by default.
+	 *
+	 * @param string $option_name The name of the option to be saved in the WordPress database.
+	 *
+	 * @return void This function outputs the HTML for the select field and does not return any value.
+	 */
 	private function render_html_image_size_field( $option_name ) {
 		$current_value = Settings::get_image_size();
-		$image_sizes   = $this->_get_all_image_sizes();
+		$image_sizes   = $this->get_all_image_sizes();
 		$options       = array();
 		foreach ( $image_sizes as $id => $image_size ) {
 			$name      = $id . ' - ' . $image_size['width'] . ' x ' . $image_size['height'];
-			$name      = $id === 'medium' ? $name . ' (' . __( 'Recommended', 'doofinder_for_wp' ) . ')' : $name;
+			$name      = 'medium' === $id ? $name . ' (' . __( 'Recommended', 'wordpress-doofinder' ) . ')' : $name;
 			$options[] = array(
 				'value' => $id,
 				'name'  => $name,
 			);
 		}
 
-		$this->_render_select_field( 'df-image-size', $option_name, $options, array( 'df-image-size-select' ), $current_value );
+		$this->render_select_field( 'df-image-size', $option_name, $options, array( 'df-image-size-select' ), $current_value );
 	}
 
 	/**
@@ -586,7 +626,7 @@ trait Renderers {
 	 *
 	 * @return array $image_sizes The image sizes
 	 */
-	private function _get_all_image_sizes() {
+	private function get_all_image_sizes() {
 		global $_wp_additional_image_sizes;
 
 		$default_image_sizes = get_intermediate_image_sizes();
@@ -620,23 +660,24 @@ trait Renderers {
 	 * @param array  $options The available options. Each option should have the keys value and name.
 	 * @param array  $classes (Optional) The classes for the select field.
 	 * @param string $selected (Optional) The key of the selected option.
-	 * @param string $default_option (Optional) A default option name to add to your select. This option will appear as disabled
+	 * @param string $default_option (Optional) A default option name to add to your select. This option will appear as disabled.
+	 *
 	 * @return void
 	 */
-	private function _render_select_field( $id, $name, $options, $classes = array(), $selected = null, $default_option = null ) {
-		// Add default class
+	private function render_select_field( $id, $name, $options, $classes = array(), $selected = null, $default_option = null ) {
+		// Add default class.
 		$classes[] = 'df-select';
 		$classes   = implode( ' ', array_unique( $classes ) );
 		?>
-		<select id="<?php echo $id; ?>" name="<?php echo $name; ?>" class="<?php echo $classes; ?>">
+		<select id="<?php echo esc_attr( $id ); ?>" name="<?php echo esc_attr( $name ); ?>" class="<?php echo esc_attr( $classes ); ?>">
 			<?php if ( ! empty( $default_option ) ) : ?>
-				<option disabled><?php echo $default_option; ?></option>
+				<option disabled><?php echo esc_html( $default_option ); ?></option>
 
 			<?php endif; ?>
 			<?php
 			foreach ( $options as $option ) {
 				?>
-				<option value="<?php echo $option['value']; ?>" <?php echo $selected === $option['value'] ? 'selected' : ''; ?>><?php echo $option['name']; ?></option>
+				<option value="<?php echo esc_attr( $option['value'] ); ?>" <?php echo $selected === $option['value'] ? 'selected' : ''; ?>><?php echo esc_html( $option['name'] ); ?></option>
 				<?php
 			}
 			?>

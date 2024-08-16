@@ -2,7 +2,7 @@
 /**
  * DooFinder Endpoint_Single_Script methods.
  *
- * @package Endpoint_Single_Script
+ * @package Doofinder\WP\Endpoints
  */
 
 use Doofinder\WP\Endpoints;
