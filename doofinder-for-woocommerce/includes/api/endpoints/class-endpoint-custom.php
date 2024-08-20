@@ -262,7 +262,14 @@ class Endpoint_Custom {
 	private static function obtain_image_link( $filtered_data ) {
 		$image_link = null;
 
-		if ( empty( $filtered_data['_embedded']['wp:featuredmedia'][0]['media_details']['sizes'] ) ) {
+		if ( empty( $filtered_data['_embedded']['wp:featuredmedia'][0]['media_details'] ) ) {
+			return $image_link;
+		}
+
+		$media_details = $filtered_data['_embedded']['wp:featuredmedia'][0]['media_details'];
+
+		// In some rare cases, the media_details is an empty stdObject. We ignore those.
+		if ( is_object( $media_details ) || empty( $media_details['sizes'] ) ) {
 			return $image_link;
 		}
 
