@@ -7,6 +7,10 @@
 
 namespace Doofinder\WP;
 
+$step       = ! empty( $data['step'] ) ? $data['step'] : 1;
+$step_state = ! empty( $data['step_state'] ) ? $data['step_state'] : 1;
+$no_steps   = ! empty( $data['no_steps'] ) ? $data['no_steps'] : 3;
+
 ?>
 <div class="df-setup-finished <?php echo $step_state >= $no_steps ? 'active' : ''; ?>">
 	<figure class="df-setup-finished__icon">🏆</figure>
