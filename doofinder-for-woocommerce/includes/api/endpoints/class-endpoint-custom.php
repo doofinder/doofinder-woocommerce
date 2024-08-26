@@ -6,7 +6,6 @@
  */
 
 use Doofinder\WP\Endpoints;
-use Doofinder\WP\Log;
 use Doofinder\WP\Thumbnail;
 
 /**
