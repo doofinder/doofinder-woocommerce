@@ -17,7 +17,7 @@ Upgrade your eCommerce site with our advanced product search for WooCommerce. In
 
 [Doofinder sign up](https://www.doofinder.com/signup?utm_campaign=Content&utm_source=WooCommerce%20Profile&utm_content=Doofinder%20Sign%20Up) | [Demo Store](https://woocommerce.doofinder.com) | [Installation Steps](https://support.doofinder.com/plugins/woocommerce/installation-guide/installation-steps-woocommerce.html)
 
-https://www.youtube.com/watch?v=Bgrq1tL4D3o
+https://www.youtube.com/watch?v=4D5hgYQpWHk
 
 == Description ==
 
@@ -38,7 +38,7 @@ Increase your WooCommerce store's conversion rates by up to 30% using our AI-dri
 -   🎉 **Promotional Banners**: Highlight special offers and promotions within search results to enhance your product merchandising.  
 -   🌐 **Multi-language and Multi-currency Support**: Reach a global audience with support for over 30 languages and currencies. 
 -   🛠️ **Technical Support**: Ensure continuous growth with a technical support team that’s always ready to help.  
--   🧥👗**AI Product recommendation carousels**: Analyze user behavior to suggest relevant products for your home and product pages.
+-   🧥👗**AI Product recommendation carousels**: Guide users to products they'll love and maximize cross-selling with our AI-powered recommendations.
 
 == Requirements ==
 
