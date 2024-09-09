@@ -173,8 +173,6 @@ class Settings {
 			10,
 			3
 		);
-
-		add_filter( 'cron_schedules', array( __CLASS__, 'add_schedules' ), 100, 1 ); // phpcs:ignore WordPress.WP.CronInterval
 	}
 	/**
 	 * Returns an array with select options structured by option groups
