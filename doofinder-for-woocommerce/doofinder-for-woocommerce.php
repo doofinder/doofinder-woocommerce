@@ -449,5 +449,5 @@ register_deactivation_hook( __FILE__, array( '\Doofinder\WP\Doofinder_For_WordPr
 add_action( 'admin_enqueue_scripts', array( '\Doofinder\WP\Doofinder_For_WordPress', 'load_only_doofinder_admin_scripts_and_styles' ), 10, 2 );
 add_action( 'plugins_loaded', array( '\Doofinder\WP\Doofinder_For_WordPress', 'instance' ), 0 );
 add_action( 'upgrader_process_complete', array( '\Doofinder\WP\Doofinder_For_WordPress', 'upgrader_process_complete' ), 10, 2 );
-// Add cron_schedules here to avoid issues with hook order
+// Add cron_schedules here to avoid issues with hook order.
 add_filter( 'cron_schedules', array( '\Doofinder\WP\Settings', 'add_schedules' ), 100, 1 ); // phpcs:ignore WordPress.WP.CronInterval
