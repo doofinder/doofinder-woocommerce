@@ -121,7 +121,7 @@ class Endpoint_Product {
 
 			foreach ( $products as $product_data ) {
 				// If the product is not a valid WC product, ignore it.
-				if ( false === wc_get_product( $product_data['id'] ) ) {
+				if ( ! isset( $product_data['id'] ) || empty( $product_data['id'] ) || false === wc_get_product( $product_data['id'] ) ) {
 					continue;
 				}
 
@@ -673,7 +673,7 @@ class Endpoint_Product {
 				unset( $product['type'] );
 			}
 
-			$attributes = $product['attributes'];
+			$attributes = isset( $product['attributes'] ) && is_array( $product['attributes'] ) ? $product['attributes'] : array();
 
 			if ( 'variable' === $type ) {
 				$variations_data = self::process_variations( $product );
