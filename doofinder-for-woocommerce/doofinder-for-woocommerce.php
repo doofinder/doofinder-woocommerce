@@ -3,7 +3,7 @@
  * Plugin Name: DOOFINDER Search and Discovery for WP & WooCommerce
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 2.5.1
+ * Version: 2.5.2
  * Requires at least: 5.6
  * Requires PHP: 7.0
  * Author: Doofinder
@@ -37,7 +37,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 		 * @var string
 		 */
 
-		public static $version = '2.5.1';
+		public static $version = '2.5.2';
 
 		/**
 		 * The only instance of Doofinder_For_WordPress
@@ -449,3 +449,5 @@ register_deactivation_hook( __FILE__, array( '\Doofinder\WP\Doofinder_For_WordPr
 add_action( 'admin_enqueue_scripts', array( '\Doofinder\WP\Doofinder_For_WordPress', 'load_only_doofinder_admin_scripts_and_styles' ), 10, 2 );
 add_action( 'plugins_loaded', array( '\Doofinder\WP\Doofinder_For_WordPress', 'instance' ), 0 );
 add_action( 'upgrader_process_complete', array( '\Doofinder\WP\Doofinder_For_WordPress', 'upgrader_process_complete' ), 10, 2 );
+//Add cron_schedules here to avoid issues with hook order
+add_filter( 'cron_schedules', array( '\Doofinder\WP\Settings', 'add_schedules' ), 100, 1 ); // phpcs:ignore WordPress.WP.CronInterval
