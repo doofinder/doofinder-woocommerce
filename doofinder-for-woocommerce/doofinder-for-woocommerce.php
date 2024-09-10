@@ -3,7 +3,7 @@
  * Plugin Name: DOOFINDER Search and Discovery for WP & WooCommerce
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 2.5.2
+ * Version: 2.5.3
  * Requires at least: 5.6
  * Requires PHP: 7.0
  * Author: Doofinder
@@ -16,6 +16,7 @@ namespace Doofinder\WP;
 
 use Doofinder\WP\Multilanguage\Multilanguage;
 use Doofinder\WP\Admin_Notices;
+use Doofinder\WP\Settings;
 use WP_Http;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -37,7 +38,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 		 * @var string
 		 */
 
-		public static $version = '2.5.2';
+		public static $version = '2.5.3';
 
 		/**
 		 * The only instance of Doofinder_For_WordPress
@@ -439,6 +440,17 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 				}
 			);
 		}
+
+		/**
+		 * Method that adds some custom schedules to be used in WP Cron.
+		 *
+		 * @param array $schedules Current WP Schedules as array.
+		 *
+		 * @return array List of previous schedules + DooFinder ones.
+		 */
+		public static function add_schedules( $schedules ) {
+			return Settings::add_schedules($schedules);
+		}
 	}
 
 endif;
@@ -450,4 +462,4 @@ add_action( 'admin_enqueue_scripts', array( '\Doofinder\WP\Doofinder_For_WordPre
 add_action( 'plugins_loaded', array( '\Doofinder\WP\Doofinder_For_WordPress', 'instance' ), 0 );
 add_action( 'upgrader_process_complete', array( '\Doofinder\WP\Doofinder_For_WordPress', 'upgrader_process_complete' ), 10, 2 );
 // Add cron_schedules here to avoid issues with hook order.
-add_filter( 'cron_schedules', array( '\Doofinder\WP\Settings', 'add_schedules' ), 100, 1 ); // phpcs:ignore WordPress.WP.CronInterval
+add_filter( 'cron_schedules', array( '\Doofinder\WP\Doofinder_For_WordPress', 'add_schedules' ), 100, 1 ); // phpcs:ignore WordPress.WP.CronInterval
