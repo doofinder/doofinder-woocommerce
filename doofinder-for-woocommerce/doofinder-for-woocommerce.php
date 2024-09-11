@@ -449,7 +449,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 		 * @return array List of previous schedules + DooFinder ones.
 		 */
 		public static function add_schedules( $schedules ) {
-			return Settings::add_schedules($schedules);
+			return Settings::add_schedules( $schedules );
 		}
 	}
 
