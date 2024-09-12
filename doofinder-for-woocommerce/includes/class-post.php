@@ -94,7 +94,7 @@ class Post {
 			function () {
 				add_meta_box(
 					'doofinder-for-wp-visibility-settings',
-					__( 'Doofinder - Indexing', 'doofinder_for_wp' ),
+					__( 'Doofinder - Indexing', 'wordpress-doofinder' ),
 					function () {
 						self::render_html_indexing_visibility();
 					},
