@@ -37,7 +37,7 @@ class Settings {
 	 *
 	 * @var string
 	 */
-	public static $top_level_menu = 'wordpress-doofinder';
+	public static $top_level_menu = 'doofinder_for_wp';
 
 	/**
 	 * List of keys that are reserved for custom attributes fields
