@@ -3,7 +3,7 @@
  * Plugin Name: DOOFINDER Search and Discovery for WP & WooCommerce
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 2.5.3
+ * Version: 2.5.4
  * Requires at least: 5.6
  * Requires PHP: 7.0
  * Author: Doofinder
@@ -38,7 +38,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 		 * @var string
 		 */
 
-		public static $version = '2.5.3';
+		public static $version = '2.5.4';
 
 		/**
 		 * The only instance of Doofinder_For_WordPress
@@ -449,7 +449,52 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 		 * @return array List of previous schedules + DooFinder ones.
 		 */
 		public static function add_schedules( $schedules ) {
-			return Settings::add_schedules( $schedules );
+			$df_schedules = array(
+				'wp_doofinder_each_5_minutes'  => array(
+					/* translators: %s is replaced with an integer number representing the minutes. */
+					'display'  => sprintf( __( 'Each %s minutes', 'wordpress-doofinder' ), 5 ),
+					'interval' => MINUTE_IN_SECONDS * 5,
+				),
+				'wp_doofinder_each_15_minutes' => array(
+					/* translators: %s is replaced with an integer number representing the minutes. */
+					'display'  => sprintf( __( 'Each %s minutes', 'wordpress-doofinder' ), 15 ),
+					'interval' => MINUTE_IN_SECONDS * 15,
+				),
+				'wp_doofinder_each_30_minutes' => array(
+					/* translators: %s is replaced with an integer number representing the minutes. */
+					'display'  => sprintf( __( 'Each %s minutes', 'wordpress-doofinder' ), 30 ),
+					'interval' => MINUTE_IN_SECONDS * 30,
+				),
+				'wp_doofinder_each_60_minutes' => array(
+					'display'  => __( 'Each hour', 'wordpress-doofinder' ),
+					'interval' => HOUR_IN_SECONDS,
+				),
+				'wp_doofinder_each_2_hours'    => array(
+					/* translators: %s is replaced with an integer number representing the hours. */
+					'display'  => sprintf( __( 'Each %s hours', 'wordpress-doofinder' ), 2 ),
+					'interval' => HOUR_IN_SECONDS * 2,
+				),
+				'wp_doofinder_each_6_hours'    => array(
+					/* translators: %s is replaced with an integer number representing the hours. */
+					'display'  => sprintf( __( 'Each %s hours', 'wordpress-doofinder' ), 6 ),
+					'interval' => HOUR_IN_SECONDS * 6,
+				),
+				'wp_doofinder_each_12_hours'   => array(
+					/* translators: %s is replaced with an integer number representing the hours. */
+					'display'  => sprintf( __( 'Each %s hours', 'wordpress-doofinder' ), 12 ),
+					'interval' => HOUR_IN_SECONDS * 12,
+				),
+				'wp_doofinder_each_day'        => array(
+					'display'  => __( 'Once a day', 'wordpress-doofinder' ),
+					'interval' => DAY_IN_SECONDS,
+				),
+				'wp_doofinder_disabled'        => array(
+					'display'  => __( 'Disabled', 'wordpress-doofinder' ),
+					'interval' => DAY_IN_SECONDS,
+				),
+			);
+
+			return array_merge( $schedules, $df_schedules );
 		}
 	}
 

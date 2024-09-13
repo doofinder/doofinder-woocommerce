@@ -37,7 +37,7 @@ class Settings {
 	 *
 	 * @var string
 	 */
-	public static $top_level_menu = 'doofinder_for_wp';
+	public static $top_level_menu = 'wordpress-doofinder';
 
 	/**
 	 * List of keys that are reserved for custom attributes fields
@@ -137,14 +137,14 @@ class Settings {
 
 		self::$tabs = array(
 			'authentication' => array(
-				'label'     => __( 'General Settings', 'doofinder_for_wp' ),
+				'label'     => __( 'General Settings', 'wordpress-doofinder' ),
 				'fields_cb' => 'add_general_settings',
 			),
 		);
 
 		if ( is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
 			self::$tabs['product_data'] = array(
-				'label'     => __( 'Product Data', 'doofinder_for_wp' ),
+				'label'     => __( 'Product Data', 'wordpress-doofinder' ),
 				'fields_cb' => 'add_product_data_settings',
 			);
 		}
@@ -166,7 +166,7 @@ class Settings {
 				add_settings_error(
 					'doofinder_for_wp_messages',
 					'doofinder_for_wp_message',
-					__( 'Custom Attributes updated successfully. <br/> Please, keep in mind that you need to reindex in order for the changes to be reflected in the search layer.', 'doofinder_for_wp' ),
+					__( 'Custom Attributes updated successfully. <br/> Please, keep in mind that you need to reindex in order for the changes to be reflected in the search layer.', 'wordpress-doofinder' ),
 					'success'
 				);
 			},
@@ -185,15 +185,15 @@ class Settings {
 			$fields        = include_once 'settings/attributes.php';
 			$option_groups = array(
 				'base_attribute' => array(
-					'title'   => __( 'Basic attributes', 'doofinder_for_wp' ),
+					'title'   => __( 'Basic attributes', 'wordpress-doofinder' ),
 					'options' => array(),
 				),
 				'wc_attribute'   => array(
-					'title'   => __( 'Product attributes', 'doofinder_for_wp' ),
+					'title'   => __( 'Product attributes', 'wordpress-doofinder' ),
 					'options' => array(),
 				),
 				'metafield'      => array(
-					'title'   => __( 'Metafields', 'doofinder_for_wp' ),
+					'title'   => __( 'Metafields', 'wordpress-doofinder' ),
 					'options' => array(),
 				),
 			);
@@ -257,61 +257,5 @@ class Settings {
 			)
 		);
 		return array_diff( $rest_attributes, static::RESERVED_CUSTOM_ATTRIBUTES_NAMES );
-	}
-
-	/**
-	 * Method that adds some custom schedules to be used in WP Cron.
-	 *
-	 * @param array $schedules Current WP Schedules as array.
-	 *
-	 * @return array List of previous schedules + DooFinder ones.
-	 */
-	public static function add_schedules( $schedules ) {
-		$df_schedules = array(
-			'wp_doofinder_each_5_minutes'  => array(
-				/* translators: %s is replaced with an integer number representing the minutes. */
-				'display'  => sprintf( __( 'Each %s minutes', 'doofinder_for_wp' ), 5 ),
-				'interval' => MINUTE_IN_SECONDS * 5,
-			),
-			'wp_doofinder_each_15_minutes' => array(
-				/* translators: %s is replaced with an integer number representing the minutes. */
-				'display'  => sprintf( __( 'Each %s minutes', 'doofinder_for_wp' ), 15 ),
-				'interval' => MINUTE_IN_SECONDS * 15,
-			),
-			'wp_doofinder_each_30_minutes' => array(
-				/* translators: %s is replaced with an integer number representing the minutes. */
-				'display'  => sprintf( __( 'Each %s minutes', 'doofinder_for_wp' ), 30 ),
-				'interval' => MINUTE_IN_SECONDS * 30,
-			),
-			'wp_doofinder_each_60_minutes' => array(
-				'display'  => __( 'Each hour', 'doofinder_for_wp' ),
-				'interval' => HOUR_IN_SECONDS,
-			),
-			'wp_doofinder_each_2_hours'    => array(
-				/* translators: %s is replaced with an integer number representing the hours. */
-				'display'  => sprintf( __( 'Each %s hours', 'doofinder_for_wp' ), 2 ),
-				'interval' => HOUR_IN_SECONDS * 2,
-			),
-			'wp_doofinder_each_6_hours'    => array(
-				/* translators: %s is replaced with an integer number representing the hours. */
-				'display'  => sprintf( __( 'Each %s hours', 'doofinder_for_wp' ), 6 ),
-				'interval' => HOUR_IN_SECONDS * 6,
-			),
-			'wp_doofinder_each_12_hours'   => array(
-				/* translators: %s is replaced with an integer number representing the hours. */
-				'display'  => sprintf( __( 'Each %s hours', 'doofinder_for_wp' ), 12 ),
-				'interval' => HOUR_IN_SECONDS * 12,
-			),
-			'wp_doofinder_each_day'        => array(
-				'display'  => __( 'Once a day', 'doofinder_for_wp' ),
-				'interval' => DAY_IN_SECONDS,
-			),
-			'wp_doofinder_disabled'        => array(
-				'display'  => __( 'Disabled', 'doofinder_for_wp' ),
-				'interval' => DAY_IN_SECONDS,
-			),
-		);
-
-		return array_merge( $schedules, $df_schedules );
 	}
 }
