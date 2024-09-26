@@ -578,7 +578,7 @@ class Endpoint_Product {
 		$product = array_filter(
 			$product,
 			function ( $value ) {
-				return ! empty( $value );
+				return ! is_null( $value );
 			}
 		);
 
