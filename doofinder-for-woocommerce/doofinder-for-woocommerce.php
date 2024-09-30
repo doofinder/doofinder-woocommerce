@@ -509,11 +509,16 @@ add_action( 'upgrader_process_complete', array( '\Doofinder\WP\Doofinder_For_Wor
 // Add cron_schedules here to avoid issues with hook order.
 add_filter( 'cron_schedules', array( '\Doofinder\WP\Doofinder_For_WordPress', 'add_schedules' ), 100, 1 ); // phpcs:ignore WordPress.WP.CronInterval
 
-// When doing update on save from cron we are not authenticated, so WP_REST_Request to get products data returned a 401
-add_filter('woocommerce_rest_check_permissions', function ( $permission, $context, $object_id, $post_type ) {
-	if(wp_doing_cron() && $context === 'read' && doing_action('doofinder_update_on_save')) {
-		return true;
-	}
+// When doing update on save from cron we are not authenticated, so WP_REST_Request to get products data returned a 401.
+add_filter(
+	'woocommerce_rest_check_permissions',
+	function ( $permission, $context ) {
+		if ( wp_doing_cron() && 'read' === $context && doing_action( 'doofinder_update_on_save' ) ) {
+			return true;
+		}
 
-	return $permission;
-}, 100, 4);
+		return $permission;
+	},
+	100,
+	4
+);
