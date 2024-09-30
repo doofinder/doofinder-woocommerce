@@ -3,7 +3,7 @@
  * Plugin Name: DOOFINDER Search and Discovery for WP & WooCommerce
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 2.5.6
+ * Version: 2.5.7
  * Requires at least: 5.6
  * Requires PHP: 7.0
  * Author: Doofinder
@@ -38,7 +38,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 		 * @var string
 		 */
 
-		public static $version = '2.5.6';
+		public static $version = '2.5.7';
 
 		/**
 		 * The only instance of Doofinder_For_WordPress
@@ -508,3 +508,17 @@ add_action( 'plugins_loaded', array( '\Doofinder\WP\Doofinder_For_WordPress', 'i
 add_action( 'upgrader_process_complete', array( '\Doofinder\WP\Doofinder_For_WordPress', 'upgrader_process_complete' ), 10, 2 );
 // Add cron_schedules here to avoid issues with hook order.
 add_filter( 'cron_schedules', array( '\Doofinder\WP\Doofinder_For_WordPress', 'add_schedules' ), 100, 1 ); // phpcs:ignore WordPress.WP.CronInterval
+
+// When doing update on save from cron we are not authenticated, so WP_REST_Request to get products data returned a 401.
+add_filter(
+	'woocommerce_rest_check_permissions',
+	function ( $permission, $context ) {
+		if ( wp_doing_cron() && 'read' === $context && doing_action( 'doofinder_update_on_save' ) ) {
+			return true;
+		}
+
+		return $permission;
+	},
+	100,
+	2
+);
