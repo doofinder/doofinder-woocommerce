@@ -520,5 +520,5 @@ add_filter(
 		return $permission;
 	},
 	100,
-	4
+	2
 );
