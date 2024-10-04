@@ -434,7 +434,13 @@ class Endpoint_Product {
 
 		$product['regular_price'] = $regular_price;
 		$product['price']         = '' === (string) $regular_price ? $price : $regular_price;
-		$product['sale_price']    = '' === (string) $sale_price && $price < $regular_price ? $price : $sale_price;
+		$final_sale_price         = '' === (string) $sale_price || $price < $regular_price ? $price : $sale_price;
+
+		if ( empty( $final_sale_price ) ) {
+			unset( $product['sale_price'] );
+		} else {
+			$product['sale_price'] = $final_sale_price;
+		}
 
 		return $product;
 	}
