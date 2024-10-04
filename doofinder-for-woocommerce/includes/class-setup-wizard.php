@@ -1286,15 +1286,15 @@ class Setup_Wizard {
 			// Suffix for options.
 			// This should be empty for default language, and language code for any other.
 			$options_suffix = '';
-
+			$set_in_lang    = '';
 			if ( $language_code !== $this->language->get_base_locale() ) {
 				$language = str_replace( '-', '_', $language_code );
 
-				$lang_parts      = explode( '_', $language );
-				$options_preffix = strtolower( $lang_parts[0] );
-				$options_suffix  = strtolower( $lang_parts[1] );
+				$lang_parts     = explode( '_', $language );
+				$options_prefix = strtolower( $lang_parts[0] );
+				$options_suffix = strtolower( $lang_parts[1] );
 
-				if ( $options_preffix === $options_suffix ) {
+				if ( $options_prefix === $options_suffix ) {
 					$set_in_lang = $options_suffix;
 				} else {
 					$set_in_lang = strtolower( $language_code );

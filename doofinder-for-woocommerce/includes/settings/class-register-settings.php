@@ -57,9 +57,9 @@ trait Register_Settings {
 					if ( ! isset( $_POST['doofinder_for_wp_selected_tab'] ) ) {
 						return;
 					}
-					$selected_tab = wp_unslash( $_POST['doofinder_for_wp_selected_tab'] );
+					$selected_tab = sanitize_text_field( wp_unslash( $_POST['doofinder_for_wp_selected_tab'] ) );
 				} elseif ( isset( $_GET['tab'] ) ) {
-					$selected_tab = wp_unslash( $_GET['tab'] );
+					$selected_tab = sanitize_text_field( wp_unslash( $_GET['tab'] ) );
 				} else {
 					$selected_tab = array_keys( self::$tabs )[0];
 				}
