@@ -10,7 +10,7 @@ namespace Doofinder\WP;
 use Doofinder\WP\Multilanguage\Language_Plugin;
 use Doofinder\WP\Multilanguage\Multilanguage;
 use Doofinder\WP\Settings;
-use Doofinder\WP\Helpers;
+use Doofinder\WP\Helpers\Helpers;
 use Doofinder\WP\Log;
 use Doofinder\WP\Api\Store_Api;
 use Exception;
