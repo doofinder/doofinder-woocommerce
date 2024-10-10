@@ -6,7 +6,7 @@
  */
 
 use Doofinder\WP\Endpoints;
-use Doofinder\WP\Helpers;
+use Doofinder\WP\Helpers\Helpers;
 use Doofinder\WP\Log;
 use Doofinder\WP\Multilanguage\Multilanguage;
 use Doofinder\WP\Settings;

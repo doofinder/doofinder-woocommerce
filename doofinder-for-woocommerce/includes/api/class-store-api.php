@@ -7,7 +7,7 @@
 
 namespace Doofinder\WP\Api;
 
-use Doofinder\WP\Helpers;
+use Doofinder\WP\Helpers\Helpers;
 use Doofinder\WP\Helpers\Store_Helpers;
 use Doofinder\WP\Setup_Wizard;
 use Doofinder\WP\Log;
