@@ -51,7 +51,7 @@ class Add_To_Cart {
 	 * Returns the product info for a given id.
 	 */
 	public static function product_info() {
-		$post_id = isset( $_REQUEST['id'] ) ? wp_unslash( $_REQUEST['id'] ) : null;
+		$post_id = isset( $_REQUEST['id'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['id'] ) ) : null;
 		if ( empty( $post_id ) ) {
 			return '';
 		}

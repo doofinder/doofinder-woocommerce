@@ -158,7 +158,7 @@ class Post {
 
 		// We only allow few specific values, so make sure
 		// someone does not try to save some funny business.
-		$visibility = wp_unslash( $_REQUEST[ $option_name ] );
+		$visibility = sanitize_text_field( wp_unslash( $_REQUEST[ $option_name ] ) );
 		if ( ! in_array( $visibility, self::$visibility_options, true ) ) {
 			return;
 		}
