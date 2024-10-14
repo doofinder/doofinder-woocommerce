@@ -46,7 +46,7 @@ trait Register_Settings {
 					! isset( $_POST['option_page'] ) || ! isset( $_POST['_wpnonce'] )
 
 					// ...or is set to something else than our custom page.
-					|| wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ) ) || $_POST['option_page'] !== self::$top_level_menu
+					|| wp_verify_nonce( sanitize_key( $_POST['_wpnonce'] ) ) || $_POST['option_page'] !== self::$top_level_menu
 				)
 				) {
 					return;

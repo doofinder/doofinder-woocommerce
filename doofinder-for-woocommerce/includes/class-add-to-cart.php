@@ -95,7 +95,7 @@ class Add_To_Cart {
 	 * @return void
 	 */
 	public static function doofinder_ajax_add_to_cart() {
-		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), self::ACTION_NAME ) ) {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), self::ACTION_NAME ) ) {
 			wp_send_json_error( __( 'Nonce verification failed.', 'wordpress-doofinder' ), WP_Http::BAD_REQUEST );
 		}
 

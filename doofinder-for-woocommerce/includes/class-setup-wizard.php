@@ -1131,7 +1131,7 @@ class Setup_Wizard {
 	 * @return bool
 	 */
 	private function is_valid_token( $step ) {
-		if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ) ) ) {
+		if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['_wpnonce'] ) ) ) {
 			return false;
 		}
 

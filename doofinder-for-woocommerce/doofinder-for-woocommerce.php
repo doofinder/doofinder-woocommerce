@@ -425,7 +425,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 			add_action(
 				'wp_ajax_doofinder_notice_dismiss',
 				function () {
-					if ( ! isset( $_POST['nonce'] ) || ! isset( $_POST['notice_id'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['nonce'] ) ), 'doofinder-ajax-nonce' ) ) {
+					if ( ! isset( $_POST['nonce'] ) || ! isset( $_POST['notice_id'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'doofinder-ajax-nonce' ) ) {
 						status_header( WP_Http::UNAUTHORIZED );
 						die( 'Unauthorized request' );
 					}
