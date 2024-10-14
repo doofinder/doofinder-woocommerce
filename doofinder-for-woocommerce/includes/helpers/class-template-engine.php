@@ -109,7 +109,6 @@ class Template_Engine {
 	 */
 	public function render( $template, $data = array(), $folder = '' ) {
 		$file = $this->resolve_file( $template, $folder );
-		extract( $data );
 		include $file;
 	}
 
