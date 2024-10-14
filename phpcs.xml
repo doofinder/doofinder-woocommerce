@@ -13,7 +13,6 @@
     <rule ref="WooCommerce-Core">
         <!-- TODO (davidmolinacano): To be removed in the future when the simpler errors are solved -->
         <exclude name="WordPress.Security.NonceVerification.Recommended" />
-        <exclude name="WordPress.Security.NonceVerification.Missing" />
     </rule>
 
     <!-- Main plugin file does not need to have `class-` prepended to the name -->
