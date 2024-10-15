@@ -14,30 +14,6 @@
                 "/var/www/html/wp-content/plugins/doofinder": "${workspaceFolder}/doofinder-for-woocommerce"
             },
             //"stopOnEntry":true
-        },
-        {
-            "name": "Launch built-in server and debug",
-            "type": "php",
-            "request": "launch",
-            "runtimeArgs": [
-                "-S",
-                "localhost:8000",
-                "-t",
-                "."
-            ],
-            "port": 9003,
-            "serverReadyAction": {
-                "action": "openExternally"
-            }
-        },
-        {
-            "name": "Debug current script in console",
-            "type": "php",
-            "request": "launch",
-            "program": "${file}",
-            "cwd": "${fileDirname}",
-            "externalConsole": false,
-            "port": 9003
-        }        
+        }
     ]
 }
