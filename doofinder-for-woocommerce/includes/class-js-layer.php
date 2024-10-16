@@ -7,6 +7,8 @@
 
 namespace Doofinder\WP;
 
+use Doofinder\WP\Helpers\Helpers;
+
 use Doofinder\WP\Multilanguage\Multilanguage;
 
 /**
