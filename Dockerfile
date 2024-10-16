@@ -7,7 +7,8 @@ RUN apt-get update -qq && \
   build-essential \
   sudo \
   less \
-  nano
+  nano \
+  git
 
 RUN mkdir -p /var/www/html/wp-content/plugins
 RUN mkdir -p /var/www/html/wp-content/uploads
@@ -31,3 +32,26 @@ COPY docker/install-wordpress.sh /usr/local/bin/docker-install-wordpress.sh
 RUN chmod +x /usr/local/bin/docker-install-wordpress.sh
 
 CMD ["apache2-hello.sh", "docker-install-wordpress.sh", "apache2-foreground"]
+
+# Install XDebug from source as described here:
+# https://xdebug.org/docs/install
+# Available branches of XDebug could be seen here:
+# https://github.com/xdebug/xdebug/branches
+RUN cd /tmp && \
+    git clone https://github.com/xdebug/xdebug.git && \
+    cd xdebug && \
+    git checkout xdebug_3_3 && \
+    phpize && \
+    ./configure --enable-xdebug && \
+    make && \
+    make install && \
+    rm -rf /tmp/xdebug
+
+# Copy xdebug.ini to /usr/local/etc/php/conf.d/
+COPY files-to-copy/ /
+
+# Since this Dockerfile extends the official Docker image `wordpress`,
+# and since `wordpress`, in turn, extends the official Docker image `php`,
+# the helper script docker-php-ext-enable (defined for image `php`)
+# works here, and we can use it to enable xdebug:
+RUN docker-php-ext-enable xdebug
