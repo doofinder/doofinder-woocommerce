@@ -190,7 +190,7 @@ trait Renderers {
 	 * in POST request), we'll submit it in the hidden field.
 	 */
 	private function render_html_current_tab_id() {
-		$selected_tab = isset( $_GET['tab'] ) ? wp_unslash( $_GET['tab'] ) : array_keys( self::$tabs )[0];
+		$selected_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : array_keys( self::$tabs )[0];
 
 		?>
 

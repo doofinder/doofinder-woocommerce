@@ -43,10 +43,10 @@ trait Register_Settings {
 				|| 'POST' === $_SERVER['REQUEST_METHOD'] )
 				&& (
 					// ...and "option_page" is either not present...
-					! isset( $_POST['option_page'] )
+					! isset( $_POST['option_page'] ) || ! isset( $_POST['_wpnonce'] )
 
 					// ...or is set to something else than our custom page.
-					|| $_POST['option_page'] !== self::$top_level_menu
+					|| wp_verify_nonce( sanitize_key( $_POST['_wpnonce'] ) ) || $_POST['option_page'] !== self::$top_level_menu
 				)
 				) {
 					return;
@@ -57,9 +57,9 @@ trait Register_Settings {
 					if ( ! isset( $_POST['doofinder_for_wp_selected_tab'] ) ) {
 						return;
 					}
-					$selected_tab = wp_unslash( $_POST['doofinder_for_wp_selected_tab'] );
+					$selected_tab = sanitize_text_field( wp_unslash( $_POST['doofinder_for_wp_selected_tab'] ) );
 				} elseif ( isset( $_GET['tab'] ) ) {
-					$selected_tab = wp_unslash( $_GET['tab'] );
+					$selected_tab = sanitize_text_field( wp_unslash( $_GET['tab'] ) );
 				} else {
 					$selected_tab = array_keys( self::$tabs )[0];
 				}

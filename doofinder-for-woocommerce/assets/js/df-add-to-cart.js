@@ -51,6 +51,7 @@ class DoofinderAddToCartError extends Error {
             product_id: product_id,
             quantity: product_qty,
             variation_id: variation_id,
+            nonce: df_cart.nonce
         };
 
         $fakebutton = $("<input type='button'/>");

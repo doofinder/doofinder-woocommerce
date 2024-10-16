@@ -27,7 +27,7 @@ class Reset_Credentials {
 		add_action(
 			'wp_ajax_doofinder_reset_credentials',
 			function () {
-				if ( ! isset( $_POST['nonce'] ) || ! current_user_can( 'manage_options' ) || ! wp_verify_nonce( wp_unslash( $_POST['nonce'] ), 'doofinder-ajax-nonce' ) ) {
+				if ( ! isset( $_POST['nonce'] ) || ! current_user_can( 'manage_options' ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'doofinder-ajax-nonce' ) ) {
 					status_header( WP_Http::UNAUTHORIZED );
 					die( 'Unauthorized request' );
 				}

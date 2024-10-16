@@ -75,7 +75,7 @@ class Endpoints {
 	 */
 	public static function check_secure_token() {
 
-		$token_rcv = isset( $_SERVER['HTTP_DOOFINDER_TOKEN'] ) ? wp_unslash( $_SERVER['HTTP_DOOFINDER_TOKEN'] ) : false;
+		$token_rcv = isset( $_SERVER['HTTP_DOOFINDER_TOKEN'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_DOOFINDER_TOKEN'] ) ) : false;
 		$token_chk = get_option( 'doofinder_for_wp_token' );
 
 		if ( ! $token_chk || $token_chk !== $token_rcv ) {

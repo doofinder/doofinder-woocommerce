@@ -10,7 +10,7 @@ namespace Doofinder\WP;
 use Doofinder\WP\Multilanguage\Language_Plugin;
 use Doofinder\WP\Multilanguage\Multilanguage;
 use Doofinder\WP\Settings;
-use Doofinder\WP\Helpers;
+use Doofinder\WP\Helpers\Helpers;
 use Doofinder\WP\Log;
 use Doofinder\WP\Api\Store_Api;
 use Exception;
@@ -186,7 +186,7 @@ class Setup_Wizard {
 
 		// Load errors stored in cookies and delete after.
 		if ( isset( $_COOKIE['doofinderError'] ) ) {
-			$cookie_doofinder_error = wp_unslash( $_COOKIE['doofinderError'] );
+			$cookie_doofinder_error = array_map( 'sanitize_text_field', wp_unslash( $_COOKIE['doofinderError'] ) );
 			foreach ( $cookie_doofinder_error as $key => $value ) {
 				$this->errors[ $key ] = $value;
 
@@ -194,7 +194,7 @@ class Setup_Wizard {
 				if ( self::is_wizard_page() && ! \wp_doing_ajax() ) {
 					$this->log->log( 'Deleting Error Cookies' );
 					unset( $_COOKIE['doofinderError'][ $key ] );
-					setcookie( "doofinderError[{$key}]", null, -1, '/' );
+					setcookie( "doofinderError[{$key}]", '', -1, '/' );
 				}
 			}
 		}
@@ -826,7 +826,7 @@ class Setup_Wizard {
 		if ( isset( $this->errors[ $name ] ) ) {
 			return $this->errors[ $name ];
 		} elseif ( isset( $_COOKIE['doofinderError'] ) ) {
-			$cookie = wp_unslash( $_COOKIE['doofinderError'] );
+			$cookie = array_map( 'sanitize_text_field', wp_unslash( $_COOKIE['doofinderError'] ) );
 			unset( $_COOKIE['doofinderError'][ $name ] );
 			return $cookie;
 		}
@@ -905,7 +905,7 @@ class Setup_Wizard {
 
 		$this->log->log( 'Processing Wizard Step 1 - Processing...' );
 
-		$sector = isset( $_REQUEST['sector'] ) ? wp_unslash( $_REQUEST['sector'] ) : null;
+		$sector = isset( $_REQUEST['sector'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['sector'] ) ) : null;
 		if ( ! empty( $sector ) ) {
 			Settings::set_sector( $sector );
 			$this->js_go_to_step( 2 );
@@ -1085,9 +1085,9 @@ class Setup_Wizard {
 	 * @return false|array
 	 */
 	private function check_api_settings( $step ) {
-		$api_key         = isset( $_REQUEST['api_token'] ) ? wp_unslash( $_REQUEST['api_token'] ) : null;
-		$api_host        = isset( $_REQUEST['admin_endpoint'] ) ? wp_unslash( $_REQUEST['admin_endpoint'] ) : null;    // i.e: https://eu1-admin.doofinder.com.
-		$dooplugins_host = isset( $_REQUEST['dooplugins_endpoint'] ) ? wp_unslash( $_REQUEST['dooplugins_endpoint'] ) : null;  // i.e: https://eu1-plugins.doofinder.com.
+		$api_key         = isset( $_REQUEST['api_token'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['api_token'] ) ) : null;
+		$api_host        = isset( $_REQUEST['admin_endpoint'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['admin_endpoint'] ) ) : null;    // i.e: https://eu1-admin.doofinder.com.
+		$dooplugins_host = isset( $_REQUEST['dooplugins_endpoint'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['dooplugins_endpoint'] ) ) : null;  // i.e: https://eu1-plugins.doofinder.com.
 
 		if ( empty( $api_key ) ) {
 			$this->add_wizard_step_error( $step, 'api-key', __( 'API key is missing.', 'wordpress-doofinder' ) );
@@ -1131,7 +1131,11 @@ class Setup_Wizard {
 	 * @return bool
 	 */
 	private function is_valid_token( $step ) {
-		$token       = isset( $_POST['token'] ) ? wp_unslash( $_POST['token'] ) : '';
+		if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['_wpnonce'] ) ) ) {
+			return false;
+		}
+
+		$token       = isset( $_POST['token'] ) ? sanitize_text_field( wp_unslash( $_POST['token'] ) ) : '';
 		$saved_token = $this->get_token();
 
 		// Exit early if tokens do not match.
@@ -1286,15 +1290,15 @@ class Setup_Wizard {
 			// Suffix for options.
 			// This should be empty for default language, and language code for any other.
 			$options_suffix = '';
-
+			$set_in_lang    = '';
 			if ( $language_code !== $this->language->get_base_locale() ) {
 				$language = str_replace( '-', '_', $language_code );
 
-				$lang_parts      = explode( '_', $language );
-				$options_preffix = strtolower( $lang_parts[0] );
-				$options_suffix  = strtolower( $lang_parts[1] );
+				$lang_parts     = explode( '_', $language );
+				$options_prefix = strtolower( $lang_parts[0] );
+				$options_suffix = strtolower( $lang_parts[1] );
 
-				if ( $options_preffix === $options_suffix ) {
+				if ( $options_prefix === $options_suffix ) {
 					$set_in_lang = $options_suffix;
 				} else {
 					$set_in_lang = strtolower( $language_code );

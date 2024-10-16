@@ -14,6 +14,7 @@ use WP_Http;
  */
 class Add_To_Cart {
 
+	const ACTION_NAME = 'doofinder_ajax_add_to_cart';
 
 	/**
 	 * Singleton of this class.
@@ -41,8 +42,8 @@ class Add_To_Cart {
 	public function __construct() {
 		$this->enqueue_script();
 
-		add_action( 'wp_ajax_doofinder_ajax_add_to_cart', array( __CLASS__, 'doofinder_ajax_add_to_cart' ) );
-		add_action( 'wp_ajax_nopriv_doofinder_ajax_add_to_cart', array( __CLASS__, 'doofinder_ajax_add_to_cart' ) );
+		add_action( 'wp_ajax_' . self::ACTION_NAME, array( __CLASS__, 'doofinder_ajax_add_to_cart' ) );
+		add_action( 'wp_ajax_nopriv_' . self::ACTION_NAME, array( __CLASS__, 'doofinder_ajax_add_to_cart' ) );
 		add_action( 'wp_ajax_doofinder_get_product_info', array( __CLASS__, 'product_info' ) );
 		add_action( 'wp_ajax_nopriv_doofinder_get_product_info', array( __CLASS__, 'product_info' ) );
 	}
@@ -51,7 +52,7 @@ class Add_To_Cart {
 	 * Returns the product info for a given id.
 	 */
 	public static function product_info() {
-		$post_id = isset( $_REQUEST['id'] ) ? wp_unslash( $_REQUEST['id'] ) : null;
+		$post_id = isset( $_REQUEST['id'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['id'] ) ) : null;
 		if ( empty( $post_id ) ) {
 			return '';
 		}
@@ -94,6 +95,10 @@ class Add_To_Cart {
 	 * @return void
 	 */
 	public static function doofinder_ajax_add_to_cart() {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), self::ACTION_NAME ) ) {
+			wp_send_json_error( __( 'Nonce verification failed.', 'wordpress-doofinder' ), WP_Http::BAD_REQUEST );
+		}
+
 		if ( ! isset( $_POST['product_id'] ) || ! isset( $_POST['variation_id'] ) ) {
 			wp_send_json_error( __( 'Required params are missing.', 'wordpress-doofinder' ), WP_Http::BAD_REQUEST );
 		}
@@ -187,6 +192,7 @@ class Add_To_Cart {
 						'doofinder-add-to-cart',
 						'df_cart',
 						array(
+							'nonce'              => wp_create_nonce( self::ACTION_NAME ),
 							'ajax_url'           => admin_url( 'admin-ajax.php' ),
 							'item_info_endpoint' => get_site_url( null, '/wp-json/doofinder-for-wc/v1/product-info/' ),
 						)

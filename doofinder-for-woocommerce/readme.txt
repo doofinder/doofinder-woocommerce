@@ -129,6 +129,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 = 2.5.10 =
 - Fixed issue with sale_price when it is equal to the regular price.
 
+= 2.5.9 =
+- Removed duplicated Helper class and unified methods into a single file.
+
 = 2.5.8 =
 - Fixed issue with sale_price field during indexation.
 
