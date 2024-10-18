@@ -845,20 +845,23 @@ class Endpoint_Product {
 	 * @param array  $custom_attr Array of custom attributes.
 	 * @param string $attribute_slug slug we are looking for.
 	 *
-	 * @return string Slug founded or false
+	 * @return string Found slug or false
 	 */
 	private static function get_slug_from_map_attributes( $custom_attr, $attribute_slug ) {
 
-		$all_attributes = wc_get_attribute_taxonomies();
+		$all_attributes            = wc_get_attribute_taxonomies();
+		$custom_map                = array_column( $custom_attr, 'field', 'attribute' );
+		$normalized_attribute_slug = str_replace( '-', '_', $attribute_slug );
 
 		foreach ( $all_attributes as $attribute ) {
-			if ( $attribute->attribute_name === $attribute_slug ) {
-				$found_key    = (int) $attribute->attribute_id;
-				$custom_index = array_search( 'wc_' . $found_key, array_column( $custom_attr, 'attribute' ), true );
+			$normalized_attribute_name = str_replace( '-', '_', $attribute->attribute_name );
 
-				if ( false !== $custom_index ) {
-					$attribute_slug = $custom_attr[ $custom_index ]['field'];
-					return $attribute_slug;
+			if ( $normalized_attribute_name === $normalized_attribute_slug ) {
+				$found_key  = (int) $attribute->attribute_id;
+				$custom_key = 'wc_' . $found_key;
+
+				if ( isset( $custom_map[ $custom_key ] ) ) {
+					return $custom_map[ $custom_key ];
 				}
 			}
 		}
