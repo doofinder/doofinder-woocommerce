@@ -19,8 +19,10 @@ NOTE: This part assumes that you have Composer installed in your PC and you have
 Currently, we have a PHP Code Beautifier and Fixer (known as phpcbf) to force WordPress and WooCommerce standard-compliant code (at least for PHP for now).
 So before commiting or pushing any changes in your code, execute the following command from the root folder of this project:
 
-`./vendor/bin/phpcbf`
+`make cs-fix`
 
-This command will fix automatically all the minor issues regarding to the coding standards. When all the manual errors are fixed, we will have to run another command just to check if there are some errors that cannot be fixed automatically by the previous command. The command is:
+This command will fix automatically all the minor issues regarding to the coding standards.
 
-`./vendor/bin/phpcs`
+When all the manual errors are fixed, we will have to run another command just to check if there are some errors that cannot be fixed automatically by the previous command. The command is:
+
+`make cs-check`
