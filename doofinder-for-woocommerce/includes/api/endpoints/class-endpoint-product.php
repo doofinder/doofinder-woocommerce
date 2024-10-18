@@ -849,19 +849,19 @@ class Endpoint_Product {
 	 */
 	private static function get_slug_from_map_attributes( $custom_attr, $attribute_slug ) {
 
-		$all_attributes = wc_get_attribute_taxonomies();
-		$custom_map = array_column($custom_attr, 'field', 'attribute');
-		$normalized_attribute_slug = str_replace("-", "_", $attribute_slug);
+		$all_attributes            = wc_get_attribute_taxonomies();
+		$custom_map                = array_column( $custom_attr, 'field', 'attribute' );
+		$normalized_attribute_slug = str_replace( '-', '_', $attribute_slug );
 
 		foreach ( $all_attributes as $attribute ) {
-			$normalized_attribute_name = str_replace("-", "_", $attribute->attribute_name);
+			$normalized_attribute_name = str_replace( '-', '_', $attribute->attribute_name );
 
-			if ( $normalized_attribute_name === $normalized_attribute_slug ) {	
-				$found_key = (int) $attribute->attribute_id;
+			if ( $normalized_attribute_name === $normalized_attribute_slug ) {
+				$found_key  = (int) $attribute->attribute_id;
 				$custom_key = 'wc_' . $found_key;
 
-				if ( isset($custom_map[$custom_key]) ) {
-					return $custom_map[$custom_key];
+				if ( isset( $custom_map[ $custom_key ] ) ) {
+					return $custom_map[ $custom_key ];
 				}
 			}
 		}
