@@ -80,6 +80,7 @@ jQuery(() => {
 
   function send_connect_data(data) {
     data["action"] = "doofinder_set_connection_data";
+    data["_wpnonce"] = Doofinder.nonce;
     $.ajax({
       type: "POST",
       dataType: "json",

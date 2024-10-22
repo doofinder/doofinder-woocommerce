@@ -589,7 +589,7 @@ class Setup_Wizard {
 		wp_send_json_success(
 			array(
 				'status' => $status,
-				'error'  => $error,
+				'error'  => $df_error,
 			)
 		);
 	}
@@ -1131,7 +1131,7 @@ class Setup_Wizard {
 	 * @return bool
 	 */
 	private function is_valid_token( $step ) {
-		if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['_wpnonce'] ) ) ) {
+		if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['_wpnonce'] ), 'doofinder_set_connection_data' ) ) {
 			return false;
 		}
 
@@ -1140,7 +1140,7 @@ class Setup_Wizard {
 
 		// Exit early if tokens do not match.
 		if ( $token !== $saved_token ) {
-			$this->log->log( 'Processing Wizard Step 2 - Recieved Token - ' . $token );
+			$this->log->log( 'Processing Wizard Step 2 - Received Token - ' . $token );
 			$this->log->log( 'Processing Wizard Step 2 - Saved Token - ' . $saved_token );
 			$this->add_wizard_step_error( $step, 'token', __( 'Invalid token', 'wordpress-doofinder' ) );
 			return false;
