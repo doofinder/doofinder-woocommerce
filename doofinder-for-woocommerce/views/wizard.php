@@ -48,7 +48,16 @@ $styles  = wp_styles();
 	</main>
 	<script>
 		const doofinderCurrentLanguage = '';
-		const Doofinder = <?php echo wp_json_encode( array( 'ajaxUrl' => admin_url( 'admin-ajax.php' ) ) ); ?>;
+		const Doofinder = 
+		<?php
+		echo wp_json_encode(
+			array(
+				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+				'nonce'   => wp_create_nonce( 'doofinder_set_connection_data' ),
+			)
+		);
+		?>
+		;
 		const doofinderConnectEmail = '<?php echo esc_attr( get_bloginfo( 'admin_email' ) ); ?>';
 		<?php
 		$token = $this->generate_token();
