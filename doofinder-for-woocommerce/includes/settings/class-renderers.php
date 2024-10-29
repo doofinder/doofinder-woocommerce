@@ -399,7 +399,7 @@ trait Renderers {
 		?>
 		<span class="doofinder-tooltip">
 			<span>
-				<?php esc_html_e( 'Enables or disables the Doofinder Search Bar.', 'wordpress-doofinder' ); ?>
+				<?php esc_html_e( 'Activating this option you are inserting the script into your store code. You can manage product visibility in Doofinder.', 'wordpress-doofinder' ); ?>
 			</span>
 		</span>
 
