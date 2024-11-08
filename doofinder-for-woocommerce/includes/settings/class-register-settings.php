@@ -245,21 +245,21 @@ trait Register_Settings {
 			);
 
 			register_setting( self::$top_level_menu, $image_size_option_name );
+
+			// Custom product Attributes.
+			$additional_attributes_option_name = Settings::$custom_attributes_option;
+			add_settings_field(
+				$additional_attributes_option_name,
+				__( 'Custom Attributes', 'wordpress-doofinder' ),
+				function () {
+					$this->render_html_additional_attributes( Settings::$custom_attributes_option );
+				},
+				self::$top_level_menu,
+				$section_id
+			);
+
+			register_setting( self::$top_level_menu, $additional_attributes_option_name, array( $this, 'sanitize_additional_attributes' ) );
 		}
-
-		// Custom Attributes.
-		$additional_attributes_option_name = Settings::$custom_attributes_option;
-		add_settings_field(
-			$additional_attributes_option_name,
-			__( 'Custom Attributes', 'wordpress-doofinder' ),
-			function () {
-				$this->render_html_additional_attributes( Settings::$custom_attributes_option );
-			},
-			self::$top_level_menu,
-			$section_id
-		);
-
-		register_setting( self::$top_level_menu, $additional_attributes_option_name, array( $this, 'sanitize_additional_attributes' ) );
 
 		$section_id = 'doofinder-for-wp-post-data';
 
