@@ -271,7 +271,7 @@ trait Register_Settings {
 			<p class="description">
 				<?php
 				esc_html_e(
-					'The following options allow you to set up which data would you like to index',
+					'The following options allow you to set up which data would you like to index. These settings are shared between posts, pages and every custom post type, except for WooCommerce products.',
 					'wordpress-doofinder'
 				);
 				?>
