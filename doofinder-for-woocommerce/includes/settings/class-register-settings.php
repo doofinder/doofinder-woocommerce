@@ -268,14 +268,24 @@ trait Register_Settings {
 			__( 'Post Data Settings', 'wordpress-doofinder' ),
 			function () {
 				?>
-			<p class="description">
-				<?php
-				esc_html_e(
-					'The following options allow you to set up which data would you like to index. These settings are shared between posts, pages and every custom post type, except for WooCommerce products.',
-					'wordpress-doofinder'
-				);
-				?>
-									</p>
+			<div class="description">
+				<p>
+					<?php
+					esc_html_e(
+						'The following options allow you to set up which data would you like to index.',
+						'wordpress-doofinder'
+					);
+					?>
+				</p>
+				<p>
+					<?php
+					esc_html_e(
+						'These settings are shared between posts, pages and every custom post type, except for WooCommerce products.',
+						'wordpress-doofinder'
+					);
+					?>
+				</p>
+									</div>
 				<?php
 			},
 			self::$top_level_menu
