@@ -102,11 +102,18 @@ class Settings {
 	private $language;
 
 	/**
-	 * DooFinder custom attributes name in options table.
+	 * DooFinder WooCommerce products custom attributes name in options table.
 	 *
 	 * @var string
 	 */
 	public static $custom_attributes_option = 'doofinder_for_wp_custom_attributes';
+
+	/**
+	 * DooFinder posts custom attributes name in options table.
+	 *
+	 * @var string
+	 */
+	public static $post_custom_attributes_option = 'doofinder_for_wp_post_custom_attributes';
 
 	/**
 	 * DooFinder image size name in options table.
@@ -142,12 +149,11 @@ class Settings {
 			),
 		);
 
-		if ( is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
-			self::$tabs['product_data'] = array(
-				'label'     => __( 'Product Data', 'wordpress-doofinder' ),
-				'fields_cb' => 'add_product_data_settings',
-			);
-		}
+		self::$tabs['data_configuration'] = array(
+			'label'     => __( 'Data Configuration', 'wordpress-doofinder' ),
+			'fields_cb' => 'add_data_settings',
+		);
+
 		$this->add_plugin_settings();
 		$this->add_settings_page();
 		static::initialize();
@@ -159,14 +165,29 @@ class Settings {
 	 * @return void
 	 */
 	public static function initialize() {
-		$option = static::$custom_attributes_option;
+		$option = self::$custom_attributes_option;
 		add_action(
 			"update_option_{$option}",
 			function () {
 				add_settings_error(
 					'doofinder_for_wp_messages',
 					'doofinder_for_wp_message',
-					__( 'Custom Attributes updated successfully. <br/> Please, keep in mind that you need to reindex in order for the changes to be reflected in the search layer.', 'wordpress-doofinder' ),
+					__( 'Product Custom Attributes updated successfully. <br/> Please, keep in mind that you need to reindex in order for the changes to be reflected in the search layer.', 'wordpress-doofinder' ),
+					'success'
+				);
+			},
+			10,
+			3
+		);
+
+		$post_option = self::$post_custom_attributes_option;
+		add_action(
+			"update_option_{$post_option}",
+			function () {
+				add_settings_error(
+					'doofinder_for_wp_messages',
+					'doofinder_for_wp_message',
+					__( 'Post Custom Attributes updated successfully. <br/> Please, keep in mind that you need to reindex in order for the changes to be reflected in the search layer.', 'wordpress-doofinder' ),
 					'success'
 				);
 			},
@@ -177,9 +198,11 @@ class Settings {
 	/**
 	 * Returns an array with select options structured by option groups
 	 *
+	 * @param bool $should_exclude_woocommerce_attributes Decides whether the WooCommerce attributes should be taken into account or not. This is intended for the second dropdown, which should display only basic attributes and metafields.
+	 *
 	 * @return array Array of option groups with options inside
 	 */
-	public static function get_additional_attributes_options() {
+	public static function get_additional_attributes_options( $should_exclude_woocommerce_attributes ) {
 		static $additional_attributes_options;
 		if ( ! isset( $additional_attributes_options ) ) {
 			$fields        = include_once 'settings/attributes.php';
@@ -204,6 +227,11 @@ class Settings {
 			}
 			$additional_attributes_options = $option_groups;
 		}
+		if ( $should_exclude_woocommerce_attributes ) {
+			unset( $additional_attributes_options['wc_attribute'] );
+			unset( $additional_attributes_options['base_attribute'] );
+		}
+
 		return $additional_attributes_options;
 	}
 

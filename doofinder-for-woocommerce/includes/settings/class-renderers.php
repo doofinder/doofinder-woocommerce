@@ -473,9 +473,12 @@ trait Renderers {
 	 * Render the inputs for Additional Attributes. This is a table
 	 * of inputs and selects where the user can choose any additional
 	 * fields to add to the exported data.
+	 *
+	 * @param string $custom_attribute_name Name of the custom attribute.
+	 * @param bool   $should_exclude_woocommerce_attributes Decides whether the WooCommerce attributes should be taken into account or not. This is intended for the second dropdown, which should display only basic attributes and metafields.
 	 */
-	private function render_html_additional_attributes() {
-		$saved_attributes = get_option( Settings::$custom_attributes_option );
+	private function render_html_additional_attributes( $custom_attribute_name, $should_exclude_woocommerce_attributes = false ) {
+		$saved_attributes = get_option( $custom_attribute_name );
 		?>
 		<table class="doofinder-for-wp-attributes">
 			<thead>
@@ -491,16 +494,18 @@ trait Renderers {
 				if ( ! empty( $saved_attributes ) ) {
 					foreach ( $saved_attributes as $index => $attribute ) {
 						$this->render_html_single_additional_attribute(
-							Settings::$custom_attributes_option,
+							$custom_attribute_name,
 							$index,
+							$should_exclude_woocommerce_attributes,
 							$attribute
 						);
 					}
 				}
 
 				$this->render_html_single_additional_attribute(
-					Settings::$custom_attributes_option,
-					'new'
+					$custom_attribute_name,
+					'new',
+					$should_exclude_woocommerce_attributes
 				);
 				?>
 			</tbody>
@@ -516,10 +521,11 @@ trait Renderers {
 	 *
 	 * @param string     $option_name Name of the option.
 	 * @param string|int $index       Index number.
+	 * @param bool       $should_exclude_woocommerce_attributes Decides whether the WooCommerce attributes should be taken into account or not. This is intended for the second dropdown, which should display only basic attributes and metafields.
 	 * @param ?array     $attribute   WooCommerce Attribute. Defaults to null.
 	 */
-	private function render_html_single_additional_attribute( $option_name, $index, $attribute = null ) {
-		$option_groups = Settings::get_additional_attributes_options();
+	private function render_html_single_additional_attribute( $option_name, $index, $should_exclude_woocommerce_attributes, $attribute = null ) {
+		$option_groups = Settings::get_additional_attributes_options( $should_exclude_woocommerce_attributes );
 
 		?>
 		<tr>
@@ -528,13 +534,13 @@ trait Renderers {
 
 				<?php
 				$type = ( null !== $attribute ) ? $attribute['type'] : null;
-				if ( 'metafield' === $type && 'new' !== $index ) :
+				if ( $should_exclude_woocommerce_attributes || ( 'metafield' === $type && 'new' !== $index ) ) :
 					?>
 					<input class="df-attribute-text" type="text" name="<?php echo esc_attr( $option_name ); ?>[<?php echo esc_attr( $index ); ?>][attribute]" 
 																					<?php
 																					if ( $attribute ) :
 																						?>
-						value="<?php echo esc_attr( $attribute['attribute'] ); ?>" <?php endif; ?> />
+						value="<?php echo esc_attr( $attribute['attribute'] ); ?>" <?php endif; ?> placeholder="<?php echo ( $should_exclude_woocommerce_attributes ) ? 'Enter the metafield key' : ''; ?>"/>
 				<?php else : ?>
 					<select class="df-attribute-select df-select-2" name="<?php echo esc_attr( $option_name ); ?>[<?php echo esc_attr( $index ); ?>][attribute]" required>
 						<option disabled <?php echo ( 'new' === $index ) ? 'selected' : ''; ?>>- <?php esc_html_e( 'Select an attribute', 'wordpress-doofinder' ); ?> -</option>

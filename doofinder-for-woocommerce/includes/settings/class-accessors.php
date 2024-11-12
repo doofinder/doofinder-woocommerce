@@ -546,7 +546,7 @@ trait Accessors {
 	}
 
 	/**
-	 * Retrieves the custom attributes configured for the Doofinder plugin.
+	 * Retrieves the custom attributes configured for the Doofinder plugin for Products.
 	 *
 	 * This function fetches an array of custom attributes from the WordPress options table.
 	 * If no custom attributes are configured, it defaults to an empty array.
@@ -555,6 +555,18 @@ trait Accessors {
 	 */
 	public static function get_custom_attributes() {
 		return get_option( Settings::$custom_attributes_option, array() );
+	}
+
+	/**
+	 * Retrieves the custom attributes configured for the Doofinder plugin for Posts.
+	 *
+	 * This function fetches an array of custom attributes from the WordPress options table.
+	 * If no custom attributes are configured, it defaults to an empty array.
+	 *
+	 * @return array The configured custom attributes, or an empty array if none are set.
+	 */
+	public static function get_post_custom_attributes() {
+		return get_option( Settings::$post_custom_attributes_option, array() );
 	}
 
 	/**

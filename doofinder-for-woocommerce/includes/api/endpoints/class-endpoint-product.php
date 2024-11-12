@@ -139,7 +139,7 @@ class Endpoint_Product {
 				$filtered_product_data = self::get_description( $filtered_product_data );
 				$filtered_product_data = self::get_short_description( $filtered_product_data );
 				$filtered_product_data = self::get_tags( $filtered_product_data );
-				$filtered_product_data = self::get_meta_attributes( $filtered_product_data, $custom_attr );
+				$filtered_product_data = Endpoint_Custom::get_meta_attributes( $filtered_product_data, $custom_attr );
 				$filtered_product_data = self::clean_fields( $filtered_product_data );
 
 				$modified_products[] = $filtered_product_data;
@@ -282,28 +282,6 @@ class Endpoint_Product {
 			}
 		}
 		return $data_with_attr;
-	}
-
-	/**
-	 * Get custom meta field data from product
-	 *
-	 * @param array $data        The data to merge into.
-	 * @param array $custom_attr The custom attributes to merge.
-	 * @return array The merged data.
-	 */
-	private static function get_meta_attributes( $data, $custom_attr ) {
-		foreach ( $custom_attr as $attr ) {
-			if ( 'metafield' === $attr['type'] ) {
-				foreach ( $data['meta_data'] as $meta ) {
-					$meta_data = $meta->get_data();
-					if ( $attr['attribute'] === $meta_data['key'] ) {
-						$data[ $attr['field'] ] = $meta_data['value'] ?? '';
-					}
-				}
-			}
-		}
-		unset( $data['meta_data'] );
-		return $data;
 	}
 
 	/**
@@ -764,13 +742,51 @@ class Endpoint_Product {
 			}
 		);
 
+		$custom_attributes_mapping = Settings::get_custom_attributes();
+		$custom_attr_fields        = self::get_field_attributes( $custom_attributes_mapping );
+
 		$variation_attributes = array();
 		foreach ( $attributes as $p_attr ) {
 			if ( $p_attr['variation'] && in_array( strtolower( $p_attr['name'] ), $product_attributes, true ) ) {
-				$variation_attributes[] = strtolower( $p_attr['name'] );
+				$variation_attributes[] = self::get_real_product_attribute_name( $p_attr, $custom_attr_fields );
 			}
 		}
 		return $variation_attributes;
+	}
+
+	/**
+	 * Retrieves the mapped custom name for a WooCommerce product attribute.
+	 *
+	 * This function checks if a WooCommerce product attribute ID is mapped to a custom name
+	 * specified in the Data Configuration tab. If a custom name is found, it returns that name.
+	 * Otherwise, it returns the lowercase version of the original attribute name. Due to the
+	 * structure of the custom attributes mapping, it is necessary to flip the keys and the
+	 * values to achieve the described purpose.
+	 *
+	 * Example of custom attributes mapping structure:
+	 *
+	 * array(
+	 *    "size_custom"  => "wc_2",
+	 *    "color_custom" => "wc_1",
+	 *    [...]
+	 * );
+	 *
+	 * @param array $product_attribute An associative array representing the product attribute, containing:
+	 *                                 - 'id'   (int): The WooCommerce attribute ID.
+	 *                                 - 'name' (string): The default attribute name.
+	 * @param array $custom_attr_fields An associative array of custom attribute fields, where each custom name maps
+	 *                                  to a WooCommerce attribute key (e.g., 'wc_{id}').
+	 *
+	 * @return string The custom attribute name if found; otherwise, the original attribute name in lowercase.
+	 */
+	private static function get_real_product_attribute_name( $product_attribute, $custom_attr_fields ) {
+		$wc_id                      = 'wc_' . $product_attribute['id'];
+		$custom_attr_fields_mapping = array_flip( $custom_attr_fields );
+		if ( array_key_exists( $wc_id, $custom_attr_fields_mapping ) ) {
+			return $custom_attr_fields_mapping[ $wc_id ];
+		}
+
+		return strtolower( $product_attribute['name'] );
 	}
 
 	/**
@@ -781,7 +797,7 @@ class Endpoint_Product {
 	 *
 	 * @return array The custom attributes for the product.
 	 */
-	private static function get_custom_attributes( $product_id, $custom_attr ) {
+	public static function get_custom_attributes( $product_id, $custom_attr ) {
 
 		$product_attributes = self::get_all_attributes( $product_id );
 		$custom_attributes  = array();

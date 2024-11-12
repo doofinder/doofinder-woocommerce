@@ -113,10 +113,11 @@ class Config {
 		foreach ( $languages as $code => $language ) {
 			$code_label = strtoupper( $code );
 
-			$configuration[ $code_label ] = array(
-				'currency' => get_woocommerce_currency(),
-				'language' => $code_label,
-			);
+			$configuration[ $code_label ]['language'] = $code_label;
+
+			if ( function_exists( 'get_woocommerce_currency' ) ) {
+				$configuration[ $code_label ]['currency'] = get_woocommerce_currency();
+			}
 		}
 
 		return $configuration;
