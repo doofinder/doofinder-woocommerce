@@ -764,13 +764,51 @@ class Endpoint_Product {
 			}
 		);
 
+		$custom_attributes_mapping = Settings::get_custom_attributes();
+		$custom_attr_fields        = self::get_field_attributes( $custom_attributes_mapping );
+
 		$variation_attributes = array();
 		foreach ( $attributes as $p_attr ) {
 			if ( $p_attr['variation'] && in_array( strtolower( $p_attr['name'] ), $product_attributes, true ) ) {
-				$variation_attributes[] = strtolower( $p_attr['name'] );
+				$variation_attributes[] = self::get_real_product_attribute_name( $p_attr, $custom_attr_fields );
 			}
 		}
 		return $variation_attributes;
+	}
+
+	/**
+	 * Retrieves the mapped custom name for a WooCommerce product attribute.
+	 *
+	 * This function checks if a WooCommerce product attribute ID is mapped to a custom name
+	 * specified in the Data Configuration tab. If a custom name is found, it returns that name.
+	 * Otherwise, it returns the lowercase version of the original attribute name. Due to the
+	 * structure of the custom attributes mapping, it is necessary to flip the keys and the
+	 * values to achieve the described purpose.
+	 *
+	 * Example of custom attributes mapping structure:
+	 *
+	 * array(
+	 *    "size_custom"  => "wc_2",
+	 *    "color_custom" => "wc_1",
+	 *    [...]
+	 * );
+	 *
+	 * @param array $product_attribute An associative array representing the product attribute, containing:
+	 *                                 - 'id'   (int): The WooCommerce attribute ID.
+	 *                                 - 'name' (string): The default attribute name.
+	 * @param array $custom_attr_fields An associative array of custom attribute fields, where each custom name maps
+	 *                                  to a WooCommerce attribute key (e.g., 'wc_{id}').
+	 *
+	 * @return string The custom attribute name if found; otherwise, the original attribute name in lowercase.
+	 */
+	private static function get_real_product_attribute_name( $product_attribute, $custom_attr_fields ) {
+		$wc_id                      = 'wc_' . $product_attribute['id'];
+		$custom_attr_fields_mapping = array_flip( $custom_attr_fields );
+		if ( array_key_exists( $wc_id, $custom_attr_fields_mapping ) ) {
+			return $custom_attr_fields_mapping[ $wc_id ];
+		}
+
+		return strtolower( $product_attribute['name'] );
 	}
 
 	/**
