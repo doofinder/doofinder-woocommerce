@@ -128,6 +128,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 2.5.14 =
 - Added the possibility to index custom metadata on custom post types.
+- Fixed an issue with the df_variants_information that were not using the custom naming from the settings.
 
 = 2.5.13 =
 - Fixed an issue with the nonce verification in the store wizard.
