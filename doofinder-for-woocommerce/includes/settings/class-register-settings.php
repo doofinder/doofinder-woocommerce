@@ -202,55 +202,102 @@ trait Register_Settings {
 	}
 
 	/**
-	 * Adds the product data settings section and fields to the DooFinder plugin settings page.
+	 * Adds additional data settings section and fields to the Doofinder plugin settings page.
 	 *
-	 * This function creates a new settings section on the plugin's settings page, allowing users to configure product data options.
-	 * It adds fields for setting the image size and custom attributes that will be indexed by the DooFinder plugin.
+	 * This function creates a new settings section on the plugin's settings page, allowing users to configure product and post data options.
+	 * It adds fields for setting the image size and custom attributes that will be indexed by the Doofinder plugin.
 	 *
 	 * @return void This function does not return any value, as it directly registers settings and fields with WordPress.
 	 */
-	private function add_product_data_settings() {
-		$section_id = 'doofinder-for-wp-data';
+	private function add_data_settings() {
+
+		if ( is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
+			$section_id = 'doofinder-for-wp-product-data';
+
+			add_settings_section(
+				$section_id,
+				__( 'Product Data Settings', 'wordpress-doofinder' ),
+				function () {
+					?>
+				<p class="description">
+					<?php
+					esc_html_e(
+						'The following options allow you to set up which data would you like to index',
+						'wordpress-doofinder'
+					);
+					?>
+										</p>
+					<?php
+				},
+				self::$top_level_menu
+			);
+
+			// Image Size.
+			$image_size_option_name = Settings::$image_size_option;
+			add_settings_field(
+				$image_size_option_name,
+				__( 'Image Size', 'wordpress-doofinder' ),
+				function () use ( $image_size_option_name ) {
+					$this->render_html_image_size_field( $image_size_option_name );
+				},
+				self::$top_level_menu,
+				$section_id
+			);
+
+			register_setting( self::$top_level_menu, $image_size_option_name );
+
+			// Custom product Attributes.
+			$additional_attributes_option_name = Settings::$custom_attributes_option;
+			add_settings_field(
+				$additional_attributes_option_name,
+				__( 'Custom Attributes', 'wordpress-doofinder' ),
+				function () {
+					$this->render_html_additional_attributes( Settings::$custom_attributes_option );
+				},
+				self::$top_level_menu,
+				$section_id
+			);
+
+			register_setting( self::$top_level_menu, $additional_attributes_option_name, array( $this, 'sanitize_additional_attributes' ) );
+		}
+
+		$section_id = 'doofinder-for-wp-post-data';
 
 		add_settings_section(
 			$section_id,
-			__( 'Product Data Settings', 'wordpress-doofinder' ),
+			__( 'Post Data Settings', 'wordpress-doofinder' ),
 			function () {
 				?>
-			<p class="description">
-				<?php
-				esc_html_e(
-					'The following options allow you to set up which data would you like to index',
-					'wordpress-doofinder'
-				);
-				?>
-									</p>
+			<div class="description">
+				<p>
+					<?php
+					esc_html_e(
+						'The following options allow you to set up which data would you like to index.',
+						'wordpress-doofinder'
+					);
+					?>
+				</p>
+				<p>
+					<?php
+					esc_html_e(
+						'These settings are shared between posts, pages and every custom post type, except for WooCommerce products.',
+						'wordpress-doofinder'
+					);
+					?>
+				</p>
+									</div>
 				<?php
 			},
 			self::$top_level_menu
 		);
 
-		// Image Size.
-		$image_size_option_name = Settings::$image_size_option;
-		add_settings_field(
-			$image_size_option_name,
-			__( 'Image Size', 'wordpress-doofinder' ),
-			function () use ( $image_size_option_name ) {
-				$this->render_html_image_size_field( $image_size_option_name );
-			},
-			self::$top_level_menu,
-			$section_id
-		);
-
-		register_setting( self::$top_level_menu, $image_size_option_name );
-
 		// Custom Attributes.
-		$additional_attributes_option_name = Settings::$custom_attributes_option;
+		$additional_attributes_option_name = Settings::$post_custom_attributes_option;
 		add_settings_field(
 			$additional_attributes_option_name,
 			__( 'Custom Attributes', 'wordpress-doofinder' ),
 			function () {
-				$this->render_html_additional_attributes();
+				$this->render_html_additional_attributes( Settings::$post_custom_attributes_option, true );
 			},
 			self::$top_level_menu,
 			$section_id

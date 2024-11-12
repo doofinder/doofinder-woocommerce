@@ -61,7 +61,12 @@ if ( is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
 	}
 }
 
-$rest_attributes = Settings::get_product_rest_attributes();
+$rest_attributes = array();
+
+if ( is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
+	$rest_attributes = Settings::get_product_rest_attributes();
+}
+
 if ( ! empty( $rest_attributes ) ) {
 	foreach ( $rest_attributes as $attribute_key ) {
 		$attribute_name               = ucfirst( trim( str_replace( '_', ' ', $attribute_key ) ) );

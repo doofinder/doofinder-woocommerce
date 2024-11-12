@@ -6,6 +6,7 @@
  */
 
 use Doofinder\WP\Endpoints;
+use Doofinder\WP\Settings;
 use Doofinder\WP\Thumbnail;
 
 /**
@@ -90,6 +91,8 @@ class Endpoint_Custom {
 				continue;
 			}
 
+			$custom_attr = Settings::get_post_custom_attributes();
+
 			$filtered_data = ! empty( $fields ) ? array_intersect_key( $item_data, array_flip( $fields ) ) : $item_data;
 
 			$filtered_data = self::get_title( $filtered_data );
@@ -99,6 +102,7 @@ class Endpoint_Custom {
 			$filtered_data = self::get_image_link( $filtered_data, $fields );
 			$filtered_data = self::get_post_tags( $filtered_data, $fields );
 			$filtered_data = self::get_categories( $filtered_data, $fields );
+			$filtered_data = self::get_meta_attributes( $filtered_data, $custom_attr );
 			$filtered_data = self::clear_unused_fields( $filtered_data );
 
 			$modified_items[] = $filtered_data;
@@ -143,6 +147,35 @@ class Endpoint_Custom {
 		);
 
 		return $items;
+	}
+
+	/**
+	 * Retrieves and merges custom meta field data from a post type into existing data.
+	 *
+	 * This function fetches metadata for a specified post using custom attribute configurations.
+	 * It converts native meta field names into custom names specified in the plugin's Data Configuration tab.
+	 * The function then merges the fetched metadata into the provided data array. Although get_post_meta allows
+	 * '' as an option to retrieve all the fields in a single call, metadata calls always try to get the data
+	 * from WordPress cache so there should not be any risk calling it in the loop. In fact, it
+	 * could be worse getting every single metadata at once.
+	 *
+	 * @param array $data        The original data array, containing at least an 'id' key with the post ID.
+	 * @param array $custom_attr An array of custom attributes, where each item is an associative array with:
+	 *                           - 'attribute' (string): The native meta key in the database.
+	 *                           - 'field'     (string): The custom name to assign in the returned data array.
+	 *
+	 * @return array The merged data array, including custom meta fields if available.
+	 */
+	public static function get_meta_attributes( $data, $custom_attr ) {
+		foreach ( $custom_attr as $attr ) {
+			$post_meta = get_post_meta( $data['id'], $attr['attribute'] );
+			if ( null === $post_meta ) {
+				continue;
+			}
+			$data[ $attr['field'] ] = self::format_metadata( $post_meta );
+		}
+
+		return $data;
 	}
 
 	/**
@@ -383,5 +416,26 @@ class Endpoint_Custom {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Formats post metadata for output.
+	 *
+	 * This function processes an array of metadata values, returning an empty string if the metadata is empty.
+	 * If there is only one metadata item, it returns that item directly. Otherwise, it returns the full metadata array.
+	 *
+	 * @param array $meta_data The metadata to format, expected as an array of values.
+	 *
+	 * @return mixed Returns an empty string if metadata is empty, a single item if metadata contains only one element,
+	 *               or the original array if there are multiple items.
+	 */
+	private static function format_metadata( $meta_data ) {
+		if ( empty( $meta_data ) ) {
+			return '';
+		} elseif ( 1 === count( $meta_data ) ) {
+			return $meta_data[0];
+		}
+
+		return $meta_data;
 	}
 }

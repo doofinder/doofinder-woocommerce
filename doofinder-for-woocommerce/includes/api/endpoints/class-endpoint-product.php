@@ -139,7 +139,7 @@ class Endpoint_Product {
 				$filtered_product_data = self::get_description( $filtered_product_data );
 				$filtered_product_data = self::get_short_description( $filtered_product_data );
 				$filtered_product_data = self::get_tags( $filtered_product_data );
-				$filtered_product_data = self::get_meta_attributes( $filtered_product_data, $custom_attr );
+				$filtered_product_data = Endpoint_Custom::get_meta_attributes( $filtered_product_data, $custom_attr );
 				$filtered_product_data = self::clean_fields( $filtered_product_data );
 
 				$modified_products[] = $filtered_product_data;
@@ -282,28 +282,6 @@ class Endpoint_Product {
 			}
 		}
 		return $data_with_attr;
-	}
-
-	/**
-	 * Get custom meta field data from product
-	 *
-	 * @param array $data        The data to merge into.
-	 * @param array $custom_attr The custom attributes to merge.
-	 * @return array The merged data.
-	 */
-	private static function get_meta_attributes( $data, $custom_attr ) {
-		foreach ( $custom_attr as $attr ) {
-			if ( 'metafield' === $attr['type'] ) {
-				foreach ( $data['meta_data'] as $meta ) {
-					$meta_data = $meta->get_data();
-					if ( $attr['attribute'] === $meta_data['key'] ) {
-						$data[ $attr['field'] ] = $meta_data['value'] ?? '';
-					}
-				}
-			}
-		}
-		unset( $data['meta_data'] );
-		return $data;
 	}
 
 	/**
@@ -819,7 +797,7 @@ class Endpoint_Product {
 	 *
 	 * @return array The custom attributes for the product.
 	 */
-	private static function get_custom_attributes( $product_id, $custom_attr ) {
+	public static function get_custom_attributes( $product_id, $custom_attr ) {
 
 		$product_attributes = self::get_all_attributes( $product_id );
 		$custom_attributes  = array();
