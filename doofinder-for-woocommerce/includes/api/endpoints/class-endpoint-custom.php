@@ -170,12 +170,14 @@ class Endpoint_Custom {
 		if ( array_key_exists( 'meta_data', $data ) ) {
 			// Case for products.
 			foreach ( $custom_attr as $attr ) {
-				if ( 'metafield' === $attr['type'] ) {
-					foreach ( $data['meta_data'] as $meta ) {
-						$meta_data = $meta->get_data();
-						if ( $attr['attribute'] === $meta_data['key'] ) {
-							$data[ $attr['field'] ] = $meta_data['value'] ?? '';
-						}
+				if ( 'metafield' !== $attr['type'] ) {
+					continue;
+				}
+
+				foreach ( $data['meta_data'] as $meta ) {
+					$meta_data = $meta->get_data();
+					if ( $attr['attribute'] === $meta_data['key'] ) {
+						$data[ $attr['field'] ] = $meta_data['value'] ?? '';
 					}
 				}
 			}
