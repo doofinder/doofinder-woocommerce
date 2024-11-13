@@ -181,6 +181,8 @@ class Endpoint_Custom {
 					}
 				}
 			}
+
+			unset( $data['meta_data'] );
 		} else {
 			// Case for other post types.
 			foreach ( $custom_attr as $attr ) {
