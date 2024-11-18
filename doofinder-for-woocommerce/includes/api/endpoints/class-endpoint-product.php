@@ -213,12 +213,14 @@ class Endpoint_Product {
 	 */
 	private static function get_meta_attributes( $data, $custom_attr ) {
 		foreach ( $custom_attr as $attr ) {
-			if ( 'metafield' === $attr['type'] ) {
-				foreach ( $data['meta_data'] as $meta ) {
-					$meta_data = $meta->get_data();
-					if ( $attr['attribute'] === $meta_data['key'] ) {
-						$data[ $attr['field'] ] = $meta_data['value'] ?? '';
-					}
+			if ( 'metafield' !== $attr['type'] ) {
+				continue;
+			}
+
+			foreach ( $data['meta_data'] as $meta ) {
+				$meta_data = $meta->get_data();
+				if ( $attr['attribute'] === $meta_data['key'] ) {
+					$data[ $attr['field'] ] = $meta_data['value'] ?? '';
 				}
 			}
 		}
