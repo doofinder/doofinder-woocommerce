@@ -222,7 +222,7 @@ trait Register_Settings {
 				<p class="description">
 					<?php
 					esc_html_e(
-						'The following options allow you to set up which data would you like to index',
+						'The following options allow you to set up which data you would like to index.',
 						'wordpress-doofinder'
 					);
 					?>
@@ -272,7 +272,7 @@ trait Register_Settings {
 				<p>
 					<?php
 					esc_html_e(
-						'The following options allow you to set up which data would you like to index.',
+						'The following options allow you to set up which data you would like to index.',
 						'wordpress-doofinder'
 					);
 					?>

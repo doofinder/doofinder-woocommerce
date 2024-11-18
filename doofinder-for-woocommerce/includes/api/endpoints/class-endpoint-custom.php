@@ -166,7 +166,7 @@ class Endpoint_Custom {
 	 *
 	 * @return array The merged data array, including custom meta fields if available.
 	 */
-	public static function get_meta_attributes( $data, $custom_attr ) {
+	private static function get_meta_attributes( $data, $custom_attr ) {
 		foreach ( $custom_attr as $attr ) {
 			$post_meta = get_post_meta( $data['id'], $attr['attribute'] );
 			if ( null === $post_meta ) {
