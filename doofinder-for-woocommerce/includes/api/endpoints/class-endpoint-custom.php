@@ -166,32 +166,13 @@ class Endpoint_Custom {
 	 *
 	 * @return array The merged data array, including custom meta fields if available.
 	 */
-	public static function get_meta_attributes( $data, $custom_attr ) {
-		if ( array_key_exists( 'meta_data', $data ) ) {
-			// Case for products.
-			foreach ( $custom_attr as $attr ) {
-				if ( 'metafield' !== $attr['type'] ) {
-					continue;
-				}
-
-				foreach ( $data['meta_data'] as $meta ) {
-					$meta_data = $meta->get_data();
-					if ( $attr['attribute'] === $meta_data['key'] ) {
-						$data[ $attr['field'] ] = $meta_data['value'] ?? '';
-					}
-				}
+	private static function get_meta_attributes( $data, $custom_attr ) {
+		foreach ( $custom_attr as $attr ) {
+			$post_meta = get_post_meta( $data['id'], $attr['attribute'] );
+			if ( null === $post_meta ) {
+				continue;
 			}
-
-			unset( $data['meta_data'] );
-		} else {
-			// Case for other post types.
-			foreach ( $custom_attr as $attr ) {
-				$post_meta = get_post_meta( $data['id'], $attr['attribute'] );
-				if ( null === $post_meta ) {
-					continue;
-				}
-				$data[ $attr['field'] ] = self::format_metadata( $post_meta );
-			}
+			$data[ $attr['field'] ] = self::format_metadata( $post_meta );
 		}
 
 		return $data;

@@ -139,7 +139,7 @@ class Endpoint_Product {
 				$filtered_product_data = self::get_description( $filtered_product_data );
 				$filtered_product_data = self::get_short_description( $filtered_product_data );
 				$filtered_product_data = self::get_tags( $filtered_product_data );
-				$filtered_product_data = Endpoint_Custom::get_meta_attributes( $filtered_product_data, $custom_attr );
+				$filtered_product_data = self::get_meta_attributes( $filtered_product_data, $custom_attr );
 				$filtered_product_data = self::clean_fields( $filtered_product_data );
 
 				$modified_products[] = $filtered_product_data;
@@ -202,6 +202,30 @@ class Endpoint_Product {
 		);
 
 		return $items;
+	}
+
+	/**
+	 * Get custom meta fields data from a WooCommerce product.
+	 *
+	 * @param array $data        The data to merge into.
+	 * @param array $custom_attr The custom attributes to merge.
+	 * @return array The merged data.
+	 */
+	private static function get_meta_attributes( $data, $custom_attr ) {
+		foreach ( $custom_attr as $attr ) {
+			if ( 'metafield' !== $attr['type'] ) {
+				continue;
+			}
+
+			foreach ( $data['meta_data'] as $meta ) {
+				$meta_data = $meta->get_data();
+				if ( $attr['attribute'] === $meta_data['key'] ) {
+					$data[ $attr['field'] ] = $meta_data['value'] ?? '';
+				}
+			}
+		}
+		unset( $data['meta_data'] );
+		return $data;
 	}
 
 	/**

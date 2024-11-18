@@ -106,7 +106,7 @@ trait Register_Settings {
 			$this->language->get_option_name( 'doofinder_for_wp_enable_js_layer' );
 		add_settings_field(
 			$enable_js_layer_option_name,
-			__( 'Enable Doofinder Layer', 'wordpress-doofinder' ),
+			__( 'Enable Doofinder Script', 'wordpress-doofinder' ),
 			function () use ( $enable_js_layer_option_name ) {
 				$this->render_html_enable_js_layer( $enable_js_layer_option_name );
 			},
