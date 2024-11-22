@@ -1214,7 +1214,7 @@ class Setup_Wizard {
 			$errors[ 'wizard-step-' . $step ] = array();
 		}
 
-		$errors[ 'wizard-step-' . $step ][ $field_name ] = $error;
+		$errors[ 'wizard-step-' . $step ][ $field_name ] = $df_error;
 		$this->set_wizard_errors( $errors );
 	}
 
