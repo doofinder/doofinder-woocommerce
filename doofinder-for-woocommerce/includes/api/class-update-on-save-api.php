@@ -252,31 +252,32 @@ class Update_On_Save_Api {
 		}
 		return false;
 	}
+
+	/**
+	 * Builds a list of search engines based on language settings and configuration.
+	 *
+	 * This function constructs an array of search engine hashes for each language available
+	 * when processing all languages. It retrieves the search engine hash for each language
+	 * using the base locale or language code.
+	 *
+	 * @param bool   $process_all_languages Determines if all available languages should be processed.
+	 * @param object $language              An instance of a language handler providing methods:
+	 *                                      - `get_languages()` to retrieve all available languages.
+	 *                                      - `get_base_locale()` to get the base locale.
+	 *
+	 * @return array An associative array mapping base locales to search engine hashes
+	 */
 	public static function build_search_engines( bool $process_all_languages, $language ) {
-		$api_key = Settings::get_api_key();
-
-		if ( ! $api_key ) {
-			return false;
-		}
-
-		$api_host = Settings::get_api_host();
-
-		if ( ! $api_host ) {
-			return false;
-		}
-
+		$search_engines = array();
 		if ( $process_all_languages ) {
-
-			$search_engines = array();
-
 			foreach ( $language->get_languages() as $lang ) {
 				$code       = $lang['locale'] === $language->get_base_locale() ? '' : $lang['code'];
 				$first_part = strpos( $code, '-' ) !== false ? explode( '-', $code )[0] : $code;
 				$hash       = Settings::get_search_engine_hash( $first_part );
 				$search_engines[ $language->get_base_locale() ] = $hash;
 			}
-
-			return $search_engines;
 		}
+
+		return $search_engines;
 	}
 }
