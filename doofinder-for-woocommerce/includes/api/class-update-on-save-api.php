@@ -92,22 +92,22 @@ class Update_On_Save_Api {
 	 * @param string $language Language code.
 	 */
 	public function __construct( $language ) {
-		$this->log                  = new Log( 'update-on-save-api.log' );
+		$this->log                   = new Log( 'update-on-save-api.log' );
 		$this->language              = Multilanguage::instance();
-		$this->api_key              = Settings::get_api_key();
-		$this->api_host             = Settings::get_api_host();
-		$this->dp_host              = Settings::get_dooplugins_host();
-		$this->hash                 = Settings::get_search_engine_hash( $language );
+		$this->api_key               = Settings::get_api_key();
+		$this->api_host              = Settings::get_api_host();
+		$this->dp_host               = Settings::get_dooplugins_host();
+		$this->hash                  = Settings::get_search_engine_hash( $language );
 		$this->process_all_languages = ! empty( $this->language->get_languages() );
-		$this->search_engines		=  self::build_search_engines( $this->process_all_languages, $this->language );
-		$this->authorization_header = array(
+		$this->search_engines        = self::build_search_engines( $this->process_all_languages, $this->language );
+		$this->authorization_header  = array(
 			'Authorization' => "Token $this->api_key",
 			'content-type'  => 'application/json',
 		);
 
 		$this->log->log( 'Create Management API Client' );
 		$this->log->log( 'API Host: ' . $this->api_host );
-		$this->log->log( 'Hash: ' . print_r($this->search_engines, true));
+		$this->log->log( 'Hash: ' . print_r( $this->search_engines, true ) );
 	}
 
 	/**
@@ -137,7 +137,7 @@ class Update_On_Save_Api {
 	 */
 	public function update_bulk( $post_type, $ids ) {
 		$this->log->log( 'Update items' );
-		foreach ($this->search_engines as $lang => $hashid) {
+		foreach ( $this->search_engines as $lang => $hashid ) {
 			// phpcs:ignore I had to add a phpcs:ignore because the formatter was changing wordpress to WordPress, thus causing issues.
 			$uri = $this->build_url( $this->dp_host, 'item/' . $hashid . '/' . $post_type . '?action=update&platform=wordpress' ); // phpcs:ignore WordPress.WP.CapitalPDangit
 
@@ -159,7 +159,7 @@ class Update_On_Save_Api {
 	 * @param array  $ids product IDs we want to get data.
 	 * @param string $post_type Type of item to request.
 	 * @param string $lang Lang.
-	 * 
+	 *
 	 * @return array API response with items list.
 	 * @since 1.0.0
 	 */
@@ -167,14 +167,14 @@ class Update_On_Save_Api {
 		if ( 'product' === $post_type ) {
 			return $this->get_products_data( $ids, $lang );
 		} else {
-			return $this->get_custom_data( $ids, $post_type);
+			return $this->get_custom_data( $ids, $post_type );
 		}
 	}
 
 	/**
 	 * Get products data from our endpoint products.
 	 *
-	 * @param array $ids product IDs we want to get data.
+	 * @param array  $ids product IDs we want to get data.
 	 * @param string $lang lang.
 	 *
 	 * @since 1.0.0
@@ -188,7 +188,7 @@ class Update_On_Save_Api {
 	/**
 	 * Get products data from our endpoint products.
 	 *
-	 * @param array $ids ID product we want to get data.
+	 * @param array  $ids ID product we want to get data.
 	 * @param string $post_type Post type.
 	 *
 	 * @since 1.0.0
@@ -270,13 +270,13 @@ class Update_On_Save_Api {
 			$search_engines = array();
 
 			foreach ( $language->get_languages() as $lang ) {
-				$code = $lang['locale'] === $language->get_base_locale() ? '' : $lang['code'];
-				$first_part = strpos($code, '-') !== false ? explode('-', $code)[0] : $code;
-				$hash = Settings::get_search_engine_hash($first_part);
-				$search_engines[$language->get_base_locale()] = $hash;
+				$code       = $lang['locale'] === $language->get_base_locale() ? '' : $lang['code'];
+				$first_part = strpos( $code, '-' ) !== false ? explode( '-', $code )[0] : $code;
+				$hash       = Settings::get_search_engine_hash( $first_part );
+				$search_engines[ $language->get_base_locale() ] = $hash;
 			}
 
 			return $search_engines;
-		} 
+		}
 	}
 }

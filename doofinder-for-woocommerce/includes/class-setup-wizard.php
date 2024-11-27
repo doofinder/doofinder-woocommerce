@@ -1086,8 +1086,8 @@ class Setup_Wizard {
 	 */
 	private function check_api_settings( $step ) {
 		$api_key         = isset( $_REQUEST['api_token'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['api_token'] ) ) : null;
-		$api_host        = isset( $_REQUEST['admin_endpoint'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['admin_endpoint'] ) ) : null;    // i.e: https://eu1-admin.doofinder.com.
-		$dooplugins_host = isset( $_REQUEST['dooplugins_endpoint'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['dooplugins_endpoint'] ) ) : null;  // i.e: https://eu1-plugins.doofinder.com.
+		$api_host        = isset( $_REQUEST['admin_endpoint'] ) ? sanitize_text_field( wp_unslash( 'https://edu-doomanager.ngrok.doofinder.com' ) ) : null;    // i.e: https://eu1-admin.doofinder.com.
+		$dooplugins_host = isset( $_REQUEST['dooplugins_endpoint'] ) ? sanitize_text_field( wp_unslash( 'https://edu-dooplugins.ngrok.doofinder.com' ) ) : null;  // i.e: https://eu1-plugins.doofinder.com.
 
 		if ( empty( $api_key ) ) {
 			$this->add_wizard_step_error( $step, 'api-key', __( 'API key is missing.', 'wordpress-doofinder' ) );
