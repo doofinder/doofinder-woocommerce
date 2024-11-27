@@ -126,6 +126,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 2.5.17 =
+- Fixed update on save in multi-lang.
+
 = 2.5.16 =
 - Changed "search bar" references to "script".
 
