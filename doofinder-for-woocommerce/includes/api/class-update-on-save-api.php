@@ -107,7 +107,7 @@ class Update_On_Save_Api {
 
 		$this->log->log( 'Create Management API Client' );
 		$this->log->log( 'API Host: ' . $this->api_host );
-		$this->log->log( 'Hash: ' . print_r( $this->search_engines, true ) );
+		$this->log->log( 'Hash: ' . print_r( $this->search_engines, true ) );  // phpcs:ignore WordPress.PHP.DevelopmentFunctions
 	}
 
 	/**
