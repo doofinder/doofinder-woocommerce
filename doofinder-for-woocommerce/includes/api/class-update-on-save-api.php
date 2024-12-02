@@ -276,6 +276,8 @@ class Update_On_Save_Api {
 				$hash       = Settings::get_search_engine_hash( $first_part );
 				$search_engines[ $language->get_base_locale() ] = $hash;
 			}
+		} else {
+			$search_engines[''] = Settings::get_search_engine_hash();
 		}
 
 		return $search_engines;
