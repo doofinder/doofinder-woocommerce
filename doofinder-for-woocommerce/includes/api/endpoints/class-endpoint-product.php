@@ -179,15 +179,17 @@ class Endpoint_Product {
 	/**
 	 * Get products data from our endpoint products
 	 *
-	 * @param array $ids ID product we want to get data.
+	 * @param array  $ids ID product we want to get data.
+	 * @param string $lang Lang.
 	 *
 	 * @return array  Array Products
 	 */
-	public static function get_data( $ids ) {
+	public static function get_data( $ids, $lang ) {
 
 		$request_params = array(
 			'ids'    => implode( ',', $ids ),
 			'fields' => implode( ',', self::get_fields() ),
+			'lang'   => $lang,
 		);
 
 		$items = self::custom_product_endpoint( false, $request_params )->data;
