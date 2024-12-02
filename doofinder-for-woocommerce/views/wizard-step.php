@@ -33,7 +33,7 @@ $df_error   = $wizard->get_errors_html( "wizard-step-$step" );
 			<?php require "wizard-step-$step.php"; ?>
 			
 			<?php if ( $df_error ) : ?>
-				<?php echo esc_html( $df_error ); ?>
+				<?php echo wp_kses_post( $df_error ); ?>
 				<a href="<?php echo esc_url( Settings::get_url( 'reset-wizard=1' ) ); ?>" class="button button-primary button-error"><?php esc_html_e( 'Exit setup', 'wordpress-doofinder' ); ?></a>
 			<?php endif; ?>
 		</div>

@@ -128,6 +128,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 2.5.17 =
 - Fixed update on save in multi-lang.
+- Solved bug regarding HTML escaping in error output + undefined variable.
 
 = 2.5.16 =
 - Changed "search bar" references to "script".
