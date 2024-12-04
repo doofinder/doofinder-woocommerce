@@ -7,6 +7,7 @@
 
 namespace Doofinder\WP\Settings;
 
+use Doofinder\WP\Doofinder_For_WordPress;
 use Doofinder\WP\Multilanguage\Language_Plugin;
 use Doofinder\WP\Settings;
 
@@ -315,6 +316,15 @@ trait Register_Settings {
 		add_action(
 			'admin_menu',
 			function () {
+				$icon          = 'dashicons-search';
+				$svg_file_path = Doofinder_For_WordPress::PLUGIN_DIR . '/assets/img/doofinder.svg';
+				if ( file_exists( $svg_file_path ) ) {
+					ob_start();
+					include $svg_file_path;
+					$svg  = ob_get_clean();
+					$icon = 'data:image/svg+xml;base64,' . base64_encode( $svg ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions
+				}
+
 				add_menu_page(
 					'Doofinder WP & WooCommerce Search',
 					'Doofinder',
@@ -323,7 +333,7 @@ trait Register_Settings {
 					function () {
 						$this->render_html_settings_page();
 					},
-					'dashicons-search'
+					$icon
 				);
 			}
 		);
