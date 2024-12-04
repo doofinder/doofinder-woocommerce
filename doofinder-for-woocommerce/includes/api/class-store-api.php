@@ -133,20 +133,21 @@ class Store_Api {
 		);
 
 		foreach ( $store_payload['search_engines'] as $search_engine ) {
-			$lang_country = Helpers::format_locale_to_underscore( $search_engine['language'] );
-			$lang         = Helpers::get_language_from_locale( $search_engine['language'] );
-			$base_lang    = Helpers::get_language_from_locale( $this->language->get_base_language() );
+			// $lang_real will remain unchanged unlike $lang that can be changed to ''.
+			$lang      = Helpers::get_language_from_locale( $search_engine['language'] );
+			$lang_real = $lang;
+			$base_lang = Helpers::get_language_from_locale( $this->language->get_base_language() );
 
 			// If the installation is not multilanguage or it's the base language, replace the lang with ''.
 			if ( is_a( $this->language, No_Language_Plugin::class ) || $lang === $base_lang ) {
-				$lang_country = '';
+				$lang = '';
 			}
 
-			if ( isset( $api_keys[ $lang_country ] ) ) {
-				$se_hashid                               = $api_keys[ $lang_country ]['hash'];
-				$payload['search_engines'][ $se_hashid ] = array( 'lang' => $lang );
+			if ( isset( $api_keys[ $lang ] ) ) {
+				$se_hashid                               = $api_keys[ $lang ]['hash'];
+				$payload['search_engines'][ $se_hashid ] = array( 'lang' => $lang_real );
 			} else {
-				$this->log->log( 'No search engine retrieved for the language - ' . $lang );
+				$this->log->log( 'No search engine retrieved for the language - ' . $lang_real );
 			}
 		}
 
