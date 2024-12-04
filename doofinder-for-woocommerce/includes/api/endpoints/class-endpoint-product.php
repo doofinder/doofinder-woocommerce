@@ -467,7 +467,7 @@ class Endpoint_Product {
 		// If sale price is empty, do not attempt to get the raw real price, as we will get the original price.
 		$raw_price = 'sale_price' === $price_name && '' === $price ? '' : self::get_raw_real_price( $price, $wc_product );
 		// If price is equal to 0, return an empty string.
-		$raw_price = ( 0 === $raw_price ) ? '' : $raw_price;
+		$raw_price = ( false === $raw_price || 0 === $raw_price ) ? '' : $raw_price;
 		return $raw_price;
 	}
 
