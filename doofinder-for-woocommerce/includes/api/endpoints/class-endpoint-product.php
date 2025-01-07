@@ -436,8 +436,12 @@ class Endpoint_Product {
 		$price         = self::get_price( $wc_product );
 		$sale_price    = self::get_sale_price( $wc_product );
 
+		/**
+		 * In some niche cases, we receive a regular_price of 0 but it is not the real regular_price.
+		 * For this reason, in case we have a regular_price of 0, we ignore it.
+		 */
 		$product['regular_price'] = $regular_price;
-		$product['price']         = '' === (string) $regular_price ? $price : $regular_price;
+		$product['price']         = '' === (string) $regular_price || 0 === $regular_price ? $price : $regular_price;
 		$final_sale_price         = '' === (string) $sale_price || $price < $regular_price ? $price : $sale_price;
 
 		if ( empty( $final_sale_price ) || $final_sale_price === $regular_price ) {
