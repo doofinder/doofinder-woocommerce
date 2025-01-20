@@ -501,25 +501,26 @@ class Endpoint_Product {
 	}
 
 	/**
-	 * Get the raw price.
+	 * Get the raw regular price.
 	 *
 	 * @param \WC_Product|null $product WooCommerce Product.
 	 *
-	 * @return float The raw price including or excluding taxes (defined in WC settings).
+	 * @return float The raw regular price including or excluding taxes (defined in WC settings).
 	 */
 	private static function get_price( $product ) {
-		return self::get_raw_price( $product );
+		return self::get_raw_price( $product, 'regular_price' );
 	}
 
 	/**
-	 * Get the raw sale price.
+	 * Get the raw sale price including or excluding taxes and taking into account the scheduled dates. If the current date is outside the scheduled dates
+	 * range, the regular price will be returned instead.
 	 *
 	 * @param \WC_Product|null $product WooCommerce Product.
 	 *
-	 * @return float The raw sale price including or excluding taxes (defined in WC settings).
+	 * @return float
 	 */
 	private static function get_sale_price( $product ) {
-		return self::get_raw_price( $product, 'sale_price' );
+		return self::get_raw_price( $product, 'price' );
 	}
 
 	/**
