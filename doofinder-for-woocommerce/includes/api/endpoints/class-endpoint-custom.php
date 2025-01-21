@@ -400,10 +400,10 @@ class Endpoint_Custom {
 		$request = new WP_REST_Request( 'GET', '/wp/v2/' . $config_request['type'] );
 		$request->set_query_params(
 			array(
-				'page'     => $config_request['page'],
-				'per_page' => $config_request['per_page'],
-				'lang'     => $config_request['lang'],
-				'include'  => $config_request['ids'],
+				'page'     => ! empty( $config_request['page'] ) ? $config_request['page'] : 1,
+				'per_page' => ! empty( $config_request['per_page'] ) ? $config_request['per_page'] : self::PER_PAGE,
+				'lang'     => ! empty( $config_request['lang'] ) ? $config_request['per_page'] : '',
+				'include'  => ! empty( $config_request['ids'] ) ? $config_request['ids'] : '',
 				'orderby'  => 'id',
 				'order'    => 'asc',
 			)
