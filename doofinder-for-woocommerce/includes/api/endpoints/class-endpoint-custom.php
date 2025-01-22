@@ -402,7 +402,7 @@ class Endpoint_Custom {
 			array(
 				'page'     => ! empty( $config_request['page'] ) ? $config_request['page'] : 1,
 				'per_page' => ! empty( $config_request['per_page'] ) ? $config_request['per_page'] : self::PER_PAGE,
-				'lang'     => ! empty( $config_request['lang'] ) ? $config_request['per_page'] : '',
+				'lang'     => ! empty( $config_request['lang'] ) ? $config_request['lang'] : '',
 				'include'  => ! empty( $config_request['ids'] ) ? $config_request['ids'] : '',
 				'orderby'  => 'id',
 				'order'    => 'asc',
