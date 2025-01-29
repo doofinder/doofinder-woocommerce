@@ -3,7 +3,7 @@
  * Plugin Name: DOOFINDER Search and Discovery for WP & WooCommerce
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 2.5.23
+ * Version: 2.6.1
  * Requires at least: 5.6
  * Requires PHP: 7.0
  * Author: Doofinder
@@ -40,7 +40,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 		 * @var string
 		 */
 
-		public static $version = '2.5.23';
+		public static $version = '2.6.1';
 
 		/**
 		 * The only instance of Doofinder_For_WordPress
@@ -128,9 +128,6 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 					if ( ! is_admin() ) {
 						JS_Layer::instance();
 					}
-
-					// Register all custom URLs.
-					call_user_func( array( $php_class, 'register_urls' ) );
 
 					if ( is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
 						Add_To_Cart::instance();
@@ -225,15 +222,6 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 			return plugin_dir_url( __FILE__ );
 		}
 
-		/**
-		 * Initialize all functionalities that register custom URLs.
-		 *
-		 * @since 1.0.0
-		 */
-		public static function register_urls() {
-			Platform_Confirmation::register();
-		}
-
 		/* Plugin activation and deactivation *****************************************/
 
 		/**
@@ -249,7 +237,6 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 			}
 
 			self::autoload( self::plugin_path() . 'includes/' );
-			self::register_urls();
 			flush_rewrite_rules();
 
 			Update_On_Save::create_update_on_save_db();
