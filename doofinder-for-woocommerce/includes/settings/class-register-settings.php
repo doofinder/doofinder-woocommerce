@@ -148,7 +148,7 @@ trait Register_Settings {
 			)
 		);
 
-		register_setting( self::$top_level_menu, $region_option_name, array('sanitize_callback' => array($this, 'validate_region')));
+		register_setting( self::$top_level_menu, $region_option_name, array( 'sanitize_callback' => array( $this, 'validate_region' ) ) );
 
 		// Search engine hash.
 		$search_engine_hash_option_name =
@@ -447,7 +447,7 @@ trait Register_Settings {
 	 * @return string|null
 	 */
 	public function validate_region( $region_input ) {
-		if ( !in_array($region_input, Settings::VALID_REGIONS) ) {
+		if ( ! in_array( $region_input, Settings::VALID_REGIONS ) ) {
 			add_settings_error(
 				'doofinder_for_wp_messages',
 				'doofinder_for_wp_message',
