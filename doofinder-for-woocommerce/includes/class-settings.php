@@ -74,6 +74,13 @@ class Settings {
 	);
 
 	/**
+	 * List of valid regions
+	 *
+	 * @var array
+	 */
+	const VALID_REGIONS = array( 'eu1', 'us1' );
+
+	/**
 	 * Array of tab settings, indexed by the id of the tag (the GET variable
 	 * representing given tab). Values contain:
 	 * label - Displayed in the tab.

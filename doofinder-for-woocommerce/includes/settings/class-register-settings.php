@@ -148,7 +148,7 @@ trait Register_Settings {
 			)
 		);
 
-		register_setting( self::$top_level_menu, $region_option_name );
+		register_setting( self::$top_level_menu, $region_option_name, array( 'sanitize_callback' => array( $this, 'validate_region' ) ) );
 
 		// Search engine hash.
 		$search_engine_hash_option_name =
@@ -439,6 +439,24 @@ trait Register_Settings {
 		return $input;
 	}
 
+	/**
+	 * Validate region
+	 *
+	 * @param string $region_input region value.
+	 *
+	 * @return string|null
+	 */
+	public function validate_region( $region_input ) {
+		if ( ! in_array( $region_input, Settings::VALID_REGIONS, true ) ) {
+			add_settings_error(
+				'doofinder_for_wp_messages',
+				'doofinder_for_wp_message',
+				__( 'Selecting a region is mandatory.', 'wordpress-doofinder' )
+			);
+			return '';
+		}
+		return $region_input;
+	}
 
 	/**
 	 * Process additional attributes sent from the frontend
