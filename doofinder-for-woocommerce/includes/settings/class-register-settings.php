@@ -442,12 +442,12 @@ trait Register_Settings {
 	/**
 	 * Validate region
 	 *
-	 * @param string $input region value.
+	 * @param string $region_input region value.
 	 *
 	 * @return string|null
 	 */
 	public function validate_region( $region_input ) {
-		if ( ! in_array( $region_input, Settings::VALID_REGIONS ) ) {
+		if ( ! in_array( $region_input, Settings::VALID_REGIONS, true ) ) {
 			add_settings_error(
 				'doofinder_for_wp_messages',
 				'doofinder_for_wp_message',
