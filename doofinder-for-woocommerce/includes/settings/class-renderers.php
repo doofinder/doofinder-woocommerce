@@ -308,7 +308,7 @@ trait Renderers {
 			$selected_us = $saved_value === $key_us ? ' selected ' : '';
 			echo wp_kses( '<option value=" ' . esc_attr( $key_us ) . ' "' . $selected_us . '> USA -  ' . $key_us . '  </option>', $kses_args );
 			$selected_ap = $saved_value === $key_ap ? ' selected ' : '';
-			echo wp_kses( '<option value=" ' . esc_attr( $key_ap ) . ' "' . $selected_ap . '> USA -  ' . $key_ap . '  </option>', $kses_args );
+			echo wp_kses( '<option value=" ' . esc_attr( $key_ap ) . ' "' . $selected_ap . '> Asia-Pacific -  ' . $key_ap . '  </option>', $kses_args );
 			?>
 		</select>
 		<?php
