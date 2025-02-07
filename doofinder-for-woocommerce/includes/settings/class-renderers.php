@@ -212,7 +212,7 @@ trait Renderers {
 		<span class="doofinder-tooltip"><span>
 		<?php
 		esc_html_e(
-			'The secret token is used to authenticate requests. Don`t need to use eu1- or us1- prefix.',
+			'The secret token is used to authenticate requests. Don`t need to use prefixes like eu1-, us1-...',
 			'wordpress-doofinder'
 		);
 		?>
@@ -236,6 +236,7 @@ trait Renderers {
 
 		$key_eu = 'eu1';
 		$key_us = 'us1';
+		$key_ap = 'ap1';
 
 		?>
 
@@ -262,6 +263,8 @@ trait Renderers {
 			echo wp_kses( '<option value=" ' . esc_attr( $key_eu ) . ' "' . $selected_eu . '> Europe -  ' . strtoupper( $key_eu ) . '  </option>', $kses_args );
 			$selected_us = $saved_value === $key_us ? ' selected ' : '';
 			echo wp_kses( '<option value=" ' . esc_attr( $key_us ) . ' "' . $selected_us . '> USA -  ' . strtoupper( $key_us ) . '  </option>', $kses_args );
+			$selected_ap = $saved_value === $key_ap ? ' selected ' : '';
+			echo wp_kses( '<option value=" ' . esc_attr( $key_ap ) . ' "' . $selected_ap . '> Asia-Pacific -  ' . strtoupper( $key_ap ) . '  </option>', $kses_args );
 			?>
 		</select>
 		<?php
@@ -277,6 +280,7 @@ trait Renderers {
 
 		$key_eu = 'https://eu1-plugins.doofinder.com';
 		$key_us = 'https://us1-plugins.doofinder.com';
+		$key_ap = 'https://ap1-plugins.doofinder.com';
 
 		// Allow `<option>` and its attributes in `wp_kses()` function.
 		$kses_args = array(
@@ -303,6 +307,8 @@ trait Renderers {
 			echo wp_kses( '<option value=" ' . esc_attr( $key_eu ) . ' "' . $selected_eu . '> Europa -  ' . $key_eu . '  </option>', $kses_args );
 			$selected_us = $saved_value === $key_us ? ' selected ' : '';
 			echo wp_kses( '<option value=" ' . esc_attr( $key_us ) . ' "' . $selected_us . '> USA -  ' . $key_us . '  </option>', $kses_args );
+			$selected_ap = $saved_value === $key_ap ? ' selected ' : '';
+			echo wp_kses( '<option value=" ' . esc_attr( $key_ap ) . ' "' . $selected_ap . '> Asia-Pacific -  ' . $key_ap . '  </option>', $kses_args );
 			?>
 		</select>
 		<?php
