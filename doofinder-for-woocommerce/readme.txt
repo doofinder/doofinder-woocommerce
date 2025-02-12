@@ -127,7 +127,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Changelog ==
 
 = 2.6.2 =
-- Bugfix update on save dont update custom attributes
+- Bugfix update on save doesn't update custom attributes
 
 = 2.6.1 =
 - Added region validation.
