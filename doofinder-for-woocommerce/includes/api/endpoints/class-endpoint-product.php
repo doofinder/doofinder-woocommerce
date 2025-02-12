@@ -106,6 +106,7 @@ class Endpoint_Product {
 			$fields_param = $config_request['fields'] ?? '';
 			$fields       = ! empty( $fields_param ) ? explode( ',', $fields_param ) : array();
 			$fields       = array_merge( $fields, array_values( $custom_attr_fields ) );
+			$config_request["fields"] = $fields;
 		}
 
 		// Retrieve the original product data.
