@@ -129,6 +129,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 = 2.7.0 =
 - Added support to Asia-Pacific region.
 
+= 2.6.2 =
+- Bugfix update on save doesn't update custom attributes
+
 = 2.6.1 =
 - Added region validation.
 
