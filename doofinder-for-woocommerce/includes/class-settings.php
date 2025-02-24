@@ -78,7 +78,7 @@ class Settings {
 	 *
 	 * @var array
 	 */
-	const VALID_REGIONS = array( 'eu1', 'us1' );
+	const VALID_REGIONS = array( 'eu1', 'us1', 'ap1' );
 
 	/**
 	 * Array of tab settings, indexed by the id of the tag (the GET variable

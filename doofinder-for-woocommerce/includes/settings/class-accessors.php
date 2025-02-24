@@ -56,7 +56,7 @@ trait Accessors {
 	/**
 	 * Sets the region.
 	 *
-	 * @param string $region The region identifier (eu1 or us1).
+	 * @param string $region The region identifier (eu1, us1 or ap1).
 	 *
 	 * @return bool The update_option result. True if successfully updated false in case of failure.
 	 */
@@ -67,7 +67,7 @@ trait Accessors {
 	/**
 	 * Retrieve the region.
 	 *
-	 * @return string The Region key (eu1 or us1).
+	 * @return string The Region key (eu1, us1 or ap1).
 	 */
 	public static function get_region() {
 		return get_option( 'doofinder_for_wp_region' );
@@ -308,7 +308,7 @@ trait Accessors {
 			update_option( 'doofinder_script_migrated', true );
 			$base_script = wp_unslash( get_option( 'doofinder_for_wp_js_layer', '' ) );
 			// Ensure that the script in the DB is the one-liner version.
-			if ( preg_match( '/<script src="https:\/\/(?P<region>eu1|us1)-config\.doofinder\.com\/2\.x\/(?P<installation_id>[a-zA-Z0-9-]+)\.js" async><\/script>/', $base_script, $matches ) ) { // phpcs:ignore WordPress.WP.EnqueuedResources
+			if ( preg_match( '/<script src="https:\/\/(?P<region>eu1|us1|ap1)-config\.doofinder\.com\/2\.x\/(?P<installation_id>[a-zA-Z0-9-]+)\.js" async><\/script>/', $base_script, $matches ) ) { // phpcs:ignore WordPress.WP.EnqueuedResources
 				$base_script = sprintf( '<script src="https://%1$s-config.doofinder.com/2.x/%2$s.js" async></script>', $matches['region'], $matches['installation_id'] ); // phpcs:ignore WordPress.WP.EnqueuedResources
 				Settings::set_js_layer( $base_script );
 			}

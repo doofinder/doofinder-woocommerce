@@ -126,7 +126,7 @@ class Helpers {
 	 *
 	 * @param string $host WordPress website host.
 	 *
-	 * @return string The region identifier (eu1 or us1).
+	 * @return string The region identifier (eu1, us1 or ap1).
 	 */
 	public static function get_region_from_host( $host ) {
 		$re = '/:\/\/(?<region>[a-z]{2}[0-9])-.*/m';
