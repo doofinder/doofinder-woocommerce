@@ -1,6 +1,6 @@
 /** START INTEGRATION WITH KLAVIYO **/
 window.addEventListener('load', async (event) => {
-  if (typeof klaviyo !== 'undefined' && await klaviyo.isIdentified() === false && typeof klUser !== 'undefined' && klUser.current_user_email !== "") {
+  if ('undefined' !== typeof klaviyo && false === await klaviyo.isIdentified() && 'undefined' !== typeof klUser && "" !== klUser.current_user_email) {
     const email = klUser.current_user_email;
     const companyId = await klaviyo.account();
     let userId = window.localStorage.getItem('df-random-userid');
@@ -26,7 +26,7 @@ window.addEventListener('load', async (event) => {
           }
         })
       });
-      console.log(response);
+
       if (!response.ok) {
         console.error('Failed to send data to Klaviyo:', await response.text());
       }

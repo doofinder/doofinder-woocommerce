@@ -7,26 +7,22 @@
 
 namespace Doofinder\WP;
 
-use WP_Http;
-
 /**
- * Handles the add to cart workflow.
+ * Handles the Klaviyo workflow.
  */
 class Klaviyo_Integration {
-
-	const ACTION_NAME = 'doofinder_ajax_add_to_cart';
 
 	/**
 	 * Singleton of this class.
 	 *
-	 * @var Add_To_Cart
+	 * @var Klaviyo
 	 */
 	private static $instance;
 
 	/**
-	 * Returns the only instance of Add_To_Cart.
+	 * Returns the only instance of Klaviyo.
 	 *
-	 * @return Add_To_Cart
+	 * @return Klaviyo
 	 */
 	public static function instance() {
 		if ( is_null( self::$instance ) ) {
@@ -37,7 +33,7 @@ class Klaviyo_Integration {
 	}
 
 	/**
-	 * Add_To_Cart constructor.
+	 * Klaviyo constructor.
 	 */
 	public function __construct() {
 		$this->enqueue_script();
@@ -46,7 +42,7 @@ class Klaviyo_Integration {
 	/**
 	 * Enqueue plugin styles and scripts.
 	 *
-	 * @since 1.5.23
+	 * @since 2.7.1
 	 */
 	public function enqueue_script() {
 		add_action(
@@ -56,7 +52,7 @@ class Klaviyo_Integration {
 					wp_enqueue_script(
 						'doofinder-integration-klaviyo',
 						Doofinder_For_WordPress::plugin_url() . 'assets/js/doofinder-integration-klaviyo.js',
-						array( 'jquery' ),
+						array(),
 						Doofinder_For_WordPress::$version,
 						true
 					);
