@@ -36,5 +36,3 @@ window.addEventListener('load', async (event) => {
   }
 });
 /** END INTEGRATION WITH KLAVIYO **/
-  
-  
