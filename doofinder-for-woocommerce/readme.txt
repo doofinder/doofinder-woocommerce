@@ -1,11 +1,11 @@
 === DOOFINDER Search and Discovery for WP & WooCommerce ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.7.1
+Version: 2.7.2
 Requires at least: 5.6
 Tested up to: 6.7.1
 Requires PHP: 7.0
-Stable tag: 2.7.1
+Stable tag: 2.7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,18 +26,18 @@ Increase your WooCommerce store's conversion rates by up to 30% using our AI-dri
 == Features ==
 
 -   🔍 **Intelligent Product Filters**: Allow shoppers to effortlessly navigate through your catalog with our intuitive default and customizable filters.
--   🔝 **Searchandising**: Create rules to prioritize products within your search results.  
--   📱 **Mobile First**: Enjoy a specialized mobile search mode crafted for an optimal user experience.  
--   🔍🗣️ **Multiple Ways to Search**: Empower users to search via voice, text, or image—whichever suits their preference. 
--   📊 **Real-Time Analytics**: Gain valuable insights into user behavior and geolocation data. 
--   🔀 **Multi-Index & Redirections**: Set up pre-configured results, seamlessly redirecting users to relevant pages based on their search query. 
--   🎨 **Respect Your Theme Design**: Ensure seamless integration with your existing design aesthetic. 
--   🔡 **Typo-Tolerance & Synonyms**: Enhance search accuracy with typo tolerance and synonym recognition.  
--   🔮 **Predictive Search Suggestions**: Anticipate user needs with relevant search suggestions. 
--   🖼️ **Customizable Appearance**: Tailor the layout and design of product cards to suit your brand.  
--   🎉 **Promotional Banners**: Highlight special offers and promotions within search results to enhance your product merchandising.  
--   🌐 **Multi-language and Multi-currency Support**: Reach a global audience with support for over 30 languages and currencies. 
--   🛠️ **Technical Support**: Ensure continuous growth with a technical support team that’s always ready to help.  
+-   🔝 **Searchandising**: Create rules to prioritize products within your search results.
+-   📱 **Mobile First**: Enjoy a specialized mobile search mode crafted for an optimal user experience.
+-   🔍🗣️ **Multiple Ways to Search**: Empower users to search via voice, text, or image—whichever suits their preference.
+-   📊 **Real-Time Analytics**: Gain valuable insights into user behavior and geolocation data.
+-   🔀 **Multi-Index & Redirections**: Set up pre-configured results, seamlessly redirecting users to relevant pages based on their search query.
+-   🎨 **Respect Your Theme Design**: Ensure seamless integration with your existing design aesthetic.
+-   🔡 **Typo-Tolerance & Synonyms**: Enhance search accuracy with typo tolerance and synonym recognition.
+-   🔮 **Predictive Search Suggestions**: Anticipate user needs with relevant search suggestions.
+-   🖼️ **Customizable Appearance**: Tailor the layout and design of product cards to suit your brand.
+-   🎉 **Promotional Banners**: Highlight special offers and promotions within search results to enhance your product merchandising.
+-   🌐 **Multi-language and Multi-currency Support**: Reach a global audience with support for over 30 languages and currencies.
+-   🛠️ **Technical Support**: Ensure continuous growth with a technical support team that’s always ready to help.
 -   🧥👗**AI Product recommendation carousels**: Guide users to products they'll love and maximize cross-selling with our AI-powered recommendations.
 
 == Requirements ==
@@ -95,7 +95,7 @@ Here you can find a more detailed [installation guide](https://support.doofinder
 == Frequently Asked Questions ==
 
 = How can I install the Doofinder Search and Discovery Module in my WooCommerce? =
-Check out our video tutorial: Installation Guide. 
+Check out our video tutorial: Installation Guide.
 
 https://www.youtube.com/watch?v=rNRH7jb_So8
 
@@ -125,6 +125,9 @@ For in-depth insights into Doofinder and its features, check out our comprehensi
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/doofinder-for-woocommerce)
 
 == Changelog ==
+
+= 2.7.2 =
+- Prevent error when `process_variations` and `$variation` is `null`.
 
 = 2.7.1 =
 - Added support for Klaviyo.
@@ -194,7 +197,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 - Fixed update on save cron not working as expected.
 
 = 2.5.6 =
-- Fixed attribute not exported when they are empty values. 
+- Fixed attribute not exported when they are empty values.
 
 = 2.5.5 =
 - Fixed top level menu name.
