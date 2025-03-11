@@ -63,13 +63,12 @@ class Endpoint_Single_Script {
 			$languages = array();
 		}
 
-		foreach ( $languages as $language_code => $language_name ) {
+		foreach ( $languages as $language_code => $language_data ) {
 			if ( empty( $language_code ) || $language_code === $multilanguage->get_base_locale() ) {
 				continue;
 			}
 
-			$language = Helpers::get_language_from_locale( $language_code );
-			Settings::set_js_layer( '', $language );
+			Settings::set_js_layer( '', $language_data['code'] );
 		}
 
 		$region = Settings::get_region();

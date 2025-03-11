@@ -345,7 +345,7 @@ trait Accessors {
 	 */
 	private static function option_name_for_language( $option_name, $language = '' ) {
 		if ( $language ) {
-			return $option_name .= "_{$language}";
+			return $option_name .= '_' . strtolower( $language );
 		} elseif ( '' === $language ) {
 			return $option_name;
 		} else {

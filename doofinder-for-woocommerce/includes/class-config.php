@@ -91,6 +91,26 @@ class Config {
 		$this->config = $config;
 	}
 
+	public static function get_multilang_option( $option_name ) {
+		$multilanguage = Multilanguage::instance();
+		$lang_code     = $multilanguage->get_current_language();
+		if ( ! $multilanguage->is_active() ) {
+			return get_option( $option_name );
+		}
+
+		$multilang_option = get_option( $option_name );
+		if ( false !== $multilang_option ) {
+			return $multilang_option;
+		} elseif ( str_ends_with( $option_name, $lang_code ) ) {
+			$option_name = explode( '-', $option_name );
+			array_pop( $option_name );
+			$option_name = implode( '-', $option_name );
+			return get_option( $option_name );
+		}
+
+		return $multilang_option;
+	}
+
 	/**
 	 * Generates the REST Response from the config data.
 	 *

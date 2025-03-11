@@ -236,7 +236,10 @@ class WPML implements I18n_Handler {
 			if ( empty( $translated_name ) ) {
 				$translated_name = isset( $value['display_name'] ) ? $value['display_name'] : '';
 			}
-			$formatted_languages[ $language_code ] = $translated_name;
+			$formatted_languages[ $language_code ] = array(
+				'code'            => $value['code'],
+				'translated_name' => $translated_name,
+			);
 		}
 
 		return $formatted_languages;
@@ -261,7 +264,7 @@ class WPML implements I18n_Handler {
 		}
 
 		// Replace hyphens with underscores in language code.
-		$language_code = Helpers::get_language_from_locale( $language_code );
+		$language_code = strtolower( Helpers::format_locale_to_hyphen( $language_code ) );
 
 		return "{$base}_{$language_code}";
 	}
