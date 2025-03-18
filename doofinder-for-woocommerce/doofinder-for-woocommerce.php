@@ -97,8 +97,12 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 				include_once ABSPATH . 'wp-admin/includes/plugin.php';
 			}
 
+			$includes_path = self::plugin_path() . 'includes/';
+
+			include_once $includes_path . 'polyfills.php';
+
 			// Load classes on demand.
-			self::autoload( self::plugin_path() . 'includes/' );
+			self::autoload( $includes_path );
 
 			add_action(
 				'init',
