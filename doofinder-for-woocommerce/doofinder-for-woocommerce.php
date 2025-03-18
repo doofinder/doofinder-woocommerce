@@ -3,7 +3,7 @@
  * Plugin Name: DOOFINDER Search and Discovery for WP & WooCommerce
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 2.7.1
+ * Version: 2.7.2
  * Requires at least: 5.6
  * Requires PHP: 7.0
  * Author: Doofinder
