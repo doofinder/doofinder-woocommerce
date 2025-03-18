@@ -127,7 +127,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Changelog ==
 
 = 2.7.3 =
-- Improve Search Engine creation for some languages.
+- Improve Search Engine creation for languages with the same ISO code, but different country (e.g. pt-PT and pt-BR).
 
 = 2.7.2 =
 - Prevent error when `process_variations` and `$variation` is `null`.
