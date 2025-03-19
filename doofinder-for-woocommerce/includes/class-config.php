@@ -106,11 +106,11 @@ class Config {
 	 */
 	public static function get_multilang_option( $option_name ) {
 		$multilanguage = Multilanguage::instance();
-		$lang_code     = $multilanguage->get_current_language();
 		if ( ! $multilanguage->is_active() ) {
 			return get_option( $option_name );
 		}
 
+		$lang_code        = $multilanguage->get_current_language();
 		$multilang_option = get_option( $option_name );
 		if ( false !== $multilang_option ) {
 			return $multilang_option;
