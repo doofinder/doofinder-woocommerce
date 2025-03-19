@@ -8,7 +8,7 @@
 namespace Doofinder\WP\Settings;
 
 use Doofinder\WP\Api\Store_Api;
-use Doofinder\WP\Landing;
+use Doofinder\WP\Config;
 use Doofinder\WP\Multilanguage\Language_Plugin;
 use Doofinder\WP\Multilanguage\No_Language_Plugin;
 use Doofinder\WP\Reset_Credentials;
@@ -205,7 +205,7 @@ trait Renderers {
 	 * @param string $option_name Name of the option.
 	 */
 	private function render_html_api_key( $option_name ) {
-		$saved_value = get_option( $option_name );
+		$saved_value = Config::get_multilang_option( $option_name );
 
 		?>
 
@@ -232,7 +232,7 @@ trait Renderers {
 	 * @param string $option_name Name of the option.
 	 */
 	private function render_html_zone_select( $option_name ) {
-		$saved_value = get_option( $option_name );
+		$saved_value = Config::get_multilang_option( $option_name );
 
 		$key_eu = 'eu1';
 		$key_us = 'us1';
@@ -276,7 +276,7 @@ trait Renderers {
 	 * @param string $option_name Name of the option.
 	 */
 	private function render_html_dooplugins_host( $option_name ) {
-		$saved_value = get_option( $option_name );
+		$saved_value = Config::get_multilang_option( $option_name );
 
 		$key_eu = 'https://eu1-plugins.doofinder.com';
 		$key_us = 'https://us1-plugins.doofinder.com';
@@ -320,7 +320,7 @@ trait Renderers {
 	 * @param string $option_name Name of the option.
 	 */
 	private function render_html_search_engine_hash( $option_name ) {
-		$saved_value = get_option( $option_name );
+		$saved_value = Config::get_multilang_option( $option_name );
 
 		?>
 
@@ -400,7 +400,7 @@ trait Renderers {
 	 * @param string $option_name Name of the option.
 	 */
 	private function render_html_enable_js_layer( $option_name ) {
-		$saved_value = get_option( $option_name );
+		$saved_value = Config::get_multilang_option( $option_name );
 
 		?>
 		<span class="doofinder-tooltip">
@@ -426,7 +426,7 @@ trait Renderers {
 	 * @param string $option_name Name of the option.
 	 */
 	private function render_html_load_js_layer_from_doofinder( $option_name ) {
-		$saved_value = get_option( $option_name );
+		$saved_value = Config::get_multilang_option( $option_name );
 
 		?>
 		<span class="doofinder-tooltip"><span>
@@ -456,7 +456,7 @@ trait Renderers {
 	 * @param string $option_name Name of the option.
 	 */
 	private function render_html_js_layer( $option_name ) {
-		$saved_value = get_option( $option_name );
+		$saved_value = Config::get_multilang_option( $option_name );
 
 		?>
 		<span class="doofinder-tooltip"><span>

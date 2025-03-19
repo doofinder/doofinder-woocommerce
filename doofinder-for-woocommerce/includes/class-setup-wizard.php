@@ -1059,10 +1059,10 @@ class Setup_Wizard {
 
 		// Clear per language settings.
 
-		foreach ( $languages as $language_code => $language_name ) {
+		foreach ( $languages as $language_code => $language_data ) {
 			// Suffix for options.
 			// This should be empty for default language, and language code for any other.
-			$options_suffix = ( $language_code === $this->language->get_base_locale() ) ? '' : Helpers::get_language_from_locale( $language_code );
+			$options_suffix = ( $language_code === $this->language->get_base_locale() ) ? '' : $language_data['code'];
 
 			// Search engine data.
 			Settings::set_search_engine_hash( '', $options_suffix );
@@ -1087,7 +1087,7 @@ class Setup_Wizard {
 	private function check_api_settings( $step ) {
 		$api_key         = isset( $_REQUEST['api_token'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['api_token'] ) ) : null;
 		$api_host        = isset( $_REQUEST['admin_endpoint'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['admin_endpoint'] ) ) : null;    // i.e: https://eu1-admin.doofinder.com.
-		$dooplugins_host = isset( $_REQUEST['dooplugins_endpoint'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['dooplugins_endpoint'] ) ) : null;  // i.e: https://eu1-plugins.doofinder.com.
+		$dooplugins_host = isset( $_REQUEST['dooplugins_endpoint'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['dooplugins_endpoint'] ) ) : null; // i.e: https://eu1-plugins.doofinder.com.
 
 		if ( empty( $api_key ) ) {
 			$this->add_wizard_step_error( $step, 'api-key', __( 'API key is missing.', 'wordpress-doofinder' ) );
@@ -1250,7 +1250,7 @@ class Setup_Wizard {
 			$currency_key = strtoupper( $currency );
 			// format language to en_US instead of en-US format.
 			$language            = Helpers::format_locale_to_underscore( $language );
-			$language_key        = Helpers::get_language_from_locale( $language );
+			$language_key        = Helpers::format_locale_to_hyphen( $language );
 			$is_primary_language = strtolower( $this->language->get_base_locale() ) === strtolower( $language );
 			if ( ! array_key_exists( $currency_key, $search_engine ) ) {
 				$currency_key = strtolower( $currency );
@@ -1286,7 +1286,7 @@ class Setup_Wizard {
 			$languages[''] = '';
 		}
 
-		foreach ( $languages as $language_code => $language_name ) {
+		foreach ( $languages as $language_code => $language_data ) {
 			// Suffix for options.
 			// This should be empty for default language, and language code for any other.
 			$options_suffix = '';
@@ -1359,7 +1359,7 @@ class Setup_Wizard {
 			$api_keys_array = array();
 
 			foreach ( $language->get_languages() as $lang ) {
-				$code = $lang['locale'] === $language->get_base_locale() ? '' : Helpers::get_language_from_locale( $lang['locale'] );
+				$code = $lang['locale'] === $language->get_base_locale() ? '' : Helpers::format_locale_to_underscore( $lang['locale'] );
 				$hash = Settings::get_search_engine_hash( $code );
 				$hash = ! $hash ? 'no-hash' : $hash;
 

@@ -1,11 +1,11 @@
 === DOOFINDER Search and Discovery for WP & WooCommerce ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.7.2
+Version: 2.7.3
 Requires at least: 5.6
 Tested up to: 6.7.1
 Requires PHP: 7.0
-Stable tag: 2.7.2
+Stable tag: 2.7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -126,6 +126,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 2.7.3 =
+- Improve Search Engine creation for languages with the same ISO code, but different country (e.g. pt-PT and pt-BR).
+
 = 2.7.2 =
 - Prevent error when `process_variations` and `$variation` is `null`.
 
@@ -136,7 +139,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 - Added support to Asia-Pacific region.
 
 = 2.6.2 =
-- Bugfix update on save doesn't update custom attributes
+- Bugfix update on save doesn't update custom attributes.
 
 = 2.6.1 =
 - Added region validation.

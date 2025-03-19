@@ -133,9 +133,8 @@ class Store_Api {
 		);
 
 		foreach ( $store_payload['search_engines'] as $search_engine ) {
-			// $lang_real will remain unchanged unlike $lang that can be changed to ''.
 			$lang      = Helpers::get_language_from_locale( $search_engine['language'] );
-			$lang_real = $lang;
+			$lang_real = $search_engine['locale'];
 			$base_lang = Helpers::get_language_from_locale( $this->language->get_base_language() );
 
 			// If the installation is not multilanguage or it's the base language, replace the lang with ''.

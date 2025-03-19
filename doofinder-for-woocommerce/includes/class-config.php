@@ -92,6 +92,39 @@ class Config {
 	}
 
 	/**
+	 * Retrieves a multilingual option value.
+	 *
+	 * This function checks if the multilingual feature is active and retrieves the corresponding
+	 * option value based on the current language. If the multilingual feature is not active,
+	 * it simply returns the default option value. If the option does not exist for the current
+	 * language but the option name ends with the language code, it attempts to retrieve the
+	 * non-language-specific option instead.
+	 *
+	 * @param string $option_name The name of the option to retrieve.
+	 *
+	 * @return mixed The option value if found, or false if not set.
+	 */
+	public static function get_multilang_option( $option_name ) {
+		$multilanguage = Multilanguage::instance();
+		if ( ! $multilanguage->is_active() ) {
+			return get_option( $option_name );
+		}
+
+		$lang_code        = $multilanguage->get_current_language();
+		$multilang_option = get_option( $option_name );
+		if ( false !== $multilang_option ) {
+			return $multilang_option;
+		} elseif ( str_ends_with( $option_name, $lang_code ) ) {
+			$option_name = explode( '-', $option_name );
+			array_pop( $option_name );
+			$option_name = implode( '-', $option_name );
+			return get_option( $option_name );
+		}
+
+		return $multilang_option;
+	}
+
+	/**
 	 * Generates the REST Response from the config data.
 	 *
 	 * @return \WP_REST_Response
