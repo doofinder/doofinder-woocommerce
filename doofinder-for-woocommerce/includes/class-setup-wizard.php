@@ -1054,15 +1054,18 @@ class Setup_Wizard {
 		$languages = $this->language->get_formatted_languages();
 
 		if ( ! $languages ) {
+			$languages     = array();
 			$languages[''] = '';
 		}
 
 		// Clear per language settings.
 
 		foreach ( $languages as $language_code => $language_data ) {
+			// If no multillang is present, the code will be ''.
+			$locale = ! empty( $language_data['code'] ) ? $language_data['code'] : '';
 			// Suffix for options.
 			// This should be empty for default language, and language code for any other.
-			$options_suffix = ( $language_code === $this->language->get_base_locale() ) ? '' : $language_data['code'];
+			$options_suffix = ( $language_code === $this->language->get_base_locale() ) ? '' : $locale;
 
 			// Search engine data.
 			Settings::set_search_engine_hash( '', $options_suffix );
@@ -1114,6 +1117,11 @@ class Setup_Wizard {
 		// Api Host should contain 'https://' protocol, i.e. https://eu1-admin.doofinder.com.
 		if ( ! preg_match( '#^((https?://)|www\.?)#i', $api_host ) ) {
 			$api_host = 'https://' . $api_host;
+		}
+
+		// Dooplugins Host should contain 'https://' protocol, i.e. https://eu1-plugins.doofinder.com.
+		if ( ! preg_match( '#^((https?://)|www\.?)#i', $dooplugins_host ) ) {
+			$dooplugins_host = 'https://' . $dooplugins_host;
 		}
 
 		return array(
@@ -1373,11 +1381,7 @@ class Setup_Wizard {
 		} else {
 			$hash = Settings::get_search_engine_hash();
 
-			if ( $hash ) {
-				return true;
-			} else {
-				return false;
-			}
+			return (bool) $hash;
 		}
 	}
 }
