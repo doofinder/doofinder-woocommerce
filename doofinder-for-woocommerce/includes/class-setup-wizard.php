@@ -1115,20 +1115,33 @@ class Setup_Wizard {
 		}
 
 		// Api Host should contain 'https://' protocol, i.e. https://eu1-admin.doofinder.com.
-		if ( ! preg_match( '#^((https?://)|www\.?)#i', $api_host ) ) {
-			$api_host = 'https://' . $api_host;
-		}
-
+		$api_host = self::maybe_prepend_https_schema( $api_host );
 		// Dooplugins Host should contain 'https://' protocol, i.e. https://eu1-plugins.doofinder.com.
-		if ( ! preg_match( '#^((https?://)|www\.?)#i', $dooplugins_host ) ) {
-			$dooplugins_host = 'https://' . $dooplugins_host;
-		}
+		$dooplugins_host = self::maybe_prepend_https_schema( $dooplugins_host );
 
 		return array(
 			'api_key'         => $api_key,
 			'api_host'        => $api_host,
 			'dooplugins_host' => $dooplugins_host,
 		);
+	}
+
+	/**
+	 * Ensures a URL has an HTTPS schema if missing.
+	 *
+	 * This function checks if a URL already contains "http://", "https://", or starts with "www.".
+	 * If not, it prepends "https://" to ensure a valid URL format.
+	 *
+	 * @param string $url The URL to check and modify if necessary.
+	 *
+	 * @return string The URL with "https://" prepended if needed.
+	 */
+	private static function maybe_prepend_https_schema( $url ) {
+		if ( preg_match( '#^((https?://)|www\.?)#i', $url ) ) {
+			return $url;
+		}
+
+		return 'https://' . $url;
 	}
 
 	/**
