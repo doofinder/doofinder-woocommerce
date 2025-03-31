@@ -26,3 +26,16 @@ This command will fix automatically all the minor issues regarding to the coding
 When all the manual errors are fixed, we will have to run another command just to check if there are some errors that cannot be fixed automatically by the previous command. The command is:
 
 `make cs-check`
+
+## PHP compatibility
+
+This plugin has been thoroughly tested and confirmed to be compatible with the following PHP versions:
+
+✅ Supported PHP Versions:
+
+- PHP 7.4
+- PHP 8.0
+- PHP 8.1
+- PHP 8.2
+- PHP 8.3
+- PHP 8.4
