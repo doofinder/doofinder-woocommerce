@@ -33,6 +33,10 @@ This plugin has been thoroughly tested and confirmed to be compatible with the f
 
 ✅ Supported PHP Versions:
 
+- PHP 7.0
+- PHP 7.1
+- PHP 7.2
+- PHP 7.3
 - PHP 7.4
 - PHP 8.0
 - PHP 8.1
