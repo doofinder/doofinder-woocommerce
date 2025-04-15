@@ -13,8 +13,16 @@ alias wp="wpcli --path=/var/www/html --allow-root"
 cd /var/www/html
 
 if ! $(wp core is-installed); then
-  echo "Installing WordPress at localhost:${WEB_SERVICE_PORT}"
-  wp core install --url=localhost:${WEB_SERVICE_PORT} --title=WooCommerce --admin_user=${ADMIN_USER} --admin_password=${ADMIN_PASSWORD} --admin_email=${ADMIN_EMAIL} --skip-email
+  if [ -n "${WORDPRESS_VERSION-}" ]; then
+    echo "Current version:"
+    wp core version
+    echo "Forced WP version:"
+    echo "${WORDPRESS_VERSION}"
+    wp core download --version=${WORDPRESS_VERSION} --force
+  fi
+  
+  echo "Installing WordPress at ${LOCAL_DOMAIN}"
+  wp core install --url=${LOCAL_DOMAIN} --title=WooCommerce --admin_user=${ADMIN_USER} --admin_password=${ADMIN_PASSWORD} --admin_email=${ADMIN_EMAIL} --skip-email
 
   wp plugin install wordpress-importer --activate
   wp plugin install woocommerce --activate
