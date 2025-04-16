@@ -26,9 +26,13 @@ if ! $(wp core is-installed); then
 
   wp plugin install wordpress-importer --activate
   wp plugin install woocommerce --activate
-  wp import wp-content/plugins/woocommerce/dummy-data/dummy-data.xml --authors=create
 
-  ln -s /usr/src/doofinder-for-woocommerce /var/www/html/wp-content/plugins
+  if [ -f wp-content/plugins/woocommerce/dummy-data/dummy-data.xml ]; then
+    wp import wp-content/plugins/woocommerce/dummy-data/dummy-data.xml --authors=create
+  else
+    echo "Dummy data file not found. Skipping import."
+  fi
+
   wp plugin activate doofinder-for-woocommerce
 fi
 
