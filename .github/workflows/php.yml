@@ -2,7 +2,7 @@ name: PHP tests
 on: [push, pull_request]
 jobs:
   phplint:
-    name: PHP Syntax check 7.0 -> 8.4
+    name: PHP Syntax check 7.2 -> 8.4
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
