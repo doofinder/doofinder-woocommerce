@@ -60,7 +60,7 @@ class Store_Helpers {
 
 		// Check if the method exists before calling it.
 		// This is to avoid errors in older versions of WordPress (WP < 5.7).
-		if (!method_exists( WP_Application_Passwords::class, 'application_name_exists_for_user')) {
+		if ( ! method_exists( WP_Application_Passwords::class, 'application_name_exists_for_user' ) ) {
 			return $password_data;
 		}
 
