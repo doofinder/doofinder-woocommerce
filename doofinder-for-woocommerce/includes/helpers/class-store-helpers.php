@@ -26,7 +26,7 @@ class Store_Helpers {
 
 		update_option( 'doofinder_for_wp_token', $endpoints_token );
 
-		$blog_url = preg_replace('#^https?://#', '', get_bloginfo( 'url' ));
+		$blog_url = preg_replace( '#^https?://#', '', get_bloginfo( 'url' ) );
 
 		if ( ! is_null( $password_data ) ) {
 			return array(
