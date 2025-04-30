@@ -7,7 +7,7 @@ FROM wordpress:latest
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Set your local WordPress installation url
-ENV LOCAL_DOMAIN=http://yourdomain-wordpress.ngrok.doofinder.com 
+ENV LOCAL_DOMAIN=http://yourlocalwordpressdomain.com 
 
 RUN apt-get update -qq && \
   apt-get install -y \
