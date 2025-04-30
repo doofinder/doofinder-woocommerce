@@ -48,7 +48,7 @@ class Store_Helpers {
 	 * We store the user_id and the uuid in order to know which application
 	 * password we must delete.
 	 *
-	 * @return array Array containing api_user and api_pass
+	 * @return array|null Array containing api_user and api_pass
 	 */
 	private static function create_application_credentials() {
 		$user_id                 = get_current_user_id();
@@ -57,6 +57,12 @@ class Store_Helpers {
 		$credentials             = get_option( $credentials_option_name );
 		$password_data           = null;
 		$app_name                = 'doofinder_' . get_current_blog_id();
+
+		// Check if the method exists before calling it.
+		// This is to avoid errors in older versions of WordPress (WP < 5.7).
+		if ( ! method_exists( WP_Application_Passwords::class, 'application_name_exists_for_user' ) ) {
+			return $password_data;
+		}
 
 		if ( is_array( $credentials ) && array_key_exists( 'user_id', $credentials ) && array_key_exists( 'uuid', $credentials ) ) {
 			WP_Application_Passwords::delete_application_password( $credentials['user_id'], $credentials['uuid'] );
