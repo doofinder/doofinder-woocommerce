@@ -3,7 +3,7 @@ Contributors: Doofinder
 Tags: search, autocomplete
 Version: 2.8.0
 Requires at least: 5.6
-Tested up to: 6.7.1
+Tested up to: 6.8
 Requires PHP: 7.0
 Stable tag: 2.8.0
 License: GPLv2 or later
@@ -128,6 +128,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 2.8.0 =
 - Add `blog_id` and schemaless `url` to installation options for store identification.
+
+= 2.7.5 =
+- Bugfix in Store Wizard for WordPress versions below 5.7 .
 
 = 2.7.4 =
 - Bugfix in Store Wizard if no multiplang plugin is present.
