@@ -26,18 +26,20 @@ class Store_Helpers {
 
 		update_option( 'doofinder_for_wp_token', $endpoints_token );
 
+		$blog_url = preg_replace( '#^https?://#', '', get_bloginfo( 'url' ) );
+
+		$options = array(
+			'blog_id'  => get_current_blog_id(),
+			'url'      => $blog_url,
+			'df_token' => $endpoints_token,
+		);
+
 		if ( ! is_null( $password_data ) ) {
-			return array(
-				'url'      => get_bloginfo( 'url' ),
-				'api_pass' => $password_data['api_pass'],
-				'api_user' => $password_data['api_user'],
-				'df_token' => $endpoints_token,
-			);
+			$options['api_pass'] = $password_data['api_pass'];
+			$options['api_user'] = $password_data['api_user'];
+			return $options;
 		} else {
-			return array(
-				'url'      => get_bloginfo( 'url' ),
-				'df_token' => $endpoints_token,
-			);
+			return $options;
 		}
 	}
 
