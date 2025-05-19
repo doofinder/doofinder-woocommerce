@@ -280,7 +280,7 @@ class Endpoint_Product {
 					continue;
 				}
 
-				$components    = parse_url( $term_link );
+				$components    = wp_parse_url( $term_link );
 				$relative_link = isset( $components['path'] ) ? $components['path'] : '';
 
 				if ( isset( $components['query'] ) && ! empty( $components['query'] ) ) {
