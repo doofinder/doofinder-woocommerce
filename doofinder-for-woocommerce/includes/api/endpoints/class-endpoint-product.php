@@ -279,14 +279,14 @@ class Endpoint_Product {
 				if ( is_wp_error( $term_link ) ) {
 					continue;
 				}
-				
-				$components = parse_url( $term_link );
+
+				$components    = parse_url( $term_link );
 				$relative_link = isset( $components['path'] ) ? $components['path'] : '';
 
 				if ( isset( $components['query'] ) && ! empty( $components['query'] ) ) {
 					$relative_link .= '?' . $components['query'];
 				}
-				
+
 				$data['category_merchandising'][] = $relative_link;
 			}
 		}
