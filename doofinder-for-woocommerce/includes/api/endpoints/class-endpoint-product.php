@@ -283,7 +283,7 @@ class Endpoint_Product {
 				$components    = wp_parse_url( $term_link );
 				$relative_link = isset( $components['path'] ) ? $components['path'] : '';
 
-				if ( isset( $components['query'] ) && ! empty( $components['query'] ) ) {
+				if ( ! empty( $components['query'] ) ) {
 					$relative_link .= '?' . $components['query'];
 				}
 
