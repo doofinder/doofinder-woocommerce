@@ -287,7 +287,7 @@ class Endpoint_Product {
 					$relative_link .= '?' . $components['query'];
 				}
 
-				$data['category_merchandising'][] = $relative_link;
+				$data['category_merchandising'][] = trim( $relative_link, '/' );
 			}
 		}
 		return $data;
