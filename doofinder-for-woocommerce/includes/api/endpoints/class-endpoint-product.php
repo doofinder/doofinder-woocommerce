@@ -132,6 +132,7 @@ class Endpoint_Product {
 				$filtered_product_data = ! empty( $fields ) ? array_intersect_key( $product_data, array_flip( $fields ) ) : $product_data;
 
 				$filtered_product_data = self::set_indexable( $filtered_product_data, $indexable_opt );
+				$filtered_product_data = self::get_category_merchandising( $filtered_product_data );
 				$filtered_product_data = self::get_categories( $filtered_product_data );
 				$filtered_product_data = self::merge_custom_attributes( $filtered_product_data, $custom_attr );
 				$filtered_product_data = self::get_image_field( $filtered_product_data );
@@ -253,6 +254,41 @@ class Endpoint_Product {
 	private static function get_categories( $data ) {
 		if ( isset( $data['categories'] ) ) {
 			$data['categories'] = self::get_category_path( $data['categories'] );
+		}
+		return $data;
+	}
+
+	/**
+	 * Processes product categories and adds a new `category_merchandising` field
+	 * containing relative URLs for each product category.
+	 *
+	 * @param array $data The product data to process.
+	 * @return array Product data including the new `category_merchandising` field.
+	 * @throws WP_Error If there is an error retrieving term links.
+	 * @since 2.7.6
+	 */
+	private static function get_category_merchandising( $data ) {
+		if ( isset( $data['categories'] ) ) {
+			$data['category_merchandising'] = array();
+			foreach ( $data['categories'] as $category ) {
+				if ( empty( $category['id'] ) || ! is_numeric( $category['id'] ) ) {
+					continue;
+				}
+
+				$term_link = get_term_link( (int) $category['id'], 'product_cat' );
+				if ( is_wp_error( $term_link ) ) {
+					continue;
+				}
+
+				$components    = wp_parse_url( $term_link );
+				$relative_link = isset( $components['path'] ) ? $components['path'] : '';
+
+				if ( ! empty( $components['query'] ) ) {
+					$relative_link .= '?' . $components['query'];
+				}
+
+				$data['category_merchandising'][] = $relative_link;
+			}
 		}
 		return $data;
 	}
