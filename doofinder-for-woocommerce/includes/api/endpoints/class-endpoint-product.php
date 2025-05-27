@@ -52,6 +52,8 @@ class Endpoint_Product {
 		'type',
 	);
 
+	const TAXONOMY = 'product_cat';
+
 	/**
 	 * Initialize the custom product endpoint.
 	 *
@@ -252,6 +254,7 @@ class Endpoint_Product {
 	 * @return array The processed data.
 	 */
 	private static function get_categories( $data ) {
+		$data['categories'] = [];
 		if ( isset( $data['categories'] ) ) {
 			$data['categories'] = self::get_category_path( $data['categories'] );
 		}
@@ -268,31 +271,50 @@ class Endpoint_Product {
 	 * @since 2.7.6
 	 */
 	private static function get_category_merchandising( $data ) {
+		$data['category_merchandising'] = [];
+	
 		if ( isset( $data['categories'] ) ) {
-			$data['category_merchandising'] = array();
 			foreach ( $data['categories'] as $category ) {
 				if ( empty( $category['id'] ) || ! is_numeric( $category['id'] ) ) {
 					continue;
 				}
-
-				$term_link = get_term_link( (int) $category['id'], 'product_cat' );
-				if ( is_wp_error( $term_link ) ) {
+	
+				$term = get_term( (int) $category['id'], self::TAXONOMY );
+				if ( ! $term || is_wp_error( $term ) ) {
 					continue;
 				}
 
-				$components    = wp_parse_url( $term_link );
-				$relative_link = isset( $components['path'] ) ? $components['path'] : '';
-
-				if ( ! empty( $components['query'] ) ) {
-					$relative_link .= '?' . $components['query'];
+				// Obtain the hierarchy from root to the current category
+				$ancestors = get_ancestors( $term->term_id, self::TAXONOMY );
+				$ancestors = array_reverse( $ancestors ); // Start from root
+				$full_path_ids = array_merge( $ancestors, array( $term->term_id ) );
+	
+				foreach ( $full_path_ids as $term_id ) {
+					$term_link = get_term_link( (int) $term_id, self::TAXONOMY );
+					if ( is_wp_error( $term_link ) ) {
+						continue;
+					}
+	
+					$components    = wp_parse_url( $term_link );
+					$relative_link = isset( $components['path'] ) ? $components['path'] : '';
+	
+					if ( ! empty( $components['query'] ) ) {
+						$relative_link .= '?' . $components['query'];
+					}
+	
+					$relative_link = trim( $relative_link, '/' );
+					
+					// Avoid duplicates
+					if ( ! in_array( $relative_link, $data['category_merchandising'], true ) ) {
+						$data['category_merchandising'][] = $relative_link;
+					}
 				}
-
-				$data['category_merchandising'][] = trim( $relative_link, '/' );
 			}
 		}
+	
 		return $data;
 	}
-
+	
 	/**
 	 * Merge custom attributes into the data.
 	 *
