@@ -52,7 +52,7 @@ class Endpoint_Product {
 		'type',
 	);
 
-	const TAXONOMY = 'product_cat';
+	const TAXONOMY = self::TAXONOMY;
 
 	/**
 	 * Initialize the custom product endpoint.
@@ -273,6 +273,10 @@ class Endpoint_Product {
 	private static function get_category_merchandising( $data ) {
 		$data['category_merchandising'] = array();
 
+		// Obtain category base.
+		$category_base = get_option( 'woocommerce_permalinks' );
+		$category_base = isset( $category_base['category_base'] ) ? trim( $category_base['category_base'], '/' ) : 'product-category';
+
 		if ( isset( $data['categories'] ) ) {
 			foreach ( $data['categories'] as $category ) {
 				if ( empty( $category['id'] ) || ! is_numeric( $category['id'] ) ) {
@@ -284,10 +288,11 @@ class Endpoint_Product {
 					continue;
 				}
 
-				// Obtain the hierarchy from root to the current category.
 				$ancestors     = get_ancestors( $term->term_id, self::TAXONOMY );
-				$ancestors     = array_reverse( $ancestors ); // Start from root.
+				$ancestors     = array_reverse( $ancestors );
 				$full_path_ids = array_merge( $ancestors, array( $term->term_id ) );
+
+				$full_path = array();
 
 				foreach ( $full_path_ids as $term_id ) {
 					$term_link = get_term_link( (int) $term_id, self::TAXONOMY );
@@ -296,17 +301,22 @@ class Endpoint_Product {
 					}
 
 					$components    = wp_parse_url( $term_link );
-					$relative_link = isset( $components['path'] ) ? $components['path'] : '';
+					$relative_path = isset( $components['path'] ) ? trim( $components['path'], '/' ) : '';
 
-					if ( ! empty( $components['query'] ) ) {
-						$relative_link .= '?' . $components['query'];
+					// Remove category base if it exists.
+					if ( $category_base && str_starts_with( $relative_path, $category_base ) ) {
+						$relative_path = substr( $relative_path, strlen( $category_base ) );
+						$relative_path = ltrim( $relative_path, '/' );
 					}
 
-					$relative_link = trim( $relative_link, '/' );
+					$segments = explode( '/', $relative_path );
+					if ( ! empty( $segments ) ) {
+						$full_path[] = $segments[ count( $segments ) - 1 ]; // just add the last segment.
+						$path        = implode( '/', $full_path );
 
-					// Avoid duplicates.
-					if ( ! in_array( $relative_link, $data['category_merchandising'], true ) ) {
-						$data['category_merchandising'][] = $relative_link;
+						if ( ! in_array( $path, $data['category_merchandising'], true ) ) {
+							$data['category_merchandising'][] = $path;
+						}
 					}
 				}
 			}
@@ -1001,7 +1011,7 @@ class Endpoint_Product {
 	 * @return string The category hierarchy.
 	 */
 	private static function get_category_hierarchy( $category_id ) {
-		$category = get_term( $category_id, 'product_cat' );
+		$category = get_term( $category_id, self::TAXONOMY );
 		if ( is_wp_error( $category ) ) {
 			return '';
 		}
@@ -1009,7 +1019,7 @@ class Endpoint_Product {
 		$parent_id     = $category->parent;
 
 		while ( ! empty( $parent_id ) ) {
-			$parent_category = get_term( $parent_id, 'product_cat' );
+			$parent_category = get_term( $parent_id, self::TAXONOMY );
 			if ( ! is_wp_error( $parent_category ) ) {
 				$category_path = $parent_category->name . ' > ' . $category_path;
 				$parent_id     = $parent_category->parent;
