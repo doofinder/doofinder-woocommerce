@@ -61,6 +61,7 @@ if (!function_exists('str_starts_with')) {
             throw new TypeError('str_starts_with(): Arguments must be strings');
         }
 
+		// Empty needle always returns true (matches PHP 8.0+ behavior)
         if ($needle === '') {
             return true;
         }
