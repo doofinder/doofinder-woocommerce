@@ -284,9 +284,9 @@ class Endpoint_Product {
 					continue;
 				}
 
-				// Obtain the hierarchy from root to the current category
+				// Obtain the hierarchy from root to the current category.
 				$ancestors     = get_ancestors( $term->term_id, self::TAXONOMY );
-				$ancestors     = array_reverse( $ancestors ); // Start from root
+				$ancestors     = array_reverse( $ancestors ); // Start from root.
 				$full_path_ids = array_merge( $ancestors, array( $term->term_id ) );
 
 				foreach ( $full_path_ids as $term_id ) {
@@ -304,7 +304,7 @@ class Endpoint_Product {
 
 					$relative_link = trim( $relative_link, '/' );
 
-					// Avoid duplicates
+					// Avoid duplicates.
 					if ( ! in_array( $relative_link, $data['category_merchandising'], true ) ) {
 						$data['category_merchandising'][] = $relative_link;
 					}
