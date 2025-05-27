@@ -57,15 +57,15 @@ if ( ! function_exists( 'str_ends_with' ) ) {
  */
 if ( ! function_exists( 'str_starts_with' ) ) {
 	function str_starts_with( $haystack, $needle ) {
-		if ( ! is_string( $haystack ) || ! is_string( $needle ) ) {
-			throw new TypeError( 'str_starts_with(): Arguments must be strings' );
-		}
+		if (!is_string($haystack) || !is_string($needle)) {
+            throw new InvalidArgumentException('str_starts_with(): Arguments must be strings');
+        }
 
 		// Empty needle always returns true (matches PHP 8.0+ behavior)
 		if ( $needle === '' ) {
 			return true;
 		}
 
-		return strpos( $haystack, $needle ) === 0;
+		return 0 === strpos( $haystack, $needle );
 	}
 }
