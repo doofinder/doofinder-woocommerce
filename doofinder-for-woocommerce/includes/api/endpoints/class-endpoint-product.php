@@ -52,7 +52,7 @@ class Endpoint_Product {
 		'type',
 	);
 
-	const TAXONOMY = self::TAXONOMY;
+	const TAXONOMY = 'product_cat';
 
 	/**
 	 * Initialize the custom product endpoint.
