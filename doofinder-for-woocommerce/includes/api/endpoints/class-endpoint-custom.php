@@ -187,7 +187,7 @@ class Endpoint_Custom {
 	 * @return array The filtered data array with post tags information if requested.
 	 */
 	private static function get_post_tags( $filtered_data, $fields ) {
-		$filtered_data['post_tags'] = [];
+		$filtered_data['post_tags'] = array();
 
 		if ( in_array( 'post_tags', $fields, true ) && isset( $filtered_data['_embedded']['wp:term'][0] ) ) {
 			$filtered_data['post_tags'] = self::get_terms( 'post_tag', $filtered_data['_embedded']['wp:term'] );
@@ -205,8 +205,8 @@ class Endpoint_Custom {
 	 * @return array The filtered data array with categories information if requested.
 	 */
 	private static function get_categories( $filtered_data, $fields ) {
-		$filtered_data['categories'] = [];
-		
+		$filtered_data['categories'] = array();
+
 		if ( in_array( 'categories', $fields, true ) && isset( $filtered_data['_embedded']['wp:term'][0] ) ) {
 			$filtered_data['categories'] = self::get_terms( 'category', $filtered_data['_embedded']['wp:term'] );
 		}

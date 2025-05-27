@@ -254,7 +254,7 @@ class Endpoint_Product {
 	 * @return array The processed data.
 	 */
 	private static function get_categories( $data ) {
-		$data['categories'] = [];
+		$data['categories'] = array();
 		if ( isset( $data['categories'] ) ) {
 			$data['categories'] = self::get_category_path( $data['categories'] );
 		}
@@ -271,39 +271,39 @@ class Endpoint_Product {
 	 * @since 2.7.6
 	 */
 	private static function get_category_merchandising( $data ) {
-		$data['category_merchandising'] = [];
-	
+		$data['category_merchandising'] = array();
+
 		if ( isset( $data['categories'] ) ) {
 			foreach ( $data['categories'] as $category ) {
 				if ( empty( $category['id'] ) || ! is_numeric( $category['id'] ) ) {
 					continue;
 				}
-	
+
 				$term = get_term( (int) $category['id'], self::TAXONOMY );
 				if ( ! $term || is_wp_error( $term ) ) {
 					continue;
 				}
 
 				// Obtain the hierarchy from root to the current category
-				$ancestors = get_ancestors( $term->term_id, self::TAXONOMY );
-				$ancestors = array_reverse( $ancestors ); // Start from root
+				$ancestors     = get_ancestors( $term->term_id, self::TAXONOMY );
+				$ancestors     = array_reverse( $ancestors ); // Start from root
 				$full_path_ids = array_merge( $ancestors, array( $term->term_id ) );
-	
+
 				foreach ( $full_path_ids as $term_id ) {
 					$term_link = get_term_link( (int) $term_id, self::TAXONOMY );
 					if ( is_wp_error( $term_link ) ) {
 						continue;
 					}
-	
+
 					$components    = wp_parse_url( $term_link );
 					$relative_link = isset( $components['path'] ) ? $components['path'] : '';
-	
+
 					if ( ! empty( $components['query'] ) ) {
 						$relative_link .= '?' . $components['query'];
 					}
-	
+
 					$relative_link = trim( $relative_link, '/' );
-					
+
 					// Avoid duplicates
 					if ( ! in_array( $relative_link, $data['category_merchandising'], true ) ) {
 						$data['category_merchandising'][] = $relative_link;
@@ -311,10 +311,10 @@ class Endpoint_Product {
 				}
 			}
 		}
-	
+
 		return $data;
 	}
-	
+
 	/**
 	 * Merge custom attributes into the data.
 	 *
