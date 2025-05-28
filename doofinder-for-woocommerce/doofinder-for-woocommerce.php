@@ -15,8 +15,8 @@
 namespace Doofinder\WP;
 
 use Doofinder\WP\Admin_Notices;
-use Doofinder\WP\Multilanguage\Multilanguage;
 use Doofinder\WP\Log;
+use Doofinder\WP\Multilanguage\Multilanguage;
 use Doofinder\WP\Settings;
 use WP_Http;
 
