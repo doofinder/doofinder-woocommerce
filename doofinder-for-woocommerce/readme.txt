@@ -129,6 +129,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 = 2.7.10 =
 - Send complete store options when updating the module to use df token.
 
+= 2.7.9 =
+- Included Log class in `use` statement.
+
 = 2.7.8 =
 - Include parent category paths in the `category_merchandising` field.
 
