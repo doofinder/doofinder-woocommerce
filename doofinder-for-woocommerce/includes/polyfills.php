@@ -45,3 +45,29 @@ if ( ! function_exists( 'str_ends_with' ) ) {
 		return 0 === strlen( $needle ) || substr( $haystack, -strlen( $needle ) ) === $needle;
 	}
 }
+
+if ( ! function_exists( 'str_starts_with' ) ) {
+	/**
+	 * Polyfill for str_starts_with() function
+	 * Available natively in PHP 8.0+
+	 *
+	 * Checks if a string starts with a given substring
+	 *
+	 * @param string $haystack The string to search in.
+	 * @param string $needle The substring to search for.
+	 * @throws InvalidArgumentException If either argument is not a string.
+	 * @return bool Returns true if haystack starts with needle, false otherwise
+	 */
+	function str_starts_with( $haystack, $needle ) {
+		if ( ! is_string( $haystack ) || ! is_string( $needle ) ) {
+			throw new InvalidArgumentException( 'str_starts_with(): Arguments must be strings' );
+		}
+
+		// Empty needle always returns true (matches PHP 8.0+ behavior).
+		if ( '' === $needle ) {
+			return true;
+		}
+
+		return 0 === strpos( $haystack, $needle );
+	}
+}

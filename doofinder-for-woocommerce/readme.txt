@@ -129,6 +129,15 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 = 2.8.0 =
 - Add `blog_id` and schemaless `url` to installation options for store identification.
 
+= 2.7.9 =
+- Included Log class in `use` statement.
+
+= 2.7.8 =
+- Include parent category paths in the `category_merchandising` field.
+
+= 2.7.7 =
+- Remove slashes from `category_merchandising` slugs.
+
 = 2.7.6 =
 - The `category_merchandising` field has been added to the indexing parameters.
 
