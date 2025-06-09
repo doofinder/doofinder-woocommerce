@@ -256,6 +256,8 @@ class Endpoint_Product {
 	private static function get_categories( $data ) {
 		if ( isset( $data['categories'] ) ) {
 			$data['categories'] = self::get_category_path( $data['categories'] );
+		} else {
+			$data['categories'] = array();
 		}
 		return $data;
 	}
