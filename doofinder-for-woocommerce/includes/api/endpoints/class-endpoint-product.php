@@ -755,7 +755,6 @@ class Endpoint_Product {
 
 			if ( isset( $product['type'] ) ) {
 				$type = $product['type'];
-				unset( $product['type'] );
 			}
 
 			$attributes = isset( $product['attributes'] ) && is_array( $product['attributes'] ) ? $product['attributes'] : array();
