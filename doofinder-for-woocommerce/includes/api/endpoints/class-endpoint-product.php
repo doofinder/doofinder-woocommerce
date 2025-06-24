@@ -254,9 +254,10 @@ class Endpoint_Product {
 	 * @return array The processed data.
 	 */
 	private static function get_categories( $data ) {
-		$data['categories'] = array();
 		if ( isset( $data['categories'] ) ) {
 			$data['categories'] = self::get_category_path( $data['categories'] );
+		} else {
+			$data['categories'] = array();
 		}
 		return $data;
 	}
@@ -754,7 +755,6 @@ class Endpoint_Product {
 
 			if ( isset( $product['type'] ) ) {
 				$type = $product['type'];
-				unset( $product['type'] );
 			}
 
 			$attributes = isset( $product['attributes'] ) && is_array( $product['attributes'] ) ? $product['attributes'] : array();

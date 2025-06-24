@@ -126,9 +126,6 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 2.8.0 =
-- Add `blog_id` and schemaless `url` to installation options for store identification.
-
 = 2.7.9 =
 - Included Log class in `use` statement.
 
