@@ -709,35 +709,52 @@ class Endpoint_Product {
 	 * @return array The modified array of product data with variants cascaded.
 	 */
 	private static function cascade_variants( $products ) {
+		$parents = array();
+		$variants = array();
+
+		// Separate parents and variants
 		foreach ( $products as $key => $product ) {
 			if ( ! empty( $product['parent_id'] ) ) {
-				foreach ( $products as $key2 => $product2 ) {
-					if ( (string) $product2['id'] === (string) $product['parent_id'] ) {
-						if ( ! isset( $products[ $key2 ]['variants'] ) ) {
-							$products[ $key2 ]['variants'] = array();
-						}
-						$products[ $key2 ]['variants'][] = $products[ $key ];
+				$variants[] = $product;
+			} else {
+				$parents[ $product['id'] ] = $product;
+			}
+		}
 
-						/*
-						WooCommerce API provides the parent product with only a single "price"
-						corresponding to the minimum price of the variants. However, it is set
-						in the "price" field, without any "sale_price". Hence, here
-						we find what should be the sale_price and regular_price from the variants
-						and populate it so the the indexed parent product has both the regular price
-						and the sale price of the variant that is being represented.
-						*/
-						if ( ! empty( $product['sale_price'] ) && $products[ $key2 ]['price'] === $product['sale_price'] ) {
-							$products[ $key2 ]['sale_price']    = $product['sale_price'];
-							$products[ $key2 ]['price']         = $product['price'];
-							$products[ $key2 ]['regular_price'] = $product['regular_price'];
-							$products[ $key2 ]['link']          = $product['link'];
-						}
-						unset( $products[ $key ] );
+		// Group variants by parent
+		foreach ( $variants as $variant ) {
+			$parent_id = (string) $variant['parent_id'];
+			if ( isset( $parents[ $parent_id ] ) ) {
+				if ( ! isset( $parents[ $parent_id ]['variants'] ) ) {
+					$parents[ $parent_id ]['variants'] = array();
+				}
+				$parents[ $parent_id ]['variants'][] = $variant;
+			}
+		}
+
+		// For each parent, take the cheapest variant and overwrite prices and link.
+		foreach ( $parents as &$parent ) {
+			if ( isset( $parent['variants'] ) && is_array( $parent['variants'] ) && count( $parent['variants'] ) > 0 ) {
+				$min_price_variant = null;
+				foreach ( $parent['variants'] as $variant ) {
+					if ( isset($variant['price']) && ( is_null($min_price_variant) || (float)$variant['price'] < (float)$min_price_variant['price'] ) ) {
+						$min_price_variant = $variant;
+					}
+				}
+				if ( $min_price_variant ) {
+					$parent['price']         = $min_price_variant['price'];
+					$parent['regular_price'] = $min_price_variant['regular_price'] ?? $min_price_variant['price'];
+					$parent['link']          = $min_price_variant['link'];
+					if ( isset($min_price_variant['sale_price']) ) {
+						$parent['sale_price'] = $min_price_variant['sale_price'];
+					} else {
+						unset($parent['sale_price']);
 					}
 				}
 			}
 		}
-		return array_values( $products );
+		unset($parent);
+		return array_values( $parents );
 	}
 
 	/**
@@ -834,21 +851,22 @@ class Endpoint_Product {
 	private static function get_df_variants_information( $product, $attributes ) {
 
 		$product_attributes = array_keys( wc_get_product( $product['id'] )->get_attributes() );
-
-		array_walk(
-			$product_attributes,
-			function ( &$element ) {
-				$element = str_replace( array( 'pa_', 'wc_' ), '', $element );
-			}
+		$product_attributes = array_map(
+			function($attr) {
+				return str_replace( array( 'pa_', 'wc_' ), '', $attr);
+			},
+			$product_attributes
 		);
 
 		$custom_attributes_mapping = Settings::get_custom_attributes();
 		$custom_attr_fields        = self::get_field_attributes( $custom_attributes_mapping );
 
 		$variation_attributes = array();
-		foreach ( $attributes as $p_attr ) {
-			if ( $p_attr['variation'] && in_array( strtolower( $p_attr['name'] ), $product_attributes, true ) ) {
-				$variation_attributes[] = self::get_real_product_attribute_name( $p_attr, $custom_attr_fields );
+		foreach ( $attributes as $p_attr ) {						
+			$slug = strtolower(str_replace('pa_', '', $p_attr['slug']));
+			if ( $p_attr['variation'] && ( in_array($slug, $product_attributes, true) ) ) {
+				$attribute= self::get_real_product_attribute_name( $p_attr, $custom_attr_fields );
+				$variation_attributes[] = $attribute;
 			}
 		}
 		return $variation_attributes;
