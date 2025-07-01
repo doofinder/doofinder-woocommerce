@@ -709,10 +709,10 @@ class Endpoint_Product {
 	 * @return array The modified array of product data with variants cascaded.
 	 */
 	private static function cascade_variants( $products ) {
-		$parents = array();
+		$parents  = array();
 		$variants = array();
 
-		// Separate parents and variants
+		// Separate parents and variants.
 		foreach ( $products as $key => $product ) {
 			if ( ! empty( $product['parent_id'] ) ) {
 				$variants[] = $product;
@@ -721,7 +721,7 @@ class Endpoint_Product {
 			}
 		}
 
-		// Group variants by parent
+		// Group variants by parent.
 		foreach ( $variants as $variant ) {
 			$parent_id = (string) $variant['parent_id'];
 			if ( isset( $parents[ $parent_id ] ) ) {
@@ -737,7 +737,7 @@ class Endpoint_Product {
 			if ( isset( $parent['variants'] ) && is_array( $parent['variants'] ) && count( $parent['variants'] ) > 0 ) {
 				$min_price_variant = null;
 				foreach ( $parent['variants'] as $variant ) {
-					if ( isset($variant['price']) && ( is_null($min_price_variant) || (float)$variant['price'] < (float)$min_price_variant['price'] ) ) {
+					if ( isset( $variant['price'] ) && ( is_null( $min_price_variant ) || (float) $variant['price'] < (float) $min_price_variant['price'] ) ) {
 						$min_price_variant = $variant;
 					}
 				}
@@ -745,15 +745,15 @@ class Endpoint_Product {
 					$parent['price']         = $min_price_variant['price'];
 					$parent['regular_price'] = $min_price_variant['regular_price'] ?? $min_price_variant['price'];
 					$parent['link']          = $min_price_variant['link'];
-					if ( isset($min_price_variant['sale_price']) ) {
+					if ( isset( $min_price_variant['sale_price'] ) ) {
 						$parent['sale_price'] = $min_price_variant['sale_price'];
 					} else {
-						unset($parent['sale_price']);
+						unset( $parent['sale_price'] );
 					}
 				}
 			}
 		}
-		unset($parent);
+		unset( $parent );
 		return array_values( $parents );
 	}
 
@@ -852,8 +852,8 @@ class Endpoint_Product {
 
 		$product_attributes = array_keys( wc_get_product( $product['id'] )->get_attributes() );
 		$product_attributes = array_map(
-			function($attr) {
-				return str_replace( array( 'pa_', 'wc_' ), '', $attr);
+			function ( $attr ) {
+				return str_replace( array( 'pa_', 'wc_' ), '', $attr );
 			},
 			$product_attributes
 		);
@@ -862,10 +862,10 @@ class Endpoint_Product {
 		$custom_attr_fields        = self::get_field_attributes( $custom_attributes_mapping );
 
 		$variation_attributes = array();
-		foreach ( $attributes as $p_attr ) {						
-			$slug = strtolower(str_replace('pa_', '', $p_attr['slug']));
-			if ( $p_attr['variation'] && ( in_array($slug, $product_attributes, true) ) ) {
-				$attribute= self::get_real_product_attribute_name( $p_attr, $custom_attr_fields );
+		foreach ( $attributes as $p_attr ) {
+			$slug = strtolower( str_replace( 'pa_', '', $p_attr['slug'] ) );
+			if ( $p_attr['variation'] && ( in_array( $slug, $product_attributes, true ) ) ) {
+				$attribute              = self::get_real_product_attribute_name( $p_attr, $custom_attr_fields );
 				$variation_attributes[] = $attribute;
 			}
 		}
