@@ -713,35 +713,35 @@ class Endpoint_Product {
 	 * @return array Array of parent products with grouped variants and updated prices/link.
 	 */
 	private static function merge_variants_into_parents( $products ) {
-		$parents = array();
+		$parents          = array();
 		$cheapest_variant = array();
-		$all_variants = array();
+		$all_variants     = array();
 
 		foreach ( $products as $product ) {
 			if ( ! empty( $product['parent_id'] ) ) {
 				$parent_id = (string) $product['parent_id'];
-				// Save all variants by parent
-				if (!isset($all_variants[$parent_id])) {
-					$all_variants[$parent_id] = array();
+				// Save all variants by parent.
+				if ( ! isset( $all_variants[ $parent_id ] ) ) {
+					$all_variants[ $parent_id ] = array();
 				}
-				$all_variants[$parent_id][] = $product;
-				// Save the cheapest variant
+				$all_variants[ $parent_id ][] = $product;
+				// Save the cheapest variant.
 				if (
-					!isset($cheapest_variant[$parent_id]) ||
-					(isset($product['price']) && (float)$product['price'] < (float)$cheapest_variant[$parent_id]['price'])
+					! isset( $cheapest_variant[ $parent_id ] ) ||
+					( isset( $product['price'] ) && (float) $product['price'] < (float) $cheapest_variant[ $parent_id ]['price'] )
 				) {
-					$cheapest_variant[$parent_id] = $product;
+					$cheapest_variant[ $parent_id ] = $product;
 				}
 			} else {
 				$parents[ $product['id'] ] = $product;
 			}
 		}
 
-		// Update parents with the cheapest variant info and the array of variants
+		// Update parents with the cheapest variant info and the array of variants.
 		foreach ( $all_variants as $parent_id => $variants ) {
 			if ( isset( $parents[ $parent_id ] ) ) {
-				$parents[ $parent_id ]['variants'] = $variants;
-				$variant = $cheapest_variant[$parent_id];
+				$parents[ $parent_id ]['variants']      = $variants;
+				$variant                                = $cheapest_variant[ $parent_id ];
 				$parents[ $parent_id ]['price']         = $variant['price'];
 				$parents[ $parent_id ]['regular_price'] = $variant['regular_price'] ?? $variant['price'];
 				$parents[ $parent_id ]['link']          = $variant['link'];
