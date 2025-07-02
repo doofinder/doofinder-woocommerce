@@ -148,8 +148,8 @@ class Endpoint_Product {
 
 				$modified_products[] = $filtered_product_data;
 			}
-			// Cascade variants to their parent products.
-			$modified_products = self::cascade_variants( $modified_products );
+			// Merge variants into their parent products.
+			$modified_products = self::merge_variants_into_parents( $modified_products );
 		}
 		// Return the modified product data as a response.
 		return new WP_REST_Response( $modified_products );
@@ -702,58 +702,57 @@ class Endpoint_Product {
 	}
 
 	/**
-	 * Cascade variants to their parent products.
+	 * Groups variants under their parent product, adds the 'variants' array to the parent,
+	 * and overwrites the parent's prices and link with those of the cheapest variant.
 	 *
-	 * @param array $products The array of product data.
+	 * For each parent product:
+	 *   - Adds the 'variants' key with all its variants.
+	 *   - Updates the 'price', 'regular_price', 'sale_price', and 'link' fields with those of the cheapest variant.
 	 *
-	 * @return array The modified array of product data with variants cascaded.
+	 * @param array $products Array of products (parents and variants).
+	 * @return array Array of parent products with grouped variants and updated prices/link.
 	 */
-	private static function cascade_variants( $products ) {
-		$parents  = array();
-		$variants = array();
+	private static function merge_variants_into_parents( $products ) {
+		$parents = array();
+		$cheapest_variant = array();
+		$all_variants = array();
 
-		// Separate parents and variants.
-		foreach ( $products as $key => $product ) {
+		foreach ( $products as $product ) {
 			if ( ! empty( $product['parent_id'] ) ) {
-				$variants[] = $product;
+				$parent_id = (string) $product['parent_id'];
+				// Save all variants by parent
+				if (!isset($all_variants[$parent_id])) {
+					$all_variants[$parent_id] = array();
+				}
+				$all_variants[$parent_id][] = $product;
+				// Save the cheapest variant
+				if (
+					!isset($cheapest_variant[$parent_id]) ||
+					(isset($product['price']) && (float)$product['price'] < (float)$cheapest_variant[$parent_id]['price'])
+				) {
+					$cheapest_variant[$parent_id] = $product;
+				}
 			} else {
 				$parents[ $product['id'] ] = $product;
 			}
 		}
 
-		// Group variants by parent.
-		foreach ( $variants as $variant ) {
-			$parent_id = (string) $variant['parent_id'];
+		// Update parents with the cheapest variant info and the array of variants
+		foreach ( $all_variants as $parent_id => $variants ) {
 			if ( isset( $parents[ $parent_id ] ) ) {
-				if ( ! isset( $parents[ $parent_id ]['variants'] ) ) {
-					$parents[ $parent_id ]['variants'] = array();
+				$parents[ $parent_id ]['variants'] = $variants;
+				$variant = $cheapest_variant[$parent_id];
+				$parents[ $parent_id ]['price']         = $variant['price'];
+				$parents[ $parent_id ]['regular_price'] = $variant['regular_price'] ?? $variant['price'];
+				$parents[ $parent_id ]['link']          = $variant['link'];
+				if ( isset( $variant['sale_price'] ) ) {
+					$parents[ $parent_id ]['sale_price'] = $variant['sale_price'];
+				} else {
+					unset( $parents[ $parent_id ]['sale_price'] );
 				}
-				$parents[ $parent_id ]['variants'][] = $variant;
 			}
 		}
 
-		// For each parent, take the cheapest variant and overwrite prices and link.
-		foreach ( $parents as &$parent ) {
-			if ( isset( $parent['variants'] ) && is_array( $parent['variants'] ) && count( $parent['variants'] ) > 0 ) {
-				$min_price_variant = null;
-				foreach ( $parent['variants'] as $variant ) {
-					if ( isset( $variant['price'] ) && ( is_null( $min_price_variant ) || (float) $variant['price'] < (float) $min_price_variant['price'] ) ) {
-						$min_price_variant = $variant;
-					}
-				}
-				if ( $min_price_variant ) {
-					$parent['price']         = $min_price_variant['price'];
-					$parent['regular_price'] = $min_price_variant['regular_price'] ?? $min_price_variant['price'];
-					$parent['link']          = $min_price_variant['link'];
-					if ( isset( $min_price_variant['sale_price'] ) ) {
-						$parent['sale_price'] = $min_price_variant['sale_price'];
-					} else {
-						unset( $parent['sale_price'] );
-					}
-				}
-			}
-		}
-		unset( $parent );
 		return array_values( $parents );
 	}
 
