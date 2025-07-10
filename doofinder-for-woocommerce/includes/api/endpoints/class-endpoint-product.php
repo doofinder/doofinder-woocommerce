@@ -148,8 +148,8 @@ class Endpoint_Product {
 
 				$modified_products[] = $filtered_product_data;
 			}
-			// Cascade variants to their parent products.
-			$modified_products = self::cascade_variants( $modified_products );
+			// Merge variants into their parent products.
+			$modified_products = self::merge_variants_into_parents( $modified_products );
 		}
 		// Return the modified product data as a response.
 		return new WP_REST_Response( $modified_products );
@@ -702,42 +702,58 @@ class Endpoint_Product {
 	}
 
 	/**
-	 * Cascade variants to their parent products.
+	 * Groups variants under their parent product, adds the 'variants' array to the parent,
+	 * and overwrites the parent's prices and link with those of the cheapest variant.
 	 *
-	 * @param array $products The array of product data.
+	 * For each parent product:
+	 *   - Adds the 'variants' key with all its variants.
+	 *   - Updates the 'price', 'regular_price', 'sale_price', and 'link' fields with those of the cheapest variant.
 	 *
-	 * @return array The modified array of product data with variants cascaded.
+	 * @param array $products Array of products (parents and variants).
+	 * @return array Array of parent products with grouped variants and updated prices/link.
 	 */
-	private static function cascade_variants( $products ) {
-		foreach ( $products as $key => $product ) {
-			if ( ! empty( $product['parent_id'] ) ) {
-				foreach ( $products as $key2 => $product2 ) {
-					if ( (string) $product2['id'] === (string) $product['parent_id'] ) {
-						if ( ! isset( $products[ $key2 ]['variants'] ) ) {
-							$products[ $key2 ]['variants'] = array();
-						}
-						$products[ $key2 ]['variants'][] = $products[ $key ];
+	private static function merge_variants_into_parents( $products ) {
+		$parents          = array();
+		$cheapest_variant = array();
+		$all_variants     = array();
 
-						/*
-						WooCommerce API provides the parent product with only a single "price"
-						corresponding to the minimum price of the variants. However, it is set
-						in the "price" field, without any "sale_price". Hence, here
-						we find what should be the sale_price and regular_price from the variants
-						and populate it so the the indexed parent product has both the regular price
-						and the sale price of the variant that is being represented.
-						*/
-						if ( ! empty( $product['sale_price'] ) && $products[ $key2 ]['price'] === $product['sale_price'] ) {
-							$products[ $key2 ]['sale_price']    = $product['sale_price'];
-							$products[ $key2 ]['price']         = $product['price'];
-							$products[ $key2 ]['regular_price'] = $product['regular_price'];
-							$products[ $key2 ]['link']          = $product['link'];
-						}
-						unset( $products[ $key ] );
-					}
+		foreach ( $products as $product ) {
+			if ( ! empty( $product['parent_id'] ) ) {
+				$parent_id = (string) $product['parent_id'];
+				// Save all variants by parent.
+				if ( ! isset( $all_variants[ $parent_id ] ) ) {
+					$all_variants[ $parent_id ] = array();
+				}
+				$all_variants[ $parent_id ][] = $product;
+				// Save the cheapest variant.
+				if (
+					! isset( $cheapest_variant[ $parent_id ] ) ||
+					( isset( $product['price'] ) && (float) $product['price'] < (float) $cheapest_variant[ $parent_id ]['price'] )
+				) {
+					$cheapest_variant[ $parent_id ] = $product;
+				}
+			} else {
+				$parents[ $product['id'] ] = $product;
+			}
+		}
+
+		// Update parents with the cheapest variant info and the array of variants.
+		foreach ( $all_variants as $parent_id => $variants ) {
+			if ( isset( $parents[ $parent_id ] ) ) {
+				$parents[ $parent_id ]['variants']      = $variants;
+				$variant                                = $cheapest_variant[ $parent_id ];
+				$parents[ $parent_id ]['price']         = $variant['price'];
+				$parents[ $parent_id ]['regular_price'] = $variant['regular_price'] ?? $variant['price'];
+				$parents[ $parent_id ]['link']          = $variant['link'];
+				if ( isset( $variant['sale_price'] ) ) {
+					$parents[ $parent_id ]['sale_price'] = $variant['sale_price'];
+				} else {
+					unset( $parents[ $parent_id ]['sale_price'] );
 				}
 			}
 		}
-		return array_values( $products );
+
+		return array_values( $parents );
 	}
 
 	/**
@@ -834,12 +850,11 @@ class Endpoint_Product {
 	private static function get_df_variants_information( $product, $attributes ) {
 
 		$product_attributes = array_keys( wc_get_product( $product['id'] )->get_attributes() );
-
-		array_walk(
-			$product_attributes,
-			function ( &$element ) {
-				$element = str_replace( array( 'pa_', 'wc_' ), '', $element );
-			}
+		$product_attributes = array_map(
+			function ( $attr ) {
+				return str_replace( array( 'pa_', 'wc_' ), '', $attr );
+			},
+			$product_attributes
 		);
 
 		$custom_attributes_mapping = Settings::get_custom_attributes();
@@ -847,8 +862,10 @@ class Endpoint_Product {
 
 		$variation_attributes = array();
 		foreach ( $attributes as $p_attr ) {
-			if ( $p_attr['variation'] && in_array( strtolower( $p_attr['name'] ), $product_attributes, true ) ) {
-				$variation_attributes[] = self::get_real_product_attribute_name( $p_attr, $custom_attr_fields );
+			$slug = strtolower( str_replace( 'pa_', '', $p_attr['slug'] ) );
+			if ( $p_attr['variation'] && ( in_array( $slug, $product_attributes, true ) ) ) {
+				$attribute              = self::get_real_product_attribute_name( $p_attr, $custom_attr_fields );
+				$variation_attributes[] = $attribute;
 			}
 		}
 		return $variation_attributes;

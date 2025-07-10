@@ -129,14 +129,14 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 						self::register_ajax_action();
 					}
 
-					// Init frontend functionalities.
-					if ( ! is_admin() ) {
-						JS_Layer::instance();
-					}
-
 					if ( is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
 						Add_To_Cart::instance();
 						Klaviyo_Integration::instance();
+					}
+
+					// Init frontend functionalities.
+					if ( ! is_admin() ) {
+						JS_Layer::instance();
 					}
 
 					// Check if the plugin exists.
