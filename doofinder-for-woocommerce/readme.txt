@@ -1,11 +1,11 @@
 === DOOFINDER Search and Discovery for WP & WooCommerce ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.8.1
+Version: 2.9.0
 Requires at least: 5.6
 Tested up to: 6.8
 Requires PHP: 7.0
-Stable tag: 2.8.2
+Stable tag: 2.9.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -126,8 +126,11 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 2.9.0 =
+- Fixed a bug when retrieving and saving data from the Store Wizard with WPML plugin active.
+
 = 2.8.2 =
-- Fix bug that didn't allow to group variants
+- Fix bug that didn't allow to group variants.
 
 = 2.8.1 =
 - Index `simple` products that have a `parent_id` set.
