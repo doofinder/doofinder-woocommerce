@@ -78,7 +78,7 @@ abstract class Language_Plugin {
 	 * Iterates over the list of configured languages and returns the language code
 	 * that matches the provided locale. If no match is found, the original locale is returned.
 	 *
-	 * @since 2.8.1
+	 * @since 2.9.0
 	 * @param string $locale The locale string with underscore to search for (e.g. 'en_US', 'es_ES', 'zh_CN').
 	 * @return string The matching language code (e.g. 'en', 'es', 'zh-hans'), or an empty string if not found.
 	 */
