@@ -6,6 +6,7 @@
  */
 
 use Doofinder\WP\Endpoints;
+use Doofinder\WP\Helpers\Helpers;
 use Doofinder\WP\Thumbnail;
 
 /**
@@ -61,9 +62,12 @@ class Endpoint_Product_Category {
 
 		Endpoints::check_secure_token();
 
+		$locale_or_lang_code = $request->get_param( 'lang' ) ?? '';
+		$lang_code           = Helpers::apply_locale_to_rest_context( $locale_or_lang_code );
+
 		$config_request['per_page'] = $request->get_param( 'per_page' ) ?? self::PER_PAGE;
 		$config_request['page']     = $request->get_param( 'page' ) ?? 1;
-		$config_request['lang']     = $request->get_param( 'lang' ) ?? '';
+		$config_request['lang']     = $lang_code;
 		$config_request['fields']   = ( 'all' === $request->get_param( 'fields' ) ) ? '' : implode( ',', self::get_fields() );
 
 		// Get the 'fields' parameter from the request.
