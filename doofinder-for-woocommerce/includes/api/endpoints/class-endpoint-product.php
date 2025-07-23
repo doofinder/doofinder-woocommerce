@@ -718,7 +718,7 @@ class Endpoint_Product {
 		$all_variants     = array();
 
 		foreach ( $products as $product ) {
-			if ( 'variable' === $product['type'] && ! empty( $product['parent_id'] ) ) {
+			if ( 'variation' === $product['type'] && ! empty( $product['parent_id'] ) ) {
 				$parent_id = (string) $product['parent_id'];
 				// Save all variants by parent.
 				if ( ! isset( $all_variants[ $parent_id ] ) ) {
