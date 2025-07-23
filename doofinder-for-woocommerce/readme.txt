@@ -5,7 +5,7 @@ Version: 2.8.1
 Requires at least: 5.6
 Tested up to: 6.8
 Requires PHP: 7.0
-Stable tag: 2.8.1
+Stable tag: 2.8.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -125,6 +125,9 @@ For in-depth insights into Doofinder and its features, check out our comprehensi
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/doofinder-for-woocommerce)
 
 == Changelog ==
+
+= 2.8.2 =
+- Fix bug that didn't allow to group variants
 
 = 2.8.1 =
 - Index `simple` products that have a `parent_id` set.
