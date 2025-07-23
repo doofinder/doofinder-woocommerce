@@ -101,11 +101,11 @@ class Helpers {
 	 * @return string The language code (e.g. 'en') after applying the locale context if needed.
 	 */
 	public static function apply_locale_to_rest_context( $locale_or_lang_code ) {
-		$lang_code = $locale_or_lang_code;
-		if ( preg_match( '/^[a-z]{2}-[A-Z]{2}$/', $locale_or_lang_code ) ) {
+		$lang_code     = $locale_or_lang_code;
+		$multilanguage = Multilanguage::instance();
+		if ( $multilanguage->is_active() && preg_match( '/^[a-z]{2}-[A-Z]{2}$/', $locale_or_lang_code ) ) {
 			$locale_underscore = self::format_locale_to_underscore( $locale_or_lang_code );
-			$language          = Multilanguage::instance();
-			$lang_code         = self::format_locale_to_hyphen( $language->get_lang_code_by_locale( $locale_underscore ) );
+			$lang_code         = self::format_locale_to_hyphen( $multilanguage->get_lang_code_by_locale( $locale_underscore ) );
 			add_filter(
 				'locale',
 				function () use ( $locale_underscore ) {
