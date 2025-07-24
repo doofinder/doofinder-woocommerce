@@ -7,7 +7,7 @@
 
 namespace Doofinder\WP\Helpers;
 
-use Doofinder\WP\Settings;
+use Doofinder\WP\Multilanguage;
 
 /**
  * Adds general helper methods.
@@ -84,6 +84,43 @@ class Helpers {
 	 */
 	public static function format_locale_to_hyphen( $locale_code ) {
 		return str_replace( '_', '-', $locale_code );
+	}
+
+	/**
+	 * Applies the given locale or language code to the REST API context.
+	 *
+	 * If the input is a valid locale string (e.g. 'en-US'), it converts it to an underscore format
+	 * (e.g. 'en_US'), fetches the corresponding language code using WPML, and applies it by:
+	 * - Adding a filter to override the `locale`.
+	 * - Triggering the WPML language switch via `do_action( 'wpml_switch_language', $lang_code )`.
+	 *
+	 * This ensures that REST API requests are handled in the appropriate language context.
+	 *
+	 * @param string $locale_or_lang_code A locale (e.g. 'en-US' or 'zh-CN') or a language code (e.g. 'en' or 'zh-hans').
+	 *
+	 * @return string The language code (e.g. 'en') after applying the locale context if needed.
+	 */
+	public static function apply_locale_to_rest_context( $locale_or_lang_code ) {
+		$lang_code     = $locale_or_lang_code;
+		$multilanguage = Multilanguage::instance();
+		if ( $multilanguage->is_active() && preg_match( '/^[a-z]{2}-[A-Z]{2}$/', $locale_or_lang_code ) ) {
+			$locale_underscore = self::format_locale_to_underscore( $locale_or_lang_code );
+			$lang_code         = self::format_locale_to_hyphen( $multilanguage->get_lang_code_by_locale( $locale_underscore ) );
+			add_filter(
+				'locale',
+				function () use ( $locale_underscore ) {
+					return $locale_underscore;
+				}
+			);
+			/**
+			 * Sets the internal WPML language for this request to the specified one if WPML plugin is enabled.
+			 *
+			 * @since 2.9.0
+			 */
+			do_action( 'wpml_switch_language', $lang_code );
+		}
+
+		return $lang_code;
 	}
 
 	/**

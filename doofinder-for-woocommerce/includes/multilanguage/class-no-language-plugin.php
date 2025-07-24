@@ -78,6 +78,16 @@ class No_Language_Plugin extends Language_Plugin {
 	}
 
 	/**
+	 * It will always return the `$locale` received without any transformation.
+	 *
+	 * @param string $locale The locale string with underscore to search for (e.g. 'en_US', 'es_ES', 'zh_CN').
+	 * @inheritdoc
+	 */
+	public function get_lang_code_by_locale( $locale ) {
+		return $locale;
+	}
+
+	/**
 	 * It will always return the URL of the site, regardless of the language param.
 	 * See https://developer.wordpress.org/reference/functions/get_bloginfo/.
 	 *

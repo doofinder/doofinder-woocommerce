@@ -1267,12 +1267,12 @@ class Setup_Wizard {
 
 		$currency = self::get_currency();
 
-		foreach ( $search_engines as $language => $search_engine ) {
+		foreach ( $search_engines as $locale => $search_engine ) {
 			$currency_key = strtoupper( $currency );
 			// format language to en_US instead of en-US format.
-			$language            = Helpers::format_locale_to_underscore( $language );
-			$language_key        = Helpers::format_locale_to_hyphen( $language );
-			$is_primary_language = strtolower( $this->language->get_base_locale() ) === strtolower( $language );
+			$locale              = Helpers::format_locale_to_underscore( $locale );
+			$lang_code_key       = $this->language->get_lang_code_by_locale( $locale );
+			$is_primary_language = strtolower( $this->language->get_base_locale() ) === strtolower( $locale );
 			if ( ! array_key_exists( $currency_key, $search_engine ) ) {
 				$currency_key = strtolower( $currency );
 			}
@@ -1280,10 +1280,10 @@ class Setup_Wizard {
 			if ( array_key_exists( $currency_key, $search_engine ) ) {
 				$search_engine_hash = $search_engine[ $currency_key ];
 				if ( ! $this->process_all_languages || $is_primary_language ) {
-					$language_key = '';
+					$lang_code_key = '';
 				}
-				$log->log( "Setting SE hash for language '$language_key'" );
-				Settings::set_search_engine_hash( $search_engine_hash, $language_key );
+				$log->log( "Setting SE hash for language '$lang_code_key'" );
+				Settings::set_search_engine_hash( $search_engine_hash, $lang_code_key );
 			} else {
 				$log->log( "Couldn't find currency $currency" );
 			}
@@ -1304,32 +1304,21 @@ class Setup_Wizard {
 		$languages = $this->language->get_formatted_languages();
 		$currency  = self::get_currency();
 		if ( ! $languages ) {
+			$languages     = array();
 			$languages[''] = '';
 		}
 
-		foreach ( $languages as $language_code => $language_data ) {
-			// Suffix for options.
+		foreach ( $languages as $locale_underscored => $language_data ) {
 			// This should be empty for default language, and language code for any other.
-			$options_suffix = '';
-			$set_in_lang    = '';
-			if ( $language_code !== $this->language->get_base_locale() ) {
-				$language = str_replace( '-', '_', $language_code );
-
-				$lang_parts     = explode( '_', $language );
-				$options_prefix = strtolower( $lang_parts[0] );
-				$options_suffix = strtolower( $lang_parts[1] );
-
-				if ( $options_prefix === $options_suffix ) {
-					$set_in_lang = $options_suffix;
-				} else {
-					$set_in_lang = strtolower( $language_code );
-				}
+			$set_in_lang = '';
+			if ( ! empty( $language_data['code'] ) && $locale_underscored !== $this->language->get_base_locale() ) {
+				$set_in_lang = $language_data['code'];
 			}
 
-			// Convert language to hyphen format used by live layer (en-US).
-			$language_code = Helpers::format_locale_to_hyphen( $language_code );
-			$lang_config   = "language: '$language_code',\n    currency: '$currency',\n    installationId:";
-			$aux_script    = ! empty( $language_code ) ? str_replace( 'installationId:', $lang_config, $script ) : $script;
+			// Convert locale with underscore format to hyphen format used by live layer (en-US).
+			$locale      = Helpers::format_locale_to_hyphen( $locale_underscored );
+			$lang_config = "language: '$locale',\n    currency: '$currency',\n    installationId:";
+			$aux_script  = ! empty( $locale ) ? str_replace( 'installationId:', $lang_config, $script ) : $script;
 
 			$log->log( 'Installing script for language: ' . $set_in_lang );
 			$log->log( $aux_script );

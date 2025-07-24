@@ -111,6 +111,25 @@ class WPML implements I18n_Handler {
 	/**
 	 * Inherited from Language_Plugin.
 	 *
+	 * @param string $locale The locale string with underscore to search for (e.g. 'en_US', 'es_ES', 'zh_CN').
+	 *
+	 * @inheritdoc
+	 */
+	public function get_lang_code_by_locale( $locale ) {
+		$locale_lowercase = strtolower( $locale );
+		foreach ( $this->languages as $language ) {
+			$current_locale = strtolower( $language['locale'] );
+			if ( $locale_lowercase === $current_locale ) {
+				return $language['code'];
+			}
+		}
+
+		return $locale;
+	}
+
+	/**
+	 * Inherited from Language_Plugin.
+	 *
 	 * @param string $lang_code Language code.
 	 *
 	 * @inheritdoc

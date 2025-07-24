@@ -114,4 +114,14 @@ class Polylang extends Language_Plugin {
 	public function get_default_language() {
 		return \pll_default_language();
 	}
+
+	/**
+	 * Inherited from Language_Plugin.
+	 *
+	 * @param string $locale The locale string with underscore to search for (e.g. 'en_US', 'es_ES', 'zh_CN').
+	 * @inheritdoc
+	 */
+	public function get_lang_code_by_locale( $locale ) {
+		return $locale;
+	}
 }
