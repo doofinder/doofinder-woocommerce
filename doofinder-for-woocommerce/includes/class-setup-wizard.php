@@ -339,17 +339,6 @@ class Setup_Wizard {
 	}
 
 	/**
-	 * Deactivate the setup wizard and set the flag making sure
-	 * to not display it anymore.
-	 */
-	public static function deactivate() {
-		update_option( self::$wizard_active_option, false );
-		update_option( self::$wizard_done_option, true );
-		update_option( self::$wizard_show_notice_option, false );
-		update_option( self::$wizard_show_indexing_notice_option, false );
-	}
-
-	/**
 	 * Dissmiss the admin setup wizard notice and set the flag making sure
 	 * to not display it anymore.
 	 */
@@ -460,6 +449,7 @@ class Setup_Wizard {
 			// Update wizard status to finished if configuration is complete.
 			if ( Settings::is_configuration_complete() ) {
 				update_option( self::$wizard_status, self::$wizard_status_finished );
+				update_option( self::$wizard_done_option, true );
 			}
 
 			?>

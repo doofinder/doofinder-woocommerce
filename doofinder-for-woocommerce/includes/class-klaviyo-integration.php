@@ -36,7 +36,7 @@ class Klaviyo_Integration {
 	 * Klaviyo constructor.
 	 */
 	public function __construct() {
-		$this->enqueue_script();
+		$this->maybe_enqueue_script();
 	}
 
 	/**
@@ -44,7 +44,11 @@ class Klaviyo_Integration {
 	 *
 	 * @since 2.7.1
 	 */
-	public function enqueue_script() {
+	public function maybe_enqueue_script() {
+		if ( ! class_exists( 'WooCommerceKlaviyo' ) ) {
+			return;
+		}
+
 		add_action(
 			'wp_enqueue_scripts',
 			function () {
