@@ -3,7 +3,9 @@
     "description": "Integrate Doofinder in your WordPress site with (almost) no effort.",
     "require-dev": {
         "phpcompatibility/phpcompatibility-wp": "^2.1",
-        "squizlabs/php_codesniffer": "3.*"
+        "squizlabs/php_codesniffer": "3.*",
+        "phpdocumentor/reflection": "^6.3",
+        "phpdocumentor/shim": "^3"
     },
     "prefer-stable" : true,
     "license": "GPLv2 or later",
@@ -16,5 +18,11 @@
     "require": {
         "wp-coding-standards/wpcs": "^3.0",
         "woocommerce/woocommerce-sniffs": "^1.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "phpdocumentor/shim": true
+        }
     }
 }

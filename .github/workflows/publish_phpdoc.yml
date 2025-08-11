@@ -1,0 +1,28 @@
+name: Publish or Update PHP Docs
+on:
+  push:
+    branches:
+      - davidmolinacano/pluginrangers/1051/phpdoc_in_s3_bucket
+jobs:
+  publish_phpdoc:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Install composer dependencies
+      uses: php-actions/composer@master
+      with:
+        dev: yes
+        args: --profile --ignore-platform-reqs
+    - name: Generate PHP Docs with PHPDocumentor
+      run: vendor/bin/phpdoc run
+    - name: Upload PHP Docs to S3
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --acl public-read --follow-symlinks --delete
+      env:
+        AWS_S3_BUCKET: 'php-docs.doofinder.com'
+        AWS_ACCESS_KEY_ID: ${{ secrets.CDN77_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.CDN77_SECRET_ACCESS_KEY }}
+        AWS_REGION: 'eu-west-1'
+        SOURCE_DIR: 'build/docs'
+        DEST_DIR: 'wordpress'

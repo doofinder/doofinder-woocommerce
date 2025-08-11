@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdocumentor
+        configVersion="3"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="https://www.phpdoc.org"
+>
+    <title>phpDocumentor</title>
+    <paths>
+        <output>build/docs</output>
+    </paths>
+    <version number="3.0">
+        <api format="php">
+        <source dsn=".">
+            <path>doofinder-for-woocommerce</path>
+        </source>
+        <ignore hidden="true" symlinks="true">
+            <path>html</path>
+            <path>vendor</path>
+        </ignore>
+        <extensions>
+            <extension>php</extension>
+        </extensions>
+        </api>
+    </version>
+</phpdocumentor>
