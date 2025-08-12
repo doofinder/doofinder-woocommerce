@@ -19,6 +19,7 @@ wp-content/plugins/hello.php
 doofinder-for-woocommerce.zip
 node_modules
 build
+.phpdoc/cache
 
 /vendor/
 .vscode/sftp.json
