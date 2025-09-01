@@ -557,7 +557,8 @@ trait Renderers {
 																<?php
 																if ( $attribute && $attribute['attribute'] === $id ) :
 																	?>
-										selected="selected" <?php endif; ?> <?php
+										selected="selected" <?php endif; ?>
+										<?php
 										if ( isset( $attr['field_name'] ) && ! empty( $attr['field_name'] ) ) :
 											?>
 	data-field-name="<?php echo esc_attr( $attr['field_name'] ); ?>" <?php endif; ?> data-type="<?php echo esc_attr( $attr['type'] ); ?>">
