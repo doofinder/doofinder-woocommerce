@@ -173,7 +173,7 @@ trait Register_Settings {
 		);
 
 		// Update on save.
-		$update_on_save_option_name = $this->language->get_option_name( 'doofinder_for_wp_update_on_save' );
+		$update_on_save_option_name = 'doofinder_for_wp_update_on_save';
 		add_settings_field(
 			$update_on_save_option_name,
 			__( 'Automatically process modified products', 'wordpress-doofinder' ),

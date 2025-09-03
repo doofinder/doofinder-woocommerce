@@ -187,12 +187,9 @@ trait Accessors {
 	 *
 	 * @return string
 	 */
-	public static function get_update_on_save( $language = '' ) {
+	public static function get_update_on_save() {
 		return get_option(
-			self::option_name_for_language(
-				'doofinder_for_wp_update_on_save',
-				$language
-			),
+			'doofinder_for_wp_update_on_save',
 			'wp_doofinder_disabled'
 		);
 	}
