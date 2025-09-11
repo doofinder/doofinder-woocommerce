@@ -172,7 +172,7 @@ class Endpoint_Custom {
 	 */
 	private static function get_meta_attributes( $data, $custom_attr ) {
 		foreach ( $custom_attr as $attr ) {
-			$post_meta = get_post_meta( $data['id'], $attr['attribute'] );
+			$post_meta = get_post_meta( $data['id'], $attr['attribute'], false );
 			if ( null === $post_meta ) {
 				continue;
 			}
