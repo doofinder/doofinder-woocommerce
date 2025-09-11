@@ -128,7 +128,7 @@ class Update_On_Save_Api {
 	 * Updates multiple items in the Doofinder index.
 	 *
 	 * This method updates multiple items of a specific post type in the Doofinder index.
-	 * It sends a POST request to the Doofinder API with the data to be updated.
+	 * It groups items by their language and sends a POST request to the Doofinder API for each group to the appropriate search engine.
 	 *
 	 * @param string $post_type The post type for which the items should be updated.
 	 * @param array  $ids      The ids representing the items to be updated.
@@ -137,20 +137,71 @@ class Update_On_Save_Api {
 	 */
 	public function update_bulk( $post_type, $ids ) {
 		$this->log->log( 'Update items' );
-		foreach ( $this->search_engines as $lang => $hashid ) {
+		
+		// Group IDs by their language/locale
+		$ids_by_language = $this->group_ids_by_language( $ids );
+		foreach ( $ids_by_language as $locale => $ids ) {
+			$hashid = $this->search_engines[ $locale ];
+			$hyphen_locale = str_replace( '_', '-', $locale );
+			
 			// phpcs:ignore I had to add a phpcs:ignore because the formatter was changing wordpress to WordPress, thus causing issues.
 			$uri = $this->build_url( $this->dp_host, 'item/' . $hashid . '/' . $post_type . '?action=update&platform=wordpress' ); // phpcs:ignore WordPress.WP.CapitalPDangit
 
-			$chunks = array_chunk( $ids, 100 );
+			$chunks = array_chunk( $ids_by_language[$locale], 100 );
 			$resp   = true;
 
 			foreach ( $chunks as $chunk ) {
-				$items = $this->get_items( $chunk, $post_type, $lang );
+				$items = $this->get_items( $chunk, $post_type, $hyphen_locale);
 				$resp  = $resp && $this->send_request( $uri, $items );
 			}
 		}
 
 		return true;
+	}
+
+	/**
+	 * Groups post IDs by their language/locale.
+	 *
+	 * @param array $ids Array of post IDs.
+	 * @return array Array with locale as key and array of IDs as value.
+	 */
+	private function group_ids_by_language( $ids ) {
+		$ids_by_language = array();
+		
+		foreach ( $ids as $id ) {
+			$locale = $this->get_post_locale( $id );
+			if ( ! isset( $ids_by_language[ $locale ] ) ) {
+				$ids_by_language[ $locale ] = array();
+			}
+			$ids_by_language[ $locale ][] = $id;
+		}
+		
+		return $ids_by_language;
+	}
+
+	/**
+	 * Gets the locale for a specific post ID.
+	 *
+	 * @param int $post_id The post ID.
+	 * @return string The locale (e.g., 'en_US', 'es_ES').
+	 */
+	private function get_post_locale( $post_id ) {
+		// If WPML is active, get the post's language
+		if ($this->language->is_active() ) {
+			// Use WPML function to get the post's language information
+			$language_info = apply_filters( 'wpml_element_language_details', null, array( 
+				'element_id' => $post_id, 
+				'element_type' => 'post_' . get_post_type( $post_id ) 
+			) );
+			
+			if ( $language_info && isset( $language_info->language_code ) ) {
+							return $this->language->get_locale_by_lang_code( $language_info->language_code );
+
+			}
+		}
+		
+		// Fallback to default locale
+		return $this->language->get_base_locale();
 	}
 
 	/**
@@ -274,10 +325,11 @@ class Update_On_Save_Api {
 				$code       = $lang['locale'] === $language->get_base_locale() ? '' : $lang['code'];
 				$first_part = strpos( $code, '-' ) !== false ? explode( '-', $code )[0] : $code;
 				$hash       = Settings::get_search_engine_hash( $first_part );
-				$search_engines[ $language->get_base_locale() ] = $hash;
+				$search_engines[ $lang['locale'] ] = $hash;
 			}
 		} else {
 			$search_engines[''] = Settings::get_search_engine_hash();
+	        $search_engines[ $language->get_base_locale() ] = Settings::get_search_engine_hash();
 		}
 
 		return $search_engines;
