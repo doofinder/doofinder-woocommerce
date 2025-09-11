@@ -187,7 +187,7 @@ class Update_On_Save_Api {
 	 */
 	private function get_post_locale( $post_id ) {
 		// If WPML is active, get the post's language
-		if ($this->language->is_active() ) {
+		if ($this->process_all_languages ) {
 			// Use WPML function to get the post's language information
 			$language_info = apply_filters( 'wpml_element_language_details', null, array( 
 				'element_id' => $post_id, 
