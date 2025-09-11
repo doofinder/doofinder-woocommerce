@@ -207,7 +207,7 @@ class Update_On_Save_Api {
 			 *                     - locale: The full locale (e.g., 'en_US', 'es_ES')
 			 *                     - display_name: The display name of the language
 			 *
-			 * @since 1.0.0
+			 * @since 2.10.0
 			 */
 			$language_info = apply_filters(
 				'wpml_element_language_details',
