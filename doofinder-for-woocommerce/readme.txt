@@ -127,7 +127,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Changelog ==
 
 = 2.10.0 =
-- Fix bug that prevented proper indexation in multilanguage contexts
+- Fix bug that prevented proper update on save in multilanguage contexts
 
 = 2.9.1 =
 - Prevent loading Klaviyo-related JS if Klaviyo plugin is not enabled.
