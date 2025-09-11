@@ -110,7 +110,7 @@ class Endpoint_Product {
 		} else {
 			// Update on save.
 
-			// Apply locale context even when config_request is provided
+			// Apply locale context even when config_request is provided.
 			$locale_or_lang_code = $config_request['lang'] ?? '';
 			$lang_code           = Helpers::apply_locale_to_rest_context( $locale_or_lang_code );
 

@@ -183,8 +183,6 @@ trait Accessors {
 	 * Just an alias for "get_option" to avoid repeating the string
 	 * (option name) in multiple files.
 	 *
-	 * @param string $language Language code to retrieve the hash for.
-	 *
 	 * @return string
 	 */
 	public static function get_update_on_save() {
