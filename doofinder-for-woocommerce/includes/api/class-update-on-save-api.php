@@ -352,6 +352,8 @@ class Update_On_Save_Api {
 				$search_engines[ $lang['locale'] ] = $hash;
 			}
 		} else {
+			// Both the empty string and the base locale are used to store the default SE hash in order to prevent inconsistencies
+			// due to WPML and no-WPML context switching.
 			$search_engines['']                             = Settings::get_search_engine_hash();
 			$search_engines[ $language->get_base_locale() ] = Settings::get_search_engine_hash();
 		}
