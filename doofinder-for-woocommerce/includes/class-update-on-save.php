@@ -56,8 +56,6 @@ class Update_On_Save {
 	 */
 	public static function activate_update_on_save_task() {
 		if ( Settings::is_update_on_save_enabled() ) {
-			$language                = Multilanguage::instance();
-			$current_language        = $language->get_current_language();
 			$update_on_save_schedule = Settings::get_update_on_save();
 			wp_schedule_event( time(), $update_on_save_schedule, 'doofinder_update_on_save' );
 		}
