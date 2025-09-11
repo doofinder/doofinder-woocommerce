@@ -7,6 +7,7 @@
 
 namespace Doofinder\WP\Api;
 
+use Doofinder\WP\Helpers\Helpers;
 use Doofinder\WP\Settings;
 use Doofinder\WP\Log;
 use Doofinder\WP\Multilanguage\Language_Plugin;
@@ -142,7 +143,7 @@ class Update_On_Save_Api {
 		$ids_by_language = $this->group_ids_by_language( $ids );
 		foreach ( $ids_by_language as $locale => $ids ) {
 			$hashid        = $this->search_engines[ $locale ];
-			$hyphen_locale = str_replace( '_', '-', $locale );
+			$hyphen_locale = Helpers::format_locale_to_hyphen( $locale );
 
 			// phpcs:ignore I had to add a phpcs:ignore because the formatter was changing wordpress to WordPress, thus causing issues.
 			$uri = $this->build_url( $this->dp_host, 'item/' . $hashid . '/' . $post_type . '?action=update&platform=wordpress' ); // phpcs:ignore WordPress.WP.CapitalPDangit
