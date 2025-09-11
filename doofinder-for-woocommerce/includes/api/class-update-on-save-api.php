@@ -214,7 +214,7 @@ class Update_On_Save_Api {
 				null,
 				array(
 					'element_id'   => $post_id,
-					'element_type' => 'post_' . get_post_type( $post_id ),
+					'element_type' => get_post_type( $post_id ),
 				)
 			);
 
