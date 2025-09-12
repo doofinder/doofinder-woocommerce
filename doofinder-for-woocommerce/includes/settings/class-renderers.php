@@ -348,7 +348,7 @@ trait Renderers {
 	 * @param string $option_name Name of the option.
 	 */
 	private function render_html_update_on_save( $option_name ) {
-		$saved_value = Settings::get_update_on_save( $this->language->get_current_language() );
+		$saved_value = Settings::get_update_on_save();
 		$schedules   = wp_get_schedules();
 		// Sort by interval.
 		uasort(
@@ -557,7 +557,8 @@ trait Renderers {
 																<?php
 																if ( $attribute && $attribute['attribute'] === $id ) :
 																	?>
-										selected="selected" <?php endif; ?> <?php
+										selected="selected" <?php endif; ?>
+										<?php
 										if ( isset( $attr['field_name'] ) && ! empty( $attr['field_name'] ) ) :
 											?>
 	data-field-name="<?php echo esc_attr( $attr['field_name'] ); ?>" <?php endif; ?> data-type="<?php echo esc_attr( $attr['type'] ); ?>">

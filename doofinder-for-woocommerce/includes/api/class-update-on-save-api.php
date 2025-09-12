@@ -7,6 +7,7 @@
 
 namespace Doofinder\WP\Api;
 
+use Doofinder\WP\Helpers\Helpers;
 use Doofinder\WP\Settings;
 use Doofinder\WP\Log;
 use Doofinder\WP\Multilanguage\Language_Plugin;
@@ -128,7 +129,7 @@ class Update_On_Save_Api {
 	 * Updates multiple items in the Doofinder index.
 	 *
 	 * This method updates multiple items of a specific post type in the Doofinder index.
-	 * It sends a POST request to the Doofinder API with the data to be updated.
+	 * It groups items by their language and sends a POST request to the Doofinder API for each group to the appropriate search engine.
 	 *
 	 * @param string $post_type The post type for which the items should be updated.
 	 * @param array  $ids      The ids representing the items to be updated.
@@ -137,20 +138,94 @@ class Update_On_Save_Api {
 	 */
 	public function update_bulk( $post_type, $ids ) {
 		$this->log->log( 'Update items' );
-		foreach ( $this->search_engines as $lang => $hashid ) {
+
+		// Group IDs by their language/locale.
+		$ids_by_language = $this->group_ids_by_language( $ids );
+		foreach ( $ids_by_language as $locale => $ids ) {
+			$hashid        = $this->search_engines[ $locale ];
+			$hyphen_locale = Helpers::format_locale_to_hyphen( $locale );
+
 			// phpcs:ignore I had to add a phpcs:ignore because the formatter was changing wordpress to WordPress, thus causing issues.
 			$uri = $this->build_url( $this->dp_host, 'item/' . $hashid . '/' . $post_type . '?action=update&platform=wordpress' ); // phpcs:ignore WordPress.WP.CapitalPDangit
 
-			$chunks = array_chunk( $ids, 100 );
+			$chunks = array_chunk( $ids_by_language[ $locale ], 100 );
 			$resp   = true;
 
 			foreach ( $chunks as $chunk ) {
-				$items = $this->get_items( $chunk, $post_type, $lang );
+				$items = $this->get_items( $chunk, $post_type, $hyphen_locale );
 				$resp  = $resp && $this->send_request( $uri, $items );
 			}
 		}
 
 		return true;
+	}
+
+	/**
+	 * Groups post IDs by their language/locale.
+	 *
+	 * @param array $ids Array of post IDs.
+	 * @return array Array with locale as key and array of IDs as value.
+	 */
+	private function group_ids_by_language( $ids ) {
+		$ids_by_language = array();
+
+		foreach ( $ids as $id ) {
+			$locale = $this->get_post_locale( $id );
+			if ( ! isset( $ids_by_language[ $locale ] ) ) {
+				$ids_by_language[ $locale ] = array();
+			}
+			$ids_by_language[ $locale ][] = $id;
+		}
+
+		return $ids_by_language;
+	}
+
+	/**
+	 * Gets the locale for a specific post ID.
+	 *
+	 * @param int $post_id The post ID.
+	 * @return string The locale (e.g., 'en_US', 'es_ES').
+	 */
+	private function get_post_locale( $post_id ) {
+		// If WPML is active, get the post's language.
+		if ( $this->process_all_languages ) {
+			/**
+			 * Retrieves the language details for a specific post using WPML.
+			 *
+			 * This is the standard WPML method to get language information for any element.
+			 * The filter returns an object containing language_code, locale, and other language details.
+			 *
+			 * @see https://wpml.org/documentation/support/wpml-coding-api/wpml-hooks-reference/#wpml_element_language_details
+			 *
+			 * @param null|object $language_details The language details object (null if not found).
+			 * @param array       $args            Arguments array containing:
+			 *                                     - element_id: The ID of the post/element
+			 *                                     - element_type: The type of element (e.g., 'post_product', 'post_page')
+			 *
+			 * @return object|null Language details object with properties:
+			 *                     - language_code: The language code (e.g., 'en', 'es')
+			 *                     - locale: The full locale (e.g., 'en_US', 'es_ES')
+			 *                     - display_name: The display name of the language
+			 *
+			 * @since 2.10.0
+			 */
+			$language_info = apply_filters(
+				'wpml_element_language_details',
+				null,
+				array(
+					'element_id'   => $post_id,
+					'element_type' => get_post_type( $post_id ),
+				)
+			);
+
+			if ( $language_info && isset( $language_info->language_code ) ) {
+							return $this->language->get_locale_by_lang_code( $language_info->language_code );
+
+			}
+		}
+
+		// Fallback to default locale.
+		return $this->language->get_base_locale();
 	}
 
 	/**
@@ -271,13 +346,16 @@ class Update_On_Save_Api {
 		$search_engines = array();
 		if ( $process_all_languages ) {
 			foreach ( $language->get_languages() as $lang ) {
-				$code       = $lang['locale'] === $language->get_base_locale() ? '' : $lang['code'];
-				$first_part = strpos( $code, '-' ) !== false ? explode( '-', $code )[0] : $code;
-				$hash       = Settings::get_search_engine_hash( $first_part );
-				$search_engines[ $language->get_base_locale() ] = $hash;
+				$code                              = $lang['locale'] === $language->get_base_locale() ? '' : $lang['code'];
+				$first_part                        = strpos( $code, '-' ) !== false ? explode( '-', $code )[0] : $code;
+				$hash                              = Settings::get_search_engine_hash( $first_part );
+				$search_engines[ $lang['locale'] ] = $hash;
 			}
 		} else {
-			$search_engines[''] = Settings::get_search_engine_hash();
+			// Both the empty string and the base locale are used to store the default SE hash in order to prevent inconsistencies
+			// due to WPML and no-WPML context switching.
+			$search_engines['']                             = Settings::get_search_engine_hash();
+			$search_engines[ $language->get_base_locale() ] = Settings::get_search_engine_hash();
 		}
 
 		return $search_engines;

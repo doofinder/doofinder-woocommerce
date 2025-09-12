@@ -1,5 +1,3 @@
-version: '2'
-
 services:
   db:
     image: mysql:5.7
@@ -18,13 +16,15 @@ services:
     depends_on:
       - db
     build: .
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./html:/var/www/html/
       - ./doofinder-for-woocommerce:/var/www/html/wp-content/plugins/doofinder-for-woocommerce
     restart: unless-stopped
     environment:
-      APACHE_RUN_USER: '#1000'
-      APACHE_RUN_GROUP: '#1000'
+      APACHE_RUN_USER: "#1000"
+      APACHE_RUN_GROUP: "#1000"
       WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_PASSWORD: wordpress
       WORDPRESS_DB_USER: wordpress

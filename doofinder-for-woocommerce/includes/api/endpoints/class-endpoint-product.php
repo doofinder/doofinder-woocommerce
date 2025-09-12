@@ -109,6 +109,11 @@ class Endpoint_Product {
 			);
 		} else {
 			// Update on save.
+
+			// Apply locale context even when config_request is provided.
+			$locale_or_lang_code = $config_request['lang'] ?? '';
+			$lang_code           = Helpers::apply_locale_to_rest_context( $locale_or_lang_code );
+
 			$fields_param             = $config_request['fields'] ?? '';
 			$fields                   = ! empty( $fields_param ) ? explode( ',', $fields_param ) : array();
 			$fields                   = array_merge( $fields, array_values( $custom_attr_fields ) );
