@@ -319,7 +319,7 @@ class Endpoint_Custom {
 
 		if ( is_object( $size_image ) ) {
 			$image_link = $filtered_data['_embedded']['wp:featuredmedia'][0]['media_details']['source_url'];
-		} else if ( isset( $size_image['medium']['source_url'] ) ) {
+		} elseif ( isset( $size_image['medium']['source_url'] ) ) {
 			$image_link = $size_image['medium']['source_url'];
 		} else {
 			$first_size = reset( $size_image );
