@@ -84,6 +84,10 @@ class Endpoint_Custom {
 				'fields'   => $fields,
 			);
 		} else {
+			// Apply locale context even when config_request is provided.
+			$locale_or_lang_code = $config_request['lang'] ?? '';
+			$lang_code           = Helpers::apply_locale_to_rest_context( $locale_or_lang_code );
+
 			$fields = ! empty( $config_request['fields'] ) ? explode( ',', $config_request['fields'] ) : array();
 		}
 
