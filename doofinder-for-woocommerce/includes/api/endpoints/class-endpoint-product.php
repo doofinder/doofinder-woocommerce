@@ -813,7 +813,14 @@ class Endpoint_Product {
 		$variations_data = self::request_variations( $product['id'] );
 
 		foreach ( $variations_data as &$variation ) {
-			$variation         = array_merge( $product, $variation ?? array(), array( 'parent_id' => $product['id'], 'type' => 'variation' ) );
+			$variation         = array_merge(
+				$product,
+				$variation ?? array(),
+				array(
+					'parent_id' => $product['id'],
+					'type'      => 'variation',
+				)
+			);
 			$variation['name'] = $product['name'];
 		}
 		return $variations_data;
