@@ -127,7 +127,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Changelog ==
 
 = 2.10.3 =
-- Fix issue groupping variants when the type is variable instead of variation
+- Fix issue grouping variants when the type is variable instead of variation
 
 = 2.10.2 =
 - Fix bug that prevented proper update on save in multilanguage contexts for custom endpoint
