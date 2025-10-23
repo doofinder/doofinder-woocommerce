@@ -822,8 +822,32 @@ class Endpoint_Product {
 				)
 			);
 			$variation['name'] = $product['name'];
+			$variation         = self::get_variation_attributes( $variation );
 		}
 		return $variations_data;
+	}
+
+	/**
+	 * Get variation attributes into direct key-value pairs.
+	 *
+	 * Converts attributes array like [{"name": "Colore", "option": "Viola"}]
+	 * into direct fields like {"Colore": "Viola"}.
+	 *
+	 * @param array $variation The variation data.
+	 * @return array The variation with flattened attributes.
+	 */
+	private static function get_variation_attributes( $variation ) {
+		if ( ! isset( $variation['attributes'] ) || ! is_array( $variation['attributes'] ) ) {
+			return $variation;
+		}
+
+		foreach ( $variation['attributes'] as $attribute ) {
+			if ( isset( $attribute['name'] ) && isset( $attribute['option'] ) ) {
+				$variation[ $attribute['name'] ] = $attribute['option'];
+			}
+		}
+
+		return $variation;
 	}
 
 	/**
