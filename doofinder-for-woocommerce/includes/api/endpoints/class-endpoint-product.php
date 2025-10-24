@@ -142,6 +142,7 @@ class Endpoint_Product {
 				// Filter fields.
 				$filtered_product_data = ! empty( $fields ) ? array_intersect_key( $product_data, array_flip( $fields ) ) : $product_data;
 
+				$filtered_product_data = self::get_variation_attributes( $filtered_product_data );
 				$filtered_product_data = self::set_indexable( $filtered_product_data, $indexable_opt );
 				$filtered_product_data = self::get_category_merchandising( $filtered_product_data );
 				$filtered_product_data = self::get_categories( $filtered_product_data );
@@ -822,8 +823,36 @@ class Endpoint_Product {
 				)
 			);
 			$variation['name'] = $product['name'];
+
 		}
 		return $variations_data;
+	}
+
+	/**
+	 * Get variation attributes into direct key-value pairs.
+	 *
+	 * Converts attributes array like [{"name": "Colore", "option": "Viola"}]
+	 * into direct fields like {"Colore": "Viola"}.
+	 *
+	 * @param array $variation The variation data.
+	 * @return array The variation with flattened attributes.
+	 */
+	private static function get_variation_attributes( $variation ) {
+		if ( ! isset( $variation['type'] ) || 'variation' !== $variation['type'] ) {
+			return $variation;
+		}
+
+		if ( ! isset( $variation['attributes'] ) || ! is_array( $variation['attributes'] ) ) {
+			return $variation;
+		}
+
+		foreach ( $variation['attributes'] as $attribute ) {
+			if ( isset( $attribute['name'] ) && isset( $attribute['option'] ) ) {
+				$variation[ $attribute['name'] ] = $attribute['option'];
+			}
+		}
+
+		return $variation;
 	}
 
 	/**
