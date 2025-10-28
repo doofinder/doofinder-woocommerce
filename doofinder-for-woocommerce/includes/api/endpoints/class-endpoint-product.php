@@ -937,6 +937,9 @@ class Endpoint_Product {
 
 		foreach ( $product_attributes as $attribute_name => $attribute_data ) {
 			$attribute_slug = str_replace( 'pa_', '', $attribute_name );
+			
+			// URL decode the attribute slug
+			$attribute_slug = urldecode( $attribute_slug );
 			$found_key      = array_search( $attribute_slug, array_column( $custom_attr, 'attribute' ), true );
 
 			// If the slug was not found, it is because the field has been renamed in the plugin's DooFinder panel.
@@ -949,6 +952,9 @@ class Endpoint_Product {
 				$attribute_options                    = is_string( $attribute_data ) ? array( $attribute_data ) : $attribute_data->get_slugs();
 				$custom_attributes[ $attribute_slug ] = array();
 				foreach ( $attribute_options as $option ) {
+					// URL decode the option value
+					$option = urldecode( $option );
+					
 					// If it is an attribute with taxonomy, we need to get taxonomy value.
 					if ( taxonomy_exists( $attribute_name ) ) {
 						$term   = get_term_by( 'slug', $option, $attribute_name );
