@@ -7,6 +7,7 @@
 
 use Doofinder\WP\Endpoints;
 use Doofinder\WP\Helpers\Helpers;
+use Doofinder\WP\Multilanguage;
 use Doofinder\WP\Settings;
 use Doofinder\WP\Thumbnail;
 
@@ -66,6 +67,7 @@ class Endpoint_Custom {
 	 */
 	public static function custom_endpoint( $request, $config_request = false ) {
 
+		$multilanguage = Multilanguage::instance();
 		if ( ! $config_request ) {
 			Endpoints::check_secure_token();
 
@@ -78,15 +80,22 @@ class Endpoint_Custom {
 			$config_request = array(
 				'per_page' => $request->get_param( 'per_page' ) ?? self::PER_PAGE,
 				'page'     => $request->get_param( 'page' ) ?? 1,
-				'lang'     => $lang_code,
 				'ids'      => $request->get_param( 'ids' ) ?? '',
 				'type'     => $request->get_param( 'type' ) ?? '',
 				'fields'   => $fields,
 			);
+
+			if ( $multilanguage->is_active() ) {
+				$locale_or_lang_code    = $request->get_param( 'lang' ) ?? '';
+				$lang_code              = Helpers::apply_locale_to_rest_context( $locale_or_lang_code );
+				$config_request['lang'] = $lang_code;
+			}
 		} else {
-			// Apply locale context even when config_request is provided.
-			$locale_or_lang_code = $config_request['lang'] ?? '';
-			$lang_code           = Helpers::apply_locale_to_rest_context( $locale_or_lang_code );
+			if ( $multilanguage->is_active() ) {
+				// Apply locale context even when config_request is provided.
+				$locale_or_lang_code = $config_request['lang'] ?? '';
+				Helpers::apply_locale_to_rest_context( $locale_or_lang_code );
+			}
 
 			$fields = ! empty( $config_request['fields'] ) ? explode( ',', $config_request['fields'] ) : array();
 		}

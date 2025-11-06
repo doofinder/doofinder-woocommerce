@@ -9,6 +9,7 @@ ini_set( 'serialize_precision', '-1' ); // phpcs:ignore WordPress.PHP.IniSet
 
 use Doofinder\WP\Endpoints;
 use Doofinder\WP\Helpers\Helpers;
+use Doofinder\WP\Multilanguage;
 use Doofinder\WP\Settings;
 use Doofinder\WP\Thumbnail;
 
@@ -89,6 +90,7 @@ class Endpoint_Product {
 
 		$custom_attr        = Settings::get_custom_attributes();
 		$custom_attr_fields = self::get_field_attributes( $custom_attr );
+		$multilanguage      = Multilanguage::instance();
 
 		if ( ! $config_request ) {
 			Endpoints::check_secure_token();
@@ -101,18 +103,25 @@ class Endpoint_Product {
 			$config_request = array(
 				'per_page' => $request->get_param( 'per_page' ) ?? self::PER_PAGE,
 				'page'     => $request->get_param( 'page' ) ?? 1,
-				'lang'     => $lang_code,
 				'ids'      => $request->get_param( 'ids' ) ?? '',
 				'orderby'  => $request->get_param( 'orderby' ) ?? 'id',
 				'order'    => $request->get_param( 'order' ) ?? 'desc',
 				'fields'   => $fields,
 			);
+
+			if ( $multilanguage->is_active() ) {
+				$locale_or_lang_code    = $request->get_param( 'lang' ) ?? '';
+				$lang_code              = Helpers::apply_locale_to_rest_context( $locale_or_lang_code );
+				$config_request['lang'] = $lang_code;
+			}
 		} else {
 			// Update on save.
 
-			// Apply locale context even when config_request is provided.
-			$locale_or_lang_code = $config_request['lang'] ?? '';
-			$lang_code           = Helpers::apply_locale_to_rest_context( $locale_or_lang_code );
+			if ( $multilanguage->is_active() ) {
+				// Apply locale context even when config_request is provided.
+				$locale_or_lang_code = $config_request['lang'] ?? '';
+				Helpers::apply_locale_to_rest_context( $locale_or_lang_code );
+			}
 
 			$fields_param             = $config_request['fields'] ?? '';
 			$fields                   = ! empty( $fields_param ) ? explode( ',', $fields_param ) : array();
