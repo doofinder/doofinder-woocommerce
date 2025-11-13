@@ -152,19 +152,24 @@ class Endpoint_Product {
 				// Filter fields.
 				$filtered_product_data = ! empty( $fields ) ? array_intersect_key( $product_data, array_flip( $fields ) ) : $product_data;
 
-				$filtered_product_data = self::set_indexable( $filtered_product_data, $indexable_opt );
-				$filtered_product_data = self::get_category_merchandising( $filtered_product_data );
-				$filtered_product_data = self::get_categories( $filtered_product_data );
-				$filtered_product_data = self::merge_custom_attributes( $filtered_product_data, $custom_attr );
-				$filtered_product_data = self::get_image_field( $filtered_product_data );
-				$filtered_product_data = self::get_images_fields( $filtered_product_data );
-				$filtered_product_data = self::format_prices( $filtered_product_data );
-				$filtered_product_data = self::check_stock_status( $filtered_product_data );
-				$filtered_product_data = self::get_description( $filtered_product_data );
-				$filtered_product_data = self::get_short_description( $filtered_product_data );
-				$filtered_product_data = self::get_tags( $filtered_product_data );
-				$filtered_product_data = self::get_meta_attributes( $filtered_product_data, $custom_attr );
-				$filtered_product_data = self::clean_fields( $filtered_product_data );
+				$filtered_product_data['df_indexable'] = $indexable_opt;
+				$filtered_product_data                 = self::get_category_merchandising( $filtered_product_data );
+				if ( isset( $filtered_product_data['categories'] ) ) {
+					$filtered_product_data['categories'] = self::get_category_path( $filtered_product_data['categories'] );
+				} else {
+					$filtered_product_data['categories'] = array();
+				}
+				$filtered_product_data               = self::merge_custom_attributes( $filtered_product_data, $custom_attr );
+				$filtered_product_data['image_link'] = self::get_image_link( $filtered_product_data['id'] );
+				unset( $filtered_product_data['images'] );
+				$filtered_product_data['images_links']      = self::get_images_links( $filtered_product_data );
+				$filtered_product_data                      = self::format_prices( $filtered_product_data );
+				$filtered_product_data                      = self::check_availability( $filtered_product_data );
+				$filtered_product_data['description']       = self::process_content( $filtered_product_data['description'] );
+				$filtered_product_data['short_description'] = self::process_content( $filtered_product_data['short_description'] );
+				$filtered_product_data['tags']              = self::get_tag_names( $filtered_product_data['tags'] );
+				$filtered_product_data                      = self::get_meta_attributes( $filtered_product_data, $custom_attr );
+				$filtered_product_data                      = self::clean_fields( $filtered_product_data );
 
 				$modified_products[] = $filtered_product_data;
 			}
@@ -254,33 +259,7 @@ class Endpoint_Product {
 		return $data;
 	}
 
-	/**
-	 * Set indexable option.
-	 *
-	 * @param array  $data   The data to process.
-	 * @param string $indexable The indexable option.
-	 * @return array The processed data.
-	 */
-	private static function set_indexable( $data, $indexable ) {
-		$data['df_indexable'] = $indexable;
-		return $data;
-	}
 
-	/**
-	 * Get categories in the data.
-	 *
-	 * @param array $data The data to process.
-	 *
-	 * @return array The processed data.
-	 */
-	private static function get_categories( $data ) {
-		if ( isset( $data['categories'] ) ) {
-			$data['categories'] = self::get_category_path( $data['categories'] );
-		} else {
-			$data['categories'] = array();
-		}
-		return $data;
-	}
 
 	/**
 	 * Processes product categories and adds a new `category_merchandising` field
@@ -400,75 +379,8 @@ class Endpoint_Product {
 		return $data_with_attr;
 	}
 
-	/**
-	 * Get the image link in the data.
-	 *
-	 * @param array $data   The data to process.
-	 *
-	 * @return array The processed data.
-	 */
-	private static function get_image_field( $data ) {
-		return self::clear_images_fields( $data );
-	}
 
-	/**
-	 * Get the images_links field in the data.
-	 *
-	 * @param array $data The data to process.
-	 *
-	 * @return array The processed data.
-	 */
-	private static function get_images_fields( $data ) {
-		$data['images_links'] = self::get_images_links( $data );
-		return $data;
-	}
 
-	/**
-	 * Check the stock status in the data.
-	 *
-	 * @param array $data   The data to check.
-	 *
-	 * @return array The processed data.
-	 */
-	private static function check_stock_status( $data ) {
-		return self::check_availability( $data );
-	}
-
-	/**
-	 * Process the description field in the data.
-	 *
-	 * @param array $data   The data to process.
-	 *
-	 * @return array The processed data.
-	 */
-	private static function get_description( $data ) {
-		$data['description'] = self::process_content( $data['description'] );
-		return $data;
-	}
-
-	/**
-	 * Process the short description field in the data.
-	 *
-	 * @param array $data   The data to process.
-	 *
-	 * @return array The processed data.
-	 */
-	private static function get_short_description( $data ) {
-		$data['short_description'] = self::process_content( $data['short_description'] );
-		return $data;
-	}
-
-	/**
-	 * Get tags in the data.
-	 *
-	 * @param array $data   The data to process.
-	 *
-	 * @return array The processed data.
-	 */
-	private static function get_tags( $data ) {
-		$data['tags'] = self::get_tag_names( $data['tags'] );
-		return $data;
-	}
 
 	/**
 	 * Retrieves an array of names from a given array.
@@ -671,20 +583,11 @@ class Endpoint_Product {
 	 */
 	private static function get_images_links( $product ) {
 		$product_id   = $product['id'];
-		$images_links = array();
-
-		// Add the main image to the array.
-		$image_link = $product['image_link'] ?? self::get_image_link( $product_id );
-		if ( ! empty( $image_link ) ) {
-			$images_links[] = $image_link;
-		}
-
-		// For variants, just return the array with the same content as image_link.
+		$images_links = array( $product['image_link'] );
 		if ( isset( $product['type'] ) && 'variation' === $product['type'] ) {
 			return $images_links;
 		}
 
-		// For regular products, add all gallery images.
 		$image_size         = Thumbnail::get_size();
 		$gallery_ids_string = get_post_meta( $product_id, '_product_image_gallery', true );
 		if ( ! empty( $gallery_ids_string ) ) {
@@ -698,7 +601,6 @@ class Endpoint_Product {
 				$image_link = $image_src[0];
 				$image_link = self::add_base_url_if_needed( $image_link );
 
-				// Avoid duplicates (in case main image is also in gallery).
 				if ( ! in_array( $image_link, $images_links, true ) ) {
 					$images_links[] = $image_link;
 				}
@@ -767,19 +669,6 @@ class Endpoint_Product {
 		return $product;
 	}
 
-	/**
-	 * Clears image fields from a product array.
-	 *
-	 * @param array $product The product array to process.
-	 *
-	 * @return array The product array with empty image fields removed.
-	 */
-	private static function clear_images_fields( $product ) {
-		$product['image_link'] = self::get_image_link( $product['id'] );
-		unset( $product['images'] );
-
-		return $product;
-	}
 
 	/**
 	 * Groups variants under their parent product, adds the 'variants' array to the parent,
