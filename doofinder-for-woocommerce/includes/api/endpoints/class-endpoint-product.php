@@ -36,6 +36,7 @@ class Endpoint_Product {
 		'group_id',
 		'id',
 		'image_link',
+		'images_links',
 		'link',
 		'meta_data',
 		'name',
@@ -156,6 +157,7 @@ class Endpoint_Product {
 				$filtered_product_data = self::get_categories( $filtered_product_data );
 				$filtered_product_data = self::merge_custom_attributes( $filtered_product_data, $custom_attr );
 				$filtered_product_data = self::get_image_field( $filtered_product_data );
+				$filtered_product_data = self::get_images_fields( $filtered_product_data );
 				$filtered_product_data = self::format_prices( $filtered_product_data );
 				$filtered_product_data = self::check_stock_status( $filtered_product_data );
 				$filtered_product_data = self::get_description( $filtered_product_data );
@@ -410,6 +412,18 @@ class Endpoint_Product {
 	}
 
 	/**
+	 * Get the images_links field in the data.
+	 *
+	 * @param array $data The data to process.
+	 *
+	 * @return array The processed data.
+	 */
+	private static function get_images_fields( $data ) {
+		$data['images_links'] = self::get_images_links( $data );
+		return $data;
+	}
+
+	/**
 	 * Check the stock status in the data.
 	 *
 	 * @param array $data   The data to check.
@@ -647,6 +661,54 @@ class Endpoint_Product {
 	}
 
 	/**
+	 * Returns an array of images links for a given product.
+	 * For regular products: returns all gallery images with the main image first.
+	 * For variant products: returns an array with the same content as image_link
+	 *
+	 * @param array $product The product array.
+	 *
+	 * @return array The array of images links.
+	 */
+	private static function get_images_links( $product ) {
+		$product_id   = $product['id'];
+		$images_links = array();
+
+		// Add the main image to the array.
+		$image_link = $product['image_link'] ?? self::get_image_link( $product_id );
+		if ( ! empty( $image_link ) ) {
+			$images_links[] = $image_link;
+		}
+
+		// For variants, just return the array with the same content as image_link.
+		if ( isset( $product['type'] ) && 'variation' === $product['type'] ) {
+			return $images_links;
+		}
+
+		// For regular products, add all gallery images.
+		$image_size         = Thumbnail::get_size();
+		$gallery_ids_string = get_post_meta( $product_id, '_product_image_gallery', true );
+		if ( ! empty( $gallery_ids_string ) ) {
+			$gallery_ids = explode( ',', $gallery_ids_string );
+			foreach ( $gallery_ids as $attachment_id ) {
+				$image_src = wp_get_attachment_image_src( (int) $attachment_id, $image_size );
+				if ( false === $image_src ) {
+					continue;
+				}
+
+				$image_link = $image_src[0];
+				$image_link = self::add_base_url_if_needed( $image_link );
+
+				// Avoid duplicates (in case main image is also in gallery).
+				if ( ! in_array( $image_link, $images_links, true ) ) {
+					$images_links[] = $image_link;
+				}
+			}
+		}
+
+		return $images_links;
+	}
+
+	/**
 	 * Check that image link is absolute, if not, add the site url
 	 *
 	 * @param string $image_link URL of the image.
@@ -718,6 +780,7 @@ class Endpoint_Product {
 
 		return $product;
 	}
+
 
 	/**
 	 * Groups variants under their parent product, adds the 'variants' array to the parent,
