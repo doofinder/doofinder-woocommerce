@@ -781,7 +781,6 @@ class Endpoint_Product {
 		return $product;
 	}
 
-
 	/**
 	 * Groups variants under their parent product, adds the 'variants' array to the parent,
 	 * and overwrites the parent's prices and link with those of the cheapest variant.
