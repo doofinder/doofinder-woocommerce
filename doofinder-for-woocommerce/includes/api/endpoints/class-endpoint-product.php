@@ -803,7 +803,7 @@ class Endpoint_Product {
 				array(
 					'page'     => $page,
 					'per_page' => self::PER_PAGE,
-					'status'   => 'publish'
+					'status'   => 'publish',
 				)
 			);
 			$variants_response            = rest_do_request( $request );
