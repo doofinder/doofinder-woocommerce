@@ -1,11 +1,11 @@
 === DOOFINDER Search and Discovery for WP & WooCommerce ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.10.7
+Version: 2.10.8
 Requires at least: 5.6
 Tested up to: 6.9
 Requires PHP: 7.0
-Stable tag: 2.10.7
+Stable tag: 2.10.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -126,9 +126,12 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 2.10.7 =
+= 2.10.8 =
 - Tested features with WordPress 6.9
 - Fixed script activation in multilanguage WordPress sites. Now it can be activated or deactivated for each language specifically.
+
+= 2.10.7 =
+- Index only published variations.
 
 = 2.10.6 =
 - Add images links to products.
