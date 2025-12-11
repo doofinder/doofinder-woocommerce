@@ -52,9 +52,7 @@ class JS_Layer {
 	 * @since 1.0.0
 	 */
 	private function __construct() {
-		$multilanguage = Multilanguage::instance();
-		$lang          = Helpers::format_locale_to_underscore( $multilanguage->get_current_language() );
-		if ( ! Settings::is_js_layer_enabled( $lang ) || '' === Settings::get_js_layer() ) {
+		if ( ! Settings::is_js_layer_enabled() || '' === Settings::get_js_layer() ) {
 			return;
 		}
 

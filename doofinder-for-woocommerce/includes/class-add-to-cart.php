@@ -7,8 +7,6 @@
 
 namespace Doofinder\WP;
 
-use Doofinder\WP\Helpers\Helpers;
-use Doofinder\WP\Multilanguage\Multilanguage;
 use WP_Http;
 
 /**
@@ -182,9 +180,7 @@ class Add_To_Cart {
 		add_action(
 			'wp_enqueue_scripts',
 			function () {
-				$multilanguage = Multilanguage::instance();
-				$lang          = Helpers::format_locale_to_underscore( $multilanguage->get_current_language() );
-				if ( Settings::is_js_layer_enabled( $lang ) ) {
+				if ( Settings::is_js_layer_enabled() ) {
 					wp_enqueue_script(
 						'doofinder-add-to-cart',
 						Doofinder_For_WordPress::plugin_url() . 'assets/js/df-add-to-cart.js',
