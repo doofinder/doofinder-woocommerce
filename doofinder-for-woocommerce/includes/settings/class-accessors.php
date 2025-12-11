@@ -209,17 +209,10 @@ trait Accessors {
 	 * Just an alias for "get_option", because ideally we don't
 	 * want to replace the option name in multiple files.
 	 *
-	 * @param string $language Language code.
-	 *
 	 * @return bool
 	 */
-	public static function is_js_layer_enabled( $language = '' ) {
-		return (bool) get_option(
-			self::option_name_for_language(
-				'doofinder_for_wp_enable_js_layer',
-				$language
-			)
-		);
+	public static function is_js_layer_enabled() {
+		return (bool) get_option( 'doofinder_for_wp_enable_js_layer' );
 	}
 
 	/**
@@ -227,17 +220,9 @@ trait Accessors {
 	 *
 	 * Just an alias for "update_option", because ideally we don't
 	 * want to replace the option name in multiple files.
-	 *
-	 * @param string $language Language code.
 	 */
-	public static function enable_js_layer( $language = '' ) {
-		update_option(
-			self::option_name_for_language(
-				'doofinder_for_wp_enable_js_layer',
-				$language
-			),
-			1
-		);
+	public static function enable_js_layer() {
+		update_option( 'doofinder_for_wp_enable_js_layer', 1 );
 	}
 
 	/**
@@ -245,17 +230,9 @@ trait Accessors {
 	 *
 	 * Just an alias for "update_option", because ideally we don't
 	 * want to replace the option name in multiple files.
-	 *
-	 * @param string $language Language code.
 	 */
-	public static function disable_js_layer( $language = '' ) {
-		update_option(
-			self::option_name_for_language(
-				'doofinder_for_wp_enable_js_layer',
-				$language
-			),
-			0
-		);
+	public static function disable_js_layer() {
+		update_option( 'doofinder_for_wp_enable_js_layer', 0 );
 	}
 
 	/**
