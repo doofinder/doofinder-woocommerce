@@ -128,7 +128,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 2.10.8 =
 - Tested features with WordPress 6.9
-- Fixed script activation in multilanguage WordPress sites. Now it can be activated or deactivated for each language specifically.
+- Fixed script activation in multilanguage WordPress sites. Now its state is synchronized for every language.
 
 = 2.10.7 =
 - Index only published variations.
