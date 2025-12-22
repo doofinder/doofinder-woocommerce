@@ -3,7 +3,7 @@
  * Plugin Name: DOOFINDER Search and Discovery for WP & WooCommerce
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Version: 2.10.8
+ * Version: 2.10.9
  * Requires at least: 5.6
  * Requires PHP: 7.0
  * Author: Doofinder
@@ -41,7 +41,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 		 * @var string
 		 */
 
-		public static $version = '2.10.8';
+		public static $version = '2.10.9';
 
 		/**
 		 * The only instance of Doofinder_For_WordPress
@@ -291,6 +291,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 		 * @param array        $options Array of bulk item update data, like the action or the type.
 		 */
 		public static function upgrader_process_complete( $upgrader_object, $options ) {
+			self::autoload( self::plugin_path() . 'includes/' );
 			$log = new Log();
 			$log->log( 'upgrader_process - start' );
 			// The path to our plugin's main file.
