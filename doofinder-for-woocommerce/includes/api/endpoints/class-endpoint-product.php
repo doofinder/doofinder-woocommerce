@@ -643,13 +643,6 @@ class Endpoint_Product {
 			unset( $product['parent_id'] );
 		}
 
-		$product = array_filter(
-			$product,
-			function ( $value ) {
-				return ! is_null( $value );
-			}
-		);
-
 		return $product;
 	}
 
