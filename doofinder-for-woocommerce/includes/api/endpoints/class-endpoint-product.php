@@ -164,7 +164,6 @@ class Endpoint_Product {
 				$filtered_product_data['image_link'] = self::get_image_link( $filtered_product_data['id'] );
 				unset( $filtered_product_data['images'] );
 				$filtered_product_data['images_links']      = self::get_images_links( $filtered_product_data );
-				$filtered_product_data['stock_quantity']    = self::get_stock_quantity( $filtered_product_data['id'] );
 				$filtered_product_data                      = self::format_prices( $filtered_product_data );
 				$filtered_product_data                      = self::check_availability( $filtered_product_data );
 				$filtered_product_data['description']       = self::process_content( $filtered_product_data['description'] );
@@ -575,29 +574,6 @@ class Endpoint_Product {
 	}
 
 	/**
-	 * Returns the stock quantity for a given product.
-	 * If the product manages stock, returns the stock quantity; otherwise returns null.
-	 *
-	 * @param int $id Product ID selected.
-	 *
-	 * @return int|null The stock quantity or null if stock is not managed.
-	 */
-	public static function get_stock_quantity( $id ) {
-		$product = wc_get_product( $id );
-
-		/*
-		Only return stock quantity if stock management is enabled for this product.
-		Just as a curiosity, if the parent product is managing stock, but the variations
-		are not, the stock quantity for these variations will be the same as the parent product.
-		*/
-		if ( $product->managing_stock() ) {
-			return $product->get_stock_quantity();
-		}
-
-		return null;
-	}
-
-	/**
 	 * Returns an array of images links for a given product.
 	 * For regular products: returns all gallery images with the main image first.
 	 * For variant products: returns an array with the same content as image_link
@@ -669,11 +645,9 @@ class Endpoint_Product {
 
 		$product = array_filter(
 			$product,
-			function ( $value, $key ) {
-				// Keep stock_quantity even if null, otherwise filter out null values.
-				return 'stock_quantity' === $key || ! is_null( $value );
-			},
-			ARRAY_FILTER_USE_BOTH
+			function ( $value ) {
+				return ! is_null( $value );
+			}
 		);
 
 		return $product;
