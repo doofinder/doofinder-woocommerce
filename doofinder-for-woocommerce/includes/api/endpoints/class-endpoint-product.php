@@ -584,9 +584,6 @@ class Endpoint_Product {
 	 */
 	public static function get_stock_quantity( $id ) {
 		$product = wc_get_product( $id );
-		if ( ! $product ) {
-			return null;
-		}
 
 		/*
 		Only return stock quantity if stock management is enabled for this product.
