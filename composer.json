@@ -8,7 +8,7 @@
         "phpdocumentor/shim": "^3"
     },
     "prefer-stable" : true,
-    "license": "GPLv2 or later",
+    "license": "MIT",
     "authors": [
         {
             "name": "Doofinder",
