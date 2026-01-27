@@ -50,6 +50,7 @@ class Endpoint_Product {
 		'sku',
 		'status',
 		'slug',
+		'stock_quantity',
 		'stock_status',
 		'tags',
 		'type',
@@ -641,13 +642,6 @@ class Endpoint_Product {
 		if ( empty( $product['parent_id'] ) ) {
 			unset( $product['parent_id'] );
 		}
-
-		$product = array_filter(
-			$product,
-			function ( $value ) {
-				return ! is_null( $value );
-			}
-		);
 
 		return $product;
 	}
