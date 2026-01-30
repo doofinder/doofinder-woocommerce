@@ -169,6 +169,7 @@ class Endpoint_Product {
 				$filtered_product_data['description']       = self::process_content( $filtered_product_data['description'] );
 				$filtered_product_data['short_description'] = self::process_content( $filtered_product_data['short_description'] );
 				$filtered_product_data['tags']              = self::get_tag_names( $filtered_product_data['tags'] );
+				$filtered_product_data['purchase_price']    = self::get_purchase_price( $filtered_product_data['id'] );
 				$filtered_product_data                      = self::get_meta_attributes( $filtered_product_data, $custom_attr );
 				$filtered_product_data                      = self::clean_fields( $filtered_product_data );
 
@@ -260,7 +261,20 @@ class Endpoint_Product {
 		return $data;
 	}
 
+	/**
+	 * Get the purchase price (Cost of Goods in WooCommerce) of a product.
+	 *
+	 * @param int $product_id The ID of the product.
+	 * @return float|null The purchase price of the product or null if not a numeric value.
+	 */
+	private static function get_purchase_price( $product_id ) {
+		$purchase_price = get_post_meta( $product_id, '_wc_cog_cost', true );
+		if ( is_numeric( $purchase_price ) ) {
+			return (float) $purchase_price;
+		}
 
+		return null;
+	}
 
 	/**
 	 * Processes product categories and adds a new `category_merchandising` field
