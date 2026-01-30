@@ -264,6 +264,11 @@ class Endpoint_Product {
 	/**
 	 * Get the purchase price (Cost of Goods in WooCommerce) of a product.
 	 *
+	 * For simple products, the purchase price is stored in the _wc_cog_cost meta field.
+	 * but for variable products, the purchase price is stored in the _wc_cog_cost_variable meta field.
+	 *
+	 * @see https://woocommerce.com/document/cost-of-goods-sold/#section-19
+	 *
 	 * @param int $product_id The ID of the product.
 	 * @return float|null The purchase price of the product or null if not a numeric value.
 	 */
@@ -271,6 +276,11 @@ class Endpoint_Product {
 		$purchase_price = get_post_meta( $product_id, '_wc_cog_cost', true );
 		if ( is_numeric( $purchase_price ) ) {
 			return (float) $purchase_price;
+		}
+
+		$purchase_price_for_variations = get_post_meta( $product_id, '_wc_cog_cost_variable', true );
+		if ( is_numeric( $purchase_price_for_variations ) ) {
+			return (float) $purchase_price_for_variations;
 		}
 
 		return null;
