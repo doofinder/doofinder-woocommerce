@@ -58,7 +58,7 @@ class Add_To_Cart {
 		}
 
 		$product = wc_get_product( $post_id );
-		if ( empty( $product ) ) {
+		if ( empty( $product ) || 'publish' !== get_post_status( $post_id ) ) {
 			return '';
 		}
 
