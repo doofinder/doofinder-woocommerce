@@ -450,6 +450,7 @@ class Setup_Wizard {
 			if ( Settings::is_configuration_complete() ) {
 				update_option( self::$wizard_status, self::$wizard_status_finished );
 				update_option( self::$wizard_done_option, true );
+				Settings::enable_js_layer();
 			}
 
 			?>

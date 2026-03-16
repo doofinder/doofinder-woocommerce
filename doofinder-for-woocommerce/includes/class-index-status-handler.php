@@ -91,8 +91,6 @@ class Index_Status_Handler {
 		// Hide the indexing notice.
 		Setup_Wizard::dismiss_indexing_notice();
 		Settings::set_indexing_status( 'processed', $lang );
-		// Enable JS Layer for the indexed language.
-		Settings::enable_js_layer( $lang );
 
 		return new WP_REST_Response(
 			array(
