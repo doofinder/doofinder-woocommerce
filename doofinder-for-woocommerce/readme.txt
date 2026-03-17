@@ -127,7 +127,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Changelog ==
 
 = 2.10.15 =
-- Solves a security issue that allowed to get certain data of draft products using the add-to-cart functionality.
+- Removes the check on wether the first indexation has finished in order to enable the doofinder script.
 
 = 2.10.14 =
 - Solves a security issue that allowed to get certain data of draft products using the add-to-cart functionality.
