@@ -90,7 +90,7 @@ class Endpoint_Product {
 	 * @return void
 	 */
 	private static function ensure_woocommerce_prepare_response_never_null() {
-		$safeguard = function ( $response, $item, $request ) {
+		$safeguard = function ( $response, $item ) {
 			if ( isset( $response ) ) {
 				return $response;
 			}
