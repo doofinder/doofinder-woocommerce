@@ -12,11 +12,6 @@ jQuery(function () {
       success: function (response) {
         if (response.status === "processed") {
           $(".indexation-status").toggleClass("processing processed");
-          //Enable Layer switch
-          $("input[name='doofinder_for_wp_enable_js_layer']").attr(
-            "checked",
-            true
-          );
           clearInterval(indexingCheckInterval);
         }
         if (response.status === "timed-out") {

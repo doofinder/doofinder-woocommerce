@@ -1,11 +1,11 @@
 === DOOFINDER Search and Discovery for WP & WooCommerce ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.10.14
+Version: 2.10.15
 Requires at least: 5.6
 Tested up to: 6.9
 Requires PHP: 7.0
-Stable tag: 2.10.14
+Stable tag: 2.10.15
 License: MIT
 License URI: https://opensource.org/licenses/MIT
 
@@ -125,6 +125,9 @@ For in-depth insights into Doofinder and its features, check out our comprehensi
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/doofinder-for-woocommerce)
 
 == Changelog ==
+
+= 2.10.15 =
+- Removes the check on whether the first indexing process has finished in order to enable the Doofinder script.
 
 = 2.10.14 =
 - Solves a security issue that allowed to get certain data of draft products using the add-to-cart functionality.
