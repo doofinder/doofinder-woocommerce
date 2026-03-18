@@ -76,8 +76,33 @@ class Endpoint_Product {
 						'permission_callback' => '__return_true',
 					)
 				);
+				self::ensure_woocommerce_prepare_response_never_null();
 			}
 		);
+	}
+
+	/**
+	 * Ensures the WooCommerce REST prepare filters never pass null to the next callback.
+	 * Some plugins (e.g. Google Listings and Ads at PHP_INT_MAX - 1) expect a WP_REST_Response and fatal if they receive null.
+	 * When our endpoint uses rest_do_request() for products/variations, a callback in the chain may return null.
+	 * This safeguard runs just before those plugins (PHP_INT_MAX - 2) and replaces null with a valid response.
+	 *
+	 * @return void
+	 */
+	private static function ensure_woocommerce_prepare_response_never_null() {
+		$safeguard = function ( $response, $item ) {
+			if ( isset( $response ) ) {
+				return $response;
+			}
+			if ( ! is_a( $item, 'WC_Product' ) ) {
+				return new \WP_REST_Response( array(), 200 );
+			}
+			return new \WP_REST_Response( $item->get_data(), 200 );
+		};
+		// Run before plugins that use PHP_INT_MAX - 1 (e.g. Google Listings and Ads) so they never receive null.
+		$priority = PHP_INT_MAX - 2;
+		add_filter( 'woocommerce_rest_prepare_product_object', $safeguard, $priority, 3 );
+		add_filter( 'woocommerce_rest_prepare_product_variation_object', $safeguard, $priority, 3 );
 	}
 
 	/**
@@ -89,6 +114,7 @@ class Endpoint_Product {
 	 * @return WP_REST_Response Response containing modified data.
 	 */
 	public static function custom_product_endpoint( $request, $config_request = false ) {
+		ob_start();
 
 		$custom_attr        = Settings::get_custom_attributes();
 		$custom_attr_fields = self::get_field_attributes( $custom_attr );
@@ -177,6 +203,10 @@ class Endpoint_Product {
 			}
 			// Merge variants into their parent products.
 			$modified_products = self::merge_variants_into_parents( $modified_products );
+		}
+		// Discard any printed output from other plugins (e.g. woocommerce_rest_prepare_*_object) so the response is valid JSON.
+		if ( ob_get_level() ) {
+			ob_end_clean();
 		}
 		// Return the modified product data as a response.
 		return new WP_REST_Response( $modified_products );
