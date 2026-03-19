@@ -127,7 +127,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Changelog ==
 
 = 2.10.17 =
-- Added the creation date to the product's information.
+- Added the creation date to the product information.
 
 = 2.10.16 =
 - Increased compatibility and prevented errors with some other plugins like Google for Woocommerce (Google Listings and Ads).
