@@ -29,6 +29,7 @@ class Endpoint_Product {
 		'best_price',
 		'catalog_visibility',
 		'categories',
+		'date_created',
 		'description',
 		'df_group_leader',
 		'df_indexable',
@@ -197,6 +198,7 @@ class Endpoint_Product {
 				$filtered_product_data['tags']              = self::get_tag_names( $filtered_product_data['tags'] );
 				$filtered_product_data['purchase_price']    = self::get_purchase_price( $filtered_product_data['id'] );
 				$filtered_product_data                      = self::get_meta_attributes( $filtered_product_data, $custom_attr );
+				$filtered_product_data['creation_date']     = gmdate( 'Y-m-d\TH:i:s\Z', strtotime( $filtered_product_data['date_created'] ) );
 				$filtered_product_data                      = self::clean_fields( $filtered_product_data );
 
 				$modified_products[] = $filtered_product_data;
@@ -692,6 +694,7 @@ class Endpoint_Product {
 		unset( $product['attributes'] );
 		unset( $product['name'] );
 		unset( $product['permalink'] );
+		unset( $product['date_created'] );
 
 		if ( empty( $product['parent_id'] ) ) {
 			unset( $product['parent_id'] );
