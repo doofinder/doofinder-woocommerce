@@ -56,12 +56,13 @@ class Klaviyo_Integration {
 					wp_enqueue_script(
 						'doofinder-integration-klaviyo',
 						Doofinder_For_WordPress::plugin_url() . 'assets/js/doofinder-integration-klaviyo.js',
-						array( 'kl-identify-browser' ), // To prevent this to be loaded before Klaviyo plugin script.
+						array(),
 						Doofinder_For_WordPress::$version,
 						true
 					);
 				}
-			}
+			},
+			PHP_INT_MAX // To prevent this to be loaded before Klaviyo plugin script.
 		);
 	}
 }
