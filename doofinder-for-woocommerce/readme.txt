@@ -1,11 +1,11 @@
 === DOOFINDER Search and Discovery for WP & WooCommerce ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.10.19
+Version: 2.11.0
 Requires at least: 5.6
 Tested up to: 6.9
 Requires PHP: 7.0
-Stable tag: 2.10.19
+Stable tag: 2.11.0
 License: MIT
 License URI: https://opensource.org/licenses/MIT
 
@@ -126,7 +126,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 2.10.19 =
+= 2.11.0 =
 - Exposed information about the actual frontend page to be used for statistics.
 
 = 2.10.18 =
