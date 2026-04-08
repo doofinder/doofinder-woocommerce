@@ -114,6 +114,7 @@ class JS_Layer {
 		echo '  var dfPageType = ' . wp_json_encode( $page_type ) . ";\n"; // phpcs:ignore WordPress.Security.EscapeOutput
 		echo '  var dfProductId = ' . wp_json_encode( $product_id ) . ";\n"; // phpcs:ignore WordPress.Security.EscapeOutput
 		echo '  var dfCategoryName = ' . wp_json_encode( $category_name ) . ";\n"; // phpcs:ignore WordPress.Security.EscapeOutput
+		echo '  var dfPlatform = ' . wp_json_encode( 'woocommerce' ) . ";\n"; // phpcs:ignore WordPress.Security.EscapeOutput
 		echo "</script>\n"; // phpcs:ignore WordPress.Security.EscapeOutput
 	}
 
