@@ -45,6 +45,7 @@ class Endpoint_Product_Category {
 	 * @return WP_REST_Response Response containing modified data.
 	 */
 	public static function product_category_endpoint( $request ) {
+		$request->set_param( 'type', 'product_cat' );
 		return Endpoint_Custom::custom_endpoint( $request );
 	}
 }
