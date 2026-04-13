@@ -112,51 +112,10 @@ class Endpoint_Custom {
 		$type = $config_request['type'] ?? '';
 
 		if ( taxonomy_exists( $type ) ) {
-			$taxonomy_fields = empty( $fields ) ? array() : self::TAXONOMY_FIELDS;
-			$items           = self::get_items( $config_request );
-
-			foreach ( $items as $item_data ) {
-				$filtered_data = ! empty( $taxonomy_fields )
-					? array_intersect_key( $item_data, array_flip( $taxonomy_fields ) )
-					: $item_data;
-
-				if ( in_array( 'image_link', $taxonomy_fields, true ) || empty( $taxonomy_fields ) ) {
-					$filtered_data['image_link'] = self::get_term_image_link( $item_data );
-				}
-
-				$modified_items[] = $filtered_data;
-			}
-
-			return new WP_REST_Response( $modified_items ?? array() );
+			return self::get_taxonomy( $request, $config_request, $fields );
 		}
 
-		$items = self::get_items( $config_request );
-
-		foreach ( $items as $item_data ) {
-
-			if ( 'noindex' === get_post_meta( $item_data['id'], '_doofinder_for_wp_indexing_visibility', true ) ) {
-				continue;
-			}
-
-			$custom_attr = Settings::get_post_custom_attributes();
-
-			$filtered_data = ! empty( $fields ) ? array_intersect_key( $item_data, array_flip( $fields ) ) : $item_data;
-
-			$filtered_data = self::get_title( $filtered_data );
-			$filtered_data = self::get_content( $filtered_data );
-			$filtered_data = self::get_description( $filtered_data );
-			$filtered_data = self::get_author( $filtered_data, $fields, $config_request );
-			$filtered_data = self::get_image_link( $filtered_data, $fields );
-			$filtered_data = self::get_post_tags( $filtered_data, $fields );
-			$filtered_data = self::get_categories( $filtered_data, $fields );
-			$filtered_data = self::get_meta_attributes( $filtered_data, $custom_attr );
-			$filtered_data = self::clear_unused_fields( $filtered_data );
-
-			$modified_items[] = $filtered_data;
-		}
-
-		// Return the modified items data as a response.
-		return new WP_REST_Response( $modified_items ?? array() );
+		return self::get_post_type( $config_request, $fields );
 	}
 
 	/**
@@ -194,6 +153,72 @@ class Endpoint_Custom {
 		);
 
 		return $items;
+	}
+
+	/**
+	 * Get the taxonomy data.
+	 *
+	 * @param WP_REST_Request $request The REST request object.
+	 * @param array           $config_request Array config for internal requests.
+	 * @param array           $fields The fields to include in the response.
+	 *
+	 * @return WP_REST_Response Response containing modified taxonomy data.
+	 */
+	private static function get_taxonomy( $request, $config_request, $fields ) {
+		$taxonomy_fields = empty( $fields ) ? array() : self::TAXONOMY_FIELDS;
+		$items           = self::get_items( $config_request );
+
+		foreach ( $items as $item_data ) {
+			$filtered_data = ! empty( $taxonomy_fields )
+				? array_intersect_key( $item_data, array_flip( $taxonomy_fields ) )
+				: $item_data;
+
+			if ( in_array( 'image_link', $taxonomy_fields, true ) || empty( $taxonomy_fields ) ) {
+				$filtered_data['image_link'] = self::get_term_image_link( $item_data );
+			}
+
+			$modified_items[] = $filtered_data;
+		}
+
+		return new WP_REST_Response( $modified_items ?? array() );
+	}
+
+	/**
+	 * Get the post type data.
+	 *
+	 * @param array $config_request Array config for internal requests.
+	 * @param array $fields The fields to include in the response.
+	 *
+	 * @return WP_REST_Response Response containing modified post type data.
+	 */
+	private static function get_post_type( $config_request, $fields ) {
+		$items = self::get_items( $config_request );
+
+		foreach ( $items as $item_data ) {
+
+			if ( 'noindex' === get_post_meta( $item_data['id'], '_doofinder_for_wp_indexing_visibility', true ) ) {
+				continue;
+			}
+
+			$custom_attr = Settings::get_post_custom_attributes();
+
+			$filtered_data = ! empty( $fields ) ? array_intersect_key( $item_data, array_flip( $fields ) ) : $item_data;
+
+			$filtered_data = self::get_title( $filtered_data );
+			$filtered_data = self::get_content( $filtered_data );
+			$filtered_data = self::get_description( $filtered_data );
+			$filtered_data = self::get_author( $filtered_data, $fields, $config_request );
+			$filtered_data = self::get_image_link( $filtered_data, $fields );
+			$filtered_data = self::get_post_tags( $filtered_data, $fields );
+			$filtered_data = self::get_categories( $filtered_data, $fields );
+			$filtered_data = self::get_meta_attributes( $filtered_data, $custom_attr );
+			$filtered_data = self::clear_unused_fields( $filtered_data );
+
+			$modified_items[] = $filtered_data;
+		}
+
+		// Return the modified items data as a response.
+		return new WP_REST_Response( $modified_items ?? array() );
 	}
 
 	/**
