@@ -39,7 +39,9 @@ class Endpoint_Product_Category {
 	}
 
 	/**
-	 * Custom item endpoint callback.
+	 * Custom item endpoint callback. It has been kept due to backward compatibility purposes.
+	 * Since the product category is a taxonomy, it will set the type parameter to 'product_cat'
+	 * and call the Endpoint_Custom class to handle the request like the rest of taxonomies.
 	 *
 	 * @param WP_REST_Request $request The REST request object.
 	 * @return WP_REST_Response Response containing modified data.
