@@ -35,6 +35,15 @@ class Endpoint_Custom {
 		'title',
 	);
 
+	const TAXONOMY_FIELDS = array(
+		'description',
+		'id',
+		'image_link',
+		'link',
+		'name',
+		'parent',
+		'slug',
+	);
 
 	/**
 	 * Initialize the custom item endpoint.
@@ -100,33 +109,13 @@ class Endpoint_Custom {
 			$fields = ! empty( $config_request['fields'] ) ? explode( ',', $config_request['fields'] ) : array();
 		}
 
-		$items = self::get_items( $config_request );
+		$type = $config_request['type'] ?? '';
 
-		foreach ( $items as $item_data ) {
-
-			if ( 'noindex' === get_post_meta( $item_data['id'], '_doofinder_for_wp_indexing_visibility', true ) ) {
-				continue;
-			}
-
-			$custom_attr = Settings::get_post_custom_attributes();
-
-			$filtered_data = ! empty( $fields ) ? array_intersect_key( $item_data, array_flip( $fields ) ) : $item_data;
-
-			$filtered_data = self::get_title( $filtered_data );
-			$filtered_data = self::get_content( $filtered_data );
-			$filtered_data = self::get_description( $filtered_data );
-			$filtered_data = self::get_author( $filtered_data, $fields, $config_request );
-			$filtered_data = self::get_image_link( $filtered_data, $fields );
-			$filtered_data = self::get_post_tags( $filtered_data, $fields );
-			$filtered_data = self::get_categories( $filtered_data, $fields );
-			$filtered_data = self::get_meta_attributes( $filtered_data, $custom_attr );
-			$filtered_data = self::clear_unused_fields( $filtered_data );
-
-			$modified_items[] = $filtered_data;
+		if ( taxonomy_exists( $type ) ) {
+			return self::get_taxonomy( $request, $config_request, $fields );
 		}
 
-		// Return the modified items data as a response.
-		return new WP_REST_Response( $modified_items ?? array() );
+		return self::get_post_type( $config_request, $fields );
 	}
 
 	/**
@@ -164,6 +153,72 @@ class Endpoint_Custom {
 		);
 
 		return $items;
+	}
+
+	/**
+	 * Get the taxonomy data.
+	 *
+	 * @param WP_REST_Request $request The REST request object.
+	 * @param array           $config_request Array config for internal requests.
+	 * @param array           $fields The fields to include in the response.
+	 *
+	 * @return WP_REST_Response Response containing modified taxonomy data.
+	 */
+	private static function get_taxonomy( $request, $config_request, $fields ) {
+		$taxonomy_fields = empty( $fields ) ? array() : self::TAXONOMY_FIELDS;
+		$items           = self::get_items( $config_request );
+
+		foreach ( $items as $item_data ) {
+			$filtered_data = ! empty( $taxonomy_fields )
+				? array_intersect_key( $item_data, array_flip( $taxonomy_fields ) )
+				: $item_data;
+
+			if ( in_array( 'image_link', $taxonomy_fields, true ) || empty( $taxonomy_fields ) ) {
+				$filtered_data['image_link'] = self::get_term_image_link( $item_data );
+			}
+
+			$modified_items[] = $filtered_data;
+		}
+
+		return new WP_REST_Response( $modified_items ?? array() );
+	}
+
+	/**
+	 * Get the post type data.
+	 *
+	 * @param array $config_request Array config for internal requests.
+	 * @param array $fields The fields to include in the response.
+	 *
+	 * @return WP_REST_Response Response containing modified post type data.
+	 */
+	private static function get_post_type( $config_request, $fields ) {
+		$items = self::get_items( $config_request );
+
+		foreach ( $items as $item_data ) {
+
+			if ( 'noindex' === get_post_meta( $item_data['id'], '_doofinder_for_wp_indexing_visibility', true ) ) {
+				continue;
+			}
+
+			$custom_attr = Settings::get_post_custom_attributes();
+
+			$filtered_data = ! empty( $fields ) ? array_intersect_key( $item_data, array_flip( $fields ) ) : $item_data;
+
+			$filtered_data = self::get_title( $filtered_data );
+			$filtered_data = self::get_content( $filtered_data );
+			$filtered_data = self::get_description( $filtered_data );
+			$filtered_data = self::get_author( $filtered_data, $fields, $config_request );
+			$filtered_data = self::get_image_link( $filtered_data, $fields );
+			$filtered_data = self::get_post_tags( $filtered_data, $fields );
+			$filtered_data = self::get_categories( $filtered_data, $fields );
+			$filtered_data = self::get_meta_attributes( $filtered_data, $custom_attr );
+			$filtered_data = self::clear_unused_fields( $filtered_data );
+
+			$modified_items[] = $filtered_data;
+		}
+
+		// Return the modified items data as a response.
+		return new WP_REST_Response( $modified_items ?? array() );
 	}
 
 	/**
@@ -419,12 +474,25 @@ class Endpoint_Custom {
 	/**
 	 * Retrieve a list of items with pagination.
 	 *
+	 * Handles both post types and taxonomies: for taxonomies the REST base is
+	 * resolved via get_taxonomy() since it may differ from the taxonomy slug
+	 * (e.g. 'category' → 'categories').
+	 *
 	 * @param array $config_request Config request params (page, per_page, type).
 	 * @return array|null   An array of items data or null on failure.
 	 */
 	private static function get_items( $config_request ) {
+		$type = $config_request['type'];
+
+		if ( taxonomy_exists( $type ) ) {
+			$taxonomy_obj = get_taxonomy( $type );
+			$rest_base    = ! empty( $taxonomy_obj->rest_base ) ? $taxonomy_obj->rest_base : $type;
+		} else {
+			$rest_base = $type;
+		}
+
 		// Retrieve the original items data.
-		$request = new WP_REST_Request( 'GET', '/wp/v2/' . $config_request['type'] );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/' . $rest_base );
 		$request->set_query_params(
 			array(
 				'page'     => ! empty( $config_request['page'] ) ? $config_request['page'] : 1,
@@ -464,5 +532,26 @@ class Endpoint_Custom {
 		}
 
 		return $meta_data;
+	}
+
+	/**
+	 * Returns the image link for a given taxonomy term.
+	 *
+	 * Looks up the term's thumbnail_id meta key, which is the standard used by
+	 * WooCommerce product categories and similar taxonomies. Returns an empty string
+	 * if no image is associated with the term.
+	 *
+	 * @param array $term Term data as an array containing at least 'id'.
+	 * @return string The image URL, or empty string if no image is found.
+	 */
+	private static function get_term_image_link( $term ) {
+		$thumbnail_id = get_term_meta( $term['id'], 'thumbnail_id', true );
+		$image_link   = empty( $thumbnail_id ) ? '' : wp_get_attachment_url( $thumbnail_id );
+
+		if ( empty( $image_link ) ) {
+			return '';
+		}
+
+		return self::add_base_url_if_needed( $image_link );
 	}
 }
