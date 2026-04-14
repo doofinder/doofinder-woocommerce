@@ -8,7 +8,9 @@
 /**
  * Class Endpoint_Product_Category
  *
- * This is kept for backward compatibility, it will call the Endpoint_Custom class to handle the request, but it will be removed in the future.
+ * This is kept for backward compatibility, it will call the Endpoint_Custom class to handle the request,
+ * but it will be removed in the future when all the customers have updated the plugin to at least version 2.12.0
+ * and when we apply a change in our internal services.
  */
 class Endpoint_Product_Category {
 
