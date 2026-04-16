@@ -199,6 +199,8 @@ class Endpoint_Product {
 				$filtered_product_data['purchase_price']    = self::get_purchase_price( $filtered_product_data['id'] );
 				$filtered_product_data                      = self::get_meta_attributes( $filtered_product_data, $custom_attr );
 				$filtered_product_data['creation_date']     = gmdate( 'Y-m-d\TH:i:s\Z', strtotime( $filtered_product_data['date_created'] ) );
+				$taxonomy_lookup_id                         = ( 'variation' === ( $filtered_product_data['type'] ?? '' ) && ! empty( $filtered_product_data['parent_id'] ) ) ? $filtered_product_data['parent_id'] : $filtered_product_data['id'];
+				$filtered_product_data                      = array_merge( $filtered_product_data, self::get_taxonomy_attributes( $taxonomy_lookup_id ) );
 				$filtered_product_data                      = self::clean_fields( $filtered_product_data );
 
 				$modified_products[] = $filtered_product_data;
@@ -1004,6 +1006,40 @@ class Endpoint_Product {
 			$basic_clean[ $key_attr ] = $basic_attr[0] ?? '';
 		}
 		return array_merge( $product_attributes, $basic_clean );
+	}
+
+	/**
+	 * Get product taxonomy terms as flat key-value pairs to be merged into the product data.
+	 *
+	 * Skips WooCommerce attribute taxonomies (pa_*), internal WooCommerce taxonomies
+	 * (product_type, product_visibility, product_shipping_class) and product categories.
+	 * since they are retrieved in a separate function. Then strips the 'product_'
+	 * prefix from remaining taxonomy slugs so e.g. 'product_brand' becomes 'brand'.
+	 * For variations, pass the parent product ID so taxonomies are correctly retrieved.
+	 *
+	 * @param int $product_id The product (or parent) ID to look up taxonomy terms for.
+	 * @return array Associative array of key => string[] term names, ready to merge into product data.
+	 */
+	private static function get_taxonomy_attributes( $product_id ) {
+		$excluded   = array( 'product_cat', 'product_type', 'product_visibility', 'product_shipping_class' );
+		$taxonomies = get_object_taxonomies( 'product', 'names' );
+		$result     = array();
+
+		foreach ( $taxonomies as $taxonomy ) {
+			if ( str_starts_with( $taxonomy, 'pa_' ) || in_array( $taxonomy, $excluded, true ) ) {
+				continue;
+			}
+
+			$terms = wp_get_object_terms( $product_id, $taxonomy, array( 'fields' => 'names' ) );
+			if ( is_wp_error( $terms ) || empty( $terms ) ) {
+				continue;
+			}
+
+			$key            = str_starts_with( $taxonomy, 'product_' ) ? substr( $taxonomy, strlen( 'product_' ) ) : $taxonomy;
+			$result[ $key ] = $terms;
+		}
+
+		return $result;
 	}
 
 	/**
