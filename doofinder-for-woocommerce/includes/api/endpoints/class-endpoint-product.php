@@ -1012,8 +1012,8 @@ class Endpoint_Product {
 	 * Get product taxonomy terms as flat key-value pairs to be merged into the product data.
 	 *
 	 * Skips WooCommerce attribute taxonomies (pa_*), internal WooCommerce taxonomies
-	 * (product_type, product_visibility, product_shipping_class) and product categories.
-	 * since they are retrieved in a separate function. Then strips the 'product_'
+	 * (product_type, product_visibility, product_shipping_class), product tags and product categories
+	 * since they are retrieved from the product data directly. Then strips the 'product_'
 	 * prefix from remaining taxonomy slugs so e.g. 'product_brand' becomes 'brand'.
 	 * For variations, pass the parent product ID so taxonomies are correctly retrieved.
 	 *
@@ -1021,7 +1021,7 @@ class Endpoint_Product {
 	 * @return array Associative array of key => string[] term names, ready to merge into product data.
 	 */
 	private static function get_taxonomy_attributes( $product_id ) {
-		$excluded   = array( 'product_cat', 'product_type', 'product_visibility', 'product_shipping_class' );
+		$excluded   = array( 'product_cat', 'product_tag', 'product_type', 'product_visibility', 'product_shipping_class' );
 		$taxonomies = get_object_taxonomies( 'product', 'names' );
 		$result     = array();
 
