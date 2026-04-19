@@ -200,7 +200,7 @@ class Endpoint_Product {
 				$filtered_product_data                      = self::get_meta_attributes( $filtered_product_data, $custom_attr );
 				$filtered_product_data['creation_date']     = gmdate( 'Y-m-d\TH:i:s\Z', strtotime( $filtered_product_data['date_created'] ) );
 				$taxonomy_lookup_id                         = ( 'variation' === ( $filtered_product_data['type'] ?? '' ) && ! empty( $filtered_product_data['parent_id'] ) ) ? $filtered_product_data['parent_id'] : $filtered_product_data['id'];
-				$filtered_product_data                      = array_merge( $filtered_product_data, self::get_taxonomy_attributes( $taxonomy_lookup_id ) );
+				$filtered_product_data                      = array_merge( $filtered_product_data, self::get_taxonomy_custom_attributes( $taxonomy_lookup_id, $custom_attr ) );
 				$filtered_product_data                      = self::clean_fields( $filtered_product_data );
 
 				$modified_products[] = $filtered_product_data;
@@ -1009,34 +1009,34 @@ class Endpoint_Product {
 	}
 
 	/**
-	 * Get product taxonomy terms as flat key-value pairs to be merged into the product data.
+	 * Get product taxonomy terms for the taxonomies the user has configured in Custom Attributes.
 	 *
-	 * Skips WooCommerce attribute taxonomies (pa_*), internal WooCommerce taxonomies
-	 * (product_type, product_visibility, product_shipping_class), product tags and product categories
-	 * since they are retrieved from the product data directly. Then strips the 'product_'
-	 * prefix from remaining taxonomy slugs so e.g. 'product_brand' becomes 'brand'.
-	 * For variations, pass the parent product ID so taxonomies are correctly retrieved.
+	 * Only processes entries with type 'taxonomy'. For variations, pass the parent product ID
+	 * so taxonomies are correctly retrieved.
 	 *
-	 * @param int $product_id The product (or parent) ID to look up taxonomy terms for.
-	 * @return array Associative array of key => string[] term names, ready to merge into product data.
+	 * @param int   $product_id  The product (or parent) ID to look up taxonomy terms for.
+	 * @param array $custom_attr The custom attributes configuration from Settings::get_custom_attributes().
+	 * @return array Associative array of field => string[] term names, ready to merge into product data.
 	 */
-	private static function get_taxonomy_attributes( $product_id ) {
-		$excluded   = array( 'product_cat', 'product_tag', 'product_type', 'product_visibility', 'product_shipping_class' );
-		$taxonomies = get_object_taxonomies( 'product', 'names' );
-		$result     = array();
+	private static function get_taxonomy_custom_attributes( $product_id, $custom_attr ) {
+		$result = array();
 
-		foreach ( $taxonomies as $taxonomy ) {
-			if ( str_starts_with( $taxonomy, 'pa_' ) || in_array( $taxonomy, $excluded, true ) ) {
+		foreach ( $custom_attr as $attr ) {
+			if ( 'taxonomy' !== $attr['type'] ) {
 				continue;
 			}
 
-			$terms = wp_get_object_terms( $product_id, $taxonomy, array( 'fields' => 'names' ) );
+			// Stored attribute is the dropdown key (e.g. 'taxonomy_series'); strip the prefix to get the slug.
+			$taxonomy_slug = str_starts_with( $attr['attribute'], 'taxonomy_' )
+				? substr( $attr['attribute'], strlen( 'taxonomy_' ) )
+				: $attr['attribute'];
+
+			$terms = wp_get_object_terms( $product_id, $taxonomy_slug, array( 'fields' => 'names' ) );
 			if ( is_wp_error( $terms ) || empty( $terms ) ) {
 				continue;
 			}
 
-			$key            = str_starts_with( $taxonomy, 'product_' ) ? substr( $taxonomy, strlen( 'product_' ) ) : $taxonomy;
-			$result[ $key ] = $terms;
+			$result[ $attr['field'] ] = $terms;
 		}
 
 		return $result;

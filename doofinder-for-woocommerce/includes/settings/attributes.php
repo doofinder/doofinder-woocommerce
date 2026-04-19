@@ -79,6 +79,25 @@ if ( ! empty( $rest_attributes ) ) {
 	}
 }
 
+// Custom product taxonomies (non-WC, non-internal).
+if ( is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
+	$excluded_taxonomies = array( 'product_cat', 'product_tag', 'product_type', 'product_visibility', 'product_shipping_class' );
+	$product_taxonomies  = get_object_taxonomies( 'product', 'objects' );
+	foreach ( $product_taxonomies as $slug => $tax_object ) {
+		if ( str_starts_with( $slug, 'pa_' ) || in_array( $slug, $excluded_taxonomies, true ) ) {
+			continue;
+		}
+		$field_name                        = str_starts_with( $slug, 'product_' ) ? substr( $slug, strlen( 'product_' ) ) : $slug;
+		$field_name                        = in_array( $field_name, Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES, true ) ? 'custom_' . $field_name : $field_name;
+		$attributes[ 'taxonomy_' . $slug ] = array(
+			'title'      => $tax_object->label,
+			'type'       => 'taxonomy',
+			'source'     => $slug,
+			'field_name' => $field_name,
+		);
+	}
+}
+
 // Custom attribute.
 // Allowing user to provide a custom meta field name.
 $attributes['metafield'] = array(
