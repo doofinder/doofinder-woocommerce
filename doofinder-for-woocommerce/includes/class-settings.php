@@ -222,6 +222,10 @@ class Settings {
 					'title'   => __( 'Product attributes', 'wordpress-doofinder' ),
 					'options' => array(),
 				),
+				'taxonomy'       => array(
+					'title'   => __( 'Product Taxonomies', 'wordpress-doofinder' ),
+					'options' => array(),
+				),
 				'metafield'      => array(
 					'title'   => __( 'Metafields', 'wordpress-doofinder' ),
 					'options' => array(),
