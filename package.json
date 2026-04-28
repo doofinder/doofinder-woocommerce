@@ -1,6 +1,6 @@
 {
   "name": "doofinder-woocommerce",
-  "version": "2.13.0",
+  "version": "2.14.0",
   "description": "Integrate Doofinder in your WooCommerce site with (almost) no effort.",
   "main": "index.js",
   "scripts": {

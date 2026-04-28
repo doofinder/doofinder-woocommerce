@@ -1,11 +1,11 @@
 === DOOFINDER Search and Discovery for WP & WooCommerce ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.13.0
+Version: 2.14.0
 Requires at least: 5.6
 Tested up to: 6.9
 Requires PHP: 7.0
-Stable tag: 2.13.0
+Stable tag: 2.14.0
 License: MIT
 License URI: https://opensource.org/licenses/MIT
 
@@ -126,6 +126,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 2.14.0 =
+- Updated the store industries list.
+
 = 2.13.0 =
 - Added taxonomies as a selectable custom attributes of the product data.
 
@@ -176,7 +179,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 - Add images links to products.
 
 = 2.10.5 =
-- Avoid sending lang to the API requests if the multilanguage plugin is not supported. 
+- Avoid sending lang to the API requests if the multilanguage plugin is not supported.
 
 = 2.10.4 =
 - Fix issue that prevented non-latin characters in attributes to be properly handled

@@ -19,18 +19,21 @@ use Doofinder\WP\Setup_Wizard;
  */
 
 $sectors = array(
-	__( 'Pharma & Cosmetics', 'wordpress-doofinder' )    => 'parapharmacy',
-	__( 'Tech Products & Electronics', 'wordpress-doofinder' ) => 'technology',
-	__( 'Apparel & Accessories', 'wordpress-doofinder' ) => 'fashion',
-	__( 'Sport & Fitness', 'wordpress-doofinder' )       => 'sport',
+	__( 'Automotive', 'wordpress-doofinder' )            => 'autos',
+	__( 'Beauty & Cosmetics', 'wordpress-doofinder' )    => 'beauty',
 	__( 'Childcare', 'wordpress-doofinder' )             => 'childcare',
-	__( 'Pets', 'wordpress-doofinder' )                  => 'pets',
+	__( 'Electronics & Technology', 'wordpress-doofinder' ) => 'technology',
+	__( 'Fashion', 'wordpress-doofinder' )               => 'fashion',
+	__( 'Food & Beverage', 'wordpress-doofinder' )       => 'food',
 	__( 'Home & Garden', 'wordpress-doofinder' )         => 'home',
-	__( 'Food & Beverages', 'wordpress-doofinder' )      => 'food',
-	__( 'Toys & Hobbies', 'wordpress-doofinder' )        => 'toys',
-	__( 'Auto Parts & Accessories', 'wordpress-doofinder' ) => 'autos',
-	__( 'Leisure & Culture', 'wordpress-doofinder' )     => 'leisure',
-	__( 'Others', 'wordpress-doofinder' )                => 'others',
+	__( 'Industrial & Business Supplies', 'wordpress-doofinder' ) => 'industrial',
+	__( 'Jewelry & Luxury', 'wordpress-doofinder' )      => 'jewelry',
+	__( 'Media & Entertainment', 'wordpress-doofinder' ) => 'media',
+	__( 'Pets', 'wordpress-doofinder' )                  => 'pets',
+	__( 'Pharma', 'wordpress-doofinder' )                => 'pharma',
+	__( 'Sports & Outdoor Activities', 'wordpress-doofinder' ) => 'sport',
+	__( 'Toys, Games & Hobbies', 'wordpress-doofinder' ) => 'toys',
+	__( 'Other', 'wordpress-doofinder' )                 => 'others',
 );
 
 $selected_sector = Settings::get_sector( '' )
