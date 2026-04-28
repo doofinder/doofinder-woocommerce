@@ -21,10 +21,11 @@ use Doofinder\WP\Settings;
 use WP_Http;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit();
+	exit;
 }
 
 if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
+
 	/**
 	 * Main Plugin Class
 	 *
@@ -71,11 +72,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 		 * @since 1.0.0
 		 */
 		public function __clone() {
-			_doing_it_wrong(
-				__FUNCTION__,
-				esc_html__( 'Cheatin&#8217; huh?', 'wordpress-doofinder' ),
-				'0.1',
-			);
+			_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'wordpress-doofinder' ), '0.1' );
 		}
 
 		/**
@@ -84,11 +81,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 		 * @since 1.0.0
 		 */
 		public function __wakeup() {
-			_doing_it_wrong(
-				__FUNCTION__,
-				esc_html__( 'Cheatin&#8217; huh?', 'wordpress-doofinder' ),
-				'0.1',
-			);
+			_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'wordpress-doofinder' ), '0.1' );
 		}
 
 		/* Initialization *************************************************************/
@@ -115,6 +108,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 			add_action(
 				'init',
 				function () use ( $php_class ) {
+
 					// Initialize update on save.
 					Update_On_Save::init();
 					// Initialize reset credentials.
@@ -146,21 +140,9 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 					}
 
 					// Check if the plugin exists.
-					$old_plugin_notice_name =
-					'doofinder-for-wp-old-version-detected';
+					$old_plugin_notice_name = 'doofinder-for-wp-old-version-detected';
 					if ( file_exists( WP_PLUGIN_DIR . '/doofinder/doofinder.php' ) ) {
-						Admin_Notices::add_notice(
-							$old_plugin_notice_name,
-							__(
-								'Deprecated version of Doofinder plugin detected',
-								'wordpress-doofinder',
-							),
-							__(
-								'The Doofinder plugin has been merged into the new version of Doofinder for WooCommerce and is no longer needed. Therefore, we have deactivated it. We recommend uninstalling it to avoid future issues.',
-								'wordpress-doofinder',
-							),
-							'warning',
-						);
+						Admin_Notices::add_notice( $old_plugin_notice_name, __( 'Deprecated version of Doofinder plugin detected', 'wordpress-doofinder' ), __( 'The Doofinder plugin has been merged into the new version of Doofinder for WooCommerce and is no longer needed. Therefore, we have deactivated it. We recommend uninstalling it to avoid future issues.', 'wordpress-doofinder' ), 'warning' );
 					} else {
 						Admin_Notices::remove_notice( $old_plugin_notice_name );
 					}
@@ -208,9 +190,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 					/*
 					* Class names and folders are lowercase and hyphen delimited.
 					*/
-					$relative_class = strtolower(
-						str_replace( '_', '-', $relative_class ),
-					);
+					$relative_class = strtolower( str_replace( '_', '-', $relative_class ) );
 
 					/*
 					* WordPress coding standards state that files containing classes should begin
@@ -310,10 +290,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 		 * @param \WP_Upgrader $upgrader_object Upgrader object.
 		 * @param array        $options Array of bulk item update data, like the action or the type.
 		 */
-		public static function upgrader_process_complete(
-			$upgrader_object,
-			$options,
-		) {
+		public static function upgrader_process_complete( $upgrader_object, $options ) {
 			self::autoload( self::plugin_path() . 'includes/' );
 			$log = new Log();
 			$log->log( 'upgrader_process - start' );
@@ -324,10 +301,8 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 			$log->log( $options );
 
 			// If an update has taken place and the updated type is plugins and the plugins element exists.
-			if (
-				'update' === $options['action'] &&
-				'plugin' === $options['type']
-			) {
+			if ( 'update' === $options['action'] && 'plugin' === $options['type'] ) {
+
 				$log->log( 'upgrader_process - updating plugin' );
 
 				if ( isset( $options['plugins'] ) ) {
@@ -354,64 +329,27 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 				return;
 			}
 
-			wp_enqueue_script(
-				'doofinder-admin-js',
-				plugins_url( 'assets/js/admin.js', __FILE__ ),
-				array(),
-				self::$version,
-				array( 'in_footer' => false ),
-			);
+			wp_enqueue_script( 'doofinder-admin-js', plugins_url( 'assets/js/admin.js', __FILE__ ), array(), self::$version, array( 'in_footer' => false ) );
 			wp_localize_script(
 				'doofinder-admin-js',
 				'Doofinder',
 				array(
 					'nonce'                            => wp_create_nonce( 'doofinder-ajax-nonce' ),
-					'show_indexing_notice'             => Setup_Wizard::should_show_indexing_notice()
-						? 'true'
-						: 'false',
-					'RESERVED_CUSTOM_ATTRIBUTES_NAMES' =>
-						Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES,
+					'show_indexing_notice'             => Setup_Wizard::should_show_indexing_notice() ? 'true' : 'false',
+					'RESERVED_CUSTOM_ATTRIBUTES_NAMES' => Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES,
 					/* translators: %1$s is replaced with the field name. */
-					'reserved_custom_attributes_error_message' => sprintf(
-						__(
-							"The '%1\$s' field name is reserved, please use a different field name, e.g.: 'custom_%1\$s'",
-							'wordpress-doofinder',
-						),
-						'%field_name%',
-					),
+					'reserved_custom_attributes_error_message' => sprintf( __( "The '%1\$s' field name is reserved, please use a different field name, e.g.: 'custom_%1\$s'", 'wordpress-doofinder' ), '%field_name%' ),
 					/* translators: %s is replaced with the field name. */
-					'duplicated_custom_attributes_error_message' => sprintf(
-						__(
-							"The '%s' field name is already in use, please use a different field name",
-							'wordpress-doofinder',
-						),
-						'%field_name%',
-					),
+					'duplicated_custom_attributes_error_message' => sprintf( __( "The '%s' field name is already in use, please use a different field name", 'wordpress-doofinder' ), '%field_name%' ),
 				)
 			);
 
 			// CSS.
-			wp_enqueue_style(
-				'doofinder-admin-css',
-				self::plugin_url() . '/assets/css/admin.css',
-				array(),
-				self::$version,
-			);
+			wp_enqueue_style( 'doofinder-admin-css', self::plugin_url() . '/assets/css/admin.css', array(), self::$version );
 			// Add the Select2 CSS file.
-			wp_enqueue_style(
-				'select2-css',
-				'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css',
-				array(),
-				'4.1.0-rc.0',
-			);
+			wp_enqueue_style( 'select2-css', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', array(), '4.1.0-rc.0' );
 			// Add the Select2 JavaScript file.
-			wp_enqueue_script(
-				'select2-js',
-				'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js',
-				array( 'jquery' ),
-				'4.1.0-rc.0',
-				array( 'in_footer' => false ),
-			);
+			wp_enqueue_script( 'select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', array( 'jquery' ), '4.1.0-rc.0', array( 'in_footer' => false ) );
 		}
 
 		/**
@@ -420,12 +358,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 		 * @return void
 		 */
 		public static function register_notices_styles() {
-			wp_enqueue_style(
-				'doofinder-notice',
-				self::plugin_url() . '/assets/css/doofinder-notice.css',
-				array(),
-				self::$version,
-			);
+			wp_enqueue_style( 'doofinder-notice', self::plugin_url() . '/assets/css/doofinder-notice.css', array(), self::$version );
 		}
 
 		/**
@@ -466,11 +399,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 				'wp_ajax_doofinder_check_indexing_status',
 				function () {
 					$multilanguage = Multilanguage::instance();
-					$lang          =
-					$multilanguage->get_current_language() ===
-					$multilanguage->get_base_language()
-						? ''
-						: $multilanguage->get_current_language();
+					$lang          = ( $multilanguage->get_current_language() === $multilanguage->get_base_language() ) ? '' : $multilanguage->get_current_language();
 					$status        = Settings::get_indexing_status( $lang );
 
 					if ( Index_Status_Handler::is_indexing_status_timed_out( $lang ) ) {
@@ -484,7 +413,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 							'status' => $status,
 						)
 					);
-					exit();
+					exit;
 				}
 			);
 
@@ -492,27 +421,18 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 			add_action(
 				'wp_ajax_doofinder_notice_dismiss',
 				function () {
-					if (
-					! isset( $_POST['nonce'] ) ||
-					! isset( $_POST['notice_id'] ) ||
-					! wp_verify_nonce(
-						sanitize_key( $_POST['nonce'] ),
-						'doofinder-ajax-nonce',
-					)
-					) {
+					if ( ! isset( $_POST['nonce'] ) || ! isset( $_POST['notice_id'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'doofinder-ajax-nonce' ) ) {
 						status_header( WP_Http::UNAUTHORIZED );
 						die( 'Unauthorized request' );
 					}
-					$notice_id = sanitize_text_field(
-						wp_unslash( $_POST['notice_id'] ),
-					);
+					$notice_id = sanitize_text_field( wp_unslash( $_POST['notice_id'] ) );
 					Admin_Notices::remove_notice( $notice_id );
 					wp_send_json(
 						array(
 							'success' => true,
 						)
 					);
-					exit();
+					exit;
 				}
 			);
 		}
@@ -528,26 +448,17 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 			$df_schedules = array(
 				'wp_doofinder_each_5_minutes'  => array(
 					/* translators: %s is replaced with an integer number representing the minutes. */
-					'display'  => sprintf(
-						__( 'Each %s minutes', 'wordpress-doofinder' ),
-						5,
-					),
+					'display'  => sprintf( __( 'Each %s minutes', 'wordpress-doofinder' ), 5 ),
 					'interval' => MINUTE_IN_SECONDS * 5,
 				),
 				'wp_doofinder_each_15_minutes' => array(
 					/* translators: %s is replaced with an integer number representing the minutes. */
-					'display'  => sprintf(
-						__( 'Each %s minutes', 'wordpress-doofinder' ),
-						15,
-					),
+					'display'  => sprintf( __( 'Each %s minutes', 'wordpress-doofinder' ), 15 ),
 					'interval' => MINUTE_IN_SECONDS * 15,
 				),
 				'wp_doofinder_each_30_minutes' => array(
 					/* translators: %s is replaced with an integer number representing the minutes. */
-					'display'  => sprintf(
-						__( 'Each %s minutes', 'wordpress-doofinder' ),
-						30,
-					),
+					'display'  => sprintf( __( 'Each %s minutes', 'wordpress-doofinder' ), 30 ),
 					'interval' => MINUTE_IN_SECONDS * 30,
 				),
 				'wp_doofinder_each_60_minutes' => array(
@@ -556,26 +467,17 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 				),
 				'wp_doofinder_each_2_hours'    => array(
 					/* translators: %s is replaced with an integer number representing the hours. */
-					'display'  => sprintf(
-						__( 'Each %s hours', 'wordpress-doofinder' ),
-						2,
-					),
+					'display'  => sprintf( __( 'Each %s hours', 'wordpress-doofinder' ), 2 ),
 					'interval' => HOUR_IN_SECONDS * 2,
 				),
 				'wp_doofinder_each_6_hours'    => array(
 					/* translators: %s is replaced with an integer number representing the hours. */
-					'display'  => sprintf(
-						__( 'Each %s hours', 'wordpress-doofinder' ),
-						6,
-					),
+					'display'  => sprintf( __( 'Each %s hours', 'wordpress-doofinder' ), 6 ),
 					'interval' => HOUR_IN_SECONDS * 6,
 				),
 				'wp_doofinder_each_12_hours'   => array(
 					/* translators: %s is replaced with an integer number representing the hours. */
-					'display'  => sprintf(
-						__( 'Each %s hours', 'wordpress-doofinder' ),
-						12,
-					),
+					'display'  => sprintf( __( 'Each %s hours', 'wordpress-doofinder' ), 12 ),
 					'interval' => HOUR_IN_SECONDS * 12,
 				),
 				'wp_doofinder_each_day'        => array(
@@ -591,22 +493,11 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 			return array_merge( $schedules, $df_schedules );
 		}
 	}
+
 endif;
 
-register_activation_hook(
-	__FILE__,
-	array(
-		'\Doofinder\WP\Doofinder_For_WordPress',
-		'plugin_enabled',
-	)
-);
-register_deactivation_hook(
-	__FILE__,
-	array(
-		'\Doofinder\WP\Doofinder_For_WordPress',
-		'plugin_disabled',
-	)
-);
+register_activation_hook( __FILE__, array( '\Doofinder\WP\Doofinder_For_WordPress', 'plugin_enabled' ) );
+register_deactivation_hook( __FILE__, array( '\Doofinder\WP\Doofinder_For_WordPress', 'plugin_disabled' ) );
 
 /*
  * Ensure Doofinder receives prices in the store's default currency.
@@ -622,48 +513,22 @@ if ( isset( $_SERVER['HTTP_DOOFINDER_ORIGIN'] ) ) {
 	);
 }
 
-add_action(
-	'admin_enqueue_scripts',
-	array(
-		'\Doofinder\WP\Doofinder_For_WordPress',
-		'load_only_doofinder_admin_scripts_and_styles',
-	),
-	10,
-	2,
-);
-add_action(
-	'plugins_loaded',
-	array( '\Doofinder\WP\Doofinder_For_WordPress', 'instance' ),
-	0,
-);
-add_action(
-	'upgrader_process_complete',
-	array( '\Doofinder\WP\Doofinder_For_WordPress', 'upgrader_process_complete' ),
-	10,
-	2,
-);
+add_action( 'admin_enqueue_scripts', array( '\Doofinder\WP\Doofinder_For_WordPress', 'load_only_doofinder_admin_scripts_and_styles' ), 10, 2 );
+add_action( 'plugins_loaded', array( '\Doofinder\WP\Doofinder_For_WordPress', 'instance' ), 0 );
+add_action( 'upgrader_process_complete', array( '\Doofinder\WP\Doofinder_For_WordPress', 'upgrader_process_complete' ), 10, 2 );
 // Add cron_schedules here to avoid issues with hook order.
-add_filter(
-	'cron_schedules',
-	array( '\Doofinder\WP\Doofinder_For_WordPress', 'add_schedules' ),
-	100,
-	1,
-); // phpcs:ignore WordPress.WP.CronInterval
+add_filter( 'cron_schedules', array( '\Doofinder\WP\Doofinder_For_WordPress', 'add_schedules' ), 100, 1 ); // phpcs:ignore WordPress.WP.CronInterval
 
 // When doing update on save from cron we are not authenticated, so WP_REST_Request to get products data returned a 401.
 add_filter(
 	'woocommerce_rest_check_permissions',
 	function ( $permission, $context ) {
-		if (
-			wp_doing_cron() &&
-			'read' === $context &&
-			doing_action( 'doofinder_update_on_save' )
-		) {
+		if ( wp_doing_cron() && 'read' === $context && doing_action( 'doofinder_update_on_save' ) ) {
 			return true;
 		}
 
 		return $permission;
 	},
 	100,
-	2,
+	2
 );
