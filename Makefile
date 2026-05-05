@@ -1,24 +1,107 @@
-.PHONY: cs-fix cs-check dump
+.PHONY: all init start stop clean dev-console logs cache-flush db-backup db-restore doofinder-install doofinder-uninstall doofinder-reinstall consistency lint-php-versions
 
-# Load .env vars
-ifneq ("$(wildcard .env)","")
-	include .env
+# Include environment variables from .env file
+ifeq ("$(wildcard .env)","")
+	$(error Please ensure the `.env` file is present in the root directory.)
 endif
 
-TIMESTAMP=$(shell date +"%Y-%m-%d-%H-%M")
-DUMP_FILE=wordpress-dump-$(TIMESTAMP).sql
-DB_CONTAINER=doofinder-woocommerce-db-1
-MYSQL_DATABASE=wordpress
-MYSQL_USER=wordpress
-MYSQL_PASSWORD=wordpress
+include .env
+export
 
-cs-fix:
-	./vendor/bin/phpcbf
-cs-check:
-	./vendor/bin/phpcs
+docker_compose ?= docker compose
+ifneq ("$(wildcard .env.local)","")
+	include .env.local
+	export
+	docker_compose = docker compose --env-file .env --env-file .env.local
+endif
 
-dump:
-	@echo "Making database dump..."
-	@docker exec -i $(DB_CONTAINER) mysqldump -u $(MYSQL_USER) -p$(MYSQL_PASSWORD) --no-tablespaces $(MYSQL_DATABASE) > /tmp/$(DUMP_FILE)
-	@cp /tmp/$(DUMP_FILE) ./$(DUMP_FILE)
-	@echo "Dump saved as $(DUMP_FILE)"
+docker_exec_web = $(docker_compose) exec wordpress
+wp = $(docker_exec_web) wpcli --path=/var/www/html --allow-root
+
+# Default target: list available tasks
+all:
+	@echo "Before \`make init\` be sure to set up your environment with a proper \`.env\` file."
+	@echo "Select a task defined in the Makefile:"
+	@echo "  all, init, start, stop, clean, dev-console, logs, cache-flush,"
+	@echo "  db-backup, db-restore,"
+	@echo "  doofinder-install, doofinder-uninstall, doofinder-reinstall,"
+	@echo "  consistency, lint-php-versions"
+
+# Build images, install WordPress, and start containers
+init:
+	$(docker_compose) pull --ignore-buildable
+	$(docker_compose) build
+	$(docker_compose) up -d
+	@echo "Waiting for WordPress install to finish..."
+	@until $(docker_compose) exec -T wordpress wpcli --path=/var/www/html --allow-root core is-installed >/dev/null 2>&1; do \
+		sleep 2; \
+	done
+	@echo "Storefront: $(LOCAL_DOMAIN)"
+	@echo "Back office: $(LOCAL_DOMAIN)/wp-admin (user: $(ADMIN_USER) / pass: $(ADMIN_PASSWORD))"
+
+# Start the WordPress Docker containers
+start:
+	@echo "(WooCommerce) Starting"
+	@$(docker_compose) up -d
+	@echo "(WooCommerce) Started"
+
+# Stop the WordPress Docker containers
+stop:
+	@echo "(WooCommerce) Stopping"
+	@$(docker_compose) down
+	@echo "(WooCommerce) Stopped"
+
+clean:
+	@echo "\033[33m⚠️ WARNING ⚠️\033[0m"
+	@echo "This will permanently delete"
+	@echo "  - All Docker volumes for this project (the MySQL database)"
+	@echo "  - The entire ./html directory, including all WordPress core files"
+	@echo -n "Type 'DELETE' to confirm removing all volumes and ./html directory: " && read ans && [ "$${ans}" = "DELETE" ]
+	$(docker_compose) down -v
+	sudo rm -rf ./html
+
+# Open an interactive shell in the wordpress container
+dev-console:
+	$(docker_exec_web) bash
+
+# Tail logs from the wordpress container
+logs:
+	@$(docker_compose) logs -f wordpress
+
+# Flush WordPress object cache and transients
+cache-flush:
+	$(wp) cache flush
+	$(wp) transient delete --all
+
+# Backup the MySQL database from the 'db' container and compress the output
+db-backup:
+	$(docker_compose) exec -T db /usr/bin/mysqldump --no-tablespaces -u root -p$(MYSQL_ROOT_PASSWORD) $(MYSQL_DATABASE) | gzip > backup_$(shell date +%Y%m%d%H%M%S)$(prefix).sql.gz
+
+# Restore the MySQL database using a provided backup file (pass file=<backupfile> as argument)
+db-restore:
+	@[ -e "$(file)" ] || (echo "Error: 'file' variable not provided. Use file=<backupfile>" && exit 1)
+	gunzip < $(file) | $(docker_compose) exec -T db /usr/bin/mysql -u root -p$(MYSQL_ROOT_PASSWORD) $(MYSQL_DATABASE)
+
+# Activate the Doofinder plugin in WordPress
+doofinder-install:
+	$(wp) plugin activate doofinder-for-woocommerce
+
+# Uninstall the Doofinder plugin: deactivates it and runs register_uninstall_hook
+# (drops plugin tables/options) but preserves the source files (the plugin dir is
+# bind-mounted from the host, and `wp plugin uninstall` would otherwise delete it).
+doofinder-uninstall:
+	$(wp) plugin uninstall --deactivate --skip-delete doofinder-for-woocommerce
+
+# Uninstall and re-activate the Doofinder plugin
+doofinder-reinstall: doofinder-uninstall doofinder-install
+
+# Check code consistency using PHP Code Sniffer in a one-shot composer container
+consistency:
+	docker run --rm \
+		-v $(shell pwd):/app -v /app/html -v /app/vendor \
+		-w /app composer:lts sh -c \
+		"composer install && ./vendor/bin/phpcs"
+
+# Run the PHP 7.0–8.4 compatibility lint
+lint-php-versions:
+	./phplint.sh
