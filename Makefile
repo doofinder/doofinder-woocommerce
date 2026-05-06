@@ -1,4 +1,4 @@
-.PHONY: all init start stop clean dev-console logs cache-flush db-backup db-restore doofinder-configure doofinder-install doofinder-uninstall doofinder-reinstall consistency lint-php-versions
+.PHONY: all init init-with-data start stop clean dev-console logs cache-flush db-backup db-restore doofinder-configure doofinder-install doofinder-uninstall doofinder-reinstall consistency lint-php-versions
 
 # Include environment variables from .env file
 ifeq ("$(wildcard .env)","")
@@ -24,7 +24,7 @@ envsubst_vars = $$PLUGIN_VERSION,$$DOOFINDER_PLUGINS_URL_FORMAT,$$DOOFINDER_API_
 all:
 	@echo "Before \`make init\` be sure to set up your environment with a proper \`.env\` file."
 	@echo "Select a task defined in the Makefile:"
-	@echo "  all, init, start, stop, clean, dev-console, logs, cache-flush, doofinder-configure,"
+	@echo "  all, init, init-with-data, start, stop, clean, dev-console, logs, cache-flush, doofinder-configure,"
 	@echo "  db-backup, db-restore,"
 	@echo "  doofinder-install, doofinder-uninstall, doofinder-reinstall,"
 	@echo "  consistency, lint-php-versions"
@@ -46,6 +46,11 @@ init: doofinder-configure
 	done
 	@echo "Storefront: $(BASE_URL)"
 	@echo "Back office: $(BASE_URL)/wp-admin (user: $(ADMIN_USER) / pass: $(ADMIN_PASSWORD))"
+
+# Same as `make init`, but also imports WooCommerce's bundled sample products
+# (only honored on a fresh install, before WordPress is set up).
+init-with-data:
+	@IMPORT_SAMPLE_DATA=true $(MAKE) init
 
 # Start the WordPress Docker containers
 start:

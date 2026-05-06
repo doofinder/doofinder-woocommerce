@@ -87,7 +87,8 @@ The root **`.env`** lists all variables with comments. For the **dev stack**, th
 
 **Use cases:**
 
-- **First-time setup:** `make init` builds images, installs WordPress + WooCommerce, imports sample products, activates the Doofinder plugin, and runs `make doofinder-configure` first to make sure generated source files are fresh.
+- **First-time setup:** `make init` builds images, installs WordPress + WooCommerce, activates the Doofinder plugin, and runs `make doofinder-configure` first so generated source files are fresh. The shop starts empty.
+- **First-time setup with demo products:** `make init-with-data` does the same as `make init` but also imports WooCommerce's bundled sample products (only takes effect on a fresh install).
 - **Bump the plugin version for a release:** edit `PLUGIN_VERSION` in `.env`, then `make doofinder-configure`, then commit.
 - **Point the plugin at your local Doofinder backend:** put `DOOFINDER_PLUGINS_URL_FORMAT` / `DOOFINDER_API_URL_FORMAT` in `.env.local`, run `make doofinder-configure`, refresh the browser.
 - **Start / stop the stack:** `make start`, `make stop`.
