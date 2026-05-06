@@ -33,7 +33,7 @@ all:
 doofinder-configure:
 	@envsubst '$(envsubst_vars)' < templates/doofinder-for-woocommerce/doofinder-for-woocommerce.php > doofinder-for-woocommerce/doofinder-for-woocommerce.php
 	@envsubst '$(envsubst_vars)' < templates/doofinder-for-woocommerce/readme.txt > doofinder-for-woocommerce/readme.txt
-	envsubst '$(envsubst_vars)' < templates/doofinder-for-woocommerce/includes/class-constants.php > doofinder-for-woocommerce/includes/class-constants.php
+	envsubst '$(envsubst_vars)' < templates/doofinder-for-woocommerce/includes/class-doofinder-constants.php > doofinder-for-woocommerce/includes/class-doofinder-constants.php
 
 # Build images, install WordPress, and start containers
 init: doofinder-configure

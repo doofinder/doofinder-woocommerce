@@ -9,14 +9,14 @@ on:
       - 'templates/**'
       - 'doofinder-for-woocommerce/doofinder-for-woocommerce.php'
       - 'doofinder-for-woocommerce/readme.txt'
-      - 'doofinder-for-woocommerce/includes/class-constants.php'
+      - 'doofinder-for-woocommerce/includes/class-doofinder-constants.php'
       - '.env'
   push:
     paths:
       - 'templates/**'
       - 'doofinder-for-woocommerce/doofinder-for-woocommerce.php'
       - 'doofinder-for-woocommerce/readme.txt'
-      - 'doofinder-for-woocommerce/includes/class-constants.php'
+      - 'doofinder-for-woocommerce/includes/class-doofinder-constants.php'
       - '.env'
 
 jobs:
@@ -35,7 +35,7 @@ jobs:
           mkdir -p .drift-out/includes
           envsubst "$ENVSUBST_VARS" < templates/doofinder-for-woocommerce/doofinder-for-woocommerce.php > .drift-out/doofinder-for-woocommerce.php
           envsubst "$ENVSUBST_VARS" < templates/doofinder-for-woocommerce/readme.txt                       > .drift-out/readme.txt
-          envsubst "$ENVSUBST_VARS" < templates/doofinder-for-woocommerce/includes/class-constants.php    > .drift-out/includes/class-constants.php
+          envsubst "$ENVSUBST_VARS" < templates/doofinder-for-woocommerce/includes/class-doofinder-constants.php    > .drift-out/includes/class-doofinder-constants.php
 
       - name: Diff doofinder-for-woocommerce.php
         run: |
@@ -49,10 +49,10 @@ jobs:
             echo "::error::Drift: readme.txt differs from template output. Run 'make doofinder-configure' and commit."
             exit 1
           fi
-      - name: Diff class-constants.php
+      - name: Diff class-doofinder-constants.php
         run: |
-          if ! diff -u doofinder-for-woocommerce/includes/class-constants.php .drift-out/includes/class-constants.php; then
-            echo "::error::Drift: class-constants.php differs from template output. Run 'make doofinder-configure' and commit."
+          if ! diff -u doofinder-for-woocommerce/includes/class-doofinder-constants.php .drift-out/includes/class-doofinder-constants.php; then
+            echo "::error::Drift: class-doofinder-constants.php differs from template output. Run 'make doofinder-configure' and commit."
             exit 1
           fi
       - name: No drift
