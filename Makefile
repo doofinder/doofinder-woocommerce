@@ -41,15 +41,15 @@ init:
 
 # Start the WordPress Docker containers
 start:
-	@echo "(WooCommerce) Starting"
+	@echo "(WordPress) Starting"
 	@$(docker_compose) up -d
-	@echo "(WooCommerce) Started"
+	@echo "(WordPress) Started"
 
 # Stop the WordPress Docker containers
 stop:
-	@echo "(WooCommerce) Stopping"
+	@echo "(WordPress) Stopping"
 	@$(docker_compose) down
-	@echo "(WooCommerce) Stopped"
+	@echo "(WordPress) Stopped"
 
 clean:
 	@echo "\033[33m⚠️ WARNING ⚠️\033[0m"
