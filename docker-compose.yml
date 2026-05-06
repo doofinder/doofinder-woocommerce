@@ -38,6 +38,15 @@ services:
       LOCAL_DOMAIN: ${LOCAL_DOMAIN}
       WEB_SERVICE_PORT: ${WEB_SERVICE_PORT}
       WORDPRESS_VERSION: ${WORDPRESS_VERSION:-}
+      WP_ENVIRONMENT_TYPE: ${WP_ENVIRONMENT_TYPE:-local}
+      FS_METHOD: ${FS_METHOD:-direct}
+      DF_PLUGINS_HOST: ${DF_PLUGINS_HOST:-}
+      DF_API_HOST: ${DF_API_HOST:-}
+      WORDPRESS_CONFIG_EXTRA: |
+        if ($$v = getenv_docker('WP_ENVIRONMENT_TYPE', '')) { define('WP_ENVIRONMENT_TYPE', $$v); }
+        if ($$v = getenv_docker('FS_METHOD', ''))           { define('FS_METHOD', $$v); }
+        if ($$v = getenv_docker('DF_PLUGINS_HOST', ''))     { define('DF_PLUGINS_HOST', $$v); }
+        if ($$v = getenv_docker('DF_API_HOST', ''))         { define('DF_API_HOST', $$v); }
     ports:
       - "${WEB_SERVICE_PORT}:80"
 volumes:

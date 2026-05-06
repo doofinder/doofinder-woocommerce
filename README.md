@@ -19,6 +19,9 @@ This repository is optimized for local development using a **Makefile** and **Do
 | `MYSQL_*` | Database credentials and database name. |
 | `ADMIN_USER` / `ADMIN_PASSWORD` / `ADMIN_EMAIL` | Back-office login created on first run. |
 | `APACHE_UID` / `APACHE_GID` | UID/GID Apache runs as inside the container — must match the host owner of `./html`. |
+| `WP_ENVIRONMENT_TYPE` | Defines `WP_ENVIRONMENT_TYPE` in `wp-config.php`. Committed default `local`; the plugin only honors per-dev host overrides when this is `local`. |
+| `FS_METHOD` | Defines `FS_METHOD`. Committed default `direct` (lets you install plugins from the WP repo without FTP credentials). |
+| `DF_PLUGINS_HOST` / `DF_API_HOST` | Optional. Point the plugin at your local dooplugins / doomanager (e.g. ngrok URLs). Leave empty to use production. Override in `.env.local`. |
 
 **Default access (Docker dev stack):** After **`make init`**, with the stock `.env` (`WEB_SERVICE_PORT=9010`, admin `admin` / `admin123`):
 
