@@ -7,6 +7,7 @@
 
 namespace Doofinder\WP\Settings;
 
+use Doofinder\WP\Doofinder_Constants;
 use Doofinder\WP\Index_Status_Handler;
 use Doofinder\WP\Multilanguage\Multilanguage;
 use Doofinder\WP\Settings;
@@ -82,15 +83,10 @@ trait Accessors {
 	 * @return string
 	 */
 	public static function get_dooplugins_host() {
-		// If we are in local environment, return the DF_PLUGINS_HOST set in wp-config.
-		if ( wp_get_environment_type() === 'local' && defined( 'DF_PLUGINS_HOST' ) ) {
-			return DF_PLUGINS_HOST;
-		}
-
 		$region = self::get_region();
 		$region = empty( $region ) ? '' : "$region-";
 
-		$plugins_host = sprintf( 'https://%splugins.doofinder.com', $region );
+		$plugins_host = sprintf( Doofinder_Constants::PLUGINS_URL_FORMAT, $region );
 		return self::normalize_host( $plugins_host );
 	}
 
@@ -103,14 +99,10 @@ trait Accessors {
 	 * @return string
 	 */
 	public static function get_api_host() {
-		// If we are in local environment, return the DF_API_HOST set in wp-config.
-		if ( wp_get_environment_type() === 'local' && defined( 'DF_API_HOST' ) ) {
-			return DF_API_HOST;
-		}
 		$region = self::get_region();
 		$region = empty( $region ) ? '' : "$region-";
 
-		$admin_host = sprintf( 'https://%sadmin.doofinder.com', $region );
+		$admin_host = sprintf( Doofinder_Constants::API_URL_FORMAT, $region );
 
 		return self::normalize_host( $admin_host );
 	}

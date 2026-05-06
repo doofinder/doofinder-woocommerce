@@ -1,4 +1,4 @@
-.PHONY: all init start stop clean dev-console logs cache-flush db-backup db-restore doofinder-install doofinder-uninstall doofinder-reinstall consistency lint-php-versions
+.PHONY: all init start stop clean dev-console logs cache-flush db-backup db-restore doofinder-configure doofinder-install doofinder-uninstall doofinder-reinstall consistency lint-php-versions
 
 # Include environment variables from .env file
 ifeq ("$(wildcard .env)","")
@@ -18,17 +18,25 @@ endif
 docker_exec_web = $(docker_compose) exec wordpress
 wp = $(docker_exec_web) wpcli --path=/var/www/html --allow-root
 
+envsubst_vars = $$PLUGIN_VERSION,$$DOOFINDER_PLUGINS_URL_FORMAT,$$DOOFINDER_API_URL_FORMAT
+
 # Default target: list available tasks
 all:
 	@echo "Before \`make init\` be sure to set up your environment with a proper \`.env\` file."
 	@echo "Select a task defined in the Makefile:"
-	@echo "  all, init, start, stop, clean, dev-console, logs, cache-flush,"
+	@echo "  all, init, start, stop, clean, dev-console, logs, cache-flush, doofinder-configure,"
 	@echo "  db-backup, db-restore,"
 	@echo "  doofinder-install, doofinder-uninstall, doofinder-reinstall,"
 	@echo "  consistency, lint-php-versions"
 
+# Regenerate templated plugin source files from `templates/` using values from .env.
+doofinder-configure:
+	@envsubst '$(envsubst_vars)' < templates/doofinder-for-woocommerce/doofinder-for-woocommerce.php > doofinder-for-woocommerce/doofinder-for-woocommerce.php
+	@envsubst '$(envsubst_vars)' < templates/doofinder-for-woocommerce/readme.txt > doofinder-for-woocommerce/readme.txt
+	envsubst '$(envsubst_vars)' < templates/doofinder-for-woocommerce/includes/class-constants.php > doofinder-for-woocommerce/includes/class-constants.php
+
 # Build images, install WordPress, and start containers
-init:
+init: doofinder-configure
 	$(docker_compose) pull --ignore-buildable
 	$(docker_compose) build
 	$(docker_compose) up -d
@@ -36,8 +44,8 @@ init:
 	@until $(docker_compose) exec -T wordpress wpcli --path=/var/www/html --allow-root core is-installed >/dev/null 2>&1; do \
 		sleep 2; \
 	done
-	@echo "Storefront: $(LOCAL_DOMAIN)"
-	@echo "Back office: $(LOCAL_DOMAIN)/wp-admin (user: $(ADMIN_USER) / pass: $(ADMIN_PASSWORD))"
+	@echo "Storefront: $(BASE_URL)"
+	@echo "Back office: $(BASE_URL)/wp-admin (user: $(ADMIN_USER) / pass: $(ADMIN_PASSWORD))"
 
 # Start the WordPress Docker containers
 start:
