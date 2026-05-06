@@ -346,7 +346,9 @@ class Store_Api {
 		}
 
 		if ( $response_code < WP_Http::OK || $response_code >= WP_Http::BAD_REQUEST ) {
-			$error_message = wp_remote_retrieve_response_message( $response );
+			$response_body    = wp_remote_retrieve_body( $response );
+			$decoded_response = json_decode( $response_body, true );
+			$error_message    = ! empty( $decoded_response['errors'][0] ) ? $decoded_response['errors'][0] : wp_remote_retrieve_response_message( $response );
 			throw new Exception( wp_kses_data( $error_message ), (int) $response_code );
 		}
 	}

@@ -988,7 +988,7 @@ class Setup_Wizard {
 				$this->log->log( 'Wizard Step 2 - Exception' );
 				$this->log->log( $exception->getMessage() );
 				/* translators: %s is replaced with the exception message. */
-				$this->errors['wizard-step-2'] = sprintf( __( "Couldn't create Store. Error: %s", 'wordpress-doofinder' ), $exception->getMessage() );
+				$this->errors['wizard-step-2'] = $exception->getMessage();
 
 				// Send failed ajax response.
 				wp_send_json_error(
