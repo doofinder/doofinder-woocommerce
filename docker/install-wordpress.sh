@@ -24,6 +24,11 @@ if ! $(wp core is-installed); then
   echo "Installing WordPress at ${LOCAL_DOMAIN}"
   wp core install --url=${LOCAL_DOMAIN} --title=WooCommerce --admin_user=${ADMIN_USER} --admin_password=${ADMIN_PASSWORD} --admin_email=${ADMIN_EMAIL} --skip-email
 
+  # Pretty permalinks. Default would be "Plain" (?p=123), which breaks product
+  # URLs and disables several plugin features (e.g. Polylang's per-language
+  # directory URL mode is greyed out under plain permalinks).
+  wp rewrite structure '/%postname%/' --hard
+
   wp plugin install wordpress-importer --activate
   wp plugin install woocommerce --activate
 
