@@ -27,6 +27,14 @@ if ! $(wp core is-installed); then
   wp plugin install wordpress-importer --activate
   wp plugin install woocommerce --activate
 
+  # Pre-register the global product attributes used by the e2e CSV catalogue.
+  # WooCommerce's CSV importer can lose term assignments on the first row that
+  # references a new attribute (the taxonomy is created mid-row and the term
+  # link is dropped). Creating them here makes subsequent imports deterministic.
+  wp wc product_attribute create --name=Brand --slug=brand --type=select --order_by=menu_order --user=1
+  wp wc product_attribute create --name=Color --slug=color --type=select --order_by=menu_order --user=1
+  wp wc product_attribute create --name=Size  --slug=size  --type=select --order_by=menu_order --user=1
+
   if [ "${IMPORT_SAMPLE_DATA:-false}" = "true" ]; then
     if [ -f wp-content/plugins/woocommerce/dummy-data/dummy-data.xml ]; then
       wp import wp-content/plugins/woocommerce/dummy-data/dummy-data.xml --authors=create --quiet
