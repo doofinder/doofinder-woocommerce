@@ -1,21 +1,24 @@
 services:
   db:
-    image: mysql:5.7
+    image: mysql:${MYSQL_VERSION}
     volumes:
       - wordpress-db:/var/lib/mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: wordpress
-      MYSQL_PASSWORD: wordpress
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - "3310:3306"
+      - "${MYSQL_HOST_PORT}:3306"
 
   wordpress:
     depends_on:
       - db
-    build: .
+    build:
+      context: .
+      args:
+        WORDPRESS_IMAGE_TAG: ${WORDPRESS_IMAGE_TAG}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
@@ -23,17 +26,25 @@ services:
       - ./doofinder-for-woocommerce:/var/www/html/wp-content/plugins/doofinder-for-woocommerce
     restart: unless-stopped
     environment:
-      APACHE_RUN_USER: "#1000"
-      APACHE_RUN_GROUP: "#1000"
+      APACHE_RUN_USER: "#${APACHE_UID}"
+      APACHE_RUN_GROUP: "#${APACHE_GID}"
       WORDPRESS_DB_HOST: db:3306
-      WORDPRESS_DB_PASSWORD: wordpress
-      WORDPRESS_DB_USER: wordpress
-      WORDPRESS_DB_NAME: wordpress
-      ADMIN_USER: admin
-      ADMIN_PASSWORD: admin123
-      ADMIN_EMAIL: developers@doofinder.com
-      WEB_SERVICE_PORT: 9010
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+      ADMIN_USER: ${ADMIN_USER}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      LOCAL_DOMAIN: ${BASE_URL}
+      WEB_SERVICE_PORT: ${WEB_SERVICE_PORT}
+      WORDPRESS_VERSION: ${WORDPRESS_VERSION:-}
+      IMPORT_SAMPLE_DATA: ${IMPORT_SAMPLE_DATA:-false}
+      WP_ENVIRONMENT_TYPE: ${WP_ENVIRONMENT_TYPE:-local}
+      FS_METHOD: ${FS_METHOD:-direct}
+      WORDPRESS_CONFIG_EXTRA: |
+        if ($$v = getenv_docker('WP_ENVIRONMENT_TYPE', '')) { define('WP_ENVIRONMENT_TYPE', $$v); }
+        if ($$v = getenv_docker('FS_METHOD', ''))           { define('FS_METHOD', $$v); }
     ports:
-      - "9010:80"
+      - "${WEB_SERVICE_PORT}:80"
 volumes:
   wordpress-db:

@@ -1,13 +1,11 @@
-FROM wordpress:latest
+ARG WORDPRESS_IMAGE_TAG=latest
+FROM wordpress:${WORDPRESS_IMAGE_TAG}
 
-# If set, forces a specific WordPress version. 
+# If set, forces a specific WordPress version.
 # Useful for testing specific WP versions that are not included in the current image.
 # ENV WORDPRESS_VERSION=6.7.1
 
 ENV DEBIAN_FRONTEND=noninteractive
-
-# Set your local WordPress installation url
-ENV LOCAL_DOMAIN=http://yourlocalwordpressdomain.com 
 
 RUN apt-get update -qq && \
   apt-get install -y \

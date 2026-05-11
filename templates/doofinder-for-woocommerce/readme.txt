@@ -1,11 +1,11 @@
 === DOOFINDER Search and Discovery for WP & WooCommerce ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.15.0
+Version: ${PLUGIN_VERSION}
 Requires at least: 5.6
 Tested up to: 6.9
 Requires PHP: 7.0
-Stable tag: 2.15.0
+Stable tag: ${PLUGIN_VERSION}
 License: MIT
 License URI: https://opensource.org/licenses/MIT
 

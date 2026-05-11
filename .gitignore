@@ -25,3 +25,7 @@ build
 .vscode/sftp.json
 
 /html
+
+.env.local
+backup_*.sql.gz
+wordpress-dump-*.sql
