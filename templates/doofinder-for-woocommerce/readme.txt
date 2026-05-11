@@ -126,6 +126,13 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 2.15.0 =
+- Added Makefile-driven local development.
+- Added support for e2e testing.
+
+= 2.14.1 =
+- Improved error message when an store exist in a different account.
+
 = 2.14.0 =
 - Updated the store industries list.
 
