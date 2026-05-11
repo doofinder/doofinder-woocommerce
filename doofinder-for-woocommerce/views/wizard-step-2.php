@@ -24,5 +24,7 @@ use Doofinder\WP\Setup_Wizard;
 </div>
 
 <div class="errors-wrapper doofinder-for-wc-indexing-error" style="display:none">
-	<h3 style="color: #cc0000;"><?php esc_html_e( 'An error ocurred while connecting with doofinder', 'wordpress-doofinder' ); ?> :</h3>
+	<h3 style="color: #cc0000;"><?php esc_html_e( 'An error occurred during the installation process.', 'wordpress-doofinder' ); ?></h3>
+	<p style="color: #cc0000;"><?php esc_html_e( 'Please contact our support team on', 'wordpress-doofinder' ); ?> 
+	<a href="https://admin.doofinder.com/admin/support" target="_blank" rel="noopener noreferrer">https://admin.doofinder.com/admin/support</a></p>
 </div>
