@@ -56,7 +56,7 @@ This repository is optimized for local development using a **Makefile** and **Do
 **`.env`** sits at the repo root and powers both your **Docker** stack and the **generated plugin source files** (what `doofinder-configure` produces from `templates/`). It ships with sensible defaults — set your `BASE_URL`, bump `PLUGIN_VERSION` for releases, then `make init`. Optional per-developer overrides go in **`.env.local`** (gitignored), which loads on top of `.env`.
 
 > [!NOTE]
-> `make doofinder-configure` regenerates `doofinder-for-woocommerce/doofinder-for-woocommerce.php`, `readme.txt`, and `includes/class-constants.php` from `templates/`. CI fails on drift — always run it after editing templates or `.env`, and commit the result.
+> `make doofinder-configure` regenerates `doofinder-for-woocommerce/doofinder-for-woocommerce.php`, `readme.txt`, and `includes/class-doofinder-constants.php` from `templates/`. CI fails on drift — always run it after editing templates or `.env`, and commit the result.
 
 ### Environment and shop access
 
