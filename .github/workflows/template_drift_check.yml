@@ -31,7 +31,7 @@ jobs:
           set -a
           source .env
           set +a
-          ENVSUBST_VARS='$PLUGIN_VERSION,$DOOFINDER_PLUGINS_URL_FORMAT,$DOOFINDER_API_URL_FORMAT'
+          ENVSUBST_VARS='$PLUGIN_VERSION,$DOOFINDER_PLUGINS_URL_FORMAT,$DOOFINDER_API_URL_FORMAT,$DOOFINDER_LAYER_SCRIPT_URL'
           mkdir -p .drift-out/includes
           envsubst "$ENVSUBST_VARS" < templates/doofinder-for-woocommerce/doofinder-for-woocommerce.php > .drift-out/doofinder-for-woocommerce.php
           envsubst "$ENVSUBST_VARS" < templates/doofinder-for-woocommerce/readme.txt                       > .drift-out/readme.txt
