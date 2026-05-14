@@ -1,0 +1,51 @@
+name: Auto-tag on version change
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  create-tag:
+    name: Create version tag if version changed
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from plugin file
+        id: version
+        run: |
+          version=`gawk 'match($0, /Version: (.*)/, ary) {print ary[1]}' doofinder-for-woocommerce/readme.txt`
+          echo "tag=v${version}" >> "$GITHUB_OUTPUT"
+          echo "Detected version: v${version}"
+
+      - name: Check if tag already exists
+        id: check
+        run: |
+          if git ls-remote --tags origin "${{ steps.version.outputs.tag }}" | grep -q .; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Tag ${{ steps.version.outputs.tag }} already exists — skipping."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "Tag ${{ steps.version.outputs.tag }} does not exist — will create."
+          fi
+
+      - name: Create and push tag
+        if: steps.check.outputs.exists == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "${{ steps.version.outputs.tag }}"
+          git push origin "${{ steps.version.outputs.tag }}"
+
+      - name: Trigger release workflow
+        if: steps.check.outputs.exists == 'false'
+        run: gh workflow run create_release.yml --ref "${{ steps.version.outputs.tag }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
