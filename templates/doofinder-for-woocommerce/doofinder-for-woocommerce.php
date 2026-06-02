@@ -405,7 +405,9 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 					$lang          = ( $multilanguage->get_current_language() === $multilanguage->get_base_language() ) ? '' : $multilanguage->get_current_language();
 					$status        = Settings::get_indexing_status( $lang );
 
-					if ( Index_Status_Handler::is_indexing_status_timed_out( $lang ) ) {
+					// Only the 'processing' status can time out; terminal statuses
+					// such as 'failed' or 'processed' must be reported as-is.
+					if ( 'processing' === $status && Index_Status_Handler::is_indexing_status_timed_out( $lang ) ) {
 						Setup_Wizard::dismiss_indexing_notice();
 						$status = 'timed-out';
 						Settings::set_indexing_status( $status, $lang );

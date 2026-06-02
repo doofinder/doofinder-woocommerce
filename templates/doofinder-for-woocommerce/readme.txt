@@ -126,6 +126,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 2.15.2 =
+- Fixed the indexing status banner so the spinner stops when an indexation failure is reported.
+
 = 2.15.1 =
 - Fixed bug that didn't allow for the builds to be finished.
 
