@@ -14,7 +14,7 @@ jQuery(function () {
           $(".indexation-status").toggleClass("processing processed");
           clearInterval(indexingCheckInterval);
         }
-        if (response.status === "timed-out") {
+        if (response.status === "timed-out" || response.status === "failed") {
           $("#df-indexing-status").remove();
           clearInterval(indexingCheckInterval);
         }

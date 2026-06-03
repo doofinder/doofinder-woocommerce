@@ -3,7 +3,7 @@
  * Plugin Name: DOOFINDER Search and Discovery for WP & WooCommerce
  * License: MIT
  * License URI: https://opensource.org/licenses/MIT
- * Version: 2.15.1
+ * Version: 2.15.2
  * Requires at least: 5.6
  * Requires PHP: 7.0
  * Author: Doofinder
@@ -44,7 +44,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 		 * @var string
 		 */
 
-		public static $version = '2.15.1';
+		public static $version = '2.15.2';
 
 		/**
 		 * The only instance of Doofinder_For_WordPress
@@ -405,7 +405,9 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 					$lang          = ( $multilanguage->get_current_language() === $multilanguage->get_base_language() ) ? '' : $multilanguage->get_current_language();
 					$status        = Settings::get_indexing_status( $lang );
 
-					if ( Index_Status_Handler::is_indexing_status_timed_out( $lang ) ) {
+					// Only the 'processing' status can time out; terminal statuses
+					// such as 'failed' or 'processed' must be reported as-is.
+					if ( 'processing' === $status && Index_Status_Handler::is_indexing_status_timed_out( $lang ) ) {
 						Setup_Wizard::dismiss_indexing_notice();
 						$status = 'timed-out';
 						Settings::set_indexing_status( $status, $lang );

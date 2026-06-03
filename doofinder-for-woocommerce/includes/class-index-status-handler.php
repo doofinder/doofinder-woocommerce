@@ -69,12 +69,17 @@ class Index_Status_Handler {
 			);
 		}
 
+		$multilanguage = Multilanguage::instance();
+		$lang          = ( $multilanguage->get_current_language() === $multilanguage->get_base_language() ) ? '' : $multilanguage->get_current_language();
+
 		$error_message = $request->get_param( 'message' );
 		if ( ! empty( $error_message ) && $error_message !== $valid_message ) {
 			$notice_title   = __( 'An error has occurred while indexing your catalog', 'wordpress-doofinder' );
 			$notice_content = __( 'To obtain further details, you can check the indexing results by accessing the "Indices" section in your Doofinder admin panel. If the problem persists, please contact our support team at <a href="mailto:support@doofinder.com">support@doofinder.com</a>', 'wordpress-doofinder' );
 			// Dismiss the indexing notice as it has already finished.
 			Setup_Wizard::dismiss_indexing_notice();
+			// Persist a terminal status so the spinner stops and the notice does not reappear.
+			Settings::set_indexing_status( 'failed', $lang );
 			Admin_Notices::add_notice( 'indexing-status-failed', $notice_title, $notice_content, 'error', null, '', true );
 
 			return new WP_REST_Response(
@@ -86,8 +91,6 @@ class Index_Status_Handler {
 			);
 		}
 
-		$multilanguage = Multilanguage::instance();
-		$lang          = ( $multilanguage->get_current_language() === $multilanguage->get_base_language() ) ? '' : $multilanguage->get_current_language();
 		// Hide the indexing notice.
 		Setup_Wizard::dismiss_indexing_notice();
 		Settings::set_indexing_status( 'processed', $lang );
