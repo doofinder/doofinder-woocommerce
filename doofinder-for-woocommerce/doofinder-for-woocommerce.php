@@ -3,7 +3,7 @@
  * Plugin Name: DOOFINDER Search and Discovery for WP & WooCommerce
  * License: MIT
  * License URI: https://opensource.org/licenses/MIT
- * Version: 2.15.2
+ * Version: 2.15.3
  * Requires at least: 5.6
  * Requires PHP: 7.0
  * Author: Doofinder
