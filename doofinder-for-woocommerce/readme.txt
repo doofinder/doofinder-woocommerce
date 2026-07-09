@@ -125,8 +125,9 @@ For in-depth insights into Doofinder and its features, check out our comprehensi
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/doofinder-for-woocommerce)
 
 == Changelog ==
+
 = 2.15.3 =
-- Fixed custom attributes overwriting product data.
+- Fixed custom attributes overwriting authoritative product data returned by the WooCommerce REST API.
 
 = 2.15.2 =
 - Fixed the indexing status banner so the spinner stops when an indexation failure is reported.
