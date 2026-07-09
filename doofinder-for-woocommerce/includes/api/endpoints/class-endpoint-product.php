@@ -408,7 +408,13 @@ class Endpoint_Product {
 			return $data;
 		}
 
-		$data_with_attr = array_merge( $data, self::get_custom_attributes( $data['id'], $custom_attr ) );
+		// `$data` (already fetched from the WooCommerce REST API) wins on key collisions.
+		// `get_custom_attributes()` falls back to raw postmeta (see get_all_attributes()),
+		// which can include WooCommerce's own internal/legacy meta keys (e.g. a stale
+		// `_featured` row); that fallback must only fill in fields the REST response didn't
+		// already provide (e.g. `length`/`width`/`height`, which WC nests under `dimensions`
+		// instead of returning as flat fields), never overwrite an authoritative REST value.
+		$data_with_attr = array_merge( self::get_custom_attributes( $data['id'], $custom_attr ), $data );
 
 		foreach ( $custom_attr as $custom ) {
 			$attribute_key = $custom['attribute'];
