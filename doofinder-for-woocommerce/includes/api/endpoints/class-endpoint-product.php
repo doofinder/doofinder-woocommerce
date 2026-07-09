@@ -407,7 +407,7 @@ class Endpoint_Product {
 		if ( empty( $custom_attr ) ) {
 			return $data;
 		}
-		
+
 		$data_with_attr = array_merge( self::get_custom_attributes( $data['id'], $custom_attr ), $data );
 
 		foreach ( $custom_attr as $custom ) {
