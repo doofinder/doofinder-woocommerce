@@ -126,6 +126,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 2.15.3 =
+- Fixed custom attributes overwriting authoritative product data returned by the WooCommerce REST API.
+
 = 2.15.2 =
 - Fixed the indexing status banner so the spinner stops when an indexation failure is reported.
 
