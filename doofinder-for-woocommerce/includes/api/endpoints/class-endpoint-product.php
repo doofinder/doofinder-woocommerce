@@ -407,9 +407,7 @@ class Endpoint_Product {
 		if ( empty( $custom_attr ) ) {
 			return $data;
 		}
-
-		// $data comes from the REST API and must win on key collisions; custom attributes
-		// only fill in gaps (e.g. dimensions), since their postmeta fallback can be stale.
+		
 		$data_with_attr = array_merge( self::get_custom_attributes( $data['id'], $custom_attr ), $data );
 
 		foreach ( $custom_attr as $custom ) {
