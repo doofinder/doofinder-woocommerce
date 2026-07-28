@@ -170,7 +170,7 @@ trait Accessors {
 	}
 
 	/**
-	 * Retrieve the Doofinder installation ID (the "store ID" used by dooplugins).
+	 * Retrieve the Doofinder installation ID (the "store ID" used by Dooplugins).
 	 *
 	 * It's not persisted as its own option; it's extracted from the layer script
 	 * already stored in the "js_layer" option, which always contains it, either as
