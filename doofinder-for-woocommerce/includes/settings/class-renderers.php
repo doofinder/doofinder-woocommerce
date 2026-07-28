@@ -340,17 +340,13 @@ trait Renderers {
 													?>
 				value="<?php echo esc_attr( htmlspecialchars( $saved_value ) ); ?>" <?php endif; ?>>
 
-			<?php if ( ! $saved_value ) : ?>
-				<button type="button" id="doofinder-create-search-engine" class="button-secondary" style="white-space: nowrap;" data-lang="<?php echo esc_attr( (string) $this->language->get_active_language() ); ?>">
-					<?php esc_html_e( 'Create Search Engine', 'wordpress-doofinder' ); ?>
-				</button>
-				<span class="spinner" id="doofinder-create-search-engine-spinner" style="float: none; margin: 0;"></span>
-			<?php endif; ?>
+			<button type="button" id="doofinder-create-search-engine" class="button-secondary" style="white-space: nowrap;" data-lang="<?php echo esc_attr( (string) $this->language->get_active_language() ); ?>" <?php disabled( (bool) $saved_value ); ?>>
+				<?php esc_html_e( 'Create Search Engine', 'wordpress-doofinder' ); ?>
+			</button>
+			<span class="spinner" id="doofinder-create-search-engine-spinner" style="float: none; margin: 0;"></span>
 		</div>
 
-		<?php if ( ! $saved_value ) : ?>
-			<span class="create-search-engine-result-wrapper"></span>
-		<?php endif; ?>
+		<span class="create-search-engine-result-wrapper"></span>
 
 		<?php
 	}

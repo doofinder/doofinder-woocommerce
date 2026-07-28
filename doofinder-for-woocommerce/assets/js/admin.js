@@ -125,7 +125,7 @@ jQuery(function () {
             .empty()
             .append("Search Engine created!")
             .fadeIn();
-          create_search_engine_btn.remove();
+          create_search_engine_btn.attr("disabled", true);
           return;
         }
 
