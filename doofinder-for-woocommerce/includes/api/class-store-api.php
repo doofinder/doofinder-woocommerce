@@ -198,7 +198,7 @@ class Store_Api {
 
 		$response = $this->send_request( 'install/search-engine', $payload, true );
 
-		return is_array( $response ) ? ( $response['hashid'] ?? null ) : null;
+		return ! empty( $response['hashid'] ) ? $response['hashid'] : null;
 	}
 
 	/**
