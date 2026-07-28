@@ -170,6 +170,30 @@ trait Accessors {
 	}
 
 	/**
+	 * Retrieve the Doofinder installation ID (the "store ID" used by dooplugins).
+	 *
+	 * It's not persisted as its own option; it's extracted from the layer script
+	 * already stored in the "js_layer" option, which always contains it, either as
+	 * part of the single-script URL or, for stores not yet migrated to the single
+	 * script, as an inline `installationId` value.
+	 *
+	 * @return string
+	 */
+	public static function get_installation_id() {
+		$script = self::get_js_layer();
+
+		if ( preg_match( '/-config\.doofinder\.com\/2\.x\/(?P<installation_id>[a-zA-Z0-9-]+)\.js/', $script, $matches ) ) {
+			return $matches['installation_id'];
+		}
+
+		if ( preg_match( "/installationId: '(?P<installation_id>[a-z0-9-]+)'/", $script, $matches ) ) {
+			return $matches['installation_id'];
+		}
+
+		return '';
+	}
+
+	/**
 	 * Retrieve the chosen update on save option.
 	 *
 	 * Just an alias for "get_option" to avoid repeating the string

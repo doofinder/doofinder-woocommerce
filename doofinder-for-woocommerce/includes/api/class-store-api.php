@@ -168,6 +168,40 @@ class Store_Api {
 	}
 
 	/**
+	 * Creates a single missing Search Engine for a language via the universal
+	 * install endpoint, without resending (and reprocessing) the whole store.
+	 *
+	 * @param array|null $lang Language data, as returned by Multilanguage::get_languages().
+	 *                         Null when there's no multilanguage plugin active, in which
+	 *                         case the site's primary language is used instead.
+	 *
+	 * @return string|null The new Search Engine hashid, or null on failure.
+	 */
+	public function create_search_engine_for_language( $lang = null ) {
+		$locale        = Helpers::format_locale_to_hyphen( $lang['locale'] ?? $this->get_primary_language() );
+		$language_code = Helpers::get_language_from_locale( $locale );
+		$home_url      = $this->language->get_home_url( $language_code );
+
+		$payload = array(
+			'store_id'     => Settings::get_installation_id(),
+			'language'     => $language_code,
+			'locale'       => $locale,
+			'currency'     => is_plugin_active( 'woocommerce/woocommerce.php' ) ? get_woocommerce_currency() : 'EUR',
+			'callback_url' => $this->build_callback_url(
+				$home_url,
+				'/?rest_route=/doofinder/v1/index-status&token=' . $this->api_key
+			),
+		);
+
+		$this->log->log( 'Creating Search Engine for language: ' );
+		$this->log->log( $payload );
+
+		$response = $this->send_request( 'install/search-engine', $payload, true );
+
+		return is_array( $response ) ? ( $response['hashid'] ?? null ) : null;
+	}
+
+	/**
 	 * Send a POST request with the given $body to the given $endpoint.
 	 *
 	 * @param string $endpoint The endpoint url.

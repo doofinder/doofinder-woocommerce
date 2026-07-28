@@ -102,6 +102,56 @@ jQuery(function () {
   let reset_credentials_btn = $("#doofinder-reset-credentials");
   reset_credentials_btn.on("click", ResetCredentialsHandler);
 
+  let CreateSearchEngineHandler = function () {
+    create_search_engine_btn.attr("disabled", true);
+    create_search_engine_spinner.addClass("is-active");
+
+    $.ajax({
+      type: "post",
+      dataType: "json",
+      url: ajaxurl,
+      data: {
+        action: "doofinder_create_search_engine",
+        lang: create_search_engine_btn.data("lang") || "",
+        nonce: Doofinder.nonce
+      },
+      success: function (response) {
+        create_search_engine_spinner.removeClass("is-active");
+
+        if (response.success && response.data && response.data.hashid) {
+          $("#doofinder-search-engine-hash").val(response.data.hashid);
+          $(".create-search-engine-result-wrapper")
+            .hide()
+            .empty()
+            .append("Search Engine created!")
+            .fadeIn();
+          create_search_engine_btn.remove();
+          return;
+        }
+
+        $(".create-search-engine-result-wrapper")
+          .hide()
+          .empty()
+          .append("Error creating the Search Engine, please try again later")
+          .fadeIn();
+        create_search_engine_btn.attr("disabled", false);
+      },
+      error: function () {
+        create_search_engine_spinner.removeClass("is-active");
+        $(".create-search-engine-result-wrapper")
+          .hide()
+          .empty()
+          .append("Error creating the Search Engine, please try again later")
+          .fadeIn();
+        create_search_engine_btn.attr("disabled", false);
+      },
+    });
+  };
+
+  let create_search_engine_btn = $("#doofinder-create-search-engine");
+  let create_search_engine_spinner = $("#doofinder-create-search-engine-spinner");
+  create_search_engine_btn.on("click", CreateSearchEngineHandler);
+
   let CustomAttributesHandler = {
     valid: true,
     init: function () {

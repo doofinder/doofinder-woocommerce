@@ -333,11 +333,24 @@ trait Renderers {
 		?>
 												</span></span>
 
-		<input type="text" name="<?php echo esc_attr( $option_name ); ?>" class="widefat" 
-											<?php
-											if ( $saved_value ) :
-												?>
-			value="<?php echo esc_attr( htmlspecialchars( $saved_value ) ); ?>" <?php endif; ?>>
+		<div style="display: flex; align-items: center; gap: 8px;">
+			<input type="text" name="<?php echo esc_attr( $option_name ); ?>" id="doofinder-search-engine-hash" class="widefat" style="flex: 1;"
+												<?php
+												if ( $saved_value ) :
+													?>
+				value="<?php echo esc_attr( htmlspecialchars( $saved_value ) ); ?>" <?php endif; ?>>
+
+			<?php if ( ! $saved_value ) : ?>
+				<button type="button" id="doofinder-create-search-engine" class="button-secondary" style="white-space: nowrap;" data-lang="<?php echo esc_attr( (string) $this->language->get_active_language() ); ?>">
+					<?php esc_html_e( 'Create Search Engine', 'wordpress-doofinder' ); ?>
+				</button>
+				<span class="spinner" id="doofinder-create-search-engine-spinner" style="float: none; margin: 0;"></span>
+			<?php endif; ?>
+		</div>
+
+		<?php if ( ! $saved_value ) : ?>
+			<span class="create-search-engine-result-wrapper"></span>
+		<?php endif; ?>
 
 		<?php
 	}
