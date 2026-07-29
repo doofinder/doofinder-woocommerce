@@ -119,13 +119,14 @@ jQuery(function () {
         create_search_engine_spinner.removeClass("is-active");
 
         if (response.success && response.data && response.data.hashid) {
-          $("#doofinder-search-engine-hash").val(response.data.hashid);
+          $("#doofinder-search-engine-hash").val(response.data.hashid).attr("readonly", true);
           $(".create-search-engine-result-wrapper")
             .hide()
             .empty()
             .append("Search Engine created!")
             .fadeIn();
-          create_search_engine_btn.attr("disabled", true);
+          create_search_engine_btn.remove();
+          create_search_engine_spinner.remove();
           return;
         }
 
