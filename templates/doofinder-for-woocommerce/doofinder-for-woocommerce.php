@@ -116,8 +116,8 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 					Update_On_Save::init();
 					// Initialize reset credentials.
 					Reset_Credentials::init();
-					// Initialize the "Create Search Engine" button handler.
-					Search_Engine_Creator::init();
+					// Initialize Search Engine related admin operations.
+					Search_Engine::init();
 
 					// Init admin functionalities.
 					if ( is_admin() ) {

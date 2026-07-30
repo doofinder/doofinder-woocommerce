@@ -1,6 +1,6 @@
 <?php
 /**
- * DooFinder Search_Engine_Creator methods.
+ * DooFinder Search_Engine methods.
  *
  * @package Doofinder\WP
  */
@@ -12,12 +12,13 @@ use Doofinder\WP\Multilanguage\Multilanguage;
 use WP_Http;
 
 /**
- * Search_Engine_Creator Class.
+ * Search_Engine Class.
  *
- * Handles the "Create Search Engine" button shown in the settings page next
- * to the Search Engine hash field, for languages that don't have one yet.
+ * Groups Search Engine related admin operations. Currently only handles the
+ * "Create Search Engine" button shown in the settings page next to the
+ * Search Engine hash field, for languages that don't have one yet.
  */
-class Search_Engine_Creator {
+class Search_Engine {
 
 	/**
 	 * Initializes the action hooks.
