@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Doofinder_Constants {
 
-	const VERSION            = '2.15.3';
+	const VERSION            = '2.16.0';
 	const PLUGINS_URL_FORMAT = 'https://%splugins.doofinder.com';
 	const API_URL_FORMAT     = 'https://%sadmin.doofinder.com';
 }
