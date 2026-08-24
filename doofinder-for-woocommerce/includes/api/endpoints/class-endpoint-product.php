@@ -62,6 +62,15 @@ class Endpoint_Product {
 	// Prefix every metafield gets, so its key can be kept verbatim without colliding with anything else.
 	const META_PREFIX = 'meta_';
 
+	// WooCommerce's own product taxonomies, left out of the emitted ones.
+	const EXCLUDED_TAXONOMIES = array(
+		'product_cat',
+		'product_tag',
+		'product_type',
+		'product_visibility',
+		'product_shipping_class',
+	);
+
 	/**
 	 * Initialize the custom product endpoint.
 	 *
@@ -203,7 +212,7 @@ class Endpoint_Product {
 				$filtered_product_data                      = self::get_meta_attributes( $filtered_product_data, $custom_attr );
 				$filtered_product_data['creation_date']     = gmdate( 'Y-m-d\TH:i:s\Z', strtotime( $filtered_product_data['date_created'] ) );
 				$taxonomy_lookup_id                         = ( 'variation' === ( $filtered_product_data['type'] ?? '' ) && ! empty( $filtered_product_data['parent_id'] ) ) ? $filtered_product_data['parent_id'] : $filtered_product_data['id'];
-				$filtered_product_data                      = array_merge( $filtered_product_data, self::get_taxonomy_custom_attributes( $taxonomy_lookup_id, $custom_attr ) );
+				$filtered_product_data                      = array_merge( $filtered_product_data, self::get_taxonomy_attributes( $taxonomy_lookup_id ) );
 				$filtered_product_data                      = self::apply_legacy_aliases( $filtered_product_data, $custom_attr );
 				$filtered_product_data                      = self::clean_fields( $filtered_product_data );
 
@@ -1207,37 +1216,65 @@ class Endpoint_Product {
 	}
 
 	/**
-	 * Get product taxonomy terms for the taxonomies the user has configured in Custom Attributes.
+	 * Get the terms of every product taxonomy as a flat field.
 	 *
-	 * Only processes entries with type 'taxonomy'. For variations, pass the parent product ID
-	 * so taxonomies are correctly retrieved.
+	 * The terms of all the taxonomies are fetched in a single query: asking for them one
+	 * taxonomy at a time costs one query per taxonomy per product, which grows with the number
+	 * of taxonomies the shop has.
 	 *
-	 * @param int   $product_id  The product (or parent) ID to look up taxonomy terms for.
-	 * @param array $custom_attr The custom attributes configuration from Settings::get_custom_attributes().
+	 * For variations, pass the parent product ID so taxonomies are correctly retrieved.
+	 *
+	 * @param int $product_id The product (or parent) ID to look up taxonomy terms for.
 	 * @return array Associative array of field => string[] term names, ready to merge into product data.
 	 */
-	private static function get_taxonomy_custom_attributes( $product_id, $custom_attr ) {
+	private static function get_taxonomy_attributes( $product_id ) {
+		$taxonomies = self::get_product_taxonomies();
+
+		if ( empty( $taxonomies ) ) {
+			return array();
+		}
+
+		$terms = wp_get_object_terms( $product_id, $taxonomies );
+
+		if ( is_wp_error( $terms ) || empty( $terms ) ) {
+			return array();
+		}
+
 		$result = array();
 
-		foreach ( $custom_attr as $attr ) {
-			if ( 'taxonomy' !== $attr['type'] ) {
-				continue;
-			}
-
-			// Stored attribute is the dropdown key (e.g. 'taxonomy_series'); strip the prefix to get the slug.
-			$taxonomy_slug = str_starts_with( $attr['attribute'], 'taxonomy_' )
-				? substr( $attr['attribute'], strlen( 'taxonomy_' ) )
-				: $attr['attribute'];
-
-			$terms = wp_get_object_terms( $product_id, $taxonomy_slug, array( 'fields' => 'names' ) );
-			if ( is_wp_error( $terms ) || empty( $terms ) ) {
-				continue;
-			}
-
-			$result[ $attr['field'] ] = $terms;
+		foreach ( $terms as $term ) {
+			$result[ self::reserved_safe_name( $term->taxonomy ) ][] = $term->name;
 		}
 
 		return $result;
+	}
+
+	/**
+	 * List the product taxonomies to emit, resolved once per request.
+	 *
+	 * WooCommerce's own taxonomies are left out: categories and tags have their own canonical
+	 * fields, the `pa_` ones are already emitted as attributes, and the rest are internal.
+	 *
+	 * @return string[] The taxonomy slugs.
+	 */
+	private static function get_product_taxonomies() {
+		static $taxonomies = null;
+
+		if ( null !== $taxonomies ) {
+			return $taxonomies;
+		}
+
+		$taxonomies = array();
+
+		foreach ( get_object_taxonomies( 'product' ) as $slug ) {
+			if ( str_starts_with( $slug, 'pa_' ) || in_array( $slug, self::EXCLUDED_TAXONOMIES, true ) ) {
+				continue;
+			}
+
+			$taxonomies[] = $slug;
+		}
+
+		return $taxonomies;
 	}
 
 	/**
