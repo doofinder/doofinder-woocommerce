@@ -20,41 +20,23 @@ use Doofinder\WP\Thumbnail;
  */
 class Endpoint_Product {
 
-	const PER_PAGE = 100;
-	const CONTEXT  = 'doofinder/v1';
-	const ENDPOINT = '/product';
-	const FIELDS   = array(
+	const PER_PAGE          = 100;
+	const CONTEXT           = 'doofinder/v1';
+	const ENDPOINT          = '/product';
+	const STRUCTURAL_FIELDS = array(
+		'image',
+		'gallery_image_ids',
+		'images',
 		'attributes',
-		'average_rating',
-		'best_price',
-		'catalog_visibility',
-		'categories',
-		'date_created',
-		'description',
-		'df_group_leader',
-		'df_indexable',
-		'df_variants_information',
-		'group_id',
-		'id',
-		'image_link',
-		'images_links',
-		'link',
 		'meta_data',
-		'name',
-		'parent_id',
-		'permalink',
-		'price',
-		'purchasable',
-		'regular_price',
-		'sale_price',
-		'short_description',
-		'sku',
-		'status',
-		'slug',
-		'stock_quantity',
-		'stock_status',
-		'tags',
-		'type',
+		'df_price',
+		'df_sale_price',
+		'df_regular_price',
+		'df_image_link',
+		'default_attributes',
+		'downloads',
+		'_links',
+		'post_password',
 	);
 
 	const TAXONOMY = 'product_cat';
@@ -129,14 +111,11 @@ class Endpoint_Product {
 	public static function custom_product_endpoint( $request, $config_request = false ) {
 		ob_start();
 
-		$custom_attr        = Settings::get_custom_attributes();
-		$custom_attr_fields = self::get_field_attributes( $custom_attr );
-		$multilanguage      = Multilanguage::instance();
+		$custom_attr   = Settings::get_custom_attributes();
+		$multilanguage = Multilanguage::instance();
 
 		if ( ! $config_request ) {
 			Endpoints::check_secure_token();
-
-			$fields = ( 'all' === $request->get_param( 'fields' ) ) ? array() : array_merge( self::get_fields(), array_values( $custom_attr_fields ) );
 
 			$locale_or_lang_code = $request->get_param( 'lang' ) ?? '';
 			$lang_code           = Helpers::apply_locale_to_rest_context( $locale_or_lang_code );
@@ -147,7 +126,6 @@ class Endpoint_Product {
 				'ids'      => $request->get_param( 'ids' ) ?? '',
 				'orderby'  => $request->get_param( 'orderby' ) ?? 'id',
 				'order'    => $request->get_param( 'order' ) ?? 'desc',
-				'fields'   => $fields,
 			);
 
 			if ( $multilanguage->is_active() ) {
@@ -155,24 +133,14 @@ class Endpoint_Product {
 				$lang_code              = Helpers::apply_locale_to_rest_context( $locale_or_lang_code );
 				$config_request['lang'] = $lang_code;
 			}
-		} else {
-			// Update on save.
-
-			if ( $multilanguage->is_active() ) {
-				// Apply locale context even when config_request is provided.
-				$locale_or_lang_code = $config_request['lang'] ?? '';
-				Helpers::apply_locale_to_rest_context( $locale_or_lang_code );
-			}
-
-			$fields_param             = $config_request['fields'] ?? '';
-			$fields                   = ! empty( $fields_param ) ? explode( ',', $fields_param ) : array();
-			$fields                   = array_merge( $fields, array_values( $custom_attr_fields ) );
-			$config_request['fields'] = $fields;
+		} elseif ( $multilanguage->is_active() ) {
+			// Update on save: apply locale context even when config_request is provided.
+			$locale_or_lang_code = $config_request['lang'] ?? '';
+			Helpers::apply_locale_to_rest_context( $locale_or_lang_code );
 		}
 
 		// Retrieve the original product data.
 		$products          = self::get_products( $config_request );
-		$custom_attr       = Settings::get_custom_attributes();
 		$modified_products = array();
 
 		// Process and filter product data.
@@ -189,8 +157,7 @@ class Endpoint_Product {
 
 				$indexable_opt = get_post_meta( $product_data['id'], '_doofinder_for_wp_indexing_visibility', true );
 
-				// Filter fields.
-				$filtered_product_data = ! empty( $fields ) ? array_intersect_key( $product_data, array_flip( $fields ) ) : $product_data;
+				$filtered_product_data = $product_data;
 
 				$filtered_product_data['df_indexable'] = $indexable_opt;
 				$filtered_product_data                 = self::get_category_merchandising( $filtered_product_data );
@@ -213,6 +180,7 @@ class Endpoint_Product {
 				$filtered_product_data['creation_date']     = gmdate( 'Y-m-d\TH:i:s\Z', strtotime( $filtered_product_data['date_created'] ) );
 				$taxonomy_lookup_id                         = ( 'variation' === ( $filtered_product_data['type'] ?? '' ) && ! empty( $filtered_product_data['parent_id'] ) ) ? $filtered_product_data['parent_id'] : $filtered_product_data['id'];
 				$filtered_product_data                      = array_merge( $filtered_product_data, self::get_taxonomy_attributes( $taxonomy_lookup_id ) );
+				$filtered_product_data                      = self::flatten_structures( $filtered_product_data );
 				$filtered_product_data                      = self::apply_legacy_aliases( $filtered_product_data, $custom_attr );
 				$filtered_product_data                      = self::clean_fields( $filtered_product_data );
 
@@ -227,31 +195,6 @@ class Endpoint_Product {
 		}
 		// Return the modified product data as a response.
 		return new WP_REST_Response( $modified_products );
-	}
-
-	/**
-	 * Get the array of custom attributes name fields.
-	 *
-	 * @param array $custom_attrs Array of custom attributes.
-	 *
-	 * @return array The array of fields.
-	 */
-	public static function get_field_attributes( $custom_attrs ) {
-
-		$custom_fields = array();
-		foreach ( $custom_attrs as $custom_attr ) {
-			$custom_fields[ $custom_attr['field'] ] = $custom_attr['attribute'];
-		}
-		return $custom_fields;
-	}
-
-	/**
-	 * Get the array of fields.
-	 *
-	 * @return array The array of fields.
-	 */
-	public static function get_fields() {
-		return self::FIELDS;
 	}
 
 	/**
@@ -342,9 +285,8 @@ class Endpoint_Product {
 	public static function get_data( $ids, $lang ) {
 
 		$request_params = array(
-			'ids'    => implode( ',', $ids ),
-			'fields' => implode( ',', self::get_fields() ),
-			'lang'   => $lang,
+			'ids'  => implode( ',', $ids ),
+			'lang' => $lang,
 		);
 
 		$items = self::custom_product_endpoint( false, $request_params )->data;
@@ -704,7 +646,6 @@ class Endpoint_Product {
 				'per_page' => $config['per_page'] ?? self::PER_PAGE,
 				'lang'     => $config['lang'] ?? '',
 				'status'   => 'publish',
-				'_fields'  => $config['fields'],
 				'include'  => $config['ids'],
 				'orderby'  => $config['orderby'] ?? 'id',
 				'order'    => $config['order'] ?? 'desc',
@@ -911,13 +852,44 @@ class Endpoint_Product {
 		$product['title'] = $product['name'];
 		$product['link']  = $product['permalink'];
 
-		unset( $product['attributes'] );
+		$product = array_diff_key( $product, array_flip( self::STRUCTURAL_FIELDS ) );
+
 		unset( $product['name'] );
 		unset( $product['permalink'] );
 		unset( $product['date_created'] );
 
 		if ( empty( $product['parent_id'] ) ) {
 			unset( $product['parent_id'] );
+		}
+
+		return $product;
+	}
+
+	/**
+	 * Flatten the nested structures WooCommerce returns into indexable fields.
+	 *
+	 * `dimensions` becomes `length`/`width`/`height`, the three entries the settings dropdown
+	 * used to offer, and `brands` becomes a plain list of names.
+	 *
+	 * @param array $product The product array to process.
+	 * @return array The product with its nested structures flattened.
+	 */
+	private static function flatten_structures( $product ) {
+		if ( ! empty( $product['dimensions'] ) && is_array( $product['dimensions'] ) ) {
+			foreach ( array( 'length', 'width', 'height' ) as $dimension ) {
+				if ( isset( $product['dimensions'][ $dimension ] ) && '' !== $product['dimensions'][ $dimension ] ) {
+					$product[ self::reserved_safe_name( $dimension ) ] = $product['dimensions'][ $dimension ];
+				}
+			}
+		}
+		unset( $product['dimensions'] );
+
+		if ( ! empty( $product['brands'] ) && is_array( $product['brands'] ) ) {
+			$names = array_column( $product['brands'], 'name' );
+
+			if ( ! empty( $names ) ) {
+				$product['brands'] = $names;
+			}
 		}
 
 		return $product;
