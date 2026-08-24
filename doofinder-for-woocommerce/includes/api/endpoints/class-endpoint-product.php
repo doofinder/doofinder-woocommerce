@@ -190,7 +190,7 @@ class Endpoint_Product {
 				} else {
 					$filtered_product_data['categories'] = array();
 				}
-				$filtered_product_data               = self::merge_custom_attributes( $filtered_product_data, $custom_attr );
+				$filtered_product_data               = self::get_attributes( $filtered_product_data );
 				$filtered_product_data['image_link'] = self::get_image_link( $filtered_product_data['id'] );
 				unset( $filtered_product_data['images'] );
 				$filtered_product_data['images_links']      = self::get_images_links( $filtered_product_data );
@@ -204,6 +204,7 @@ class Endpoint_Product {
 				$filtered_product_data['creation_date']     = gmdate( 'Y-m-d\TH:i:s\Z', strtotime( $filtered_product_data['date_created'] ) );
 				$taxonomy_lookup_id                         = ( 'variation' === ( $filtered_product_data['type'] ?? '' ) && ! empty( $filtered_product_data['parent_id'] ) ) ? $filtered_product_data['parent_id'] : $filtered_product_data['id'];
 				$filtered_product_data                      = array_merge( $filtered_product_data, self::get_taxonomy_custom_attributes( $taxonomy_lookup_id, $custom_attr ) );
+				$filtered_product_data                      = self::apply_legacy_aliases( $filtered_product_data, $custom_attr );
 				$filtered_product_data                      = self::clean_fields( $filtered_product_data );
 
 				$modified_products[] = $filtered_product_data;
@@ -465,57 +466,162 @@ class Endpoint_Product {
 	}
 
 	/**
-	 * Merge custom attributes into the data.
+	 * Get every WooCommerce attribute of the product as a flat field.
 	 *
-	 * @param array $data        The data to merge into.
-	 * @param array $custom_attr The custom attributes to merge.
-	 * @return array The merged data.
+	 * Taxonomy-backed attributes are resolved to their term names.
+	 *
+	 * @param array $data The product data.
+	 * @return array The data with one field per attribute.
 	 */
-	private static function merge_custom_attributes( $data, $custom_attr ) {
-		// Filter out metafield custom attributes and variants attributes.
-		$custom_attr = array_values(
-			array_filter(
-				$custom_attr,
-				function ( $attr ) use ( $data ) {
-					return isset( $attr['type'] ) &&
-						'metafield' !== $attr['type'] && ( empty( $data['df_variants_information'] ) ||
-						! in_array( $attr['field'], $data['df_variants_information'], true ) );
-				}
-			)
-		);
+	private static function get_attributes( $data ) {
+		$wc_product = wc_get_product( $data['id'] );
 
-		if ( empty( $custom_attr ) ) {
+		if ( ! is_a( $wc_product, 'WC_Product' ) ) {
 			return $data;
 		}
 
-		$data_with_attr = array_merge( self::get_custom_attributes( $data['id'], $custom_attr ), $data );
+		$is_variation = 'variation' === ( $data['type'] ?? '' );
 
-		foreach ( $custom_attr as $custom ) {
-			$attribute_key = $custom['attribute'];
-			$field_key     = $custom['field'];
+		foreach ( $wc_product->get_attributes() as $attribute_name => $attribute_data ) {
+			$field = self::attribute_field_name( $attribute_name );
 
-			if ( ! isset( $data_with_attr[ $attribute_key ] ) ) {
+			if ( '' === $field || isset( $data[ $field ] ) ) {
 				continue;
 			}
 
-			// Exchange renamed fields.
-			$data_with_attr[ $field_key ] = $data_with_attr[ $attribute_key ];
-
-			// We delete the original key only if it has been renamed to a different alias.
-			if ( $field_key !== $attribute_key ) {
-				unset( $data_with_attr[ $attribute_key ] );
+			// On the parent this only holds the list of options, already in `df_variants_information`.
+			if ( ! $is_variation && is_object( $attribute_data ) && $attribute_data->get_variation() ) {
+				continue;
 			}
 
-			// List of value options.
-			if ( is_array( $data_with_attr[ $field_key ] ) ) {
-				$name_column = array_column( $data_with_attr[ $field_key ], 'name' );
+			$options = is_string( $attribute_data ) ? array( $attribute_data ) : $attribute_data->get_slugs();
+			$values  = array();
 
-				if ( ! empty( $name_column ) ) {
-					$data_with_attr[ $field_key ] = $name_column;
+			foreach ( $options as $option ) {
+				$option = urldecode( $option );
+
+				// If it is an attribute with taxonomy, we need to get taxonomy value.
+				if ( taxonomy_exists( $attribute_name ) ) {
+					$term   = get_term_by( 'slug', $option, $attribute_name );
+					$option = $term ? preg_replace( '/(?<!\/)\/(?!\/)/', '//', html_entity_decode( wp_strip_all_tags( $term->name ) ) ) : '';
+				}
+
+				if ( '' === $option ) {
+					continue;
+				}
+
+				$values[] = $option;
+			}
+
+			if ( empty( $values ) ) {
+				continue;
+			}
+
+			$data[ $field ] = ( 1 === count( $values ) ) ? $values[0] : $values;
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Rename the emitted fields to the names the merchant has stored.
+	 *
+	 * A merchant who configured a field has a name stored for it, and their search
+	 * configuration points at that name.
+	 *
+	 * The removal happens after every name has been copied, not inside the loop: two rows may
+	 * point at the same source, and dropping the key on the first would leave the second empty.
+	 *
+	 * @param array $product     The product array to process.
+	 * @param array $custom_attr The stored name map.
+	 * @return array The product with the stored names applied.
+	 */
+	private static function apply_legacy_aliases( $product, $custom_attr ) {
+		$renamed = array();
+
+		foreach ( $custom_attr as $attr ) {
+			$alias  = $attr['field'] ?? '';
+			$source = self::legacy_source_field_name( $attr['attribute'] ?? '', $attr['type'] ?? '' );
+
+			if ( '' === $alias || '' === $source || $alias === $source ) {
+				continue;
+			}
+
+			// Do not overwrite a field that already exists under the stored name.
+			if ( isset( $product[ $alias ] ) || ! isset( $product[ $source ] ) ) {
+				continue;
+			}
+
+			$product[ $alias ] = $product[ $source ];
+			$renamed[]         = $source;
+		}
+
+		return array_diff_key( $product, array_flip( $renamed ) );
+	}
+
+	/**
+	 * Resolve the field name a stored entry refers to.
+	 *
+	 * The settings UI stored an identifier of its own dropdown, not a field name, so it has to
+	 * be translated into the name the field is emitted under.
+	 *
+	 * @param string $source The stored `attribute` value (e.g. `wc_2`, `taxonomy_series`, a meta key).
+	 * @param string $type   The stored `type` value.
+	 * @return string The emitted field name, or an empty string when it cannot be resolved.
+	 */
+	private static function legacy_source_field_name( $source, $type ) {
+		if ( 'wc_attribute' === $type && str_starts_with( $source, 'wc_' ) ) {
+			$attribute_id = (int) substr( $source, strlen( 'wc_' ) );
+
+			foreach ( wc_get_attribute_taxonomies() as $attribute_taxonomy ) {
+				if ( (int) $attribute_taxonomy->attribute_id === $attribute_id ) {
+					return self::attribute_field_name( wc_attribute_taxonomy_name( $attribute_taxonomy->attribute_name ) );
 				}
 			}
+
+			return '';
 		}
-		return $data_with_attr;
+
+		if ( 'taxonomy' === $type ) {
+			$slug = str_starts_with( $source, 'taxonomy_' ) ? substr( $source, strlen( 'taxonomy_' ) ) : $source;
+
+			return self::reserved_safe_name( $slug );
+		}
+
+		// The dimensions entries are stored as `dimensions:length` and flattened to `length`.
+		if ( 'base_attribute' === $type && str_contains( $source, ':' ) ) {
+			return self::reserved_safe_name( substr( $source, strpos( $source, ':' ) + 1 ) );
+		}
+
+		return self::meta_field_name( $source );
+	}
+
+	/**
+	 * Get the field name to report in `df_variants_information` for a variation attribute.
+	 *
+	 * The node has to name the fields the same way they are emitted, so the stored name wins
+	 * when the merchant has one.
+	 *
+	 * @param array $product_attribute An attribute entry of the product REST response.
+	 * @param array $custom_attr       The stored name map.
+	 * @return string The field name.
+	 */
+	private static function variant_attribute_field_name( $product_attribute, $custom_attr ) {
+		$emitted = self::attribute_field_name( $product_attribute['slug'] );
+
+		foreach ( $custom_attr as $attr ) {
+			$alias = $attr['field'] ?? '';
+
+			if ( '' === $alias || $alias === $emitted ) {
+				continue;
+			}
+
+			if ( self::legacy_source_field_name( $attr['attribute'] ?? '', $attr['type'] ?? '' ) === $emitted ) {
+				return $alias;
+			}
+		}
+
+		return $emitted;
 	}
 
 
@@ -968,14 +1074,12 @@ class Endpoint_Product {
 		);
 
 		$custom_attributes_mapping = Settings::get_custom_attributes();
-		$custom_attr_fields        = self::get_field_attributes( $custom_attributes_mapping );
 
 		$variation_attributes = array();
 		foreach ( $attributes as $p_attr ) {
 			$slug = strtolower( str_replace( 'pa_', '', $p_attr['slug'] ) );
 			if ( $p_attr['variation'] && ( in_array( $slug, $product_attributes, true ) ) ) {
-				$attribute              = self::get_real_product_attribute_name( $p_attr, $custom_attr_fields );
-				$variation_attributes[] = $attribute;
+				$variation_attributes[] = self::variant_attribute_field_name( $p_attr, $custom_attributes_mapping );
 			}
 		}
 		return $variation_attributes;
