@@ -242,6 +242,71 @@ class Endpoint_Product {
 	}
 
 	/**
+	 * Prefix a field name with `custom_` when it would collide with a canonical field.
+	 *
+	 * An extracted field is named after its source, so without this one of them could be
+	 * called `price` and overwrite the canonical field of that name.
+	 *
+	 * @param string $name The candidate field name.
+	 * @return string The same name, or prefixed with `custom_` if it is a reserved one.
+	 */
+	private static function reserved_safe_name( $name ) {
+		return in_array( $name, Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES, true ) ? 'custom_' . $name : $name;
+	}
+
+	/**
+	 * Build the output field name of a WooCommerce attribute.
+	 *
+	 * Keeps the `pa_` prefix, since `pa_color` is the attribute's internal name, and URL-decodes
+	 * the key because non-ASCII attribute taxonomies are stored encoded (`pa_tama%c3%b1o`).
+	 *
+	 * @param string $attribute_name The attribute key, as returned by `WC_Product::get_attributes()`.
+	 * @return string The field name, or an empty string when the name is unusable.
+	 */
+	private static function attribute_field_name( $attribute_name ) {
+		$name = strtolower( trim( urldecode( (string) $attribute_name ) ) );
+
+		return '' === $name ? '' : self::reserved_safe_name( $name );
+	}
+
+	/**
+	 * Build the output field name of a metafield.
+	 *
+	 * Strips leading underscores so the emitted name matches the indexed one, which is also
+	 * what the merchant sees when picking the fields to index.
+	 *
+	 * @param string $meta_key The meta key, as stored in `wp_postmeta`.
+	 * @return string The field name, or an empty string when the key is unusable.
+	 */
+	private static function meta_field_name( $meta_key ) {
+		$name = strtolower( trim( preg_replace( '/^_+/', '', (string) $meta_key ) ) );
+
+		return '' === $name ? '' : self::reserved_safe_name( $name );
+	}
+
+	/**
+	 * Shape a metafield value into something indexable.
+	 *
+	 * @param mixed $value The raw meta value.
+	 * @return mixed A scalar, a list of scalars, or a JSON string for anything nested.
+	 */
+	private static function format_meta_value( $value ) {
+		if ( null === $value ) {
+			return '';
+		}
+
+		if ( is_scalar( $value ) ) {
+			return $value;
+		}
+
+		if ( is_array( $value ) && count( $value ) === count( array_filter( $value, 'is_scalar' ) ) ) {
+			return array_values( $value );
+		}
+
+		return wp_json_encode( $value );
+	}
+
+	/**
 	 * Get products data from our endpoint products
 	 *
 	 * @param array  $ids ID product we want to get data.
