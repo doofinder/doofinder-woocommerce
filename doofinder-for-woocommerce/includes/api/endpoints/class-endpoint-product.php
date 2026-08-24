@@ -209,7 +209,7 @@ class Endpoint_Product {
 				$filtered_product_data['short_description'] = self::process_content( $filtered_product_data['short_description'] );
 				$filtered_product_data['tags']              = self::get_tag_names( $filtered_product_data['tags'] );
 				$filtered_product_data['purchase_price']    = self::get_purchase_price( $filtered_product_data['id'] );
-				$filtered_product_data                      = self::get_meta_attributes( $filtered_product_data, $custom_attr );
+				$filtered_product_data                      = self::get_meta_attributes( $filtered_product_data );
 				$filtered_product_data['creation_date']     = gmdate( 'Y-m-d\TH:i:s\Z', strtotime( $filtered_product_data['date_created'] ) );
 				$taxonomy_lookup_id                         = ( 'variation' === ( $filtered_product_data['type'] ?? '' ) && ! empty( $filtered_product_data['parent_id'] ) ) ? $filtered_product_data['parent_id'] : $filtered_product_data['id'];
 				$filtered_product_data                      = array_merge( $filtered_product_data, self::get_taxonomy_attributes( $taxonomy_lookup_id ) );
@@ -362,25 +362,31 @@ class Endpoint_Product {
 	}
 
 	/**
-	 * Get custom meta fields data from a WooCommerce product.
+	 * Get every metafield of the product as a flat field.
 	 *
-	 * @param array $data        The data to merge into.
-	 * @param array $custom_attr The custom attributes to merge.
-	 * @return array The merged data.
+	 * `meta_data` is what WooCommerce exposes, so its own internal meta is already left out.
+	 *
+	 * @param array $data The product data, including its raw `meta_data`.
+	 * @return array The data with one flat field per metafield, and `meta_data` removed.
 	 */
-	private static function get_meta_attributes( $data, $custom_attr ) {
-		foreach ( $custom_attr as $attr ) {
-			if ( 'metafield' !== $attr['type'] ) {
+	private static function get_meta_attributes( $data ) {
+		if ( empty( $data['meta_data'] ) || ! is_array( $data['meta_data'] ) ) {
+			unset( $data['meta_data'] );
+			return $data;
+		}
+
+		foreach ( $data['meta_data'] as $meta ) {
+			$meta_data = is_object( $meta ) && method_exists( $meta, 'get_data' ) ? $meta->get_data() : (array) $meta;
+			$field     = self::meta_field_name( $meta_data['key'] ?? '' );
+
+			// Never let a metafield overwrite a field that is already present.
+			if ( '' === $field || isset( $data[ $field ] ) ) {
 				continue;
 			}
 
-			foreach ( $data['meta_data'] as $meta ) {
-				$meta_data = $meta->get_data();
-				if ( $attr['attribute'] === $meta_data['key'] ) {
-					$data[ $attr['field'] ] = $meta_data['value'] ?? '';
-				}
-			}
+			$data[ $field ] = self::format_meta_value( $meta_data['value'] ?? '' );
 		}
+
 		unset( $data['meta_data'] );
 		return $data;
 	}
