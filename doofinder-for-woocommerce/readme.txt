@@ -1,11 +1,11 @@
 === DOOFINDER Search and Discovery for WP & WooCommerce ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.16.0
+Version: 2.17.0
 Requires at least: 5.6
 Tested up to: 6.9
 Requires PHP: 7.0
-Stable tag: 2.16.0
+Stable tag: 2.17.0
 License: MIT
 License URI: https://opensource.org/licenses/MIT
 
@@ -125,6 +125,10 @@ For in-depth insights into Doofinder and its features, check out our comprehensi
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/doofinder-for-woocommerce)
 
 == Changelog ==
+
+= 2.17.0 =
+- Every product attribute, taxonomy and metafield is now indexed, along with the posts and pages ones, so there is no need to pick them beforehand. Choose which of them to index from the search engine settings, in Additional indexed fields.
+- Removed the Custom Attributes section from the Data Configuration tab. The field names already configured keep working.
 
 = 2.16.0 =
 - Added a button to create the Search Engine for a new language without reinstalling the plugin.
