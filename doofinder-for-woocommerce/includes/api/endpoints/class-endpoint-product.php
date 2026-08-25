@@ -59,6 +59,9 @@ class Endpoint_Product {
 
 	const TAXONOMY = 'product_cat';
 
+	// Prefix every metafield gets, so its key can be kept verbatim without colliding with anything else.
+	const META_PREFIX = 'meta_';
+
 	/**
 	 * Initialize the custom product endpoint.
 	 *
@@ -270,18 +273,30 @@ class Endpoint_Product {
 	}
 
 	/**
-	 * Build the output field name of a metafield.
+	 * Build the name of a metafield, without the output prefix.
 	 *
-	 * Strips leading underscores so the emitted name matches the indexed one, which is also
-	 * what the merchant sees when picking the fields to index.
+	 * The key is kept as it is stored, leading underscores included: `_sku` and `sku` are two
+	 * different metafields and have to stay apart. The emitted field adds `META_PREFIX`, which
+	 * is also what makes a `custom_` guard unnecessary here — no prefixed name can reach a
+	 * canonical field.
+	 *
+	 * @param string $meta_key The meta key, as stored in `wp_postmeta`.
+	 * @return string The metafield name, or an empty string when the key is unusable.
+	 */
+	private static function meta_field_name( $meta_key ) {
+		return strtolower( trim( urldecode( (string) $meta_key ) ) );
+	}
+
+	/**
+	 * Build the output field name of a metafield.
 	 *
 	 * @param string $meta_key The meta key, as stored in `wp_postmeta`.
 	 * @return string The field name, or an empty string when the key is unusable.
 	 */
-	private static function meta_field_name( $meta_key ) {
-		$name = strtolower( trim( preg_replace( '/^_+/', '', (string) $meta_key ) ) );
+	private static function meta_output_field_name( $meta_key ) {
+		$name = self::meta_field_name( $meta_key );
 
-		return '' === $name ? '' : self::reserved_safe_name( $name );
+		return '' === $name ? '' : self::META_PREFIX . $name;
 	}
 
 	/**
