@@ -852,7 +852,9 @@ class Endpoint_Product {
 		$product['title'] = $product['name'];
 		$product['link']  = $product['permalink'];
 
-		$product = array_diff_key( $product, array_flip( self::STRUCTURAL_FIELDS ) );
+		foreach ( self::STRUCTURAL_FIELDS as $structural_field ) {
+			unset( $product[ $structural_field ] );
+		}
 
 		unset( $product['name'] );
 		unset( $product['permalink'] );
