@@ -453,7 +453,11 @@ class Endpoint_Custom {
 	 * @return array The processed data array with unused fields removed.
 	 */
 	private static function clear_unused_fields( $filtered_data ) {
-		return array_diff_key( $filtered_data, array_flip( self::STRUCTURAL_FIELDS ) );
+		foreach ( self::STRUCTURAL_FIELDS as $structural_field ) {
+			unset( $filtered_data[ $structural_field ] );
+		}
+
+		return $filtered_data;
 	}
 
 	/**
