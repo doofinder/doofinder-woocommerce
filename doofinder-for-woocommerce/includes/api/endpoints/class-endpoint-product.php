@@ -29,14 +29,20 @@ class Endpoint_Product {
 		'images',
 		'attributes',
 		'meta_data',
+		'dimensions',
 		'df_price',
 		'df_sale_price',
 		'df_regular_price',
 		'df_image_link',
-		'default_attributes',
-		'downloads',
 		'_links',
 		'post_password',
+	);
+
+	// Nested structures that are a list of objects, emitted as the list of their names.
+	const OBJECT_LIST_FIELDS = array(
+		'brands',
+		'default_attributes',
+		'downloads',
 	);
 
 	const TAXONOMY = 'product_cat';
@@ -871,7 +877,11 @@ class Endpoint_Product {
 	 * Flatten the nested structures WooCommerce returns into indexable fields.
 	 *
 	 * `dimensions` becomes `length`/`width`/`height`, the three entries the settings dropdown
-	 * used to offer, and `brands` becomes a plain list of names.
+	 * used to offer, and every list of objects becomes the list of its names.
+	 *
+	 * The `dimensions` key itself is left in place: a merchant may have a stored name for it,
+	 * and `apply_legacy_aliases` needs to find it. What is left of it afterwards is dropped as
+	 * a structural field.
 	 *
 	 * @param array $product The product array to process.
 	 * @return array The product with its nested structures flattened.
@@ -884,13 +894,16 @@ class Endpoint_Product {
 				}
 			}
 		}
-		unset( $product['dimensions'] );
 
-		if ( ! empty( $product['brands'] ) && is_array( $product['brands'] ) ) {
-			$names = array_column( $product['brands'], 'name' );
+		foreach ( self::OBJECT_LIST_FIELDS as $field ) {
+			if ( empty( $product[ $field ] ) || ! is_array( $product[ $field ] ) ) {
+				continue;
+			}
+
+			$names = array_column( $product[ $field ], 'name' );
 
 			if ( ! empty( $names ) ) {
-				$product['brands'] = $names;
+				$product[ $field ] = $names;
 			}
 		}
 
