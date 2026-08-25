@@ -541,33 +541,39 @@ class Endpoint_Product {
 
 		foreach ( $custom_attr as $attr ) {
 			$alias  = $attr['field'] ?? '';
-			$source = self::legacy_source_field_name( $attr['attribute'] ?? '', $attr['type'] ?? '' );
+			$type   = $attr['type'] ?? '';
+			$source = self::legacy_source_field_name( $attr['attribute'] ?? '', $type );
 
-			if ( '' === $alias || '' === $source || $alias === $source ) {
+			// The stored map names the metafield, not the field it is emitted under, so the
+			// prefix is added here and not in `legacy_source_field_name`.
+			$emitted = 'metafield' === $type ? self::META_PREFIX . $source : $source;
+
+			if ( '' === $alias || '' === $source || $alias === $emitted ) {
 				continue;
 			}
 
 			// Do not overwrite a field that already exists under the stored name.
-			if ( isset( $product[ $alias ] ) || ! isset( $product[ $source ] ) ) {
+			if ( isset( $product[ $alias ] ) || ! isset( $product[ $emitted ] ) ) {
 				continue;
 			}
 
-			$product[ $alias ] = $product[ $source ];
-			$renamed[]         = $source;
+			$product[ $alias ] = $product[ $emitted ];
+			$renamed[]         = $emitted;
 		}
 
 		return array_diff_key( $product, array_flip( $renamed ) );
 	}
 
 	/**
-	 * Resolve the field name a stored entry refers to.
+	 * Resolve the source a stored entry refers to.
 	 *
 	 * The settings UI stored an identifier of its own dropdown, not a field name, so it has to
-	 * be translated into the name the field is emitted under.
+	 * be translated into the name of the thing it points at. For a metafield that is its key;
+	 * the `META_PREFIX` of the emitted field is the caller's business.
 	 *
 	 * @param string $source The stored `attribute` value (e.g. `wc_2`, `taxonomy_series`, a meta key).
 	 * @param string $type   The stored `type` value.
-	 * @return string The emitted field name, or an empty string when it cannot be resolved.
+	 * @return string The source name, or an empty string when it cannot be resolved.
 	 */
 	private static function legacy_source_field_name( $source, $type ) {
 		if ( 'wc_attribute' === $type && str_starts_with( $source, 'wc_' ) ) {
