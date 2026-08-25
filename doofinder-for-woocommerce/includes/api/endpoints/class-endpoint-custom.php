@@ -274,7 +274,11 @@ class Endpoint_Custom {
 			$renamed[]      = $emitted;
 		}
 
-		return array_diff_key( $data, array_flip( $renamed ) );
+		foreach ( $renamed as $emitted_field ) {
+			unset( $data[ $emitted_field ] );
+		}
+
+		return $data;
 	}
 
 	/**
