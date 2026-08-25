@@ -362,7 +362,7 @@ class Endpoint_Product {
 	}
 
 	/**
-	 * Get every metafield of the product as a flat field.
+	 * Get every metafield of the product as a flat field, named `meta_` plus its key.
 	 *
 	 * `meta_data` is what WooCommerce exposes, so its own internal meta is already left out.
 	 *
@@ -382,7 +382,7 @@ class Endpoint_Product {
 
 		foreach ( $data['meta_data'] as $meta ) {
 			$meta_data = is_object( $meta ) && method_exists( $meta, 'get_data' ) ? $meta->get_data() : (array) $meta;
-			$field     = self::meta_field_name( $meta_data['key'] ?? '' );
+			$field     = self::meta_output_field_name( $meta_data['key'] ?? '' );
 
 			// Never let a metafield overwrite a field that is not one of its own.
 			if ( '' === $field || ( isset( $data[ $field ] ) && ! isset( $written[ $field ] ) ) ) {
