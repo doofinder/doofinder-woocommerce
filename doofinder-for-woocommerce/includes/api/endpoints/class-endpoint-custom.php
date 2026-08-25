@@ -36,6 +36,9 @@ class Endpoint_Custom {
 		'password',
 	);
 
+	// Prefix every metafield gets, so its key can be kept verbatim without colliding with anything else.
+	const META_PREFIX = 'meta_';
+
 	/**
 	 * Initialize the custom item endpoint.
 	 *
@@ -184,7 +187,7 @@ class Endpoint_Custom {
 	}
 
 	/**
-	 * Get every metafield of the item as a flat field.
+	 * Get every metafield of the item as a flat field, named `meta_` plus its key.
 	 *
 	 * Unlike products, there is no WooCommerce filter here: `get_post_meta` exposes the whole
 	 * meta of the item, WordPress internals included.
@@ -200,7 +203,7 @@ class Endpoint_Custom {
 		}
 
 		foreach ( $meta as $meta_key => $meta_values ) {
-			$field = self::meta_field_name( $meta_key );
+			$field = self::meta_output_field_name( $meta_key );
 
 			// Never let a metafield overwrite a field that is already present.
 			if ( '' === $field || isset( $data[ $field ] ) ) {
@@ -214,22 +217,30 @@ class Endpoint_Custom {
 	}
 
 	/**
-	 * Build the output field name of a metafield.
+	 * Build the name of a metafield, without the output prefix.
 	 *
-	 * Strips leading underscores so the emitted name matches the indexed one, and prefixes
-	 * `custom_` when the name would collide with a canonical field.
+	 * The key is kept as it is stored, leading underscores included: `_ean` and `ean` are two
+	 * different metafields and have to stay apart. The emitted field adds `META_PREFIX`, which
+	 * is also what makes a `custom_` guard unnecessary here — no prefixed name can reach a
+	 * canonical field.
+	 *
+	 * @param string $meta_key The meta key, as stored in `wp_postmeta`.
+	 * @return string The metafield name, or an empty string when the key is unusable.
+	 */
+	private static function meta_field_name( $meta_key ) {
+		return strtolower( trim( urldecode( (string) $meta_key ) ) );
+	}
+
+	/**
+	 * Build the output field name of a metafield.
 	 *
 	 * @param string $meta_key The meta key, as stored in `wp_postmeta`.
 	 * @return string The field name, or an empty string when the key is unusable.
 	 */
-	private static function meta_field_name( $meta_key ) {
-		$name = strtolower( trim( preg_replace( '/^_+/', '', (string) $meta_key ) ) );
+	private static function meta_output_field_name( $meta_key ) {
+		$name = self::meta_field_name( $meta_key );
 
-		if ( '' === $name ) {
-			return '';
-		}
-
-		return in_array( $name, Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES, true ) ? 'custom_' . $name : $name;
+		return '' === $name ? '' : self::META_PREFIX . $name;
 	}
 
 	/**
@@ -246,19 +257,21 @@ class Endpoint_Custom {
 		$renamed = array();
 
 		foreach ( $custom_attr as $attr ) {
-			$alias  = $attr['field'] ?? '';
-			$source = self::meta_field_name( $attr['attribute'] ?? '' );
+			$alias = $attr['field'] ?? '';
 
-			if ( '' === $alias || '' === $source || $alias === $source ) {
+			// The stored map names the meta key, not the field it is emitted under.
+			$emitted = self::meta_output_field_name( $attr['attribute'] ?? '' );
+
+			if ( '' === $alias || '' === $emitted || $alias === $emitted ) {
 				continue;
 			}
 
-			if ( isset( $data[ $alias ] ) || ! isset( $data[ $source ] ) ) {
+			if ( isset( $data[ $alias ] ) || ! isset( $data[ $emitted ] ) ) {
 				continue;
 			}
 
-			$data[ $alias ] = $data[ $source ];
-			$renamed[]      = $source;
+			$data[ $alias ] = $data[ $emitted ];
+			$renamed[]      = $emitted;
 		}
 
 		return array_diff_key( $data, array_flip( $renamed ) );
