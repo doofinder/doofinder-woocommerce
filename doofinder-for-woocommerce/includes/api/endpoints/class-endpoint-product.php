@@ -561,7 +561,11 @@ class Endpoint_Product {
 			$renamed[]         = $emitted;
 		}
 
-		return array_diff_key( $product, array_flip( $renamed ) );
+		foreach ( $renamed as $emitted_field ) {
+			unset( $product[ $emitted_field ] );
+		}
+
+		return $product;
 	}
 
 	/**
