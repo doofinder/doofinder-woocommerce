@@ -18,10 +18,18 @@ use Doofinder\WP\Thumbnail;
  */
 class Endpoint_Custom {
 
-	const PER_PAGE          = 100;
-	const CONTEXT           = 'doofinder/v1';
-	const ENDPOINT          = '/custom';
-	const STRUCTURAL_FIELDS = array(
+	const PER_PAGE = 100;
+	const CONTEXT  = 'doofinder/v1';
+	const ENDPOINT = '/custom';
+
+	/**
+	 * Fields left out of the response.
+	 *
+	 * Only wrappers, traps and duplicates of something already emitted belong here. Deciding
+	 * which fields are worth indexing is the search engine's job, so this is not the place to
+	 * drop a field for being uninteresting.
+	 */
+	const EXCLUDED_FIELDS = array(
 		// REST wrappers.
 		'_embedded',
 		'_links',
@@ -457,8 +465,8 @@ class Endpoint_Custom {
 	 * @return array The processed data array with unused fields removed.
 	 */
 	private static function clear_unused_fields( $filtered_data ) {
-		foreach ( self::STRUCTURAL_FIELDS as $structural_field ) {
-			unset( $filtered_data[ $structural_field ] );
+		foreach ( self::EXCLUDED_FIELDS as $excluded_field ) {
+			unset( $filtered_data[ $excluded_field ] );
 		}
 
 		return $filtered_data;
