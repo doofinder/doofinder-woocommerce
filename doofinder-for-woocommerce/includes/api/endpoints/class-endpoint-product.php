@@ -366,8 +366,9 @@ class Endpoint_Product {
 	 *
 	 * `meta_data` is what WooCommerce exposes, so its own internal meta is already left out.
 	 *
-	 * When the same metafield appears more than once, the last row wins. WooCommerce reads meta
-	 * ordered by `meta_id`, so that is the most recently written value.
+	 * When the same metafield appears more than once the assignment simply overwrites, so the
+	 * last row wins. WooCommerce reads meta ordered by `meta_id`, so that is the most recently
+	 * written value, and it is what the plugin emitted before.
 	 *
 	 * @param array $data The product data, including its raw `meta_data`.
 	 * @return array The data with one flat field per metafield, and `meta_data` removed.
@@ -378,19 +379,15 @@ class Endpoint_Product {
 			return $data;
 		}
 
-		$written = array();
-
 		foreach ( $data['meta_data'] as $meta ) {
 			$meta_data = is_object( $meta ) && method_exists( $meta, 'get_data' ) ? $meta->get_data() : (array) $meta;
 			$field     = self::meta_output_field_name( $meta_data['key'] ?? '' );
 
-			// Never let a metafield overwrite a field that is not one of its own.
-			if ( '' === $field || ( isset( $data[ $field ] ) && ! isset( $written[ $field ] ) ) ) {
+			if ( '' === $field ) {
 				continue;
 			}
 
-			$data[ $field ]    = self::format_meta_value( $meta_data['value'] ?? '' );
-			$written[ $field ] = true;
+			$data[ $field ] = self::format_meta_value( $meta_data['value'] ?? '' );
 		}
 
 		unset( $data['meta_data'] );
