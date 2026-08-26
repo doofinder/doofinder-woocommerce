@@ -557,7 +557,7 @@ class Endpoint_Product {
 				continue;
 			}
 
-			$product[ $alias ] = self::legacy_alias_value( $product[ $emitted ] );
+			$product[ $alias ] = $product[ $emitted ];
 			$renamed[]         = $emitted;
 		}
 
@@ -566,26 +566,6 @@ class Endpoint_Product {
 		}
 
 		return $product;
-	}
-
-	/**
-	 * Shape a value the way the plugin did when it renamed a field.
-	 *
-	 * A list of objects that carry a `name` collapses to the list of those names, which is how
-	 * `brands` or `default_attributes` reached the merchant. Anything else is left untouched:
-	 * `dimensions` has no `name` inside, so it keeps its shape, and a scalar is copied as it is.
-	 *
-	 * @param mixed $value The value found under the emitted field name.
-	 * @return mixed The value as the stored alias expects it.
-	 */
-	private static function legacy_alias_value( $value ) {
-		if ( ! is_array( $value ) ) {
-			return $value;
-		}
-
-		$names = array_column( $value, 'name' );
-
-		return empty( $names ) ? $value : $names;
 	}
 
 	/**
