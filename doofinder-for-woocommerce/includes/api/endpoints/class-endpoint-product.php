@@ -59,6 +59,9 @@ class Endpoint_Product {
 
 	const TAXONOMY = 'product_cat';
 
+	// Prefix every metafield gets, so its key can be kept verbatim without colliding with anything else.
+	const META_PREFIX = 'meta_';
+
 	/**
 	 * Initialize the custom product endpoint.
 	 *
@@ -239,6 +242,83 @@ class Endpoint_Product {
 	 */
 	public static function get_fields() {
 		return self::FIELDS;
+	}
+
+	/**
+	 * Prefix a field name with `custom_` when it would collide with a canonical field.
+	 *
+	 * An extracted field is named after its source, so without this one of them could be
+	 * called `price` and overwrite the canonical field of that name.
+	 *
+	 * @param string $name The candidate field name.
+	 * @return string The same name, or prefixed with `custom_` if it is a reserved one.
+	 */
+	private static function reserved_safe_name( $name ) {
+		return in_array( $name, Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES, true ) ? 'custom_' . $name : $name;
+	}
+
+	/**
+	 * Build the output field name of a WooCommerce attribute.
+	 *
+	 * Keeps the `pa_` prefix, since `pa_color` is the attribute's internal name, and URL-decodes
+	 * the key because non-ASCII attribute taxonomies are stored encoded (`pa_tama%c3%b1o`).
+	 *
+	 * @param string $attribute_name The attribute key, as returned by `WC_Product::get_attributes()`.
+	 * @return string The field name, or an empty string when the name is unusable.
+	 */
+	private static function attribute_field_name( $attribute_name ) {
+		$name = strtolower( trim( urldecode( (string) $attribute_name ) ) );
+
+		return '' === $name ? '' : self::reserved_safe_name( $name );
+	}
+
+	/**
+	 * Build the name of a metafield, without the output prefix.
+	 *
+	 * The key is kept as it is stored, leading underscores included: `_sku` and `sku` are two
+	 * different metafields and have to stay apart. The emitted field adds `META_PREFIX`, which
+	 * is also what makes a `custom_` guard unnecessary here — no prefixed name can reach a
+	 * canonical field.
+	 *
+	 * @param string $meta_key The meta key, as stored in `wp_postmeta`.
+	 * @return string The metafield name, or an empty string when the key is unusable.
+	 */
+	private static function meta_field_name( $meta_key ) {
+		return strtolower( trim( urldecode( (string) $meta_key ) ) );
+	}
+
+	/**
+	 * Build the output field name of a metafield.
+	 *
+	 * @param string $meta_key The meta key, as stored in `wp_postmeta`.
+	 * @return string The field name, or an empty string when the key is unusable.
+	 */
+	private static function meta_output_field_name( $meta_key ) {
+		$name = self::meta_field_name( $meta_key );
+
+		return '' === $name ? '' : self::META_PREFIX . $name;
+	}
+
+	/**
+	 * Shape a metafield value into something indexable.
+	 *
+	 * @param mixed $value The raw meta value.
+	 * @return mixed A scalar, a list of scalars, or a JSON string for anything nested.
+	 */
+	private static function format_meta_value( $value ) {
+		if ( null === $value ) {
+			return '';
+		}
+
+		if ( is_scalar( $value ) ) {
+			return $value;
+		}
+
+		if ( is_array( $value ) && count( $value ) === count( array_filter( $value, 'is_scalar' ) ) ) {
+			return array_values( $value );
+		}
+
+		return wp_json_encode( $value );
 	}
 
 	/**
