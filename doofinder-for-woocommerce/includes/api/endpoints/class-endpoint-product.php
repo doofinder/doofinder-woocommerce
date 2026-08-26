@@ -20,10 +20,18 @@ use Doofinder\WP\Thumbnail;
  */
 class Endpoint_Product {
 
-	const PER_PAGE          = 100;
-	const CONTEXT           = 'doofinder/v1';
-	const ENDPOINT          = '/product';
-	const STRUCTURAL_FIELDS = array(
+	const PER_PAGE = 100;
+	const CONTEXT  = 'doofinder/v1';
+	const ENDPOINT = '/product';
+
+	/**
+	 * Fields left out of the response.
+	 *
+	 * Only wrappers, traps and duplicates of something already emitted belong here. Deciding
+	 * which fields are worth indexing is the search engine's job, so this is not the place to
+	 * drop a field for being uninteresting.
+	 */
+	const EXCLUDED_FIELDS = array(
 		'image',
 		'gallery_image_ids',
 		'images',
@@ -851,8 +859,8 @@ class Endpoint_Product {
 		$product['title'] = $product['name'];
 		$product['link']  = $product['permalink'];
 
-		foreach ( self::STRUCTURAL_FIELDS as $structural_field ) {
-			unset( $product[ $structural_field ] );
+		foreach ( self::EXCLUDED_FIELDS as $excluded_field ) {
+			unset( $product[ $excluded_field ] );
 		}
 
 		unset( $product['name'] );
@@ -875,7 +883,7 @@ class Endpoint_Product {
 	 *
 	 * `dimensions` needs naming its parts, which cannot be read off the value, so it keeps its
 	 * own case. Its key is left in place because a merchant may have a stored name for it and
-	 * `apply_legacy_aliases` has to find it; what is left afterwards is dropped as structural.
+	 * `apply_legacy_aliases` has to find it; what is left afterwards is dropped as excluded.
 	 *
 	 * @param array $product The product array to process.
 	 * @return array The product with its nested structures flattened.
