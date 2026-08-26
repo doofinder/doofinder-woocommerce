@@ -213,8 +213,7 @@ class Endpoint_Custom {
 		foreach ( $meta as $meta_key => $meta_values ) {
 			$field = self::meta_output_field_name( $meta_key );
 
-			// Never let a metafield overwrite a field that is already present.
-			if ( '' === $field || isset( $data[ $field ] ) ) {
+			if ( '' === $field ) {
 				continue;
 			}
 
