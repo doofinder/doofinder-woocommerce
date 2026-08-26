@@ -38,10 +38,6 @@ class Endpoint_Product {
 		'attributes',
 		'meta_data',
 		'dimensions',
-		'df_price',
-		'df_sale_price',
-		'df_regular_price',
-		'df_image_link',
 		'_links',
 		'post_password',
 	);
