@@ -599,8 +599,12 @@ class Endpoint_Product {
 		}
 
 		// The dimensions entries are stored as `dimensions:length` and flattened to `length`.
-		if ( 'base_attribute' === $type && str_contains( $source, ':' ) ) {
-			return self::reserved_safe_name( substr( $source, strpos( $source, ':' ) + 1 ) );
+		if ( 'base_attribute' === $type && str_starts_with( $source, 'dimensions:' ) ) {
+			$dimension = substr( $source, strlen( 'dimensions:' ) );
+
+			return in_array( $dimension, array( 'length', 'width', 'height' ), true )
+				? self::reserved_safe_name( $dimension )
+				: '';
 		}
 
 		return self::meta_field_name( $source );
