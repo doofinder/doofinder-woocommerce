@@ -18,7 +18,7 @@ endif
 docker_exec_web = $(docker_compose) exec wordpress
 wp = $(docker_exec_web) wpcli --path=/var/www/html --allow-root
 
-envsubst_vars = $$PLUGIN_VERSION,$$DOOFINDER_PLUGINS_URL_FORMAT,$$DOOFINDER_API_URL_FORMAT
+envsubst_vars = $$PLUGIN_VERSION,$$DOOFINDER_PLUGINS_URL_FORMAT,$$DOOFINDER_API_URL_FORMAT,$$DOOFINDER_LAYER_SCRIPT_URL
 
 # Default target: list available tasks
 all:
