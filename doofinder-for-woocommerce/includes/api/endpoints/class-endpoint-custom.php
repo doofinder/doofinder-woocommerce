@@ -21,29 +21,31 @@ class Endpoint_Custom {
 	const PER_PAGE = 100;
 	const CONTEXT  = 'doofinder/v1';
 	const ENDPOINT = '/custom';
-	const FIELDS   = array(
+
+	/**
+	 * Fields left out of the response.
+	 *
+	 * Only wrappers, traps and duplicates of something already emitted belong here. Deciding
+	 * which fields are worth indexing is the search engine's job, so this is not the place to
+	 * drop a field for being uninteresting.
+	 */
+	const EXCLUDED_FIELDS = array(
+		// REST wrappers.
 		'_embedded',
-		'author',
-		'categories',
-		'content',
+		'_links',
+		'meta',
+		'guid',
+		// Already flattened into canonical fields.
 		'excerpt',
-		'id',
-		'image_link',
-		'link',
-		'post_tags',
-		'slug',
-		'title',
+		'author',
+		// Raw term IDs; the names are emitted as `post_tags` and `categories`.
+		'tags',
+		// Not an item attribute.
+		'password',
 	);
 
-	const TAXONOMY_FIELDS = array(
-		'description',
-		'id',
-		'image_link',
-		'link',
-		'name',
-		'parent',
-		'slug',
-	);
+	// Prefix every metafield gets, so its key can be kept verbatim without colliding with anything else.
+	const META_PREFIX = 'meta_';
 
 	/**
 	 * Initialize the custom item endpoint.
@@ -83,15 +85,11 @@ class Endpoint_Custom {
 			$locale_or_lang_code = $request->get_param( 'lang' ) ?? '';
 			$lang_code           = Helpers::apply_locale_to_rest_context( $locale_or_lang_code );
 
-			// Get the 'fields' parameter from the request.
-			$fields = ( 'all' === $request->get_param( 'fields' ) ) ? array() : self::get_fields();
-
 			$config_request = array(
 				'per_page' => $request->get_param( 'per_page' ) ?? self::PER_PAGE,
 				'page'     => $request->get_param( 'page' ) ?? 1,
 				'ids'      => $request->get_param( 'ids' ) ?? '',
 				'type'     => $request->get_param( 'type' ) ?? '',
-				'fields'   => $fields,
 			);
 
 			if ( $multilanguage->is_active() ) {
@@ -99,32 +97,19 @@ class Endpoint_Custom {
 				$lang_code              = Helpers::apply_locale_to_rest_context( $locale_or_lang_code );
 				$config_request['lang'] = $lang_code;
 			}
-		} else {
-			if ( $multilanguage->is_active() ) {
+		} elseif ( $multilanguage->is_active() ) {
 				// Apply locale context even when config_request is provided.
 				$locale_or_lang_code = $config_request['lang'] ?? '';
 				Helpers::apply_locale_to_rest_context( $locale_or_lang_code );
-			}
-
-			$fields = ! empty( $config_request['fields'] ) ? explode( ',', $config_request['fields'] ) : array();
 		}
 
 		$type = $config_request['type'] ?? '';
 
 		if ( taxonomy_exists( $type ) ) {
-			return self::get_taxonomy( $request, $config_request, $fields );
+			return self::get_taxonomy( $config_request );
 		}
 
-		return self::get_post_type( $config_request, $fields );
-	}
-
-	/**
-	 * Get the array of fields.
-	 *
-	 * @return array The array of fields.
-	 */
-	public static function get_fields() {
-		return self::FIELDS;
+		return self::get_post_type( $config_request );
 	}
 
 	/**
@@ -138,9 +123,8 @@ class Endpoint_Custom {
 	public static function get_data( $ids, $type ) {
 
 		$request_params = array(
-			'ids'    => implode( ',', $ids ),
-			'fields' => implode( ',', self::get_fields() ),
-			'type'   => $type,
+			'ids'  => implode( ',', $ids ),
+			'type' => $type,
 		);
 
 		$items = self::custom_endpoint( false, $request_params )->data;
@@ -158,26 +142,18 @@ class Endpoint_Custom {
 	/**
 	 * Get the taxonomy data.
 	 *
-	 * @param WP_REST_Request $request The REST request object.
-	 * @param array           $config_request Array config for internal requests.
-	 * @param array           $fields The fields to include in the response.
+	 * @param array $config_request Array config for internal requests.
 	 *
 	 * @return WP_REST_Response Response containing modified taxonomy data.
 	 */
-	private static function get_taxonomy( $request, $config_request, $fields ) {
-		$taxonomy_fields = empty( $fields ) ? array() : self::TAXONOMY_FIELDS;
-		$items           = self::get_items( $config_request );
+	private static function get_taxonomy( $config_request ) {
+		$items = self::get_items( $config_request );
 
 		foreach ( $items as $item_data ) {
-			$filtered_data = ! empty( $taxonomy_fields )
-				? array_intersect_key( $item_data, array_flip( $taxonomy_fields ) )
-				: $item_data;
+			$filtered_data               = $item_data;
+			$filtered_data['image_link'] = self::get_term_image_link( $item_data );
 
-			if ( in_array( 'image_link', $taxonomy_fields, true ) || empty( $taxonomy_fields ) ) {
-				$filtered_data['image_link'] = self::get_term_image_link( $item_data );
-			}
-
-			$modified_items[] = $filtered_data;
+			$modified_items[] = self::clear_unused_fields( $filtered_data );
 		}
 
 		return new WP_REST_Response( $modified_items ?? array() );
@@ -187,12 +163,12 @@ class Endpoint_Custom {
 	 * Get the post type data.
 	 *
 	 * @param array $config_request Array config for internal requests.
-	 * @param array $fields The fields to include in the response.
 	 *
 	 * @return WP_REST_Response Response containing modified post type data.
 	 */
-	private static function get_post_type( $config_request, $fields ) {
-		$items = self::get_items( $config_request );
+	private static function get_post_type( $config_request ) {
+		$items       = self::get_items( $config_request );
+		$custom_attr = Settings::get_post_custom_attributes();
 
 		foreach ( $items as $item_data ) {
 
@@ -200,18 +176,15 @@ class Endpoint_Custom {
 				continue;
 			}
 
-			$custom_attr = Settings::get_post_custom_attributes();
-
-			$filtered_data = ! empty( $fields ) ? array_intersect_key( $item_data, array_flip( $fields ) ) : $item_data;
-
-			$filtered_data = self::get_title( $filtered_data );
+			$filtered_data = self::get_title( $item_data );
 			$filtered_data = self::get_content( $filtered_data );
 			$filtered_data = self::get_description( $filtered_data );
-			$filtered_data = self::get_author( $filtered_data, $fields, $config_request );
-			$filtered_data = self::get_image_link( $filtered_data, $fields );
-			$filtered_data = self::get_post_tags( $filtered_data, $fields );
-			$filtered_data = self::get_categories( $filtered_data, $fields );
-			$filtered_data = self::get_meta_attributes( $filtered_data, $custom_attr );
+			$filtered_data = self::get_author( $filtered_data, $config_request );
+			$filtered_data = self::get_image_link( $filtered_data );
+			$filtered_data = self::get_post_tags( $filtered_data );
+			$filtered_data = self::get_categories( $filtered_data );
+			$filtered_data = self::get_meta_attributes( $filtered_data );
+			$filtered_data = self::apply_legacy_aliases( $filtered_data, $custom_attr );
 			$filtered_data = self::clear_unused_fields( $filtered_data );
 
 			$modified_items[] = $filtered_data;
@@ -222,46 +195,110 @@ class Endpoint_Custom {
 	}
 
 	/**
-	 * Retrieves and merges custom meta field data from a post type into existing data.
+	 * Get every metafield of the item as a flat field, named `meta_` plus its key.
 	 *
-	 * This function fetches metadata for a specified post using custom attribute configurations.
-	 * It converts native meta field names into custom names specified in the plugin's Data Configuration tab.
-	 * The function then merges the fetched metadata into the provided data array. Although get_post_meta allows
-	 * '' as an option to retrieve all the fields in a single call, metadata calls always try to get the data
-	 * from WordPress cache so there should not be any risk calling it in the loop. In fact, it
-	 * could be worse getting every single metadata at once.
+	 * Unlike products, there is no WooCommerce filter here: `get_post_meta` exposes the whole
+	 * meta of the item, WordPress internals included.
 	 *
-	 * @param array $data        The original data array, containing at least an 'id' key with the post ID.
-	 * @param array $custom_attr An array of custom attributes, where each item is an associative array with:
-	 *                           - 'attribute' (string): The native meta key in the database.
-	 *                           - 'field'     (string): The custom name to assign in the returned data array.
-	 *
-	 * @return array The merged data array, including custom meta fields if available.
+	 * @param array $data The item data, containing at least an 'id' key.
+	 * @return array The data with one flat field per metafield.
 	 */
-	private static function get_meta_attributes( $data, $custom_attr ) {
-		foreach ( $custom_attr as $attr ) {
-			$post_meta = get_post_meta( $data['id'], $attr['attribute'], false );
-			if ( null === $post_meta ) {
+	private static function get_meta_attributes( $data ) {
+		$meta = get_post_meta( $data['id'] );
+
+		if ( empty( $meta ) || ! is_array( $meta ) ) {
+			return $data;
+		}
+
+		foreach ( $meta as $meta_key => $meta_values ) {
+			$field = self::meta_output_field_name( $meta_key );
+
+			if ( '' === $field ) {
 				continue;
 			}
-			$data[ $attr['field'] ] = self::format_metadata( $post_meta );
+
+			$data[ $field ] = self::format_metadata( $meta_values );
 		}
 
 		return $data;
 	}
 
 	/**
-	 * Retrieves and processes the post tags information if requested by the fields.
+	 * Build the name of a metafield, without the output prefix.
+	 *
+	 * The key is kept as it is stored, leading underscores included: `_ean` and `ean` are two
+	 * different metafields and have to stay apart. The emitted field adds `META_PREFIX`, which
+	 * is also what makes a `custom_` guard unnecessary here — no prefixed name can reach a
+	 * canonical field.
+	 *
+	 * @param string $meta_key The meta key, as stored in `wp_postmeta`.
+	 * @return string The metafield name, or an empty string when the key is unusable.
+	 */
+	private static function meta_field_name( $meta_key ) {
+		return strtolower( trim( urldecode( (string) $meta_key ) ) );
+	}
+
+	/**
+	 * Build the output field name of a metafield.
+	 *
+	 * @param string $meta_key The meta key, as stored in `wp_postmeta`.
+	 * @return string The field name, or an empty string when the key is unusable.
+	 */
+	private static function meta_output_field_name( $meta_key ) {
+		$name = self::meta_field_name( $meta_key );
+
+		return '' === $name ? '' : self::META_PREFIX . $name;
+	}
+
+	/**
+	 * Rename the emitted fields to the names the merchant has stored.
+	 *
+	 * The removal happens after every name has been copied, not inside the loop: two rows may
+	 * point at the same meta key, and dropping it on the first would leave the second empty.
+	 *
+	 * @param array $data        The item data.
+	 * @param array $custom_attr The stored name map.
+	 * @return array The data with the stored names applied.
+	 */
+	private static function apply_legacy_aliases( $data, $custom_attr ) {
+		$renamed = array();
+
+		foreach ( $custom_attr as $attr ) {
+			$alias = $attr['field'] ?? '';
+
+			// The stored map names the meta key, not the field it is emitted under.
+			$emitted = self::meta_output_field_name( $attr['attribute'] ?? '' );
+
+			if ( '' === $alias || '' === $emitted || $alias === $emitted ) {
+				continue;
+			}
+
+			if ( isset( $data[ $alias ] ) || ! isset( $data[ $emitted ] ) ) {
+				continue;
+			}
+
+			$data[ $alias ] = $data[ $emitted ];
+			$renamed[]      = $emitted;
+		}
+
+		foreach ( $renamed as $emitted_field ) {
+			unset( $data[ $emitted_field ] );
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Retrieves and processes the post tags information.
 	 *
 	 * @param array $filtered_data The filtered data array.
-	 * @param array $fields        The requested fields.
 	 *
 	 * @return array The filtered data array with post tags information if requested.
 	 */
-	private static function get_post_tags( $filtered_data, $fields ) {
+	private static function get_post_tags( $filtered_data ) {
 		$filtered_data['post_tags'] = array();
 
-		if ( in_array( 'post_tags', $fields, true ) && isset( $filtered_data['_embedded']['wp:term'][0] ) ) {
+		if ( isset( $filtered_data['_embedded']['wp:term'][0] ) ) {
 			$filtered_data['post_tags'] = self::get_terms( 'post_tag', $filtered_data['_embedded']['wp:term'] );
 		}
 
@@ -269,17 +306,16 @@ class Endpoint_Custom {
 	}
 
 	/**
-	 * Retrieves and processes the categories information if requested by the fields.
+	 * Retrieves and processes the categories information.
 	 *
 	 * @param array $filtered_data The filtered data array.
-	 * @param array $fields        The requested fields.
 	 *
 	 * @return array The filtered data array with categories information if requested.
 	 */
-	private static function get_categories( $filtered_data, $fields ) {
+	private static function get_categories( $filtered_data ) {
 		$filtered_data['categories'] = array();
 
-		if ( in_array( 'categories', $fields, true ) && isset( $filtered_data['_embedded']['wp:term'][0] ) ) {
+		if ( isset( $filtered_data['_embedded']['wp:term'][0] ) ) {
 			$filtered_data['categories'] = self::get_terms( 'category', $filtered_data['_embedded']['wp:term'] );
 		}
 
@@ -288,7 +324,7 @@ class Endpoint_Custom {
 
 
 	/**
-	 * Retrieves and processes the title information if requested by the fields.
+	 * Retrieves and processes the title information.
 	 *
 	 * @param array $filtered_data The filtered data array.
 	 *
@@ -301,7 +337,7 @@ class Endpoint_Custom {
 	}
 
 	/**
-	 * Retrieves and processes the content information if requested by the fields.
+	 * Retrieves and processes the content information.
 	 *
 	 * @param array $filtered_data The filtered data array.
 	 *
@@ -314,7 +350,7 @@ class Endpoint_Custom {
 	}
 
 	/**
-	 * Retrieves and processes the description information if requested by the fields.
+	 * Retrieves and processes the description information.
 	 *
 	 * @param array $filtered_data The filtered data array.
 	 *
@@ -327,16 +363,15 @@ class Endpoint_Custom {
 	}
 
 	/**
-	 * Retrieves and processes the author information if requested by the fields.
+	 * Retrieves and processes the author information.
 	 *
 	 * @param array $filtered_data Product data array.
-	 * @param array $fields        The requested fields.
 	 * @param array $config_request The configuration request array.
 	 *
 	 * @return array The filtered data array with author information if requested.
 	 */
-	private static function get_author( $filtered_data, $fields, $config_request ) {
-		if ( in_array( 'author', $fields, true ) && 'posts' !== $config_request['type'] ) {
+	private static function get_author( $filtered_data, $config_request ) {
+		if ( 'posts' !== $config_request['type'] ) {
 			$filtered_data['author'] = $filtered_data['_embedded']['author'][0]['name'] ?? 'Default';
 		}
 
@@ -344,18 +379,16 @@ class Endpoint_Custom {
 	}
 
 	/**
-	 * Retrieves and processes the image link information if requested by the fields.
+	 * Retrieves and processes the image link information.
 	 *
 	 * @param array $filtered_data The filtered data array.
-	 * @param array $fields        The requested fields.
 	 *
 	 * @return array The filtered data array with image link information if requested.
 	 */
-	private static function get_image_link( $filtered_data, $fields ) {
+	private static function get_image_link( $filtered_data ) {
 		$filtered_data_array = json_decode( wp_json_encode( $filtered_data ), true );
 
-		$should_obtain_image_link          = is_array( $filtered_data_array ) && in_array( 'image_link', $fields, true );
-		$filtered_data_array['image_link'] = $should_obtain_image_link ? self::obtain_image_link( $filtered_data ) : null;
+		$filtered_data_array['image_link'] = is_array( $filtered_data_array ) ? self::obtain_image_link( $filtered_data ) : null;
 
 		return $filtered_data_array;
 	}
@@ -431,9 +464,9 @@ class Endpoint_Custom {
 	 * @return array The processed data array with unused fields removed.
 	 */
 	private static function clear_unused_fields( $filtered_data ) {
-		unset( $filtered_data['excerpt'] );
-		unset( $filtered_data['_embedded'] );
-		unset( $filtered_data['author'] );
+		foreach ( self::EXCLUDED_FIELDS as $excluded_field ) {
+			unset( $filtered_data[ $excluded_field ] );
+		}
 
 		return $filtered_data;
 	}
