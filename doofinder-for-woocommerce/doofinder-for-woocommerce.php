@@ -3,7 +3,7 @@
  * Plugin Name: DOOFINDER Search and Discovery for WP & WooCommerce
  * License: MIT
  * License URI: https://opensource.org/licenses/MIT
- * Version: 2.16.0
+ * Version: 2.17.0
  * Requires at least: 5.6
  * Requires PHP: 7.0
  * Author: Doofinder
@@ -44,7 +44,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 		 * @var string
 		 */
 
-		public static $version = '2.16.0';
+		public static $version = '2.17.0';
 
 		/**
 		 * The only instance of Doofinder_For_WordPress
@@ -339,22 +339,13 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 				'doofinder-admin-js',
 				'Doofinder',
 				array(
-					'nonce'                            => wp_create_nonce( 'doofinder-ajax-nonce' ),
-					'show_indexing_notice'             => Setup_Wizard::should_show_indexing_notice() ? 'true' : 'false',
-					'RESERVED_CUSTOM_ATTRIBUTES_NAMES' => Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES,
-					/* translators: %1$s is replaced with the field name. */
-					'reserved_custom_attributes_error_message' => sprintf( __( "The '%1\$s' field name is reserved, please use a different field name, e.g.: 'custom_%1\$s'", 'wordpress-doofinder' ), '%field_name%' ),
-					/* translators: %s is replaced with the field name. */
-					'duplicated_custom_attributes_error_message' => sprintf( __( "The '%s' field name is already in use, please use a different field name", 'wordpress-doofinder' ), '%field_name%' ),
+					'nonce'                => wp_create_nonce( 'doofinder-ajax-nonce' ),
+					'show_indexing_notice' => Setup_Wizard::should_show_indexing_notice() ? 'true' : 'false',
 				)
 			);
 
 			// CSS.
 			wp_enqueue_style( 'doofinder-admin-css', self::plugin_url() . '/assets/css/admin.css', array(), self::$version );
-			// Add the Select2 CSS file.
-			wp_enqueue_style( 'select2-css', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', array(), '4.1.0-rc.0' );
-			// Add the Select2 JavaScript file.
-			wp_enqueue_script( 'select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', array( 'jquery' ), '4.1.0-rc.0', array( 'in_footer' => false ) );
 		}
 
 		/**

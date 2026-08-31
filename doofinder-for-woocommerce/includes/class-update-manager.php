@@ -266,4 +266,17 @@ class Update_Manager {
 		}
 		return true;
 	}
+
+	/**
+	 * Update: 2.17.0
+	 * Drop the cached list of product REST fields, which was only used to build the removed
+	 * Custom Attributes dropdown. The stored field names are kept: the plugin still honours
+	 * the names the merchant configured.
+	 *
+	 * @return bool
+	 */
+	public static function update_021700() {
+		delete_transient( 'df_product_rest_attributes' );
+		return true;
+	}
 }

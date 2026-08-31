@@ -245,65 +245,7 @@ trait Register_Settings {
 			);
 
 			register_setting( self::$top_level_menu, $image_size_option_name );
-
-			// Custom product Attributes.
-			$additional_attributes_option_name = Settings::$custom_attributes_option;
-			add_settings_field(
-				$additional_attributes_option_name,
-				__( 'Custom Attributes', 'wordpress-doofinder' ),
-				function () {
-					$this->render_html_additional_attributes( Settings::$custom_attributes_option );
-				},
-				self::$top_level_menu,
-				$section_id
-			);
-
-			register_setting( self::$top_level_menu, $additional_attributes_option_name, array( $this, 'sanitize_additional_attributes' ) );
 		}
-
-		$section_id = 'doofinder-for-wp-post-data';
-
-		add_settings_section(
-			$section_id,
-			__( 'Post Data Settings', 'wordpress-doofinder' ),
-			function () {
-				?>
-			<div class="description">
-				<p>
-					<?php
-					esc_html_e(
-						'The following options allow you to set up which data you would like to index.',
-						'wordpress-doofinder'
-					);
-					?>
-				</p>
-				<p>
-					<?php
-					esc_html_e(
-						'These settings are shared between posts, pages and every custom post type, except for WooCommerce products.',
-						'wordpress-doofinder'
-					);
-					?>
-				</p>
-									</div>
-				<?php
-			},
-			self::$top_level_menu
-		);
-
-		// Custom Attributes.
-		$additional_attributes_option_name = Settings::$post_custom_attributes_option;
-		add_settings_field(
-			$additional_attributes_option_name,
-			__( 'Custom Attributes', 'wordpress-doofinder' ),
-			function () {
-				$this->render_html_additional_attributes( Settings::$post_custom_attributes_option, true );
-			},
-			self::$top_level_menu,
-			$section_id
-		);
-
-		register_setting( self::$top_level_menu, $additional_attributes_option_name, array( $this, 'sanitize_additional_attributes' ) );
 	}
 
 	/**
@@ -455,54 +397,5 @@ trait Register_Settings {
 			return '';
 		}
 		return $region_input;
-	}
-
-	/**
-	 * Process additional attributes sent from the frontend
-	 * and convert them to the shape we want to store in the DB.
-	 *
-	 * This functional basically converts indexes, so we save a nice
-	 * regular numerically-indexed array, and removes all records
-	 * that are either selected to be deleted, or invalid.
-	 *
-	 * @param array $input Additional attributes.
-	 *
-	 * @return array
-	 */
-	public function sanitize_additional_attributes( $input ) {
-		$output = array();
-
-		// We want to save a regular array containing all attributes,
-		// but what we send from the frontend is an associative array
-		// (because it has "new" entry).
-		// Convert data from frontend to nicely-indexed regular array,
-		// removing all the records that we want to delete, and those
-		// with empty "field" value along the way.
-		foreach ( $input as $attribute ) {
-			$attribute['field'] = wp_strip_all_tags( $attribute['field'] );
-			if ( ! $attribute['field'] ) {
-				continue;
-			}
-
-			if ( isset( $attribute['delete'] ) && $attribute['delete'] ) {
-				continue;
-			}
-
-			if ( in_array( $attribute['field'], Settings::RESERVED_CUSTOM_ATTRIBUTES_NAMES, true ) ) {
-				$field_name         = $attribute['field'];
-				$attribute['field'] = 'custom_' . $field_name;
-				add_settings_error(
-					'doofinder_for_wp_messages',
-					'doofinder_for_wp_message_update_on_save',
-					/* translators: %1$s is replaced with the reserved field name and %2$s by the new field name (non-conflicting one). */
-					sprintf( __( "The '%1\$s' field name is reserved, we have changed it to '%2\$s' automatically, but you can change it if you want", 'wordpress-doofinder' ), $field_name, $attribute['field'] )
-				);
-				return false;
-			}
-
-			$output[] = $attribute;
-		}
-
-		return $output;
 	}
 }
