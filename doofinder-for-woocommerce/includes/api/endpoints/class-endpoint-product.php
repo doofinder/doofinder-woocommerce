@@ -667,22 +667,28 @@ class Endpoint_Product {
 	private static function format_prices( $product ) {
 		$wc_product = wc_get_product( $product['id'] );
 
-		$regular_price = self::get_regular_price( $wc_product );
-		$price         = self::get_price( $wc_product );
-		$sale_price    = self::get_sale_price( $wc_product );
+		$regular_price   = self::get_regular_price( $wc_product );
+		$effective_price = self::get_effective_price( $wc_product );
 
 		/**
 		 * In some niche cases, we receive a regular_price of 0 but it is not the real regular_price.
-		 * For this reason, in case we have a regular_price of 0, we ignore it.
+		 * For this reason, in case we have a regular_price of 0, we fall back to the effective price.
+		 * The comparison is made on floats because that is what WooCommerce returns: a strict
+		 * comparison against the integer 0 never matches and leaves the spurious 0 in place.
 		 */
-		$product['regular_price'] = $regular_price;
-		$product['price']         = '' === (string) $regular_price || 0 === $regular_price ? $price : $regular_price;
-		$final_sale_price         = '' === (string) $sale_price || $price < $regular_price ? $price : $sale_price;
+		$has_regular_price = '' !== (string) $regular_price && 0.0 !== (float) $regular_price;
 
-		if ( empty( $final_sale_price ) || $final_sale_price === $regular_price ) {
+		$product['regular_price'] = $regular_price;
+		$product['price']         = $has_regular_price ? $regular_price : $effective_price;
+
+		/**
+		 * The sale price only travels when it differs from the price that ended up in the feed,
+		 * so that a product which is not discounted does not carry the same figure twice.
+		 */
+		if ( empty( $effective_price ) || (float) $effective_price === (float) $product['price'] ) {
 			unset( $product['sale_price'] );
 		} else {
-			$product['sale_price'] = $final_sale_price;
+			$product['sale_price'] = $effective_price;
 		}
 
 		return $product;
@@ -736,25 +742,15 @@ class Endpoint_Product {
 	}
 
 	/**
-	 * Get the raw regular price.
-	 *
-	 * @param \WC_Product|null $product WooCommerce Product.
-	 *
-	 * @return float The raw regular price including or excluding taxes (defined in WC settings).
-	 */
-	private static function get_price( $product ) {
-		return self::get_raw_price( $product, 'regular_price' );
-	}
-
-	/**
-	 * Get the raw sale price including or excluding taxes and taking into account the scheduled dates. If the current date is outside the scheduled dates
+	 * Get the raw effective price, the one the shopper is charged: including or excluding taxes and
+	 * taking into account the scheduled dates. If the current date is outside the scheduled dates
 	 * range, the regular price will be returned instead.
 	 *
 	 * @param \WC_Product|null $product WooCommerce Product.
 	 *
 	 * @return float
 	 */
-	private static function get_sale_price( $product ) {
+	private static function get_effective_price( $product ) {
 		return self::get_raw_price( $product, 'price' );
 	}
 
