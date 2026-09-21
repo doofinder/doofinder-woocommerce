@@ -126,6 +126,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 2.17.1 =
+- Fixed the indexed price being 0 for products whose regular price is 0 but are sold at another price.
+
 = 2.17.0 =
 - Every product attribute, taxonomy and metafield is now indexed, along with the posts and pages ones, so there is no need to pick them beforehand. Choose which of them to index from the search engine settings, in Additional indexed fields.
 - Removed the Custom Attributes section from the Data Configuration tab. The field names already configured keep working.
