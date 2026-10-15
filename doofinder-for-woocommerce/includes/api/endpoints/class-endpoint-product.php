@@ -654,8 +654,48 @@ class Endpoint_Product {
 				'order'    => $config['order'] ?? 'desc',
 			)
 		);
-		$original_response = rest_do_request( $request );
+		$original_response = self::with_requested_ordering(
+			function () use ( $request ) {
+				return rest_do_request( $request );
+			}
+		);
 		return $original_response->data;
+	}
+
+	/**
+	 * Run a callback with the catalog ordering WooCommerce derives from the request,
+	 * whatever other plugins do to it.
+	 *
+	 * Paginating by offset needs a stable order. Plugins that sort the catalog (for example by
+	 * `menu_order`) hook into `woocommerce_get_catalog_ordering_args` and also rewrite the
+	 * ordering of `/wc/v3/products`, so pages overlap and some products are never returned.
+	 * The arguments WooCommerce computes are saved before any other callback runs and put
+	 * back after all of them.
+	 *
+	 * @param callable $callback The code that queries the products.
+	 * @return mixed What the callback returns.
+	 */
+	private static function with_requested_ordering( $callback ) {
+		$requested_args = null;
+
+		$save_requested_args = function ( $args ) use ( &$requested_args ) {
+			$requested_args = $args;
+			return $args;
+		};
+
+		$restore_requested_args = function ( $args ) use ( &$requested_args ) {
+			return null === $requested_args ? $args : $requested_args;
+		};
+
+		add_filter( 'woocommerce_get_catalog_ordering_args', $save_requested_args, PHP_INT_MIN );
+		add_filter( 'woocommerce_get_catalog_ordering_args', $restore_requested_args, PHP_INT_MAX );
+
+		try {
+			return $callback();
+		} finally {
+			remove_filter( 'woocommerce_get_catalog_ordering_args', $save_requested_args, PHP_INT_MIN );
+			remove_filter( 'woocommerce_get_catalog_ordering_args', $restore_requested_args, PHP_INT_MAX );
+		}
 	}
 
 	/**
