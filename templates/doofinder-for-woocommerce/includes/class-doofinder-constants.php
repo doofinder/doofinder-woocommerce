@@ -26,4 +26,5 @@ class Doofinder_Constants {
 	const VERSION            = '${PLUGIN_VERSION}';
 	const PLUGINS_URL_FORMAT = '${DOOFINDER_PLUGINS_URL_FORMAT}';
 	const API_URL_FORMAT     = '${DOOFINDER_API_URL_FORMAT}';
+	const LAYER_SCRIPT_URL   = '${DOOFINDER_LAYER_SCRIPT_URL}';
 }
