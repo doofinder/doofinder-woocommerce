@@ -3,7 +3,7 @@ Contributors: Doofinder
 Tags: search, autocomplete
 Version: ${PLUGIN_VERSION}
 Requires at least: 5.6
-Tested up to: 6.9
+Tested up to: 7.1
 Requires PHP: 7.0
 Stable tag: ${PLUGIN_VERSION}
 License: MIT
