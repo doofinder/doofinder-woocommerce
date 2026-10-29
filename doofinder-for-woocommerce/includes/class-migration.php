@@ -224,8 +224,7 @@ class Migration {
 	private static function migrate_option( $wc_option_name, $wp_option_name ) {
 		$current_option_value = get_option( $wp_option_name );
 		if ( ! empty( $current_option_value ) ) {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions
-			self::$log->log( "No need to migrate the wc option from '" . $wc_option_name . "' to '" . $wp_option_name . "', the value is already set to: \n" . print_r( $current_option_value, true ) );
+			self::$log->log( "No need to migrate the wc option from '" . $wc_option_name . "' to '" . $wp_option_name . "', the value is already set" );
 		} else {
 			$wc_option_value = get_option( $wc_option_name );
 			/**
@@ -235,8 +234,7 @@ class Migration {
 			 */
 			$wc_option_value = apply_filters( "doofinder_for_wp_migration_transform_$wc_option_name", $wc_option_value );
 
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions
-			self::$log->log( "Migrate option from '" . $wc_option_name . "' to '" . $wp_option_name . "' with value: \n" . print_r( $wc_option_value, true ) );
+			self::$log->log( "Migrate option from '" . $wc_option_name . "' to '" . $wp_option_name . "'" );
 			update_option( $wp_option_name, $wc_option_value );
 		}
 	}

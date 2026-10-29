@@ -279,4 +279,15 @@ class Update_Manager {
 		delete_transient( 'df_product_rest_attributes' );
 		return true;
 	}
+
+	/**
+	 * Update: 2.17.3
+	 * Delete the log files written by previous versions, which could contain the API key.
+	 *
+	 * @return bool
+	 */
+	public static function update_021703() {
+		Log::delete_log_files();
+		return true;
+	}
 }

@@ -57,9 +57,11 @@ class Index_Status_Handler {
 	 * @return WP_REST_Response
 	 */
 	public static function index_status( WP_REST_Request $request ) {
-		self::$logger->log( "Received indexing status request with payload:\n" . print_r( $request, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions
 		$valid_message = 'Sources were processed successfully.';
-		if ( $request->get_param( 'token' ) !== Settings::get_api_key() ) {
+		$api_key       = Settings::get_api_key();
+		$token         = $request->get_param( 'token' );
+		if ( empty( $api_key ) || ! is_string( $token ) || ! hash_equals( $api_key, $token ) ) {
+			self::$logger->log( 'Received indexing status request with an invalid token.' );
 			return new WP_REST_Response(
 				array(
 					'status'   => WP_Http::UNAUTHORIZED,
@@ -73,6 +75,8 @@ class Index_Status_Handler {
 		$lang          = ( $multilanguage->get_current_language() === $multilanguage->get_base_language() ) ? '' : $multilanguage->get_current_language();
 
 		$error_message = $request->get_param( 'message' );
+		self::$logger->log( 'Received indexing status request with message:' );
+		self::$logger->log( $error_message );
 		if ( ! empty( $error_message ) && $error_message !== $valid_message ) {
 			$notice_title   = __( 'An error has occurred while indexing your catalog', 'wordpress-doofinder' );
 			$notice_content = __( 'To obtain further details, you can check the indexing results by accessing the "Indices" section in your Doofinder admin panel. If the problem persists, please contact our support team at <a href="mailto:support@doofinder.com">support@doofinder.com</a>', 'wordpress-doofinder' );

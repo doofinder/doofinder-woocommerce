@@ -3,7 +3,7 @@ Contributors: Doofinder
 Tags: search, autocomplete
 Version: ${PLUGIN_VERSION}
 Requires at least: 5.6
-Tested up to: 6.9
+Tested up to: 7.1
 Requires PHP: 7.0
 Stable tag: ${PLUGIN_VERSION}
 License: MIT
@@ -125,6 +125,9 @@ For in-depth insights into Doofinder and its features, check out our comprehensi
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/doofinder-for-woocommerce)
 
 == Changelog ==
+
+= 2.17.3 =
+- Security improvements.
 
 = 2.17.2 =
 - Fixed products missing from the index when another plugin changes the ordering of the catalog.

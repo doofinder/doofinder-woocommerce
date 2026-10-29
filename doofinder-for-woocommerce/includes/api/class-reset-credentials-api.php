@@ -116,7 +116,8 @@ class Reset_Credentials_Api {
 		if ( ! is_wp_error( $response ) && $resp_code >= WP_Http::OK && $resp_code < WP_Http::BAD_REQUEST ) {
 			$response_body    = wp_remote_retrieve_body( $response );
 			$decoded_response = json_decode( $response_body, true );
-			$this->log->log( "The request has been made correctly: $decoded_response" );
+			$this->log->log( 'The request has been made correctly:' );
+			$this->log->log( $decoded_response );
 		} else {
 			$this->log->log( print_r( $response, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions
 			$error_message = wp_remote_retrieve_response_message( $response );
