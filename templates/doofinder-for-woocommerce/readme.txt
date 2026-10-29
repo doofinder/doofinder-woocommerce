@@ -126,6 +126,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 2.17.3 =
+- Security improvements.
+
 = 2.17.2 =
 - Fixed products missing from the index when another plugin changes the ordering of the catalog.
 

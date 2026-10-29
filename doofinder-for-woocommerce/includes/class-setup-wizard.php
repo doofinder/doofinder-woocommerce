@@ -1152,8 +1152,7 @@ class Setup_Wizard {
 
 		// Exit early if tokens do not match.
 		if ( $token !== $saved_token ) {
-			$this->log->log( 'Processing Wizard Step 2 - Received Token - ' . $token );
-			$this->log->log( 'Processing Wizard Step 2 - Saved Token - ' . $saved_token );
+			$this->log->log( 'Processing Wizard Step 2 - The received token does not match the saved one' );
 			$this->add_wizard_step_error( $step, 'token', __( 'Invalid token', 'wordpress-doofinder' ) );
 			return false;
 		} else {

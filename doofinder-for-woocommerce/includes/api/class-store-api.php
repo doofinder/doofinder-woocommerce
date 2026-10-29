@@ -87,6 +87,13 @@ class Store_Api {
 
 			$store_payload_log = $store_payload;
 			unset( $store_payload_log['options'] );
+			$store_payload_log['search_engines'] = array_map(
+				function ( $search_engine ) {
+					unset( $search_engine['callback_url'] );
+					return $search_engine;
+				},
+				$store_payload_log['search_engines']
+			);
 
 			$this->log->log( $store_payload_log );
 			return $this->send_request( 'install', $store_payload );
@@ -193,8 +200,11 @@ class Store_Api {
 			),
 		);
 
+		$payload_log = $payload;
+		unset( $payload_log['callback_url'] );
+
 		$this->log->log( 'Creating Search Engine for language: ' );
-		$this->log->log( $payload );
+		$this->log->log( $payload_log );
 
 		$response = $this->send_request( 'install/search-engine', $payload, true );
 

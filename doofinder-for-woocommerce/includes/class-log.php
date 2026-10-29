@@ -53,9 +53,7 @@ class Log {
 	 * @param mixed $value Value to be logged.
 	 */
 	public function log( $value ) {
-		$wp_upload_dir_array = wp_upload_dir();
-		$wp_upload_dir       = $wp_upload_dir_array['basedir'];
-		$doofinder_logs_dir  = trailingslashit( $wp_upload_dir . '/' . self::LOG_FOLDER_NAME );
+		$doofinder_logs_dir = self::get_logs_dir();
 		// Check if logs directory exits. Create it if it doesn't.
 		if ( ! is_dir( $doofinder_logs_dir ) ) {
 			wp_mkdir_p( $doofinder_logs_dir );
@@ -86,6 +84,11 @@ class Log {
 			$to_log .= var_export( $value, true ) . "\n"; // phpcs:ignore WordPress.PHP.DevelopmentFunctions
 		}
 
+		$api_key = Settings::get_api_key();
+		if ( ! empty( $api_key ) ) {
+			$to_log = str_replace( $api_key, '[REDACTED]', $to_log );
+		}
+
 		// Append the things we fake send to API to the log file.
 		// TODO (davidmolinacano): Possible alternative: https://developer.wordpress.org/reference/functions/wp_filesystem/.
 		// phpcs:ignore WordPress.WP.AlternativeFunctions
@@ -97,10 +100,38 @@ class Log {
 	}
 
 	/**
+	 * Deletes every log file written so far.
+	 *
+	 * @return void
+	 */
+	public static function delete_log_files() {
+		$log_files = glob( self::get_logs_dir() . '*.log' );
+		if ( empty( $log_files ) ) {
+			return;
+		}
+
+		foreach ( $log_files as $log_file ) {
+			wp_delete_file( $log_file );
+		}
+	}
+
+	/**
+	 * Returns the path of the folder where the logs are stored, with a trailing slash.
+	 *
+	 * @return string
+	 */
+	private static function get_logs_dir() {
+		$wp_upload_dir_array = wp_upload_dir();
+		$wp_upload_dir       = $wp_upload_dir_array['basedir'];
+		return trailingslashit( $wp_upload_dir . '/' . self::LOG_FOLDER_NAME );
+	}
+
+	/**
 	 * Adds some files for security reasons.
 	 *
-	 * Adds a .htaccess with Deny From All and an empty index.php file in the
-	 * plugin log folder for security reasons
+	 * Adds a .htaccess denying all access and an empty index.php file in the
+	 * plugin log folder for security reasons. The .htaccess is rewritten when
+	 * it doesn't match the expected rules, so older folders get them too.
 	 *
 	 * @param string $doofinder_logs_dir Path where the DooFinder logs will be stored. By default
 	 * they will be located at the upload directory, inside the doofinder-logs folder.
@@ -109,9 +140,13 @@ class Log {
 		$htaccess_filename = $doofinder_logs_dir . '.htaccess';
 		$index_filename    = $doofinder_logs_dir . 'index.php';
 
-		if ( ! is_file( $htaccess_filename ) ) {
+		// Apache 2.4 ignores "Deny from all" unless mod_access_compat is enabled.
+		$htaccess_content = "<IfModule mod_authz_core.c>\n\tRequire all denied\n</IfModule>\n<IfModule !mod_authz_core.c>\n\tOrder deny,allow\n\tDeny from all\n</IfModule>\n";
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions
+		if ( ! is_file( $htaccess_filename ) || file_get_contents( $htaccess_filename ) !== $htaccess_content ) {
 			// phpcs:ignore WordPress.WP.AlternativeFunctions
-			file_put_contents( $htaccess_filename, 'Deny from All' );
+			file_put_contents( $htaccess_filename, $htaccess_content );
 		}
 
 		if ( ! is_file( $index_filename ) ) {
