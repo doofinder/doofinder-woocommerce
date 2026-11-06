@@ -84,6 +84,7 @@ class JS_Layer {
 		TODO: When all the customer have migrated to the single script
 		this one should be adapted too.
 		*/
+		$layer = str_replace( 'https://cdn.doofinder.com/livelayer/1/js/loader.min.js', Doofinder_Constants::LAYER_SCRIPT_URL, $layer );
 		if ( defined( 'WP_ENVIRONMENT_TYPE' ) && WP_ENVIRONMENT_TYPE === 'local' && defined( 'DF_SEARCH_HOST' ) && defined( 'DF_LAYER_HOST' ) ) {
 			$local_constants = "<script>
     // FOR DEVELOPMENT PURPOSES ONLY!!!
@@ -92,7 +93,6 @@ class JS_Layer {
     var __DF_LAYER_SERVER__ = '" . DF_LAYER_HOST . "';
     var __DF_CDN_PREFIX__ =  '" . DF_LAYER_HOST . "/assets';";
 			$layer           = str_replace( '<script>', $local_constants, $layer );
-			$layer           = str_replace( 'https://cdn.doofinder.com/livelayer/1/js/loader.min.js', DF_LAYER_HOST . '/assets/js/loader.js', $layer );
 		}
 
 		$this->output_page_context_variables();
