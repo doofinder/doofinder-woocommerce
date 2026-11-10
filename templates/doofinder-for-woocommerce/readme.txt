@@ -126,6 +126,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 2.17.4 =
+- Product changes from WP CLI and REST API also triggers the update on save now.
+
 = 2.17.3 =
 - Security improvements.
 
