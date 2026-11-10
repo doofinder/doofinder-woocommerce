@@ -3,7 +3,7 @@
  * Plugin Name: DOOFINDER Search and Discovery for WP & WooCommerce
  * License: MIT
  * License URI: https://opensource.org/licenses/MIT
- * Version: 2.17.3
+ * Version: 2.17.4
  * Requires at least: 5.6
  * Requires PHP: 7.0
  * Author: Doofinder
@@ -44,7 +44,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 		 * @var string
 		 */
 
-		public static $version = '2.17.3';
+		public static $version = '2.17.4';
 
 		/**
 		 * The only instance of Doofinder_For_WordPress
@@ -114,6 +114,9 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 
 					// Initialize update on save.
 					Update_On_Save::init();
+					// Listen to post changes in every context, not only in wp-admin, so that
+					// changes made via the REST API or WP-CLI are queued too.
+					Update_On_Save::register_hooks();
 					// Initialize reset credentials.
 					Reset_Credentials::init();
 					// Initialize Search Engine related admin operations.
@@ -128,7 +131,6 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 						}
 
 						Setup_Wizard::instance();
-						Update_On_Save::register_hooks();
 
 						self::register_notices_styles();
 						self::register_ajax_action();
