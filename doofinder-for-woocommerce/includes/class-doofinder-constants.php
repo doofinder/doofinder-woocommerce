@@ -24,6 +24,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Doofinder_Constants {
 
 	const VERSION            = '2.17.5';
-	const PLUGINS_URL_FORMAT = 'https://david-dooplugins.ngrok.doofinder.com';
-	const API_URL_FORMAT     = 'https://david-doomanager.ngrok.doofinder.com';
+	const PLUGINS_URL_FORMAT = 'https://%splugins.doofinder.com';
+	const API_URL_FORMAT     = 'https://%sadmin.doofinder.com';
 }
