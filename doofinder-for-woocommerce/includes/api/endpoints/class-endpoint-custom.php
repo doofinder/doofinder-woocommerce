@@ -42,6 +42,9 @@ class Endpoint_Custom {
 		'tags',
 		// Not an item attribute.
 		'password',
+		// SEO markup Yoast adds to the REST response, built from fields already emitted.
+		'yoast_head',
+		'yoast_head_json',
 	);
 
 	// Prefix every metafield gets, so its key can be kept verbatim without colliding with anything else.
@@ -176,7 +179,10 @@ class Endpoint_Custom {
 				continue;
 			}
 
-			$filtered_data = self::get_title( $item_data );
+			$filtered_data                       = $item_data;
+			$filtered_data['password_protected'] = Helpers::is_password_protected( $item_data['id'] );
+
+			$filtered_data = self::get_title( $filtered_data );
 			$filtered_data = self::get_content( $filtered_data );
 			$filtered_data = self::get_description( $filtered_data );
 			$filtered_data = self::get_author( $filtered_data, $config_request );

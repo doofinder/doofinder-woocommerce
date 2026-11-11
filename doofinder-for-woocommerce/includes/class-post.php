@@ -232,11 +232,8 @@ class Post {
 
 		// Visibility is "auto", and there are no Yoast settings.
 		// In that case post status is checked.
-		// First of all - password protected posts are not publicly visible
-		// so don't index them.
-		if ( $this->post->post_password ) {
-			return false;
-		}
+		// Password protected posts are indexed too, like in the full indexing: they carry the
+		// `password_protected` field, so the merchant can exclude them from search if they want.
 
 		// Default post_status of attachments is "inherit"
 		// so we need to check it separately.
