@@ -129,6 +129,12 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 = 2.18.0 =
 - The sales can be registered from the server: the paid orders are sent to Doofinder in the background.
 
+= 2.17.5 =
+- Added boolean password protected field + Always exclude Yoast SEO head metadata.
+
+= 2.17.4 =
+- Product changes from WP CLI and REST API also triggers the update on save now.
+
 = 2.17.3 =
 - Security improvements.
 

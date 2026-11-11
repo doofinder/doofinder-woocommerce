@@ -59,6 +59,7 @@ class Settings {
 		'meta_data',
 		'name',
 		'parent_id',
+		'password_protected',
 		'price',
 		'rating_count',
 		'regular_price',

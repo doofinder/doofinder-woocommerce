@@ -40,6 +40,9 @@ class Endpoint_Product {
 		'dimensions',
 		'_links',
 		'post_password',
+		// SEO markup Yoast adds to the REST response, built from fields already emitted.
+		'yoast_head',
+		'yoast_head_json',
 	);
 
 	const TAXONOMY = 'product_cat';
@@ -163,15 +166,17 @@ class Endpoint_Product {
 				$filtered_product_data = $product_data;
 
 				$filtered_product_data['df_indexable'] = $indexable_opt;
-				$filtered_product_data                 = self::get_category_merchandising( $filtered_product_data );
+				$taxonomy_lookup_id                    = ( 'variation' === ( $filtered_product_data['type'] ?? '' ) && ! empty( $filtered_product_data['parent_id'] ) ) ? $filtered_product_data['parent_id'] : $filtered_product_data['id'];
+
+				$filtered_product_data['password_protected'] = Helpers::is_password_protected( $taxonomy_lookup_id );
+				$filtered_product_data                       = self::get_category_merchandising( $filtered_product_data );
 				if ( isset( $filtered_product_data['categories'] ) ) {
 					$filtered_product_data['categories'] = self::get_category_path( $filtered_product_data['categories'] );
 				} else {
 					$filtered_product_data['categories'] = array();
 				}
-				$filtered_product_data               = self::get_attributes( $filtered_product_data );
-				$filtered_product_data['image_link'] = self::get_image_link( $filtered_product_data['id'] );
-				unset( $filtered_product_data['images'] );
+				$filtered_product_data                      = self::get_attributes( $filtered_product_data );
+				$filtered_product_data['image_link']        = self::get_image_link( $filtered_product_data['id'] );
 				$filtered_product_data['images_links']      = self::get_images_links( $filtered_product_data );
 				$filtered_product_data                      = self::format_prices( $filtered_product_data );
 				$filtered_product_data                      = self::check_availability( $filtered_product_data );
@@ -181,7 +186,6 @@ class Endpoint_Product {
 				$filtered_product_data['purchase_price']    = self::get_purchase_price( $filtered_product_data['id'] );
 				$filtered_product_data                      = self::get_meta_attributes( $filtered_product_data );
 				$filtered_product_data['creation_date']     = gmdate( 'Y-m-d\TH:i:s\Z', strtotime( $filtered_product_data['date_created'] ) );
-				$taxonomy_lookup_id                         = ( 'variation' === ( $filtered_product_data['type'] ?? '' ) && ! empty( $filtered_product_data['parent_id'] ) ) ? $filtered_product_data['parent_id'] : $filtered_product_data['id'];
 				$filtered_product_data                      = array_merge( $filtered_product_data, self::get_taxonomy_attributes( $taxonomy_lookup_id ) );
 				$filtered_product_data                      = self::flatten_structures( $filtered_product_data );
 				$filtered_product_data                      = self::apply_legacy_aliases( $filtered_product_data, $custom_attr );

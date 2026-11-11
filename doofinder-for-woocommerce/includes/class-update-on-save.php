@@ -18,6 +18,15 @@ use Doofinder\WP\Multilanguage\Multilanguage;
 class Update_On_Save {
 
 	/**
+	 * IDs of the posts changed during the current request, pending to be queued.
+	 *
+	 * The keys are the post IDs, so a post that fires several hooks is only kept once.
+	 *
+	 * @var array<int, true>
+	 */
+	private static $pending_post_ids = array();
+
+	/**
 	 * Adds the actions for the update on save and its associated AJAX to force it via clicking the button.
 	 */
 	public static function init() {
@@ -114,21 +123,69 @@ class Update_On_Save {
 
 	/**
 	 * Register hooks and actions.
+	 *
+	 * Changed posts are not queued straight away. They are collected during the request and
+	 * queued once, on shutdown, by `process_pending_items()`. This is needed because a single
+	 * product save can fire more than one of these hooks, and because WooCommerce fires
+	 * `wp_insert_post` before it saves the product meta, so by waiting until shutdown the
+	 * product is read with all its changes applied.
 	 */
 	public static function register_hooks() {
 		add_action(
 			'wp_insert_post',
-			function ( $post_id, \WP_Post $post ) {
+			function ( $post_id ) {
 				if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 					return;
 				}
-				self::add_item_to_update( $post_id, $post );
+				self::add_pending_item( $post_id );
 			},
 			99,
-			3
+			1
 		);
 
+		/*
+		 * WooCommerce only calls wp_update_post() when a post field (name, status, description...)
+		 * changes. A save that only touches meta, such as the price or the stock, never fires
+		 * wp_insert_post, so we also listen to the hook WooCommerce fires on every product save.
+		 */
+		add_action(
+			'woocommerce_update_product',
+			function ( $product_id ) {
+				self::add_pending_item( $product_id );
+			},
+			99,
+			1
+		);
+
+		add_action( 'shutdown', array( self::class, 'process_pending_items' ) );
+
 		add_action( 'update_option_doofinder_for_wp_update_on_save', array( self::class, 'update_on_save_schedule_updated' ), 10, 3 );
+	}
+
+	/**
+	 * Marks a post as changed during the current request, so that it is queued on shutdown.
+	 *
+	 * @param int $post_id The ID of the post.
+	 */
+	public static function add_pending_item( $post_id ) {
+		self::$pending_post_ids[ (int) $post_id ] = true;
+	}
+
+	/**
+	 * Queues, once each, the posts changed during the current request.
+	 *
+	 * The posts are read again at this point, so the queue reflects their final state.
+	 */
+	public static function process_pending_items() {
+		$post_ids               = array_keys( self::$pending_post_ids );
+		self::$pending_post_ids = array();
+
+		foreach ( $post_ids as $post_id ) {
+			$post = get_post( $post_id );
+			if ( $post instanceof \WP_Post ) {
+				self::add_item_to_update( $post_id, $post );
+			}
+		}
 	}
 
 	/**
