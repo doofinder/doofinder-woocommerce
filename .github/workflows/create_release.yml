@@ -9,7 +9,7 @@ on:
 jobs:
   release:
     name: Create new release
-    runs-on: aws-runners
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
