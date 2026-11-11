@@ -174,4 +174,18 @@ class Helpers {
 		}
 		return false;
 	}
+
+	/**
+	 * Tells whether a post (product, page, post or any other post type) is protected by a password.
+	 *
+	 * Reads the stored password instead of using `post_password_required()`, since that one
+	 * depends on the cookie of the current visitor and not only on the post itself.
+	 *
+	 * @param int $post_id The ID of the post. For a variation, pass its parent's, as the password belongs to it.
+	 *
+	 * @return bool True if the post has a password set.
+	 */
+	public static function is_password_protected( $post_id ) {
+		return '' !== (string) get_post_field( 'post_password', (int) $post_id, 'raw' );
+	}
 }
