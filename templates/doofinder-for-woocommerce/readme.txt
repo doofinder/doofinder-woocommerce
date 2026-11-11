@@ -126,6 +126,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 2.19.0 =
+- Removed legacy endpoint code unused from version 2.1.1 of the plugin.
+
 = 2.18.0 =
 - The sales can be registered from the server: the paid orders are sent to Doofinder in the background.
 
