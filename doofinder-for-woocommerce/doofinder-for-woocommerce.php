@@ -3,7 +3,7 @@
  * Plugin Name: DOOFINDER Search and Discovery for WP & WooCommerce
  * License: MIT
  * License URI: https://opensource.org/licenses/MIT
- * Version: 2.17.5
+ * Version: 2.18.0
  * Requires at least: 5.6
  * Requires PHP: 7.0
  * Author: Doofinder
@@ -44,7 +44,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 		 * @var string
 		 */
 
-		public static $version = '2.17.5';
+		public static $version = '2.18.0';
 
 		/**
 		 * The only instance of Doofinder_For_WordPress
@@ -139,6 +139,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 					if ( is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
 						Add_To_Cart::instance();
 						Klaviyo_Integration::instance();
+						Sales_From_Platform::init();
 					}
 
 					// Init frontend functionalities.

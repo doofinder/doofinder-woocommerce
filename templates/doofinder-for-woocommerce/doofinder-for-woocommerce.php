@@ -139,6 +139,7 @@ if ( ! class_exists( '\Doofinder\WP\Doofinder_For_WordPress' ) ) :
 					if ( is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
 						Add_To_Cart::instance();
 						Klaviyo_Integration::instance();
+						Sales_From_Platform::init();
 					}
 
 					// Init frontend functionalities.

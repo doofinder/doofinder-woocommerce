@@ -126,6 +126,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 2.18.0 =
+- The sales can be registered from the server: the paid orders are sent to Doofinder in the background.
+
 = 2.17.5 =
 - Added boolean password protected field + Always exclude Yoast SEO head metadata.
 
