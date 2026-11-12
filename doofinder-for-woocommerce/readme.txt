@@ -1,11 +1,11 @@
 === DOOFINDER Search and Discovery for WP & WooCommerce ===
 Contributors: Doofinder
 Tags: search, autocomplete
-Version: 2.18.0
+Version: 2.19.0
 Requires at least: 5.6
 Tested up to: 7.1
 Requires PHP: 7.0
-Stable tag: 2.18.0
+Stable tag: 2.19.0
 License: MIT
 License URI: https://opensource.org/licenses/MIT
 
@@ -125,6 +125,9 @@ For in-depth insights into Doofinder and its features, check out our comprehensi
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/doofinder-for-woocommerce)
 
 == Changelog ==
+
+= 2.19.0 =
+- Removed legacy endpoint code unused from version 2.1.1 of the plugin.
 
 = 2.18.0 =
 - The sales can be registered from the server: the paid orders are sent to Doofinder in the background.
