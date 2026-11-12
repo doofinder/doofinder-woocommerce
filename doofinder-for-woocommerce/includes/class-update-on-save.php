@@ -157,6 +157,22 @@ class Update_On_Save {
 			1
 		);
 
+		/*
+		 * Variations are not indexed on their own, they travel inside their parent, whose price
+		 * and link come from one of them. Saving a variation through the REST API or in code
+		 * does not save the parent, so the parent is queued here. Deletions are caught before
+		 * they happen, while the variation still knows its parent.
+		 */
+		$queue_variation_parent = function ( $variation_id ) {
+			$parent_id = wp_get_post_parent_id( $variation_id );
+			if ( $parent_id ) {
+				self::add_pending_item( $parent_id );
+			}
+		};
+		foreach ( array( 'new', 'update', 'trash', 'before_delete' ) as $event ) {
+			add_action( "woocommerce_{$event}_product_variation", $queue_variation_parent, 99, 1 );
+		}
+
 		add_action( 'shutdown', array( self::class, 'process_pending_items' ) );
 
 		add_action( 'update_option_doofinder_for_wp_update_on_save', array( self::class, 'update_on_save_schedule_updated' ), 10, 3 );
