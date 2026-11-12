@@ -972,15 +972,16 @@ class Endpoint_Product {
 	 *
 	 * For each parent product:
 	 *   - Adds the 'variants' key with all its variants.
-	 *   - Updates the 'price', 'regular_price', 'sale_price', and 'link' fields with those of the cheapest variant.
+	 *   - Updates the 'price', 'regular_price', 'sale_price', and 'link' fields with those of the
+	 *     cheapest variant, as chosen by `pick_cheapest_variant()`. When no variant has a price,
+	 *     the parent keeps its own prices and link.
 	 *
 	 * @param array $products Array of products (parents and variants).
 	 * @return array Array of parent products with grouped variants and updated prices/link.
 	 */
 	private static function merge_variants_into_parents( $products ) {
-		$parents          = array();
-		$cheapest_variant = array();
-		$all_variants     = array();
+		$parents      = array();
+		$all_variants = array();
 
 		foreach ( $products as $product ) {
 			if ( 'variation' === $product['type'] && ! empty( $product['parent_id'] ) ) {
@@ -990,13 +991,6 @@ class Endpoint_Product {
 					$all_variants[ $parent_id ] = array();
 				}
 				$all_variants[ $parent_id ][] = $product;
-				// Save the cheapest variant.
-				if (
-					! isset( $cheapest_variant[ $parent_id ] ) ||
-					( isset( $product['price'] ) && (float) $product['price'] < (float) $cheapest_variant[ $parent_id ]['price'] )
-				) {
-					$cheapest_variant[ $parent_id ] = $product;
-				}
 			} else {
 				$parents[ $product['id'] ] = $product;
 			}
@@ -1005,8 +999,12 @@ class Endpoint_Product {
 		// Update parents with the cheapest variant info and the array of variants.
 		foreach ( $all_variants as $parent_id => $variants ) {
 			if ( isset( $parents[ $parent_id ] ) ) {
-				$parents[ $parent_id ]['variants']      = $variants;
-				$variant                                = $cheapest_variant[ $parent_id ];
+				$parents[ $parent_id ]['variants'] = $variants;
+
+				$variant = self::pick_cheapest_variant( $variants );
+				if ( null === $variant ) {
+					continue;
+				}
 				$parents[ $parent_id ]['price']         = $variant['price'];
 				$parents[ $parent_id ]['regular_price'] = $variant['regular_price'] ?? $variant['price'];
 				$parents[ $parent_id ]['link']          = $variant['link'];
@@ -1019,6 +1017,73 @@ class Endpoint_Product {
 		}
 
 		return array_values( $parents );
+	}
+
+	/**
+	 * Pick the variant whose price represents the parent of a variable product.
+	 *
+	 * The rule is the lowest price a shopper can actually pay:
+	 *   - Variants are compared by their effective price: the sale price when there is one,
+	 *     otherwise the price.
+	 *   - Only variants that are 'in stock' (as set by `check_availability()`, which includes
+	 *     backorders) are considered. When none is, every variant is considered.
+	 *   - Variants without a price are ignored, so they cannot win as a price of 0.
+	 *   - Ties go to the variant with the lowest ID, so the result does not depend on the order
+	 *     WooCommerce returns them in.
+	 *
+	 * @param array $variants The variants of one parent, already formatted.
+	 * @return array|null The chosen variant, or null when no variant has a price.
+	 */
+	private static function pick_cheapest_variant( $variants ) {
+		$priced = array();
+
+		foreach ( $variants as $variant ) {
+			$effective_price = self::get_variant_effective_price( $variant );
+			if ( null !== $effective_price ) {
+				$priced[] = array(
+					'variant' => $variant,
+					'price'   => $effective_price,
+				);
+			}
+		}
+
+		$in_stock = array_filter(
+			$priced,
+			function ( $candidate ) {
+				return 'in stock' === ( $candidate['variant']['availability'] ?? '' );
+			}
+		);
+
+		$candidates = ! empty( $in_stock ) ? $in_stock : $priced;
+		$cheapest   = null;
+
+		foreach ( $candidates as $candidate ) {
+			if (
+				null === $cheapest ||
+				$candidate['price'] < $cheapest['price'] ||
+				( $candidate['price'] === $cheapest['price'] && (int) $candidate['variant']['id'] < (int) $cheapest['variant']['id'] )
+			) {
+				$cheapest = $candidate;
+			}
+		}
+
+		return null === $cheapest ? null : $cheapest['variant'];
+	}
+
+	/**
+	 * Get the price a shopper pays for a variant: its sale price when it has one, otherwise its price.
+	 *
+	 * @param array $variant The variant, already formatted by `format_prices()`.
+	 * @return float|null The effective price, or null when the variant has no usable price.
+	 */
+	private static function get_variant_effective_price( $variant ) {
+		foreach ( array( 'sale_price', 'price' ) as $field ) {
+			if ( isset( $variant[ $field ] ) && is_numeric( $variant[ $field ] ) && 0.0 < (float) $variant[ $field ] ) {
+				return (float) $variant[ $field ];
+			}
+		}
+
+		return null;
 	}
 
 	/**
