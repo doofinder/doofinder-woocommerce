@@ -126,6 +126,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 2.19.2 =
+- Fixed attributes marked as "Used for variations" not being indexed on non-variable products (e.g. products converted from variable to simple).
+
 = 2.19.1 =
 - Improved calculation of cheapest price from the variants. Out of stock ones are no longer taken into account.
 
