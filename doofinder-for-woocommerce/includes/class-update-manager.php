@@ -290,4 +290,18 @@ class Update_Manager {
 		Log::delete_log_files();
 		return true;
 	}
+
+	/**
+	 * Update: 2.20.0
+	 * Ask Doofinder to take the sales of the WooCommerce stores from the plugin, which sends them since
+	 * 2.18.0. It is queued from `init`, as updates run on `plugins_loaded`, before the Action Scheduler
+	 * can queue.
+	 *
+	 * @return bool
+	 */
+	public static function update_022000() {
+		add_action( 'init', array( Sales_From_Platform::class, 'queue_activation' ) );
+
+		return true;
+	}
 }

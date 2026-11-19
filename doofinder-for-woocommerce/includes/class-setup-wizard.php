@@ -984,6 +984,9 @@ class Setup_Wizard {
 
 				$this->set_search_engines( $store_data['config']['search_engines'] );
 				$this->set_layer_script( $store_data['script'] );
+
+				// WooCommerce stores take their sales from the plugin, also when it is installed again.
+				Sales_From_Platform::queue_activation();
 			} catch ( Exception $exception ) {
 				$this->log->log( 'Wizard Step 2 - Exception' );
 				$this->log->log( $exception->getMessage() );

@@ -126,6 +126,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 2.20.0 =
+- WooCommerce stores register their Doofinder sales from the plugin when it is installed or updated to this version.
+
 = 2.19.1 =
 - Improved calculation of cheapest price from the variants. Out of stock ones are no longer taken into account.
 
