@@ -447,7 +447,7 @@ class Endpoint_Product {
 			return $data;
 		}
 
-		$is_variation = 'variation' === ( $data['type'] ?? '' );
+		$is_variable = 'variable' === ( $data['type'] ?? '' );
 
 		foreach ( $wc_product->get_attributes() as $attribute_name => $attribute_data ) {
 			$field = self::attribute_field_name( $attribute_name );
@@ -456,8 +456,8 @@ class Endpoint_Product {
 				continue;
 			}
 
-			// On the parent this only holds the list of options, already in `df_variants_information`.
-			if ( ! $is_variation && is_object( $attribute_data ) && $attribute_data->get_variation() ) {
+			// On a variable parent this only holds the list of options, already in `df_variants_information`.
+			if ( $is_variable && is_object( $attribute_data ) && $attribute_data->get_variation() ) {
 				continue;
 			}
 
