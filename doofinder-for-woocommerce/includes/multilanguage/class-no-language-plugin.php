@@ -1,6 +1,6 @@
 <?php
 /**
- * DooFinder WPML methods.
+ * DooFinder methods for sites without a multilanguage plugin.
  *
  * @package Doofinder\WP\Multilanguage
  */
@@ -97,6 +97,35 @@ class No_Language_Plugin extends Language_Plugin {
 	 */
 	public function get_home_url( $language ) {
 		return get_bloginfo( 'url' );
+	}
+
+	/**
+	 * It will always return '' since posts have no language.
+	 *
+	 * @param int $post_id Post ID.
+	 *
+	 * @inheritdoc
+	 */
+	public function get_post_language( $post_id ) {
+		return '';
+	}
+
+	/**
+	 * Does nothing, since there is only one language.
+	 *
+	 * @param string $lang_code Language code.
+	 *
+	 * @inheritdoc
+	 */
+	public function switch_language( $lang_code ) {
+	}
+
+	/**
+	 * Does nothing, since there is only one language.
+	 *
+	 * @inheritdoc
+	 */
+	public function switch_to_all_languages() {
 	}
 
 	/**

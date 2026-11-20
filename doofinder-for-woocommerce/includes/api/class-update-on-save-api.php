@@ -187,40 +187,12 @@ class Update_On_Save_Api {
 	 * @return string The locale (e.g., 'en_US', 'es_ES').
 	 */
 	private function get_post_locale( $post_id ) {
-		// If WPML is active, get the post's language.
+		// If a multilanguage plugin is active, get the post's language.
 		if ( $this->process_all_languages ) {
-			/**
-			 * Retrieves the language details for a specific post using WPML.
-			 *
-			 * This is the standard WPML method to get language information for any element.
-			 * The filter returns an object containing language_code, locale, and other language details.
-			 *
-			 * @see https://wpml.org/documentation/support/wpml-coding-api/wpml-hooks-reference/#wpml_element_language_details
-			 *
-			 * @param null|object $language_details The language details object (null if not found).
-			 * @param array       $args            Arguments array containing:
-			 *                                     - element_id: The ID of the post/element
-			 *                                     - element_type: The type of element (e.g., 'post_product', 'post_page')
-			 *
-			 * @return object|null Language details object with properties:
-			 *                     - language_code: The language code (e.g., 'en', 'es')
-			 *                     - locale: The full locale (e.g., 'en_US', 'es_ES')
-			 *                     - display_name: The display name of the language
-			 *
-			 * @since 2.10.0
-			 */
-			$language_info = apply_filters(
-				'wpml_element_language_details',
-				null,
-				array(
-					'element_id'   => $post_id,
-					'element_type' => get_post_type( $post_id ),
-				)
-			);
+			$lang_code = $this->language->get_post_language( $post_id );
 
-			if ( $language_info && isset( $language_info->language_code ) ) {
-							return $this->language->get_locale_by_lang_code( $language_info->language_code );
-
+			if ( $lang_code ) {
+				return $this->language->get_locale_by_lang_code( $lang_code );
 			}
 		}
 
@@ -353,7 +325,7 @@ class Update_On_Save_Api {
 			}
 		} else {
 			// Both the empty string and the base locale are used to store the default SE hash in order to prevent inconsistencies
-			// due to WPML and no-WPML context switching.
+			// due to multilanguage and no-multilanguage context switching.
 			$search_engines['']                             = Settings::get_search_engine_hash();
 			$search_engines[ $language->get_base_locale() ] = Settings::get_search_engine_hash();
 		}

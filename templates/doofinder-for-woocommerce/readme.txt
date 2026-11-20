@@ -126,6 +126,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 2.20.0 =
+- Added basic support for Polylang plugin (before this version, only WPML was supported)
+
 = 2.19.2 =
 - Fixed attributes marked as "Used for variations" not being indexed on non-variable products (e.g. products converted from variable to simple).
 
