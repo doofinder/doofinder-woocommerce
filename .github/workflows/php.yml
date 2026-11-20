@@ -52,5 +52,7 @@ jobs:
         uses: php-actions/composer@v6
         with:
           command: install
+          # Pinned: "latest" broke when PHP 8.6 came out (locked dev dependencies require PHP <= 8.5).
+          php_version: "8.4"
       - name: Standards Compliance check
         run: ./vendor/bin/phpcs
