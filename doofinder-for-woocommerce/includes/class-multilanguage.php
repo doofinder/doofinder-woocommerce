@@ -1,6 +1,6 @@
 <?php
 /**
- * DooFinder Multilanguage methods. For now, only WPML is supported.
+ * DooFinder Multilanguage methods. WPML and Polylang are supported.
  *
  * @package Doofinder\WP\Multilanguage
  */
@@ -8,6 +8,8 @@
 namespace Doofinder\WP;
 
 use Doofinder\WP\Multilanguage\I18n_Handler;
+use Doofinder\WP\Multilanguage\Multilanguage as Language_Factory;
+use Doofinder\WP\Multilanguage\Polylang;
 use Doofinder\WP\Multilanguage\WPML;
 
 /**
@@ -56,6 +58,12 @@ class Multilanguage {
 
 		if ( function_exists( 'icl_object_id' ) && isset( $sitepress ) && $sitepress ) {
 			$this->handler = new WPML();
+		} elseif ( Polylang::is_plugin_active() ) {
+			// Share the instance with Multilanguage\Multilanguage, so both work on the same language state.
+			$language = Language_Factory::instance();
+			if ( $language instanceof Polylang ) {
+				$this->handler = $language;
+			}
 		}
 	}
 

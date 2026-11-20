@@ -43,17 +43,13 @@ class Multilanguage {
 				return self::$instance;
 			}
 
-			// TODO Test and finish Polylang support implementation.
-			// phpcs:disable
-			/*
-			if ( defined( 'POLYLANG_BASENAME' ) ) {
-				self::$instance = new Polylang();
+			// WPML takes priority if both plugins are active.
+			if ( Polylang::is_plugin_active() ) {
+				self::$instance     = new Polylang();
 				self::$is_multilang = true;
 
 				return self::$instance;
 			}
-			*/
-			// phpcs:enable
 		}
 
 		// Still no instance?

@@ -90,9 +90,11 @@ class Helpers {
 	 * Applies the given locale or language code to the REST API context.
 	 *
 	 * If the input is a valid locale string (e.g. 'en-US'), it converts it to an underscore format
-	 * (e.g. 'en_US'), fetches the corresponding language code using WPML, and applies it by:
+	 * (e.g. 'en_US'), fetches the corresponding language code from the multilanguage plugin, and applies it by:
 	 * - Adding a filter to override the `locale`.
-	 * - Triggering the WPML language switch via `do_action( 'wpml_switch_language', $lang_code )`.
+	 * - Switching the multilanguage plugin's language (WPML or Polylang).
+	 *
+	 * If the input is a language code of the site (e.g. 'es'), only the language is switched.
 	 *
 	 * This ensures that REST API requests are handled in the appropriate language context.
 	 *
@@ -112,12 +114,10 @@ class Helpers {
 					return $locale_underscore;
 				}
 			);
-			/**
-			 * Sets the internal WPML language for this request to the specified one if WPML plugin is enabled.
-			 *
-			 * @since 2.9.0
-			 */
-			do_action( 'wpml_switch_language', $lang_code );
+			$multilanguage->switch_language( $lang_code );
+		} elseif ( $multilanguage->is_active() && '' !== $locale_or_lang_code && isset( $multilanguage->get_languages()[ $locale_or_lang_code ] ) ) {
+			// WPML already applies a language code from the request's `lang` param, but Polylang doesn't filter the queries by it.
+			$multilanguage->switch_language( $locale_or_lang_code );
 		}
 
 		return $lang_code;

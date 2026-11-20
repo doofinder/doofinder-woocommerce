@@ -506,14 +506,8 @@ class Setup_Wizard {
 			return;
 		}
 
-		global $sitepress;
-
-		if ( $sitepress ) {
-			$sitepress->switch_lang( 'all' );
-			$this->active_lang = $sitepress->get_current_language();
-		} else {
-			$this->active_lang = '';
-		}
+		$this->language->switch_to_all_languages();
+		$this->active_lang = (string) $this->language->get_active_language();
 
 		// Show wizard, if active.
 		if ( self::is_active() ) {

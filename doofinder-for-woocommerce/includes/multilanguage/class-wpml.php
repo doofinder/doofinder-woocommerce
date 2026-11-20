@@ -226,6 +226,75 @@ class WPML implements I18n_Handler {
 	/**
 	 * Inherited from Language_Plugin.
 	 *
+	 * @param int $post_id Post ID.
+	 *
+	 * @inheritdoc
+	 */
+	public function get_post_language( $post_id ) {
+		/**
+		 * Retrieves the language details for a specific post using WPML.
+		 *
+		 * This is the standard WPML method to get language information for any element.
+		 * The filter returns an object containing language_code, locale, and other language details.
+		 *
+		 * @see https://wpml.org/documentation/support/wpml-coding-api/wpml-hooks-reference/#wpml_element_language_details
+		 *
+		 * @param null|object $language_details The language details object (null if not found).
+		 * @param array       $args            Arguments array containing:
+		 *                                     - element_id: The ID of the post/element
+		 *                                     - element_type: The type of element (e.g., 'post_product', 'post_page')
+		 *
+		 * @return object|null Language details object with properties:
+		 *                     - language_code: The language code (e.g., 'en', 'es')
+		 *                     - locale: The full locale (e.g., 'en_US', 'es_ES')
+		 *                     - display_name: The display name of the language
+		 *
+		 * @since 2.10.0
+		 */
+		$language_info = apply_filters(
+			'wpml_element_language_details',
+			null,
+			array(
+				'element_id'   => $post_id,
+				'element_type' => get_post_type( $post_id ),
+			)
+		);
+
+		return ( $language_info && isset( $language_info->language_code ) ) ? (string) $language_info->language_code : '';
+	}
+
+	/**
+	 * Inherited from Language_Plugin.
+	 *
+	 * @param string $lang_code Language code.
+	 *
+	 * @inheritdoc
+	 */
+	public function switch_language( $lang_code ) {
+		/**
+		 * Sets the internal WPML language for this request to the specified one.
+		 *
+		 * @since 2.9.0
+		 */
+		do_action( 'wpml_switch_language', $lang_code );
+	}
+
+	/**
+	 * Inherited from Language_Plugin.
+	 *
+	 * @inheritdoc
+	 */
+	public function switch_to_all_languages() {
+		global $sitepress;
+
+		if ( $sitepress ) {
+			$sitepress->switch_lang( 'all' );
+		}
+	}
+
+	/**
+	 * Inherited from Language_Plugin.
+	 *
 	 * @inheritdoc
 	 */
 	public function get_formatted_languages() {

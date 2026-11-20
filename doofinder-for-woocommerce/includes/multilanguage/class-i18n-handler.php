@@ -50,6 +50,31 @@ interface I18n_Handler {
 	public function get_lang_code_by_locale( $locale );
 
 	/**
+	 * Get the language code of a post (e.g. a product).
+	 *
+	 * @param int $post_id Post ID.
+	 *
+	 * @return string Language code, or empty string if the post has no language.
+	 */
+	public function get_post_language( $post_id );
+
+	/**
+	 * Switch the language of the current request, so queries return content in it.
+	 *
+	 * @param string $lang_code Language code.
+	 *
+	 * @return void
+	 */
+	public function switch_language( $lang_code );
+
+	/**
+	 * Switch the current request to "all languages", so queries are not filtered by language.
+	 *
+	 * @return void
+	 */
+	public function switch_to_all_languages();
+
+	/**
 	 * Retrieve the list of available languages. That should be an array containing following:
 	 * name    - Full name of the language.
 	 * code    - A language code (typically two letter, e.g. "en").
