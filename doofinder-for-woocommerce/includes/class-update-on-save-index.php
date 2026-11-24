@@ -112,31 +112,22 @@ class Update_On_Save_Index {
 			$this->log->log( $posts_ids_to_update );
 
 			if ( ! empty( $posts_ids_to_update ) ) {
-				$processed_ids = array();
+				$result = false;
 				$this->log->log( 'Ids ready to send ' . print_r( $posts_ids_to_update, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions
 
 				// Call the function passing the post type name as a parameter.
 				switch ( $action ) {
 					case 'update':
 						$this->log->log( 'We send the request to UPDATE items with this data:' );
-						$processed_ids = $this->api->update_bulk( $post_type, $posts_ids_to_update );
+						$result = $this->api->update_bulk( $post_type, $posts_ids_to_update );
 						break;
 					case 'delete':
 						$this->log->log( 'We send the request to DELETE items with this data:' );
-						if ( $this->api->delete_bulk( $post_type, $posts_ids_to_update ) ) {
-							$processed_ids = $posts_ids_to_update;
-						}
+						$result = $this->api->delete_bulk( $post_type, $posts_ids_to_update );
 						break;
 				}
-
-				// Only the ids that were processed leave the queue, the rest stay for the next run.
-				if ( ! empty( $processed_ids ) ) {
-					Update_On_Save::clean_updated_items( $processed_ids, $action );
-				}
-
-				$pending_ids = array_diff( $posts_ids_to_update, $processed_ids );
-				if ( ! empty( $pending_ids ) ) {
-					$this->log->log( 'The ' . $action . ' failed for these ids, they stay queued for the next run: ' . implode( ',', $pending_ids ) );
+				if ( $result ) {
+					Update_On_Save::clean_updated_items( $posts_ids_to_update, $action );
 				}
 			} else {
 				$this->log->log( 'No objects to index.' );
