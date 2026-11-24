@@ -133,31 +133,34 @@ class Update_On_Save_Api {
 	 *
 	 * @param string $post_type The post type for which the items should be updated.
 	 * @param array  $ids      The ids representing the items to be updated.
-	 * @return bool
+	 * @return array The ids whose update request succeeded. Ids of failed requests are left out so they can be retried.
 	 * @since 1.0.0
 	 */
 	public function update_bulk( $post_type, $ids ) {
 		$this->log->log( 'Update items' );
 
+		$updated_ids = array();
+
 		// Group IDs by their language/locale.
 		$ids_by_language = $this->group_ids_by_language( $ids );
-		foreach ( $ids_by_language as $locale => $ids ) {
+		foreach ( $ids_by_language as $locale => $locale_ids ) {
 			$hashid        = $this->search_engines[ $locale ];
 			$hyphen_locale = Helpers::format_locale_to_hyphen( $locale );
 
 			// phpcs:ignore I had to add a phpcs:ignore because the formatter was changing wordpress to WordPress, thus causing issues.
 			$uri = $this->build_url( $this->dp_host, 'item/' . $hashid . '/' . $post_type . '?action=update&platform=wordpress' ); // phpcs:ignore WordPress.WP.CapitalPDangit
 
-			$chunks = array_chunk( $ids_by_language[ $locale ], 100 );
-			$resp   = true;
+			$chunks = array_chunk( $locale_ids, 100 );
 
 			foreach ( $chunks as $chunk ) {
 				$items = $this->get_items( $chunk, $post_type, $hyphen_locale );
-				$resp  = $resp && $this->send_request( $uri, $items );
+				if ( $this->send_request( $uri, $items ) ) {
+					$updated_ids = array_merge( $updated_ids, $chunk );
+				}
 			}
 		}
 
-		return true;
+		return $updated_ids;
 	}
 
 	/**
