@@ -18,6 +18,13 @@ use Doofinder\WP\Multilanguage\Multilanguage;
 class Update_On_Save {
 
 	/**
+	 * Number of failed attempts after which an item is removed from the update queue.
+	 *
+	 * @var int
+	 */
+	const MAX_ATTEMPTS = 3;
+
+	/**
 	 * IDs of the posts changed during the current request, pending to be queued.
 	 *
 	 * The keys are the post IDs, so a post that fires several hooks is only kept once.
@@ -112,6 +119,7 @@ class Update_On_Save {
                 post_id INT NOT NULL,
                 type_post VARCHAR(255),
                 type_action VARCHAR(255),
+                attempts INT NOT NULL DEFAULT 0,
                 PRIMARY KEY (post_id)
             ) $charset_collate;";
 			require_once ABSPATH . 'wp-admin/includes/upgrade.php';
@@ -119,6 +127,28 @@ class Update_On_Save {
 		}
 
 		update_option( 'doofinder_update_on_save_last_exec', gmdate( 'Y-m-d H:i:s' ) );
+	}
+
+	/**
+	 * Adds the attempts column to the update on save database table if it doesn't have it yet.
+	 *
+	 * @return bool Whether the table has the column after the call.
+	 */
+	public static function add_attempts_column() {
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'doofinder_update_on_save';
+
+		if ( null === $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) ) ) {
+			// The table is created with the column on activation.
+			return true;
+		}
+
+		if ( null !== $wpdb->get_var( $wpdb->prepare( 'SHOW COLUMNS FROM ' . esc_sql( $table_name ) . ' LIKE %s', 'attempts' ) ) ) {
+			return true;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		return false !== $wpdb->query( 'ALTER TABLE ' . esc_sql( $table_name ) . ' ADD COLUMN attempts INT NOT NULL DEFAULT 0' );
 	}
 
 	/**
@@ -281,6 +311,7 @@ class Update_On_Save {
 					'post_id'     => $post_id,
 					'type_post'   => $post_type,
 					'type_action' => $action,
+					'attempts'    => 0,
 				),
 				array( 'post_id' => $post_id )
 			);
@@ -388,5 +419,44 @@ class Update_On_Save {
 
 		$log = new Log( 'update-on-save-add-item.log' );
 		$log->log( 'Update on save: ' . $action . "d $affected_rows rows with IDs: $ids" );
+	}
+
+	/**
+	 * Counts one more failed attempt for the given entries of the update on save database table.
+	 *
+	 * @param array  $ids Array of post IDs.
+	 * @param string $action Update on save action (can be update, create or delete).
+	 *
+	 * @return void
+	 */
+	public static function increment_attempts( $ids, $action ) {
+		global $wpdb;
+		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+		$values       = array_merge( array( $action ), array_map( 'absint', $ids ) );
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$wpdb->query( $wpdb->prepare( 'UPDATE ' . $wpdb->prefix . "doofinder_update_on_save SET attempts = attempts + 1 WHERE type_action = %s AND post_id IN ($placeholders)", $values ) );
+	}
+
+	/**
+	 * Removes from the update on save database table the entries that have reached the maximum number of failed attempts.
+	 *
+	 * @param string $action Update on save action (can be update, create or delete).
+	 *
+	 * @return void
+	 */
+	public static function drop_exhausted_items( $action ) {
+		global $wpdb;
+
+		$ids = $wpdb->get_col( $wpdb->prepare( 'SELECT post_id FROM ' . $wpdb->prefix . 'doofinder_update_on_save WHERE type_action = %s AND attempts >= %d', $action, self::MAX_ATTEMPTS ) );
+
+		if ( empty( $ids ) ) {
+			return;
+		}
+
+		self::clean_updated_items( $ids, $action );
+
+		$log = new Log( 'update-on-save-add-item.log' );
+		$log->log( 'Update on save: gave up on the ' . $action . ' of IDs ' . implode( ',', $ids ) . ' after ' . self::MAX_ATTEMPTS . ' failed attempts' );
 	}
 }

@@ -290,4 +290,15 @@ class Update_Manager {
 		Log::delete_log_files();
 		return true;
 	}
+
+	/**
+	 * Update: 2.19.3
+	 * Add the attempts counter to the update on save queue table, used to stop retrying the
+	 * items whose requests keep failing.
+	 *
+	 * @return bool
+	 */
+	public static function update_021903() {
+		return Update_On_Save::add_attempts_column();
+	}
 }
