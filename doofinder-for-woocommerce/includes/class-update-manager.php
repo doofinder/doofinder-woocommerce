@@ -292,6 +292,17 @@ class Update_Manager {
 	}
 
 	/**
+	 * Update: 2.19.3
+	 * Add the attempts counter to the update on save queue table, used to stop retrying the
+	 * items whose requests keep failing.
+	 *
+	 * @return bool
+	 */
+	public static function update_021903() {
+		return Update_On_Save::add_attempts_column();
+	}
+
+	/**
 	 * Update: 2.20.0
 	 * Ask Doofinder to take the sales of the WooCommerce stores from the plugin, which sends them since
 	 * 2.18.0. It is queued from `init`, as updates run on `plugins_loaded`, before the Action Scheduler

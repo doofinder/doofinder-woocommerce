@@ -129,6 +129,12 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 = 2.20.0 =
 - WooCommerce stores register their Doofinder sales from the plugin when it is installed or updated to this version.
 
+= 2.19.3 =
+- Fixed update on save removing products from the queue when the request to Doofinder failed. Failed items are now retried on the next runs, up to 3 attempts.
+
+= 2.19.2 =
+- Fixed attributes marked as "Used for variations" not being indexed on non-variable products (e.g. products converted from variable to simple).
+
 = 2.19.1 =
 - Improved calculation of cheapest price from the variants. Out of stock ones are no longer taken into account.
 

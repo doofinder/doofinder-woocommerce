@@ -52,5 +52,6 @@ jobs:
         uses: php-actions/composer@v6
         with:
           command: install
+          php_version: '8.2'
       - name: Standards Compliance check
         run: ./vendor/bin/phpcs
