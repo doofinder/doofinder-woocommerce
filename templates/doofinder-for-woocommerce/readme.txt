@@ -126,6 +126,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 2.20.0 =
+- WooCommerce stores register their Doofinder sales from the plugin when it is installed or updated to this version.
+
 = 2.19.3 =
 - Fixed update on save removing products from the queue when the request to Doofinder failed. Failed items are now retried on the next runs, up to 3 attempts.
 

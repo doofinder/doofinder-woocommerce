@@ -18,10 +18,11 @@ namespace Doofinder\WP;
  */
 class Sales_From_Platform {
 
-	const COOKIE        = 'doofinder_session';
-	const META_KEY      = '_doofinder_session';
-	const SENT_META_KEY = '_doofinder_sale_sent';
-	const ACTION        = 'doofinder_send_sale';
+	const COOKIE          = 'doofinder_session';
+	const META_KEY        = '_doofinder_session';
+	const SENT_META_KEY   = '_doofinder_sale_sent';
+	const ACTION          = 'doofinder_send_sale';
+	const ACTIVATE_ACTION = 'doofinder_activate_sales';
 
 	/**
 	 * Seconds to wait before each new attempt: 5 minutes, 30 minutes, 2 hours and 12 hours.
@@ -43,6 +44,34 @@ class Sales_From_Platform {
 		}
 
 		add_action( self::ACTION, array( __CLASS__, 'send_sale' ), 10, 2 );
+		add_action( self::ACTIVATE_ACTION, array( __CLASS__, 'activate' ) );
+	}
+
+	/**
+	 * Queues the request that asks Doofinder to take the sales of the store from the plugin, once the
+	 * store has a search engine. Only with WooCommerce, whose Action Scheduler runs it.
+	 */
+	public static function queue_activation() {
+		if ( function_exists( 'as_enqueue_async_action' ) && Settings::get_search_engine_hash() ) {
+			as_enqueue_async_action( self::ACTIVATE_ACTION, array(), 'doofinder' );
+		}
+	}
+
+	/**
+	 * Asks Doofinder to take the sales of the store from the plugin from now on. It is asked whenever
+	 * the plugin is installed, also again on a store that already exists, and once when it is updated
+	 * to the version that turns them on.
+	 */
+	public static function activate() {
+		wp_remote_post(
+			Settings::get_dooplugins_host() . '/wordpress/' . Settings::get_search_engine_hash() . '/sales/activate',
+			array(
+				'headers' => array(
+					'Authorization' => 'Token ' . Settings::get_api_key(),
+					'content-type'  => 'application/json',
+				),
+			)
+		);
 	}
 
 	/**
